@@ -1,0 +1,243 @@
+
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-sky: #00d2ff;
+            --silver-glow: #C0C0C0;
+            --section-gap: 599px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* الخلفية الفضائية المتحركة */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #0a0a1a 0%, #000000 100%);
+        }
+
+        header {
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+        }
+
+        .logo-img { height: clamp(35px, 5vw, 45px); }
+
+        .top-login-btn {
+            padding: 0.8rem 2.2rem;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.4s;
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 180px 5% 0;
+        }
+
+        /* العنوان العلوي - سميك جداً بحروف عادية */
+        .top-welcome-msg {
+            font-size: clamp(1.4rem, 5vw, 2.8rem);
+            color: var(--accent-sky);
+            font-weight: 900; /* سماكة قصوى */
+            letter-spacing: 1px;
+            margin-bottom: 3rem;
+            text-align: center;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.4);
+        }
+
+        /* الكلمة الرئيسية المتوهجة */
+        .afnan-hero-text {
+            font-size: clamp(3.5rem, 15vw, 8rem);
+            font-weight: 900;
+            color: #e0e0e0;
+            position: relative;
+            letter-spacing: -2px;
+            text-align: center;
+            text-shadow: 0 0 30px rgba(192, 192, 192, 0.4);
+            margin-bottom: 220px;
+        }
+
+        .letter-a {
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(90deg, #555 50%, #fff 50%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(4px 0 15px rgba(0, 210, 255, 0.6));
+        }
+
+        /* مستطيل الدردشة */
+        .chat-container {
+            width: 100%;
+            max-width: 850px;
+            margin-bottom: var(--section-gap);
+        }
+
+        .chat-box {
+            background: rgba(15, 15, 15, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: clamp(1.5rem, 4vw, 3rem);
+            min-height: 220px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+        }
+
+        .chat-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            outline: none;
+            resize: none;
+            width: 100%;
+        }
+
+        .send-btn {
+            width: 55px;
+            height: 55px;
+            background: #fff;
+            border: none;
+            border-radius: 50%;
+            color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            align-self: flex-end;
+            font-size: 1.3rem;
+        }
+
+        /* معرض الصور */
+        .gallery-section {
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: var(--section-gap);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 30px;
+            overflow: hidden;
+            height: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: 0.5s;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* المستطيل العريض السفلي */
+        .wide-bar-section {
+            width: 100%;
+            max-width: 1400px;
+            margin-bottom: 120px;
+            padding: 0 5%;
+        }
+
+        .afnan-wide-bar {
+            width: 100%;
+            min-height: 450px;
+            background: rgba(15, 15, 15, 0.7);
+            border-radius: clamp(40px, 10vw, 80px);
+            border-top: 6px solid var(--silver-glow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 50px;
+            backdrop-filter: blur(20px);
+        }
+
+        .bar-logo { height: 90px; margin-bottom: 2rem; }
+        .bar-title { 
+            font-size: clamp(2.5rem, 8vw, 4.5rem); 
+            font-weight: 900; 
+            color: #fff; 
+            margin-bottom: 2rem; 
+        }
+        
+        .bar-login-btn {
+            padding: 1.2rem 4rem;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: 0.4s;
+        }
+
+        /* الروابط الجانبية */
+        .footer-links {
+            width: 100%;
+            padding: 0 5%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 120px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            font-size: 1.1rem;
+            width: max-content;
+        }
+
+        /* كلمة الحقوق النهائية - سميكة وحروف عادية */
+        .copyright-final {
+            padding: 0 5% 80px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            font-weight: 900; /* سماكة قصوى */
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        @media (max-width: 768px) {
+            :root { --section-gap: 350px; }
+        }
+    
