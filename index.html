@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - المحفظة والشحن</title>
+    <title>Afnan AI - لوحة التحكم</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -24,6 +24,7 @@
         .level-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 10px; color: white; margin: 2px; }
         .wealth-lv { background: linear-gradient(to left, #f59e0b, #d97706); }
         .magic-lv { background: linear-gradient(to left, #8b5cf6, #6d28d9); }
+        .recharge-lv { background: linear-gradient(to left, #10b981, #059669); }
 
         .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px; width: 100%; max-width: 200px; margin: 0 auto; }
         .badge-slot { width: 40px; height: 40px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px dashed #ccc; }
@@ -54,18 +55,75 @@
         
         .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* البنر */
+        .banner-container { margin: 0 20px 20px; border-radius: 20px; overflow: hidden; height: 80px; }
+        .banner-link { display: block; width: 100%; height: 100%; }
+        .banner-image { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* لوحة التحكم */
+        .admin-panel { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .admin-form { background: white; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid #eee; }
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 5px; color: #666; }
+        .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+        .form-textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; min-height: 100px; resize: vertical; }
+        
+        /* قائمة العناصر */
+        .items-list { background: white; border-radius: 20px; padding: 20px; border: 1px solid #eee; }
+        .item-row { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #f3f4f6; }
+        .item-row:last-child { border-bottom: none; }
+        .item-image { width: 50px; height: 50px; object-fit: cover; border-radius: 10px; margin-left: 15px; }
+        .item-info { flex: 1; }
+        .item-name { font-weight: bold; font-size: 14px; }
+        .item-meta { font-size: 12px; color: #666; }
+        .item-actions { display: flex; gap: 10px; }
+        
+        /* ID مع خلفية */
+        .id-badge { position: relative; display: inline-flex; align-items: center; padding: 5px 15px; border-radius: 20px; color: white; font-weight: bold; font-size: 12px; background-size: cover; background-position: center; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .copy-btn { margin-right: 8px; background: rgba(255,255,255,0.2); border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        
+        /* تعديل البروفايل */
+        .edit-profile-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5000; display: none; align-items: center; justify-content: center; }
+        .edit-profile-modal.active { display: flex; }
+        .edit-profile-content { background: white; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; }
+        
+        /* Tabs */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 600; background: #f3f4f6; border: none; cursor: pointer; }
+        .tab-btn.active { background: #f59e0b; color: white; }
     </style>
 </head>
 <body>
 
     <div id="toastContainer" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-[11000]"></div>
 
+    <!-- صفحة تسجيل الدخول -->
     <div id="loginPage" class="fixed inset-0 bg-white z-[10000] flex flex-col items-center justify-center p-6">
         <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-24 mb-6">
-        <button onclick="loginWithGoogle()" class="w-full max-w-xs flex items-center justify-center gap-3 border p-4 rounded-2xl font-bold shadow-sm hover:bg-gray-50">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5">
-            دخول عبر جوجل
-        </button>
+        
+        <!-- تسجيل المستخدم العادي -->
+        <div id="userLoginSection">
+            <button onclick="loginWithGoogle()" class="w-full max-w-xs flex items-center justify-center gap-3 border p-4 rounded-2xl font-bold shadow-sm hover:bg-gray-50 mb-4">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5">
+                دخول عبر جوجل
+            </button>
+            <button onclick="switchToAdminLogin()" class="text-sm text-blue-500 hover:text-blue-700">
+                دخول كمسؤول
+            </button>
+        </div>
+        
+        <!-- تسجيل المسؤول -->
+        <div id="adminLoginSection" class="hidden w-full max-w-xs">
+            <h3 class="text-lg font-bold mb-4">تسجيل دخول المسؤول</h3>
+            <input type="email" id="adminEmail" placeholder="البريد الإلكتروني" class="form-input mb-3">
+            <input type="password" id="adminPassword" placeholder="كلمة المرور" class="form-input mb-4">
+            <button onclick="adminLogin()" class="w-full bg-gray-800 text-white p-4 rounded-2xl font-bold">دخول</button>
+            <button onclick="switchToUserLogin()" class="w-full text-sm text-gray-500 mt-3">
+                العودة لتسجيل المستخدم
+            </button>
+        </div>
+        
         <div id="loginError" class="mt-4 text-red-500 text-sm hidden"></div>
         <div id="loginLoading" class="mt-4 hidden">
             <div class="loading"></div>
@@ -73,6 +131,7 @@
         </div>
     </div>
 
+    <!-- التطبيق الرئيسي -->
     <div id="main-app" style="display: none;">
         <header class="app-header">
             <button onclick="toggleSidebar()" class="p-2 bg-gray-50 rounded-lg"><i data-lucide="menu"></i></button>
@@ -95,6 +154,7 @@
             <div id="searchResults" class="mt-3 max-h-60 overflow-y-auto"></div>
         </div>
 
+        <!-- السايدبار -->
         <div id="sidebar" class="sidebar overflow-y-auto">
             <div class="p-6 text-center border-b">
                 <div class="profile-container">
@@ -103,32 +163,89 @@
                 </div>
                 <div id="userName" class="font-bold mt-2 text-gray-800">تحميل...</div>
                 <div id="userEmail" class="text-xs text-gray-500 mb-1"></div>
+                
+                <!-- ID مع زر النسخ -->
+                <div class="my-3 relative">
+                    <div class="id-badge" id="userIDBadge">
+                        <div class="copy-btn" onclick="copyUserId()">
+                            <i data-lucide="copy" class="w-3 h-3"></i>
+                        </div>
+                        <span id="userID">88291034</span>
+                    </div>
+                    <button onclick="openEditProfile()" class="absolute left-0 top-1/2 -translate-y-1/2 p-1 bg-gray-100 rounded-lg">
+                        <i data-lucide="edit-2" class="w-3 h-3"></i>
+                    </button>
+                </div>
+                
                 <div class="flex justify-center gap-1 my-2">
                     <span id="wealth-lv" class="level-badge wealth-lv">ثروة LV 1</span>
                     <span id="magic-lv" class="level-badge magic-lv">سحر LV 1</span>
+                    <span id="recharge-lv" class="level-badge recharge-lv">شحن LV 1</span>
                 </div>
-                <div class="text-[10px] text-gray-400 font-bold mb-3">ID: <span id="userID">88291034</span></div>
                 
                 <div class="badges-grid" id="userBadges">
-                    <div class="badge-slot"></div>
-                    <div class="badge-slot"></div>
-                    <div class="badge-slot"></div>
-                    <div class="badge-slot"></div>
+                    <!-- سيتم ملؤها ديناميكياً -->
                 </div>
             </div>
             
             <div class="p-4">
-                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('rooms')"><i data-lucide="home"></i> الرئيسية</div>
-                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('wallet')"><i data-lucide="wallet"></i> المحفظة</div>
-                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('store')"><i data-lucide="shopping-bag"></i> المتجر</div>
-                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer text-red-500" onclick="logout()"><i data-lucide="log-out"></i> خروج</div>
+                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('rooms')">
+                    <i data-lucide="home"></i> الرئيسية
+                </div>
+                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('wallet')">
+                    <i data-lucide="wallet"></i> المحفظة
+                </div>
+                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('store')">
+                    <i data-lucide="shopping-bag"></i> المتجر
+                </div>
+                <div id="adminPanelBtn" class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer hidden" onclick="switchView('admin')">
+                    <i data-lucide="shield"></i> لوحة التحكم
+                </div>
+                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer text-red-500" onclick="logout()">
+                    <i data-lucide="log-out"></i> خروج
+                </div>
             </div>
         </div>
 
+        <!-- تعديل البروفايل -->
+        <div id="editProfileModal" class="edit-profile-modal">
+            <div class="edit-profile-content">
+                <h3 class="font-bold text-lg mb-4">تعديل الملف الشخصي</h3>
+                <div class="form-group">
+                    <label class="form-label">الاسم</label>
+                    <input type="text" id="editUserName" class="form-input" placeholder="أدخل اسمك">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">رابط الصورة</label>
+                    <input type="text" id="editUserAvatar" class="form-input" placeholder="https://example.com/avatar.jpg">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">الـ ID المميز</label>
+                    <input type="text" id="editUserId" class="form-input" placeholder="رقم ID مميز">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">خلفية الـ ID</label>
+                    <input type="text" id="editIdBackground" class="form-input" placeholder="رابط صورة الخلفية">
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="saveProfile()" class="flex-1 bg-green-500 text-white py-3 rounded-xl font-bold">حفظ</button>
+                    <button onclick="closeEditProfile()" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">إلغاء</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- عرض الغرف الرئيسية -->
         <div id="view-rooms" class="view-screen active">
+            <!-- البنر -->
+            <div id="bannerContainer" class="banner-container">
+                <!-- سيتم إضافة البنرات هنا ديناميكياً -->
+            </div>
+            
+            <!-- الغرف -->
             <div class="p-4 grid grid-cols-2 gap-4" id="roomsContainer"></div>
         </div>
 
+        <!-- المحفظة -->
         <div id="view-wallet" class="view-screen">
             <div class="wallet-card">
                 <div class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">رصيدك الحالي</div>
@@ -159,6 +276,7 @@
             </div>
         </div>
 
+        <!-- المتجر -->
         <div id="view-store" class="view-screen">
             <div class="flex justify-center gap-2 p-4">
                 <button id="framesBtn" class="px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold" onclick="filterStore('frames')">إطارات</button>
@@ -167,9 +285,150 @@
             <div id="storeItems" class="grid grid-cols-2 gap-4 p-4"></div>
         </div>
 
+        <!-- لوحة التحكم -->
+        <div id="view-admin" class="view-screen">
+            <div class="admin-panel">
+                <h2 class="text-2xl font-bold mb-6">لوحة تحكم المسؤول</h2>
+                
+                <!-- التبويبات -->
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="showAdminTab('banners')">البنرات</button>
+                    <button class="tab-btn" onclick="showAdminTab('frames')">الإطارات</button>
+                    <button class="tab-btn" onclick="showAdminTab('badges')">الشارات</button>
+                    <button class="tab-btn" onclick="showAdminTab('levels')">المستويات</button>
+                    <button class="tab-btn" onclick="showAdminTab('users')">المستخدمين</button>
+                </div>
+                
+                <!-- البنرات -->
+                <div id="adminBannersTab" class="admin-tab">
+                    <div class="admin-form">
+                        <h3 class="font-bold mb-4">إضافة بنر جديد</h3>
+                        <div class="form-group">
+                            <label class="form-label">رابط الصورة</label>
+                            <input type="text" id="bannerImageUrl" class="form-input" placeholder="https://example.com/banner.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رابط التوجيه</label>
+                            <input type="text" id="bannerLink" class="form-input" placeholder="https://example.com">
+                        </div>
+                        <button onclick="addBanner()" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold">إضافة البنر</button>
+                    </div>
+                    
+                    <div class="items-list">
+                        <h3 class="font-bold mb-4">البنرات الحالية</h3>
+                        <div id="bannersList"></div>
+                    </div>
+                </div>
+                
+                <!-- الإطارات -->
+                <div id="adminFramesTab" class="admin-tab" style="display: none;">
+                    <div class="admin-form">
+                        <h3 class="font-bold mb-4">إضافة إطار جديد</h3>
+                        <div class="form-group">
+                            <label class="form-label">اسم الإطار</label>
+                            <input type="text" id="frameName" class="form-input" placeholder="إطار ذهبي">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">السعر</label>
+                            <input type="number" id="framePrice" class="form-input" placeholder="5000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رابط الصورة</label>
+                            <input type="text" id="frameImage" class="form-input" placeholder="https://example.com/frame.png">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الوصف</label>
+                            <textarea id="frameDescription" class="form-textarea" placeholder="وصف الإطار"></textarea>
+                        </div>
+                        <button onclick="addFrame()" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold">إضافة الإطار</button>
+                    </div>
+                    
+                    <div class="items-list">
+                        <h3 class="font-bold mb-4">الإطارات الحالية</h3>
+                        <div id="framesList"></div>
+                    </div>
+                </div>
+                
+                <!-- الشارات -->
+                <div id="adminBadgesTab" class="admin-tab" style="display: none;">
+                    <div class="admin-form">
+                        <h3 class="font-bold mb-4">إضافة شارة جديدة</h3>
+                        <div class="form-group">
+                            <label class="form-label">اسم الشارة</label>
+                            <input type="text" id="badgeName" class="form-input" placeholder="شارة الملك">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">السعر</label>
+                            <input type="number" id="badgePrice" class="form-input" placeholder="1000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الأيقونة</label>
+                            <input type="text" id="badgeIcon" class="form-input" placeholder="👑">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الوصف</label>
+                            <textarea id="badgeDescription" class="form-textarea" placeholder="وصف الشارة"></textarea>
+                        </div>
+                        <button onclick="addBadge()" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold">إضافة الشارة</button>
+                    </div>
+                    
+                    <div class="items-list">
+                        <h3 class="font-bold mb-4">الشارات الحالية</h3>
+                        <div id="badgesList"></div>
+                    </div>
+                </div>
+                
+                <!-- المستويات -->
+                <div id="adminLevelsTab" class="admin-tab" style="display: none;">
+                    <div class="admin-form">
+                        <h3 class="font-bold mb-4">إضافة مستوى جديد</h3>
+                        <div class="form-group">
+                            <label class="form-label">نوع المستوى</label>
+                            <select id="levelType" class="form-input">
+                                <option value="wealth">ثروة</option>
+                                <option value="magic">سحر</option>
+                                <option value="recharge">شحن</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رقم المستوى</label>
+                            <input type="number" id="levelNumber" class="form-input" placeholder="1">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الرصيد المطلوب</label>
+                            <input type="number" id="levelRequired" class="form-input" placeholder="1000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">رابط صورة المستوى</label>
+                            <input type="text" id="levelImage" class="form-input" placeholder="https://example.com/level.png">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">الاسم</label>
+                            <input type="text" id="levelName" class="form-input" placeholder="المستوى الذهبي">
+                        </div>
+                        <button onclick="addLevel()" class="w-full bg-green-500 text-white py-3 rounded-xl font-bold">إضافة المستوى</button>
+                    </div>
+                    
+                    <div class="items-list">
+                        <h3 class="font-bold mb-4">المستويات الحالية</h3>
+                        <div id="levelsList"></div>
+                    </div>
+                </div>
+                
+                <!-- إدارة المستخدمين -->
+                <div id="adminUsersTab" class="admin-tab" style="display: none;">
+                    <div class="items-list">
+                        <h3 class="font-bold mb-4">إدارة المستخدمين</h3>
+                        <div id="usersList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
     </div>
 
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { 
@@ -177,7 +436,8 @@
             signInWithPopup, 
             GoogleAuthProvider, 
             onAuthStateChanged, 
-            signOut 
+            signOut,
+            signInWithEmailAndPassword 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -189,8 +449,10 @@
             query, 
             where, 
             getDocs,
+            deleteDoc,
             increment,
-            serverTimestamp
+            serverTimestamp,
+            orderBy
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -206,100 +468,22 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // تعريف المتغيرات العامة
+        window.currentUserData = null;
+        window.isAdmin = false;
+        const ADMIN_EMAIL = "html55551@gmail.com";
+        const ADMIN_PASSWORD = "221369";
+
         // تعريف المتجر
-        const storeItems = {
-            frames: [
-                { 
-                    id: 'gold_frame_1', 
-                    name: 'إطار ذهبي', 
-                    price: 5000, 
-                    type: 'frame', 
-                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                    description: 'إطار ذهبي متميز'
-                },
-                { 
-                    id: 'silver_frame_2', 
-                    name: 'إطار فضي', 
-                    price: 3000, 
-                    type: 'frame', 
-                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                    description: 'إطار فضي أنيق'
-                },
-                { 
-                    id: 'diamond_frame_3', 
-                    name: 'إطار ماسي', 
-                    price: 10000, 
-                    type: 'frame', 
-                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                    description: 'إطار ماسي نادر'
-                },
-                { 
-                    id: 'magic_frame_4', 
-                    name: 'إطار سحري', 
-                    price: 15000, 
-                    type: 'frame', 
-                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                    description: 'إطار سحري متوهج'
-                }
-            ],
-            badges: [
-                { 
-                    id: 'king_badge_1', 
-                    name: 'شارة الملك', 
-                    price: 1000, 
-                    type: 'badge', 
-                    icon: '👑',
-                    description: 'شارة العظمة والقيادة'
-                },
-                { 
-                    id: 'star_badge_2', 
-                    name: 'شارة النجم', 
-                    price: 800, 
-                    type: 'badge', 
-                    icon: '⭐',
-                    description: 'شارة التميز والإبداع'
-                },
-                { 
-                    id: 'fire_badge_3', 
-                    name: 'شارة النار', 
-                    price: 1200, 
-                    type: 'badge', 
-                    icon: '🔥',
-                    description: 'شارة الحماس والطاقة'
-                },
-                { 
-                    id: 'magic_badge_4', 
-                    name: 'شارة السحر', 
-                    price: 2000, 
-                    type: 'badge', 
-                    icon: '✨',
-                    description: 'شارة الغموض والسحر'
-                },
-                { 
-                    id: 'crown_badge_5', 
-                    name: 'شارة التاج', 
-                    price: 1500, 
-                    type: 'badge', 
-                    icon: '👑',
-                    description: 'شارة السيادة'
-                },
-                { 
-                    id: 'heart_badge_6', 
-                    name: 'شارة القلب', 
-                    price: 700, 
-                    type: 'badge', 
-                    icon: '❤️',
-                    description: 'شارة الحب والوفاء'
-                },
-                { 
-                    id: 'shield_badge_7', 
-                    name: 'شارة الدرع', 
-                    price: 2500, 
-                    type: 'badge', 
-                    icon: '🛡️',
-                    description: 'شارة الحماية والقوة'
-                }
-            ]
+        window.storeItems = {
+            frames: [],
+            badges: []
+        };
+
+        window.levelsData = {
+            wealth: [],
+            magic: [],
+            recharge: []
         };
 
         // دالة لعرض الرسائل
@@ -318,7 +502,63 @@
             setTimeout(() => toast.remove(), 3000);
         };
 
-        window.loginWithGoogle = async () => {
+        // تبديل بين تسجيل المستخدم والمسؤول
+        window.switchToAdminLogin = function() {
+            document.getElementById('userLoginSection').style.display = 'none';
+            document.getElementById('adminLoginSection').classList.remove('hidden');
+        };
+
+        window.switchToUserLogin = function() {
+            document.getElementById('adminLoginSection').classList.add('hidden');
+            document.getElementById('userLoginSection').style.display = 'block';
+        };
+
+        // تسجيل الدخول كمسؤول
+        window.adminLogin = async function() {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (email !== ADMIN_EMAIL || password !== ADMIN_PASSWORD) {
+                showToast("بيانات الدخول غير صحيحة", 'error');
+                return;
+            }
+            
+            try {
+                // محاولة تسجيل الدخول بفايربيز
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                window.isAdmin = true;
+                showToast("مرحباً بك مسؤول!", 'success');
+                
+                // تحميل بيانات المسؤول
+                await loadUserData(userCredential.user.uid);
+                
+            } catch (error) {
+                // إذا فشل تسجيل الدخول، ننشئ حساب مسؤول
+                console.log("إنشاء حساب مسؤول جديد...");
+                await createAdminAccount(email, password);
+            }
+        };
+
+        async function createAdminAccount(email, password) {
+            // في بيئة الإنتاج، يجب إنشاء المستخدم يدوياً في وحدة تحكم Firebase
+            // هنا سنستخدم بيانات وهمية للمسؤول
+            window.isAdmin = true;
+            showToast("تم تسجيل الدخول كمسؤول", 'success');
+            
+            // إخفاء صفحة تسجيل الدخول وإظهار التطبيق
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            
+            // إظهار زر لوحة التحكم
+            document.getElementById('adminPanelBtn').classList.remove('hidden');
+            
+            // تحميل البيانات الأولية
+            await loadInitialData();
+            initApp();
+        }
+
+        // تسجيل الدخول بالمستخدم العادي
+        window.loginWithGoogle = async function() {
             try {
                 document.getElementById('loginLoading').classList.remove('hidden');
                 document.getElementById('loginError').classList.add('hidden');
@@ -331,8 +571,6 @@
                 const user = result.user;
                 
                 showToast(`مرحباً ${user.displayName}!`, 'success');
-                
-                // إنشاء/تحميل بيانات المستخدم
                 await initUserData(user);
                 
             } catch (error) {
@@ -345,69 +583,76 @@
             }
         };
 
+        // إنشاء أو تحديث بيانات المستخدم
         async function initUserData(user) {
             try {
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
                 
                 if (!userSnap.exists()) {
-                    // إنشاء بيانات جديدة للمستخدم
                     const userData = {
                         uid: user.uid,
                         displayName: user.displayName || 'مستخدم',
                         email: user.email || '',
                         photoURL: user.photoURL || 'https://i.pravatar.cc/150',
-                        balance: 1000, // رصيد ابتدائي
+                        customId: generateCustomId(),
+                        idBackground: 'https://images.unsplash.com/photo-1614850523060-8da1d56ae167?q=80&w=1000',
+                        balance: 1000,
                         wealthLv: 1,
                         magicLv: 1,
+                        rechargeLv: 1,
+                        totalSpent: 0,
+                        totalRecharged: 0,
                         purchasedFrames: [],
                         purchasedBadges: [],
                         activeFrame: null,
                         activeBadges: [],
                         createdAt: serverTimestamp(),
                         lastLogin: serverTimestamp(),
-                        username: user.displayName?.split(' ')[0] || 'مستخدم'
+                        isAdmin: user.email === ADMIN_EMAIL
                     };
                     
                     await setDoc(userRef, userData);
-                    console.log("تم إنشاء بيانات المستخدم:", userData);
                     showToast("تم إنشاء حسابك بنجاح! 🎉", 'success');
                 } else {
-                    // تحديث آخر دخول
                     await updateDoc(userRef, {
                         lastLogin: serverTimestamp()
                     });
-                    console.log("تم تحديث بيانات الدخول");
                 }
                 
-                // تحديث الواجهة بعد التأكد من حفظ البيانات
-                await new Promise(resolve => setTimeout(resolve, 500));
                 await loadUserData(user.uid);
                 
             } catch (error) {
                 console.error("خطأ في إنشاء بيانات المستخدم:", error);
                 showToast("حدث خطأ في تهيئة البيانات", 'error');
-                throw error;
             }
         }
 
+        // توليد ID مخصص
+        function generateCustomId() {
+            return Math.floor(10000000 + Math.random() * 90000000).toString();
+        }
+
+        // تحميل بيانات المستخدم
         async function loadUserData(uid) {
             try {
                 const userRef = doc(db, "users", uid);
                 const userSnap = await getDoc(userRef);
                 
                 if (userSnap.exists()) {
-                    const userData = userSnap.data();
-                    console.log("بيانات المستخدم المحملة:", userData);
+                    window.currentUserData = userSnap.data();
                     
-                    // تحديث الواجهة
-                    updateUI(userData);
+                    // التحقق إذا كان مسؤولاً
+                    if (window.currentUserData.email === ADMIN_EMAIL) {
+                        window.isAdmin = true;
+                        document.getElementById('adminPanelBtn').classList.remove('hidden');
+                    }
                     
-                    // تحميل التطبيق الرئيسي
+                    updateUI(window.currentUserData);
+                    
+                    // تحميل البيانات الأولية
+                    await loadInitialData();
                     initApp();
-                } else {
-                    console.error("لم يتم العثور على بيانات المستخدم");
-                    showToast("لم يتم العثور على بيانات المستخدم", 'error');
                 }
             } catch (error) {
                 console.error("خطأ في تحميل بيانات المستخدم:", error);
@@ -415,9 +660,110 @@
             }
         }
 
-        window.logout = async () => {
+        // تحميل البيانات الأولية
+        async function loadInitialData() {
+            try {
+                // تحميل البنرات
+                await loadBanners();
+                
+                // تحميل عناصر المتجر
+                await loadStoreItems();
+                
+                // تحميل المستويات
+                await loadLevels();
+                
+                // إذا كان مسؤولاً، تحميل قوائم لوحة التحكم
+                if (window.isAdmin) {
+                    await loadAdminLists();
+                }
+                
+            } catch (error) {
+                console.error("خطأ في تحميل البيانات الأولية:", error);
+            }
+        }
+
+        // تحميل البنرات
+        async function loadBanners() {
+            try {
+                const bannersRef = collection(db, "banners");
+                const querySnapshot = await getDocs(bannersRef);
+                const banners = [];
+                
+                querySnapshot.forEach(doc => {
+                    banners.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // عرض البنرات
+                displayBanners(banners);
+                
+            } catch (error) {
+                console.error("خطأ في تحميل البنرات:", error);
+            }
+        }
+
+        // تحميل عناصر المتجر
+        async function loadStoreItems() {
+            try {
+                // تحميل الإطارات
+                const framesRef = collection(db, "frames");
+                const framesSnapshot = await getDocs(framesRef);
+                window.storeItems.frames = [];
+                
+                framesSnapshot.forEach(doc => {
+                    window.storeItems.frames.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // تحميل الشارات
+                const badgesRef = collection(db, "badges");
+                const badgesSnapshot = await getDocs(badgesRef);
+                window.storeItems.badges = [];
+                
+                badgesSnapshot.forEach(doc => {
+                    window.storeItems.badges.push({ id: doc.id, ...doc.data() });
+                });
+                
+            } catch (error) {
+                console.error("خطأ في تحميل عناصر المتجر:", error);
+            }
+        }
+
+        // تحميل المستويات
+        async function loadLevels() {
+            try {
+                const levelsRef = collection(db, "levels");
+                const querySnapshot = await getDocs(query(levelsRef, orderBy("levelNumber")));
+                
+                window.levelsData.wealth = [];
+                window.levelsData.magic = [];
+                window.levelsData.recharge = [];
+                
+                querySnapshot.forEach(doc => {
+                    const level = { id: doc.id, ...doc.data() };
+                    if (level.type === 'wealth') window.levelsData.wealth.push(level);
+                    if (level.type === 'magic') window.levelsData.magic.push(level);
+                    if (level.type === 'recharge') window.levelsData.recharge.push(level);
+                });
+                
+            } catch (error) {
+                console.error("خطأ في تحميل المستويات:", error);
+            }
+        }
+
+        // تحميل قوائم لوحة التحكم
+        async function loadAdminLists() {
+            await loadBannersList();
+            await loadFramesList();
+            await loadBadgesList();
+            await loadLevelsList();
+            await loadUsersList();
+        }
+
+        // تسجيل الخروج
+        window.logout = async function() {
             try {
                 await signOut(auth);
+                window.isAdmin = false;
+                window.currentUserData = null;
                 showToast("تم تسجيل الخروج بنجاح", 'info');
             } catch (error) {
                 console.error("خطأ في تسجيل الخروج:", error);
@@ -425,6 +771,7 @@
             }
         };
 
+        // متتبع حالة المصادقة
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('loginPage').style.display = 'none';
@@ -433,251 +780,422 @@
             } else {
                 document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('main-app').style.display = 'none';
+                window.isAdmin = false;
             }
         });
 
-        // وظيفة الشحن
-        window.recharge = async (amount, dollars) => {
-            const user = auth.currentUser;
-            if (!user) {
-                showToast("يجب تسجيل الدخول أولاً", 'error');
-                return;
-            }
-            
+        // وظائف لوحة التحكم
+        window.addBanner = async function() {
             try {
-                showToast("جاري معالجة الشحن...", 'info');
-                const userRef = doc(db, "users", user.uid);
+                const imageUrl = document.getElementById('bannerImageUrl').value;
+                const link = document.getElementById('bannerLink').value;
                 
-                await updateDoc(userRef, {
-                    balance: increment(amount),
-                    wealthLv: increment(Math.floor(dollars))
+                if (!imageUrl || !link) {
+                    showToast("يرجى ملء جميع الحقول", 'error');
+                    return;
+                }
+                
+                const bannersRef = collection(db, "banners");
+                await addDoc(bannersRef, {
+                    imageUrl,
+                    link,
+                    createdAt: serverTimestamp(),
+                    active: true
                 });
                 
-                // تحديث البيانات
-                await loadUserData(user.uid);
-                showToast(`💎 تم شحن ${amount.toLocaleString()} عملة بنجاح!`, 'success');
+                showToast("تم إضافة البنر بنجاح", 'success');
+                document.getElementById('bannerImageUrl').value = '';
+                document.getElementById('bannerLink').value = '';
+                
+                await loadBanners();
+                await loadBannersList();
                 
             } catch (error) {
-                console.error("خطأ في الشحن:", error);
-                showToast("حدث خطأ أثناء الشحن", 'error');
+                console.error("خطأ في إضافة البنر:", error);
+                showToast("حدث خطأ في إضافة البنر", 'error');
             }
         };
 
-        // وظيفة الشراء
-        window.buyItem = async (item) => {
-            const user = auth.currentUser;
-            if (!user) {
-                showToast("يجب تسجيل الدخول أولاً", 'error');
-                return;
-            }
-            
+        window.deleteBanner = async function(bannerId) {
             try {
-                showToast("جاري معالجة الشراء...", 'info');
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                const userData = userSnap.data();
+                if (!confirm("هل أنت متأكد من حذف هذا البنر؟")) return;
                 
-                // التحقق من الرصيد
-                if (userData.balance < item.price) {
-                    showToast("رصيدك غير كافي للشراء", 'error');
-                    return;
-                }
+                await deleteDoc(doc(db, "banners", bannerId));
+                showToast("تم حذف البنر بنجاح", 'success');
                 
-                // التحقق إذا كان العنصر مملوك بالفعل
-                if (item.type === 'frame') {
-                    if (userData.purchasedFrames?.includes(item.id)) {
-                        showToast("لديك هذا الإطار بالفعل", 'warning');
-                        return;
-                    }
-                } else if (item.type === 'badge') {
-                    if (userData.purchasedBadges?.includes(item.id)) {
-                        showToast("لديك هذه الشارة بالفعل", 'warning');
-                        return;
-                    }
-                }
+                await loadBanners();
+                await loadBannersList();
                 
-                // خصم السعر وإضافة العنصر
-                let updates = {
-                    balance: increment(-item.price)
+            } catch (error) {
+                console.error("خطأ في حذف البنر:", error);
+                showToast("حدث خطأ في حذف البنر", 'error');
+            }
+        };
+
+        window.addFrame = async function() {
+            try {
+                const frameData = {
+                    name: document.getElementById('frameName').value,
+                    price: parseInt(document.getElementById('framePrice').value),
+                    image: document.getElementById('frameImage').value,
+                    description: document.getElementById('frameDescription').value,
+                    type: 'frame',
+                    createdAt: serverTimestamp()
                 };
                 
-                if (item.type === 'frame') {
-                    updates.purchasedFrames = [...(userData.purchasedFrames || []), item.id];
-                    updates.activeFrame = item.id; // تفعيل الإطار تلقائياً
-                } else if (item.type === 'badge') {
-                    updates.purchasedBadges = [...(userData.purchasedBadges || []), item.id];
-                    
-                    // إضافة الشارة إذا كان هناك مكان
-                    if ((userData.activeBadges?.length || 0) < 4) {
-                        updates.activeBadges = [...(userData.activeBadges || []), item.id];
-                    }
-                }
-                
-                await updateDoc(userRef, updates);
-                await loadUserData(user.uid);
-                showToast(`✅ تم شراء ${item.name} بنجاح!`, 'success');
-                
-                // تحديث المتجر
-                filterStore(item.type === 'frame' ? 'frames' : 'badges');
-                
-            } catch (error) {
-                console.error("خطأ في الشراء:", error);
-                showToast("حدث خطأ أثناء الشراء", 'error');
-            }
-        };
-
-        // البحث عن مستخدمين
-        window.searchUsers = async () => {
-            const searchInput = document.getElementById('searchInput').value.trim();
-            const resultsContainer = document.getElementById('searchResults');
-            
-            if (!searchInput) {
-                resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">اكتب ID المستخدم للبحث</div>';
-                return;
-            }
-            
-            try {
-                showToast("جاري البحث...", 'info');
-                const usersRef = collection(db, "users");
-                
-                // البحث بالـ UID أو اسم المستخدم
-                const q = query(
-                    usersRef,
-                    where("uid", "==", searchInput)
-                );
-                
-                const querySnapshot = await getDocs(q);
-                
-                resultsContainer.innerHTML = '';
-                
-                if (querySnapshot.empty) {
-                    resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">لم يتم العثور على مستخدم بهذا الـ ID</div>';
+                if (!frameData.name || !frameData.price || !frameData.image) {
+                    showToast("يرجى ملء الحقول المطلوبة", 'error');
                     return;
                 }
                 
-                querySnapshot.forEach((doc) => {
-                    const user = doc.data();
-                    resultsContainer.innerHTML += `
-                        <div class="bg-white p-4 rounded-xl border mb-2 flex items-center gap-3">
-                            <div class="relative">
-                                <img src="${user.photoURL || 'https://i.pravatar.cc/150'}" 
-                                     class="w-12 h-12 rounded-full object-cover">
-                                ${user.activeFrame ? '<div class="absolute inset-0 border-2 border-yellow-500 rounded-full"></div>' : ''}
+                const framesRef = collection(db, "frames");
+                await addDoc(framesRef, frameData);
+                
+                showToast("تم إضافة الإطار بنجاح", 'success');
+                resetFrameForm();
+                
+                await loadStoreItems();
+                await loadFramesList();
+                
+            } catch (error) {
+                console.error("خطأ في إضافة الإطار:", error);
+                showToast("حدث خطأ في إضافة الإطار", 'error');
+            }
+        };
+
+        window.deleteFrame = async function(frameId) {
+            try {
+                if (!confirm("هل أنت متأكد من حذف هذا الإطار؟")) return;
+                
+                await deleteDoc(doc(db, "frames", frameId));
+                showToast("تم حذف الإطار بنجاح", 'success');
+                
+                await loadStoreItems();
+                await loadFramesList();
+                
+            } catch (error) {
+                console.error("خطأ في حذف الإطار:", error);
+                showToast("حدث خطأ في حذف الإطار", 'error');
+            }
+        };
+
+        window.addBadge = async function() {
+            try {
+                const badgeData = {
+                    name: document.getElementById('badgeName').value,
+                    price: parseInt(document.getElementById('badgePrice').value),
+                    icon: document.getElementById('badgeIcon').value,
+                    description: document.getElementById('badgeDescription').value,
+                    type: 'badge',
+                    createdAt: serverTimestamp()
+                };
+                
+                if (!badgeData.name || !badgeData.price || !badgeData.icon) {
+                    showToast("يرجى ملء الحقول المطلوبة", 'error');
+                    return;
+                }
+                
+                const badgesRef = collection(db, "badges");
+                await addDoc(badgesRef, badgeData);
+                
+                showToast("تم إضافة الشارة بنجاح", 'success');
+                resetBadgeForm();
+                
+                await loadStoreItems();
+                await loadBadgesList();
+                
+            } catch (error) {
+                console.error("خطأ في إضافة الشارة:", error);
+                showToast("حدث خطأ في إضافة الشارة", 'error');
+            }
+        };
+
+        window.deleteBadge = async function(badgeId) {
+            try {
+                if (!confirm("هل أنت متأكد من حذف هذه الشارة؟")) return;
+                
+                await deleteDoc(doc(db, "badges", badgeId));
+                showToast("تم حذف الشارة بنجاح", 'success');
+                
+                await loadStoreItems();
+                await loadBadgesList();
+                
+            } catch (error) {
+                console.error("خطأ في حذف الشارة:", error);
+                showToast("حدث خطأ في حذف الشارة", 'error');
+            }
+        };
+
+        window.addLevel = async function() {
+            try {
+                const levelData = {
+                    type: document.getElementById('levelType').value,
+                    levelNumber: parseInt(document.getElementById('levelNumber').value),
+                    required: parseInt(document.getElementById('levelRequired').value),
+                    image: document.getElementById('levelImage').value,
+                    name: document.getElementById('levelName').value,
+                    createdAt: serverTimestamp()
+                };
+                
+                if (!levelData.type || !levelData.levelNumber || !levelData.required) {
+                    showToast("يرجى ملء الحقول المطلوبة", 'error');
+                    return;
+                }
+                
+                const levelsRef = collection(db, "levels");
+                await addDoc(levelsRef, levelData);
+                
+                showToast("تم إضافة المستوى بنجاح", 'success');
+                resetLevelForm();
+                
+                await loadLevels();
+                await loadLevelsList();
+                
+            } catch (error) {
+                console.error("خطأ في إضافة المستوى:", error);
+                showToast("حدث خطأ في إضافة المستوى", 'error');
+            }
+        };
+
+        window.deleteLevel = async function(levelId) {
+            try {
+                if (!confirm("هل أنت متأكد من حذف هذا المستوى؟")) return;
+                
+                await deleteDoc(doc(db, "levels", levelId));
+                showToast("تم حذف المستوى بنجاح", 'success');
+                
+                await loadLevels();
+                await loadLevelsList();
+                
+            } catch (error) {
+                console.error("خطأ في حذف المستوى:", error);
+                showToast("حدث خطأ في حذف المستوى", 'error');
+            }
+        };
+
+        // وظائف تحميل القوائم
+        async function loadBannersList() {
+            try {
+                const bannersRef = collection(db, "banners");
+                const querySnapshot = await getDocs(query(bannersRef, orderBy("createdAt", "desc")));
+                const container = document.getElementById('bannersList');
+                container.innerHTML = '';
+                
+                querySnapshot.forEach(doc => {
+                    const banner = doc.data();
+                    container.innerHTML += `
+                        <div class="item-row">
+                            <img src="${banner.imageUrl}" class="item-image" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="item-info">
+                                <div class="item-name">${banner.link}</div>
+                                <div class="item-meta">${new Date(banner.createdAt?.toDate()).toLocaleDateString('ar-SA')}</div>
                             </div>
-                            <div class="flex-1">
-                                <div class="font-bold text-sm">${user.displayName || 'مستخدم'}</div>
-                                <div class="text-xs text-gray-500">${user.email || ''}</div>
-                                <div class="text-[10px] text-gray-400 font-bold mt-1">ID: ${user.uid.substring(0, 8)}...</div>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded">💰 ${user.balance?.toLocaleString() || 0}</span>
-                                    <span class="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded">👑 ${user.wealthLv || 1}</span>
-                                    <span class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">✨ ${user.magicLv || 1}</span>
-                                </div>
+                            <div class="item-actions">
+                                <button onclick="deleteBanner('${doc.id}')" class="px-3 py-1 bg-red-500 text-white text-xs rounded-lg">حذف</button>
                             </div>
                         </div>
                     `;
                 });
-                
-                showToast(`تم العثور على ${querySnapshot.size} مستخدم`, 'success');
-                
             } catch (error) {
-                console.error("خطأ في البحث:", error);
-                resultsContainer.innerHTML = '<div class="text-center text-red-500 py-4">حدث خطأ في البحث</div>';
-                showToast("حدث خطأ في البحث", 'error');
+                console.error("خطأ في تحميل قائمة البنرات:", error);
             }
-        };
-
-        // تفعيل العنصر
-        window.equipItem = async (item) => {
-            const user = auth.currentUser;
-            if (!user) return;
-            
-            try {
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                const userData = userSnap.data();
-                
-                let updates = {};
-                if (item.type === 'frame') {
-                    // التحقق من ملكية الإطار
-                    if (!userData.purchasedFrames?.includes(item.id)) {
-                        showToast("يجب شراء هذا الإطار أولاً", 'error');
-                        return;
-                    }
-                    updates.activeFrame = item.id;
-                    showToast(`✅ تم تفعيل الإطار: ${item.name}`, 'success');
-                } else if (item.type === 'badge') {
-                    // التحقق من ملكية الشارة
-                    if (!userData.purchasedBadges?.includes(item.id)) {
-                        showToast("يجب شراء هذه الشارة أولاً", 'error');
-                        return;
-                    }
-                    
-                    let activeBadges = [...(userData.activeBadges || [])];
-                    const index = activeBadges.indexOf(item.id);
-                    
-                    if (index > -1) {
-                        activeBadges.splice(index, 1);
-                        showToast(`تم إزالة الشارة: ${item.name}`, 'info');
-                    } else {
-                        if (activeBadges.length >= 4) {
-                            showToast("لا يمكنك إضافة أكثر من 4 شارات", 'error');
-                            return;
-                        }
-                        activeBadges.push(item.id);
-                        showToast(`✅ تم تفعيل الشارة: ${item.name}`, 'success');
-                    }
-                    updates.activeBadges = activeBadges;
-                }
-                
-                await updateDoc(userRef, updates);
-                await loadUserData(user.uid);
-                
-                // تحديث عرض المتجر
-                filterStore(item.type === 'frame' ? 'frames' : 'badges');
-                
-            } catch (error) {
-                console.error("خطأ في التفعيل:", error);
-                showToast("حدث خطأ أثناء التفعيل", 'error');
-            }
-        };
-    </script>
-
-    <script>
-        let currentUserData = null;
-
-        function initApp() {
-            renderRooms();
-            filterStore('frames');
-            lucide.createIcons();
-            
-            console.log("التطبيق جاهز!");
         }
 
+        async function loadFramesList() {
+            try {
+                const framesRef = collection(db, "frames");
+                const querySnapshot = await getDocs(query(framesRef, orderBy("createdAt", "desc")));
+                const container = document.getElementById('framesList');
+                container.innerHTML = '';
+                
+                querySnapshot.forEach(doc => {
+                    const frame = doc.data();
+                    container.innerHTML += `
+                        <div class="item-row">
+                            <img src="${frame.image}" class="item-image" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="item-info">
+                                <div class="item-name">${frame.name}</div>
+                                <div class="item-meta">السعر: ${frame.price.toLocaleString()} | ${frame.description}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button onclick="deleteFrame('${doc.id}')" class="px-3 py-1 bg-red-500 text-white text-xs rounded-lg">حذف</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("خطأ في تحميل قائمة الإطارات:", error);
+            }
+        }
+
+        async function loadBadgesList() {
+            try {
+                const badgesRef = collection(db, "badges");
+                const querySnapshot = await getDocs(query(badgesRef, orderBy("createdAt", "desc")));
+                const container = document.getElementById('badgesList');
+                container.innerHTML = '';
+                
+                querySnapshot.forEach(doc => {
+                    const badge = doc.data();
+                    container.innerHTML += `
+                        <div class="item-row">
+                            <div class="item-image flex items-center justify-center bg-gray-100 text-2xl">
+                                ${badge.icon}
+                            </div>
+                            <div class="item-info">
+                                <div class="item-name">${badge.name}</div>
+                                <div class="item-meta">السعر: ${badge.price.toLocaleString()} | ${badge.description}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button onclick="deleteBadge('${doc.id}')" class="px-3 py-1 bg-red-500 text-white text-xs rounded-lg">حذف</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("خطأ في تحميل قائمة الشارات:", error);
+            }
+        }
+
+        async function loadLevelsList() {
+            try {
+                const levelsRef = collection(db, "levels");
+                const querySnapshot = await getDocs(query(levelsRef, orderBy("levelNumber")));
+                const container = document.getElementById('levelsList');
+                container.innerHTML = '';
+                
+                querySnapshot.forEach(doc => {
+                    const level = doc.data();
+                    const typeName = level.type === 'wealth' ? 'ثروة' : level.type === 'magic' ? 'سحر' : 'شحن';
+                    
+                    container.innerHTML += `
+                        <div class="item-row">
+                            <img src="${level.image || 'https://via.placeholder.com/150'}" class="item-image" onerror="this.src='https://via.placeholder.com/150'">
+                            <div class="item-info">
+                                <div class="item-name">${level.name} (${typeName} - المستوى ${level.levelNumber})</div>
+                                <div class="item-meta">المطلوب: ${level.required.toLocaleString()} عملة</div>
+                            </div>
+                            <div class="item-actions">
+                                <button onclick="deleteLevel('${doc.id}')" class="px-3 py-1 bg-red-500 text-white text-xs rounded-lg">حذف</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("خطأ في تحميل قائمة المستويات:", error);
+            }
+        }
+
+        async function loadUsersList() {
+            try {
+                const usersRef = collection(db, "users");
+                const querySnapshot = await getDocs(query(usersRef, orderBy("createdAt", "desc")));
+                const container = document.getElementById('usersList');
+                container.innerHTML = '';
+                
+                querySnapshot.forEach(doc => {
+                    const user = doc.data();
+                    container.innerHTML += `
+                        <div class="item-row">
+                            <img src="${user.photoURL || 'https://i.pravatar.cc/150'}" class="item-image rounded-full">
+                            <div class="item-info">
+                                <div class="item-name">${user.displayName}</div>
+                                <div class="item-meta">${user.email} | ID: ${user.customId || user.uid.substring(0,8)}</div>
+                                <div class="item-meta">رصيد: ${user.balance?.toLocaleString()} | ثروة: ${user.wealthLv} | سحر: ${user.magicLv}</div>
+                            </div>
+                            <div class="item-actions">
+                                <button onclick="editUser('${doc.id}')" class="px-3 py-1 bg-blue-500 text-white text-xs rounded-lg">تعديل</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("خطأ في تحميل قائمة المستخدمين:", error);
+            }
+        }
+
+        // إعادة تعيين النماذج
+        function resetFrameForm() {
+            document.getElementById('frameName').value = '';
+            document.getElementById('framePrice').value = '';
+            document.getElementById('frameImage').value = '';
+            document.getElementById('frameDescription').value = '';
+        }
+
+        function resetBadgeForm() {
+            document.getElementById('badgeName').value = '';
+            document.getElementById('badgePrice').value = '';
+            document.getElementById('badgeIcon').value = '';
+            document.getElementById('badgeDescription').value = '';
+        }
+
+        function resetLevelForm() {
+            document.getElementById('levelNumber').value = '';
+            document.getElementById('levelRequired').value = '';
+            document.getElementById('levelImage').value = '';
+            document.getElementById('levelName').value = '';
+        }
+    </script>
+
+    <!-- JavaScript للواجهة الأمامية -->
+    <script>
+        // عرض البنرات
+        function displayBanners(banners) {
+            const container = document.getElementById('bannerContainer');
+            container.innerHTML = '';
+            
+            if (banners.length === 0) return;
+            
+            // عرض البنر الأول فقط (يمكن تعديله لعرض عدة بنرات)
+            const banner = banners[0];
+            container.innerHTML = `
+                <a href="${banner.link}" target="_blank" class="banner-link">
+                    <img src="${banner.imageUrl}" class="banner-image" onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af2176?q=80&w=1000'">
+                </a>
+            `;
+        }
+
+        // تحديث الواجهة
         function updateUI(userData) {
             try {
-                currentUserData = userData;
+                window.currentUserData = userData;
                 
                 // تحديث المعلومات الأساسية
                 document.getElementById('userName').innerText = userData.displayName || 'مستخدم';
                 document.getElementById('userEmail').innerText = userData.email || '';
                 document.getElementById('userAvatar').src = userData.photoURL || 'https://i.pravatar.cc/150';
-                document.getElementById('userID').innerText = userData.uid ? userData.uid.substring(0, 8) : '00000000';
+                
+                // تحديث الـ ID مع الخلفية
+                const idBadge = document.getElementById('userIDBadge');
+                idBadge.innerHTML = `
+                    <div class="copy-btn" onclick="copyUserId()">
+                        <i data-lucide="copy" class="w-3 h-3"></i>
+                    </div>
+                    <span id="userID">${userData.customId || userData.uid.substring(0, 8)}</span>
+                `;
+                
+                if (userData.idBackground) {
+                    idBadge.style.backgroundImage = `url('${userData.idBackground}')`;
+                    idBadge.style.backgroundSize = 'cover';
+                    idBadge.style.backgroundPosition = 'center';
+                }
                 
                 // تحديث الرصيد والمستويات
                 const balance = userData.balance || 0;
                 const wealthLv = userData.wealthLv || 1;
                 const magicLv = userData.magicLv || 1;
+                const rechargeLv = userData.rechargeLv || 1;
                 
                 document.getElementById('header-balance').innerText = balance.toLocaleString();
                 document.getElementById('wallet-balance-big').innerText = balance.toLocaleString();
                 document.getElementById('wealth-lv').innerText = `ثروة LV ${wealthLv}`;
                 document.getElementById('magic-lv').innerText = `سحر LV ${magicLv}`;
+                document.getElementById('recharge-lv').innerText = `شحن LV ${rechargeLv}`;
                 
                 // تحديث الإطار النشط
                 const activeFrameImg = document.getElementById('activeFrame');
                 if (userData.activeFrame) {
-                    const frame = storeItems.frames.find(f => f.id === userData.activeFrame);
+                    const frame = window.storeItems.frames.find(f => f.id === userData.activeFrame);
                     if (frame) {
                         activeFrameImg.src = frame.image;
                         activeFrameImg.style.display = 'block';
@@ -691,33 +1209,114 @@
                 // تحديث الشارات
                 updateBadgesDisplay(userData.activeBadges || []);
                 
-                console.log("تم تحديث الواجهة بنجاح");
             } catch (error) {
                 console.error("خطأ في تحديث الواجهة:", error);
             }
         }
 
+        // تحديث عرض الشارات
         function updateBadgesDisplay(activeBadges) {
             try {
-                const badgeSlots = document.querySelectorAll('.badge-slot');
-                badgeSlots.forEach((slot, index) => {
-                    slot.innerHTML = '';
-                    slot.classList.remove('has-badge');
+                const container = document.getElementById('userBadges');
+                container.innerHTML = '';
+                
+                // إنشاء 4 مربعات للشارات
+                for (let i = 0; i < 4; i++) {
+                    const slot = document.createElement('div');
+                    slot.className = 'badge-slot';
                     
-                    if (index < activeBadges.length) {
-                        const badgeId = activeBadges[index];
-                        const badge = storeItems.badges.find(b => b.id === badgeId);
+                    if (i < activeBadges.length) {
+                        const badgeId = activeBadges[i];
+                        const badge = window.storeItems.badges.find(b => b.id === badgeId);
                         if (badge) {
                             slot.innerHTML = badge.icon;
                             slot.classList.add('has-badge');
                         }
                     }
-                });
+                    
+                    container.appendChild(slot);
+                }
             } catch (error) {
                 console.error("خطأ في تحديث الشارات:", error);
             }
         }
 
+        // نسخ الـ ID
+        function copyUserId() {
+            const id = window.currentUserData?.customId || window.currentUserData?.uid.substring(0, 8);
+            navigator.clipboard.writeText(id).then(() => {
+                showToast("تم نسخ الـ ID", 'success');
+            });
+        }
+
+        // تعديل البروفايل
+        function openEditProfile() {
+            if (!window.currentUserData) return;
+            
+            document.getElementById('editUserName').value = window.currentUserData.displayName || '';
+            document.getElementById('editUserAvatar').value = window.currentUserData.photoURL || '';
+            document.getElementById('editUserId').value = window.currentUserData.customId || '';
+            document.getElementById('editIdBackground').value = window.currentUserData.idBackground || '';
+            
+            document.getElementById('editProfileModal').classList.add('active');
+        }
+
+        function closeEditProfile() {
+            document.getElementById('editProfileModal').classList.remove('active');
+        }
+
+        async function saveProfile() {
+            try {
+                const user = window.currentUserData;
+                if (!user) return;
+                
+                const updates = {
+                    displayName: document.getElementById('editUserName').value || user.displayName,
+                    photoURL: document.getElementById('editUserAvatar').value || user.photoURL,
+                    customId: document.getElementById('editUserId').value || user.customId,
+                    idBackground: document.getElementById('editIdBackground').value || user.idBackground
+                };
+                
+                // تحديث في Firestore
+                const { doc, updateDoc, getFirestore } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                const db = getFirestore();
+                const userRef = doc(db, "users", user.uid);
+                
+                await updateDoc(userRef, updates);
+                
+                // تحديث البيانات المحلية
+                Object.assign(window.currentUserData, updates);
+                updateUI(window.currentUserData);
+                
+                closeEditProfile();
+                showToast("تم تحديث الملف الشخصي بنجاح", 'success');
+                
+            } catch (error) {
+                console.error("خطأ في حفظ الملف الشخصي:", error);
+                showToast("حدث خطأ في حفظ التعديلات", 'error');
+            }
+        }
+
+        // عرض تبويبات لوحة التحكم
+        function showAdminTab(tabName) {
+            // إخفاء جميع التبويبات
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // إزالة النشاط من جميع الأزرار
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // إظهار التبويب المطلوب
+            document.getElementById(`admin${tabName.charAt(0).toUpperCase() + tabName.slice(1)}Tab`).style.display = 'block';
+            
+            // تفعيل الزر
+            event.target.classList.add('active');
+        }
+
+        // عرض الغرف
         function renderRooms() {
             try {
                 const container = document.getElementById('roomsContainer');
@@ -746,6 +1345,7 @@
             }
         }
 
+        // تصفية المتجر
         function filterStore(type) {
             try {
                 // تحديث أزرار التصفية
@@ -759,21 +1359,21 @@
                 
                 const container = document.getElementById('storeItems');
                 container.innerHTML = "";
-                const items = storeItems[type];
+                const items = window.storeItems[type];
                 
-                if (!items || !currentUserData) {
+                if (!items || !window.currentUserData) {
                     container.innerHTML = '<div class="col-span-2 text-center py-8 text-gray-500">جاري تحميل البيانات...</div>';
                     return;
                 }
                 
                 items.forEach(item => {
                     const isOwned = type === 'frames' 
-                        ? (currentUserData.purchasedFrames || []).includes(item.id)
-                        : (currentUserData.purchasedBadges || []).includes(item.id);
+                        ? (window.currentUserData.purchasedFrames || []).includes(item.id)
+                        : (window.currentUserData.purchasedBadges || []).includes(item.id);
                     
                     const isEquipped = type === 'frames'
-                        ? currentUserData.activeFrame === item.id
-                        : (currentUserData.activeBadges || []).includes(item.id);
+                        ? window.currentUserData.activeFrame === item.id
+                        : (window.currentUserData.activeBadges || []).includes(item.id);
                     
                     container.innerHTML += `
                         <div class="store-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}" 
@@ -794,20 +1394,31 @@
             }
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('active');
+        // شراء العنصر
+        async function buyItem(item) {
+            const { buyItem } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            window.buyItem(item);
         }
 
-        function toggleSearch() {
-            const searchContainer = document.getElementById('searchContainer');
-            searchContainer.classList.toggle('active');
-            if (searchContainer.classList.contains('active')) {
-                document.getElementById('searchInput').focus();
-                document.getElementById('searchResults').innerHTML = '<div class="text-center text-gray-500 py-4">اكتب ID المستخدم للبحث</div>';
-            }
+        // تفعيل العنصر
+        async function equipItem(item) {
+            const { equipItem } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            window.equipItem(item);
         }
 
+        // البحث عن مستخدمين
+        async function searchUsers() {
+            const { searchUsers } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            window.searchUsers();
+        }
+
+        // الشحن
+        async function recharge(amount, dollars) {
+            const { recharge } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            window.recharge(amount, dollars);
+        }
+
+        // تبديل المشاهد
         function switchView(v) {
             document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
             document.getElementById(`view-${v}`).classList.add('active');
@@ -815,7 +1426,8 @@
             const titles = {
                 'rooms': 'الرئيسية',
                 'wallet': 'المحفظة',
-                'store': 'المتجر'
+                'store': 'المتجر',
+                'admin': 'لوحة التحكم'
             };
             document.getElementById('view-title').innerText = titles[v] || v;
             
@@ -826,8 +1438,43 @@
             if (v === 'store') {
                 setTimeout(() => filterStore('frames'), 100);
             }
+            
+            // إذا كانت لوحة التحكم، تحميل القوائم
+            if (v === 'admin' && window.isAdmin) {
+                setTimeout(() => {
+                    showAdminTab('banners');
+                    lucide.createIcons();
+                }, 100);
+            }
         }
 
+        // تبديل السايدبار
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+            lucide.createIcons();
+        }
+
+        // تبديل البحث
+        function toggleSearch() {
+            const searchContainer = document.getElementById('searchContainer');
+            searchContainer.classList.toggle('active');
+            if (searchContainer.classList.contains('active')) {
+                document.getElementById('searchInput').focus();
+                const results = document.getElementById('searchResults');
+                results.innerHTML = '<div class="text-center text-gray-500 py-4">اكتب ID المستخدم للبحث</div>';
+            }
+        }
+
+        // تهيئة التطبيق
+        function initApp() {
+            renderRooms();
+            filterStore('frames');
+            lucide.createIcons();
+            console.log("التطبيق جاهز!");
+        }
+
+        // عند تحميل الصفحة
         window.onload = () => {
             lucide.createIcons();
         };
