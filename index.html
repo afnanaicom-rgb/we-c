@@ -352,7 +352,7 @@
                 
                 if (!userSnap.exists()) {
                     // إنشاء بيانات جديدة للمستخدم
-                    await setDoc(userRef, {
+                    const userData = {
                         uid: user.uid,
                         displayName: user.displayName || 'مستخدم',
                         email: user.email || '',
@@ -365,17 +365,23 @@
                         activeFrame: null,
                         activeBadges: [],
                         createdAt: serverTimestamp(),
-                        lastLogin: serverTimestamp()
-                    });
+                        lastLogin: serverTimestamp(),
+                        username: user.displayName?.split(' ')[0] || 'مستخدم'
+                    };
+                    
+                    await setDoc(userRef, userData);
+                    console.log("تم إنشاء بيانات المستخدم:", userData);
                     showToast("تم إنشاء حسابك بنجاح! 🎉", 'success');
                 } else {
                     // تحديث آخر دخول
                     await updateDoc(userRef, {
                         lastLogin: serverTimestamp()
                     });
+                    console.log("تم تحديث بيانات الدخول");
                 }
                 
-                // تحديث الواجهة
+                // تحديث الواجهة بعد التأكد من حفظ البيانات
+                await new Promise(resolve => setTimeout(resolve, 500));
                 await loadUserData(user.uid);
                 
             } catch (error) {
@@ -392,8 +398,15 @@
                 
                 if (userSnap.exists()) {
                     const userData = userSnap.data();
+                    console.log("بيانات المستخدم المحملة:", userData);
+                    
+                    // تحديث الواجهة
                     updateUI(userData);
+                    
+                    // تحميل التطبيق الرئيسي
+                    initApp();
                 } else {
+                    console.error("لم يتم العثور على بيانات المستخدم");
                     showToast("لم يتم العثور على بيانات المستخدم", 'error');
                 }
             } catch (error) {
@@ -417,7 +430,6 @@
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 await loadUserData(user.uid);
-                initApp();
             } else {
                 document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('main-app').style.display = 'none';
@@ -436,17 +448,9 @@
                 showToast("جاري معالجة الشحن...", 'info');
                 const userRef = doc(db, "users", user.uid);
                 
-                // الحصول على البيانات الحالية
-                const userSnap = await getDoc(userRef);
-                const currentData = userSnap.data();
-                
-                // حساب مستوى الثروة الجديد (كل 5 دولارات ترفع مستوى)
-                const newWealthLv = currentData.wealthLv + Math.floor(dollars / 5);
-                
                 await updateDoc(userRef, {
                     balance: increment(amount),
-                    wealthLv: newWealthLv > currentData.wealthLv ? newWealthLv : currentData.wealthLv,
-                    totalSpent: increment(dollars)
+                    wealthLv: increment(Math.floor(dollars))
                 });
                 
                 // تحديث البيانات
@@ -647,123 +651,147 @@
             filterStore('frames');
             lucide.createIcons();
             
-            // تحديث الأيقونات
-            setTimeout(() => {
-                lucide.createIcons();
-            }, 100);
+            console.log("التطبيق جاهز!");
         }
 
         function updateUI(userData) {
-            currentUserData = userData;
-            
-            // تحديث المعلومات الأساسية
-            document.getElementById('userName').innerText = userData.displayName || 'مستخدم';
-            document.getElementById('userEmail').innerText = userData.email || '';
-            document.getElementById('userAvatar').src = userData.photoURL || 'https://i.pravatar.cc/150';
-            document.getElementById('userID').innerText = userData.uid.substring(0, 8);
-            
-            // تحديث الرصيد والمستويات
-            document.getElementById('header-balance').innerText = userData.balance?.toLocaleString() || '0';
-            document.getElementById('wallet-balance-big').innerText = userData.balance?.toLocaleString() || '0';
-            document.getElementById('wealth-lv').innerText = `ثروة LV ${userData.wealthLv || 1}`;
-            document.getElementById('magic-lv').innerText = `سحر LV ${userData.magicLv || 1}`;
-            
-            // تحديث الإطار النشط
-            const activeFrameImg = document.getElementById('activeFrame');
-            if (userData.activeFrame) {
-                const frame = storeItems.frames.find(f => f.id === userData.activeFrame);
-                if (frame) {
-                    activeFrameImg.src = frame.image;
-                    activeFrameImg.style.display = 'block';
+            try {
+                currentUserData = userData;
+                
+                // تحديث المعلومات الأساسية
+                document.getElementById('userName').innerText = userData.displayName || 'مستخدم';
+                document.getElementById('userEmail').innerText = userData.email || '';
+                document.getElementById('userAvatar').src = userData.photoURL || 'https://i.pravatar.cc/150';
+                document.getElementById('userID').innerText = userData.uid ? userData.uid.substring(0, 8) : '00000000';
+                
+                // تحديث الرصيد والمستويات
+                const balance = userData.balance || 0;
+                const wealthLv = userData.wealthLv || 1;
+                const magicLv = userData.magicLv || 1;
+                
+                document.getElementById('header-balance').innerText = balance.toLocaleString();
+                document.getElementById('wallet-balance-big').innerText = balance.toLocaleString();
+                document.getElementById('wealth-lv').innerText = `ثروة LV ${wealthLv}`;
+                document.getElementById('magic-lv').innerText = `سحر LV ${magicLv}`;
+                
+                // تحديث الإطار النشط
+                const activeFrameImg = document.getElementById('activeFrame');
+                if (userData.activeFrame) {
+                    const frame = storeItems.frames.find(f => f.id === userData.activeFrame);
+                    if (frame) {
+                        activeFrameImg.src = frame.image;
+                        activeFrameImg.style.display = 'block';
+                    } else {
+                        activeFrameImg.style.display = 'none';
+                    }
+                } else {
+                    activeFrameImg.style.display = 'none';
                 }
-            } else {
-                activeFrameImg.style.display = 'none';
+                
+                // تحديث الشارات
+                updateBadgesDisplay(userData.activeBadges || []);
+                
+                console.log("تم تحديث الواجهة بنجاح");
+            } catch (error) {
+                console.error("خطأ في تحديث الواجهة:", error);
             }
-            
-            // تحديث الشارات
-            updateBadgesDisplay(userData.activeBadges || []);
         }
 
         function updateBadgesDisplay(activeBadges) {
-            const badgeSlots = document.querySelectorAll('.badge-slot');
-            badgeSlots.forEach((slot, index) => {
-                slot.innerHTML = '';
-                slot.classList.remove('has-badge');
-                
-                if (index < activeBadges.length) {
-                    const badgeId = activeBadges[index];
-                    const badge = storeItems.badges.find(b => b.id === badgeId);
-                    if (badge) {
-                        slot.innerHTML = badge.icon;
-                        slot.classList.add('has-badge');
+            try {
+                const badgeSlots = document.querySelectorAll('.badge-slot');
+                badgeSlots.forEach((slot, index) => {
+                    slot.innerHTML = '';
+                    slot.classList.remove('has-badge');
+                    
+                    if (index < activeBadges.length) {
+                        const badgeId = activeBadges[index];
+                        const badge = storeItems.badges.find(b => b.id === badgeId);
+                        if (badge) {
+                            slot.innerHTML = badge.icon;
+                            slot.classList.add('has-badge');
+                        }
                     }
-                }
-            });
+                });
+            } catch (error) {
+                console.error("خطأ في تحديث الشارات:", error);
+            }
         }
 
         function renderRooms() {
-            const container = document.getElementById('roomsContainer');
-            container.innerHTML = "";
-            const roomNames = [
-                "غرفة الأحلام", "غرفة النجوم", "غرفة السحر", 
-                "غرفة الذهب", "غرفة الألماس", "غرفة الأسرار", "غرفة التحدي"
-            ];
-            
-            for (let i = 0; i < 7; i++) {
-                container.innerHTML += `
-                    <div class="bg-white p-3 rounded-2xl border text-center shadow-sm hover:shadow-md transition-shadow">
-                        <div class="relative">
-                            <img src="https://picsum.photos/seed/room${i}/200" class="w-full h-24 object-cover rounded-xl mb-2">
-                            <div class="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full">${i + 1}</div>
+            try {
+                const container = document.getElementById('roomsContainer');
+                container.innerHTML = "";
+                const roomNames = [
+                    "غرفة الأحلام", "غرفة النجوم", "غرفة السحر", 
+                    "غرفة الذهب", "غرفة الألماس", "غرفة الأسرار", "غرفة التحدي"
+                ];
+                
+                for (let i = 0; i < 7; i++) {
+                    container.innerHTML += `
+                        <div class="bg-white p-3 rounded-2xl border text-center shadow-sm hover:shadow-md transition-shadow">
+                            <div class="relative">
+                                <img src="https://picsum.photos/seed/room${i}/200" class="w-full h-24 object-cover rounded-xl mb-2">
+                                <div class="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full">${i + 1}</div>
+                            </div>
+                            <div class="font-bold text-[11px]">${roomNames[i]}</div>
+                            <button class="w-full bg-orange-500 text-white mt-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-orange-600">
+                                دخول
+                            </button>
                         </div>
-                        <div class="font-bold text-[11px]">${roomNames[i]}</div>
-                        <button class="w-full bg-orange-500 text-white mt-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-orange-600">
-                            دخول
-                        </button>
-                    </div>
-                `;
+                    `;
+                }
+            } catch (error) {
+                console.error("خطأ في عرض الغرف:", error);
             }
         }
 
         function filterStore(type) {
-            // تحديث أزرار التصفية
-            document.getElementById('framesBtn').className = type === 'frames' 
-                ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold'
-                : 'px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold';
-            
-            document.getElementById('badgesBtn').className = type === 'badges'
-                ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold'
-                : 'px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold';
-            
-            const container = document.getElementById('storeItems');
-            container.innerHTML = "";
-            const items = storeItems[type];
-            
-            if (!items || !currentUserData) return;
-            
-            items.forEach(item => {
-                const isOwned = type === 'frames' 
-                    ? (currentUserData.purchasedFrames || []).includes(item.id)
-                    : (currentUserData.purchasedBadges || []).includes(item.id);
+            try {
+                // تحديث أزرار التصفية
+                document.getElementById('framesBtn').className = type === 'frames' 
+                    ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold'
+                    : 'px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold';
                 
-                const isEquipped = type === 'frames'
-                    ? currentUserData.activeFrame === item.id
-                    : (currentUserData.activeBadges || []).includes(item.id);
+                document.getElementById('badgesBtn').className = type === 'badges'
+                    ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold'
+                    : 'px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold';
                 
-                container.innerHTML += `
-                    <div class="store-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}" 
-                         onclick="${isOwned ? 'equipItem' : 'buyItem'}(${JSON.stringify(item).replace(/'/g, "\\'")})">
-                        <div class="text-3xl mb-2">${item.icon || `<img src="${item.image}" class="w-12 h-12 mx-auto">`}</div>
-                        <div class="font-bold text-xs mb-1">${item.name}</div>
-                        <div class="text-[10px] text-gray-500 mb-2">${item.description || ''}</div>
-                        <div class="text-[10px] text-gray-500 mb-2">${item.price.toLocaleString()} 💰</div>
-                        <button class="w-full ${isOwned ? (isEquipped ? 'bg-green-500' : 'bg-blue-500') : 'bg-orange-500'} 
-                                    text-white py-2 rounded-xl text-[10px] font-bold hover:opacity-90">
-                            ${isOwned ? (isEquipped ? '💎 مُفعّل' : 'تفعيل') : 'شراء'}
-                        </button>
-                    </div>
-                `;
-            });
+                const container = document.getElementById('storeItems');
+                container.innerHTML = "";
+                const items = storeItems[type];
+                
+                if (!items || !currentUserData) {
+                    container.innerHTML = '<div class="col-span-2 text-center py-8 text-gray-500">جاري تحميل البيانات...</div>';
+                    return;
+                }
+                
+                items.forEach(item => {
+                    const isOwned = type === 'frames' 
+                        ? (currentUserData.purchasedFrames || []).includes(item.id)
+                        : (currentUserData.purchasedBadges || []).includes(item.id);
+                    
+                    const isEquipped = type === 'frames'
+                        ? currentUserData.activeFrame === item.id
+                        : (currentUserData.activeBadges || []).includes(item.id);
+                    
+                    container.innerHTML += `
+                        <div class="store-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}" 
+                             onclick="${isOwned ? 'equipItem' : 'buyItem'}(${JSON.stringify(item).replace(/'/g, "\\'")})">
+                            <div class="text-3xl mb-2">${item.icon || `<img src="${item.image}" class="w-12 h-12 mx-auto">`}</div>
+                            <div class="font-bold text-xs mb-1">${item.name}</div>
+                            <div class="text-[10px] text-gray-500 mb-2">${item.description || ''}</div>
+                            <div class="text-[10px] text-gray-500 mb-2">${item.price.toLocaleString()} 💰</div>
+                            <button class="w-full ${isOwned ? (isEquipped ? 'bg-green-500' : 'bg-blue-500') : 'bg-orange-500'} 
+                                        text-white py-2 rounded-xl text-[10px] font-bold hover:opacity-90">
+                                ${isOwned ? (isEquipped ? '💎 مُفعّل' : 'تفعيل') : 'شراء'}
+                            </button>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("خطأ في عرض المتجر:", error);
+            }
         }
 
         function toggleSidebar() {
@@ -796,7 +824,7 @@
             
             // إذا كانت واجهة المتجر، قم بتحديثها
             if (v === 'store') {
-                filterStore('frames');
+                setTimeout(() => filterStore('frames'), 100);
             }
         }
 
