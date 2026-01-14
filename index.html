@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - الرئيسية</title>
+    <title>Afnan AI - النسخة المتقدمة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -22,93 +22,57 @@
 
         /* --- Profile Styles --- */
         .profile-container { position: relative; width: 100px; height: 100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-        
-        .avatar-img { 
-            width: 80px; height: 80px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            z-index: 1; 
-            border: 2px solid white; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
-        }
-        
-        /* تعديل الإطار: تكبيره قليلاً واستخدام contain لمنع المط */
-        .user-frame { 
-            position: absolute; 
-            width: 115%; /* أكبر قليلاً من الكونتينر ليحيط بالصورة */
-            height: 115%; 
-            top: 50%; left: 50%; 
-            transform: translate(-50%, -50%); /* سنترة دقيقة */
-            z-index: 2; 
-            pointer-events: none; 
-            object-fit: contain; /* يحافظ على أبعاد الإطار */
-        }
+        .avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; z-index: 1; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .user-frame { position: absolute; width: 115%; height: 115%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; pointer-events: none; object-fit: contain; }
         
         /* --- Level Styles --- */
         .level-container { display: flex; justify-content: center; gap: 15px; margin-top: 15px; padding: 0 10px; }
         .level-badge-wrapper { position: relative; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
-        .level-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2)); }
+        .level-img { width: 100%; height: 100%; object-fit: contain; }
         
-        /* رقم الليفل في المنتصف، أبيض، بدون خلفية */
+        /* رقم ليفل مدمج، صغير، وجهة اليمين */
         .level-number { 
             position: absolute; 
-            inset: 0; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+            bottom: 8px;
+            right: 6px; 
             color: white; 
-            font-size: 14px; 
-            font-weight: 800; 
+            font-size: 10px; 
+            font-weight: 900; 
             z-index: 5; 
-            text-shadow: 
-                -1px -1px 0 #000,  
-                 1px -1px 0 #000,
-                -1px  1px 0 #000,
-                 1px  1px 0 #000,
-                 0 2px 5px rgba(0,0,0,0.5); /* ستروك أسود لضمان الوضوح */
+            line-height: 1;
+            pointer-events: none;
         }
 
         /* --- Glowing ID Style --- */
         @keyframes glow-red-blue {
-            0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5), 0 0 10px rgba(255, 0, 0, 0.3); color: #ef4444; }
-            50% { text-shadow: 0 0 10px rgba(120, 50, 255, 0.8), 0 0 20px rgba(0, 0, 255, 0.4); color: #8b5cf6; }
-            100% { text-shadow: 0 0 5px rgba(0, 0, 255, 0.5), 0 0 10px rgba(0, 0, 255, 0.3); color: #3b82f6; }
+            0% { text-shadow: 0 0 5px rgba(255, 0, 0, 0.5); color: #ef4444; }
+            50% { text-shadow: 0 0 10px rgba(120, 50, 255, 0.8); color: #8b5cf6; }
+            100% { text-shadow: 0 0 5px rgba(0, 0, 255, 0.5); color: #3b82f6; }
         }
+        .glowing-id { font-family: 'Courier New', monospace; font-weight: 900; animation: glow-red-blue 3s infinite alternate; }
 
-        .glowing-id {
-            font-family: 'Courier New', monospace; /* خط رقمي */
-            font-weight: 900;
-            letter-spacing: 1px;
-            animation: glow-red-blue 3s infinite alternate;
-        }
-
-        /* Store & Items */
         .store-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         .store-card { background: white; border-radius: 18px; padding: 12px; text-align: center; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; position: relative; transition: 0.2s; }
-        .store-card.owned { border-color: #e5e7eb; background: #f9fafb; }
         .store-card.equipped { border: 2px solid #10b981; background: #ecfdf5; }
         
-        .action-btn { width: 100%; padding: 8px 0; border-radius: 12px; font-size: 12px; font-weight: bold; margin-top: 8px; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-buy { background: #f59e0b; color: white; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2); }
-        .btn-buy:active { transform: scale(0.95); }
+        .action-btn { width: 100%; padding: 8px 0; border-radius: 12px; font-size: 11px; font-weight: bold; margin-top: 8px; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-buy { background: #f59e0b; color: white; }
         .btn-equip { background: #3b82f6; color: white; }
-        .btn-equipped { background: #10b981; color: white; cursor: default; }
+        .btn-unequip { background: #ef4444; color: white; }
 
         .sidebar { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: white; z-index: 4000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid #eee; display: flex; flex-direction: column; }
         .sidebar.open { right: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 2500; display: none; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
         .overlay.active { display: block; opacity: 1; }
 
-        .wallet-card { background: linear-gradient(135deg, #0f172a, #334155); color: white; border-radius: 24px; padding: 30px; margin: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2); }
-        .login-btn { width: 100%; max-width: 280px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 18px; font-weight: bold; margin-bottom: 12px; transition: 0.2s; }
-        .login-btn:active { transform: scale(0.98); }
-        .btn-google { background: white; border: 1px solid #eee; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .btn-x { background: #000; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .wallet-card { background: linear-gradient(135deg, #0f172a, #334155); color: white; border-radius: 24px; padding: 30px; margin: 20px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2); }
+        .login-btn { width: 100%; max-width: 280px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 18px; font-weight: bold; margin-bottom: 12px; }
+        .btn-google { background: white; border: 1px solid #eee; color: #333; }
+        .btn-x { background: #000; color: white; }
 
-        /* Edit Profile Modal */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal.active { display: flex; }
-        .modal-content { background: white; width: 90%; max-width: 350px; padding: 25px; border-radius: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .modal-content { background: white; width: 90%; max-width: 350px; padding: 25px; border-radius: 25px; animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .form-input { width: 100%; padding: 12px; border: 1px solid #eee; background: #f9f9f9; border-radius: 12px; margin-bottom: 10px; font-size: 14px; }
     </style>
@@ -117,196 +81,131 @@
 
     <div id="toastContainer" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[11000] transition-all duration-300"></div>
 
-    <!-- Login Page -->
+    <!-- Login -->
     <div id="loginPage" class="fixed inset-0 bg-white z-[10000] flex flex-col items-center justify-center p-8">
-        <div class="w-32 h-32 bg-orange-50 rounded-full flex items-center justify-center mb-6 animate-pulse">
-             <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-24 drop-shadow-lg">
+        <div class="w-32 h-32 bg-orange-50 rounded-full flex items-center justify-center mb-6">
+             <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-24">
         </div>
         <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Afnan AI</h1>
-        <p class="text-gray-400 mb-10 text-sm">عالمك الافتراضي المتكامل</p>
-        
-        <div id="userLoginSection" class="w-full flex flex-col items-center gap-2">
+        <div class="w-full flex flex-col items-center gap-2">
             <button onclick="loginWithGoogle()" class="login-btn btn-google">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5">
                 <span>تسجيل الدخول عبر جوجل</span>
             </button>
-            <button onclick="loginWithX()" class="login-btn btn-x">
-                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                <span>تسجيل الدخول عبر X</span>
-            </button>
         </div>
     </div>
 
-    <!-- Main App -->
+    <!-- Main -->
     <div id="main-app" style="display: none;">
-        
-        <!-- Header -->
         <header class="app-header">
             <div class="header-top">
-                <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl hover:bg-gray-100 transition"><i data-lucide="menu" class="text-gray-600"></i></button>
+                <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl"><i data-lucide="menu"></i></button>
                 <div class="font-bold text-lg text-gray-800" id="view-title">الرئيسية</div>
-                <div class="flex items-center gap-2">
-                    <div class="flex items-center gap-2 bg-gradient-to-l from-orange-100 to-orange-50 px-4 py-1.5 rounded-full cursor-pointer border border-orange-100 shadow-sm" onclick="switchView('wallet')">
-                        <span id="header-balance" class="text-sm font-bold text-orange-600">0</span>
-                        <span class="text-lg">💰</span>
-                    </div>
+                <div onclick="switchView('wallet')" class="flex items-center gap-2 bg-orange-50 px-4 py-1.5 rounded-full border border-orange-100 shadow-sm cursor-pointer">
+                    <span id="header-balance" class="text-sm font-bold text-orange-600">0</span>
+                    <span class="text-lg">💰</span>
                 </div>
             </div>
             <div class="header-tabs" id="main-tabs">
-                <div id="tab-public" class="tab-link active" onclick="switchTab('public')">غرف عامة</div>
-                <div id="tab-private" class="tab-link" onclick="switchTab('private')">خاص بي</div>
+                <div class="tab-link active">غرف عامة</div>
+                <div class="tab-link">خاص بي</div>
             </div>
         </header>
 
-        <!-- Sidebar -->
-        <div id="sidebar" class="sidebar overflow-y-auto custom-scrollbar">
+        <div id="sidebar" class="sidebar overflow-y-auto">
             <div class="p-6 text-center border-b border-gray-100 pb-8">
-                
-                <!-- بروفايل -->
                 <div class="profile-container mb-3">
-                    <img id="userAvatar" src="https://i.pravatar.cc/150" class="avatar-img">
+                    <img id="userAvatar" src="" class="avatar-img">
                     <img id="activeFrame" src="" class="user-frame" style="display: none;">
                 </div>
-                
-                <!-- اسم المستخدم وزر التعديل -->
                 <div class="flex items-center justify-center gap-2 mb-1">
-                    <div id="userName" class="font-bold text-lg text-gray-800">...</div>
-                    <button onclick="openEditProfile()" class="text-gray-400 hover:text-blue-500 bg-gray-50 p-1 rounded-full"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
+                    <div id="userName" class="font-bold text-lg">...</div>
+                    <button onclick="openEditProfile()" class="text-gray-400 bg-gray-50 p-1 rounded-full"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
                 </div>
-
-                <!-- ID مع النسخ والتوهج -->
                 <div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg text-[12px] mb-4 border border-gray-100 shadow-sm">
-                    <span class="text-gray-400">ID:</span>
                     <span id="userID" class="glowing-id">00000000</span>
-                    <button onclick="copyID()" class="text-gray-400 hover:text-green-500 active:scale-90 transition"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                    <button onclick="copyID()" class="text-gray-400 hover:text-green-500"><i data-lucide="copy" class="w-3 h-3"></i></button>
                 </div>
 
-                <!-- قسم الليفلات الجديد -->
                 <div class="level-container">
-                    <!-- ليفل الثروة -->
-                    <div class="flex flex-col items-center gap-1">
+                    <div class="flex flex-col items-center">
                         <div class="level-badge-wrapper">
-                            <img id="wealth-img" src="" class="level-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2535/2535556.png'">
+                            <img id="wealth-img" src="" class="level-img">
                             <div id="wealth-num" class="level-number">0</div>
                         </div>
-                        <span class="text-[10px] font-bold text-gray-400">ثروة</span>
+                        <span class="text-[9px] font-bold text-gray-400">ثروة</span>
                     </div>
-
-                    <!-- ليفل السحر -->
-                    <div class="flex flex-col items-center gap-1">
+                    <div class="flex flex-col items-center">
                         <div class="level-badge-wrapper">
-                            <img id="magic-img" src="" class="level-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/867/867906.png'">
+                            <img id="magic-img" src="" class="level-img">
                             <div id="magic-num" class="level-number">0</div>
                         </div>
-                        <span class="text-[10px] font-bold text-gray-400">سحر</span>
+                        <span class="text-[9px] font-bold text-gray-400">سحر</span>
                     </div>
                 </div>
-
             </div>
             
             <nav class="p-4 space-y-1">
-                <button onclick="switchView('home')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
-                    <i data-lucide="home" class="w-5 h-5"></i><span class="font-bold text-sm">الرئيسية</span>
+                <button onclick="switchView('home')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
+                    <i data-lucide="home"></i><span class="font-bold text-sm">الرئيسية</span>
                 </button>
-                <button onclick="switchView('wallet')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
-                    <i data-lucide="wallet" class="w-5 h-5"></i><span class="font-bold text-sm">المحفظة</span>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
+                    <i data-lucide="wallet"></i><span class="font-bold text-sm">المحفظة</span>
                 </button>
-                <button onclick="switchView('store')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
-                    <i data-lucide="shopping-bag" class="w-5 h-5"></i><span class="font-bold text-sm">المتجر</span>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
+                    <i data-lucide="shopping-bag"></i><span class="font-bold text-sm">المتجر</span>
                 </button>
-                <button onclick="switchView('bag')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
-                    <i data-lucide="briefcase" class="w-5 h-5"></i><span class="font-bold text-sm">حقيبتي</span>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
+                    <i data-lucide="briefcase"></i><span class="font-bold text-sm">حقيبتي</span>
                 </button>
             </nav>
             
-            <div class="mt-auto p-4 border-t border-gray-100">
-                 <button onclick="logout()" class="w-full flex items-center justify-center gap-2 p-3 bg-red-50 text-red-500 hover:bg-red-100 rounded-xl transition font-bold text-sm">
-                    <i data-lucide="log-out" class="w-4 h-4"></i> خروج
-                </button>
-            </div>
-        </div>
-
-        <!-- Edit Profile Modal -->
-        <div id="editProfileModal" class="modal">
-            <div class="modal-content">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-lg">تعديل الملف الشخصي</h3>
-                    <button onclick="closeEditProfile()" class="text-gray-400"><i data-lucide="x"></i></button>
-                </div>
-                <div class="space-y-3">
-                    <div>
-                        <label class="text-xs font-bold text-gray-500 mb-1 block">اسم المستخدم</label>
-                        <input type="text" id="newDisplayName" class="form-input" placeholder="اسمك الجديد">
-                    </div>
-                    <div>
-                        <label class="text-xs font-bold text-gray-500 mb-1 block">رابط الصورة الشخصية</label>
-                        <input type="text" id="newPhotoURL" class="form-input" placeholder="https://...">
-                    </div>
-                    <button onclick="saveProfileChanges()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mt-2 shadow-lg shadow-blue-200">حفظ التعديلات</button>
-                </div>
+            <div class="mt-auto p-4">
+                 <button onclick="logout()" class="w-full flex items-center justify-center gap-2 p-3 bg-red-50 text-red-500 rounded-xl font-bold text-sm"> خروج </button>
             </div>
         </div>
 
         <!-- Home View -->
         <div id="view-home" class="view-screen active">
-            <div id="bannerContainer" class="mx-4 mb-6 rounded-2xl overflow-hidden shadow-sm h-[180px] relative bg-gray-200">
-                <!-- Banner loaded dynamically -->
-            </div>
-            <div id="public-rooms" class="px-4 pb-20">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bold text-gray-800 text-lg">الغرف النشطة</h3>
-                    <span class="text-xs text-orange-500 font-bold cursor-pointer">عرض الكل</span>
-                </div>
-                <div id="roomsList" class="flex flex-col gap-3">
-                    <!-- Rooms here -->
-                </div>
+            <div id="bannerContainer" class="mx-4 mb-6 rounded-2xl h-[180px] bg-gray-200"></div>
+            <div class="px-4 pb-20">
+                <h3 class="font-bold text-gray-800 text-lg mb-4">الغرف النشطة</h3>
+                <div id="roomsList" class="flex flex-col gap-3"></div>
             </div>
         </div>
 
-        <!-- Wallet View -->
+        <!-- Wallet -->
         <div id="view-wallet" class="view-screen">
             <div class="wallet-card">
-                <div class="text-xs text-gray-300 mb-2 font-medium">رصيدك الحالي</div>
-                <div class="text-4xl font-extrabold tracking-tight"><span id="wallet-balance-big">0</span> 💰</div>
-                <div class="mt-6 flex gap-3">
-                    <button class="flex-1 bg-white/10 hover:bg-white/20 text-white py-2 rounded-lg text-xs font-bold transition">سجل العمليات</button>
-                    <button class="flex-1 bg-white text-gray-900 py-2 rounded-lg text-xs font-bold shadow-lg hover:bg-gray-50 transition">شحن الرصيد</button>
-                </div>
-            </div>
-            <div class="px-5">
-                <h3 class="font-bold mb-4 text-gray-800">باقات الشحن</h3>
-                <div class="bg-white border border-gray-100 rounded-2xl p-4 flex items-center justify-between shadow-sm mb-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center text-xl">💎</div>
-                        <div>
-                            <div class="font-bold text-gray-800">باقة المبتدئ</div>
-                            <div class="text-[10px] text-orange-500 font-bold bg-orange-50 px-2 py-0.5 rounded-full inline-block mt-1">+27,000 عملة</div>
-                        </div>
-                    </div>
-                    <button onclick="recharge(27000, 1)" class="bg-gray-900 text-white px-5 py-2 rounded-xl text-xs font-bold shadow-md hover:bg-gray-800 transition">1$ شراء</button>
-                </div>
+                <div class="text-xs text-gray-300 mb-2">رصيدك الحالي</div>
+                <div class="text-4xl font-extrabold"><span id="wallet-balance-big">0</span> 💰</div>
             </div>
         </div>
 
-        <!-- Store View -->
+        <!-- Store -->
         <div id="view-store" class="view-screen">
-            <div class="sticky top-[110px] bg-[#f8f9fa] z-20 pb-2 pt-2 px-4 shadow-sm">
-                <div class="flex p-1 bg-gray-200 rounded-xl">
-                    <button id="framesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold transition text-gray-600" onclick="filterStore('frames')">إطارات</button>
-                    <button id="badgesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold transition text-gray-600" onclick="filterStore('badges')">شارات</button>
-                </div>
+            <div class="flex p-4 gap-2 sticky top-[110px] bg-[#f8f9fa] z-20">
+                <button id="framesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white shadow-sm" onclick="filterStore('frames')">إطارات</button>
+                <button id="badgesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold text-gray-500" onclick="filterStore('badges')">شارات</button>
             </div>
             <div id="storeItems" class="store-grid"></div>
         </div>
 
-        <!-- Bag View -->
+        <!-- Bag -->
         <div id="view-bag" class="view-screen">
             <div class="px-5">
-                <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                    <i data-lucide="briefcase" class="w-5 h-5 text-orange-500"></i>
-                    حقيبتي
-                </h3>
+                <h3 class="font-bold text-gray-800 mb-4">حقيبتي (صلاحية العناصر 24 ساعة)</h3>
                 <div id="bagItems" class="store-grid"></div>
+            </div>
+        </div>
+
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content">
+                <h3 class="font-bold text-lg mb-4">تعديل البروفايل</h3>
+                <input type="text" id="newDisplayName" class="form-input" placeholder="الاسم">
+                <input type="text" id="newPhotoURL" class="form-input" placeholder="رابط الصورة">
+                <button onclick="saveProfileChanges()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">حفظ</button>
+                <button onclick="closeEditProfile()" class="w-full mt-2 text-gray-400 text-sm">إلغاء</button>
             </div>
         </div>
 
@@ -315,7 +214,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -333,24 +232,18 @@
 
         window.currentUserData = null;
         window.storeItems = { frames: [], badges: [] };
-        window.levelAssets = {}; 
         let userUnsubscribe = null;
 
-        // --- AUTH & REALTIME DATA ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userUnsubscribe = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                     if (docSnap.exists()) {
                         window.currentUserData = docSnap.data();
+                        checkItemExpiration(); // فحص انتهاء الصلاحية عند كل تحديث
                         updateUI();
                         if(document.getElementById('view-bag').classList.contains('active')) updateBag();
-                        if(document.getElementById('view-store').classList.contains('active')) {
-                            const currentType = document.getElementById('framesBtn').classList.contains('bg-white') ? 'frames' : 'badges';
-                            filterStore(currentType); 
-                        }
                     }
                 });
-
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
                 loadInitialData();
@@ -361,45 +254,45 @@
             }
         });
 
-        window.loginWithGoogle = async () => {
-            const provider = new GoogleAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                await checkAndCreateUser(result.user);
-            } catch (error) { showToast("خطأ في تسجيل الدخول", "error"); }
-        };
+        async function checkItemExpiration() {
+            const u = window.currentUserData;
+            const now = Date.now();
+            const oneDay = 24 * 60 * 60 * 1000;
+            let changed = false;
+            
+            // فحص الإطارات
+            const validFrames = (u.purchasedFrames || []).filter(item => {
+                if (now - item.purchasedAt > oneDay) { changed = true; return false; }
+                return true;
+            });
 
-        window.loginWithX = async () => {
-            const provider = new TwitterAuthProvider();
-            try {
-                const result = await signInWithPopup(auth, provider);
-                await checkAndCreateUser(result.user);
-            } catch (error) { showToast("خطأ في تسجيل الدخول", "error"); }
-        };
+            // فحص الشارات
+            const validBadges = (u.purchasedBadges || []).filter(item => {
+                if (now - item.purchasedAt > oneDay) { changed = true; return false; }
+                return true;
+            });
 
-        async function checkAndCreateUser(user) {
-            const userRef = doc(db, "users", user.uid);
-            const snap = await getDoc(userRef);
-            if (!snap.exists()) {
-                await setDoc(userRef, {
-                    uid: user.uid,
-                    displayName: user.displayName || "مستخدم جديد",
-                    email: user.email,
-                    photoURL: user.photoURL,
-                    balance: 1000,
-                    wealthLevel: 1,
-                    magicLevel: 1,
-                    customId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-                    createdAt: new Date()
-                });
+            if (changed) {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                const updates = { purchasedFrames: validFrames, purchasedBadges: validBadges };
+                
+                // خلع الإطار إذا انتهى
+                if (u.activeFrame && !validFrames.find(f => f.id === u.activeFrame)) {
+                    updates.activeFrame = null;
+                }
+                
+                await updateDoc(userRef, updates);
+                showToast("انتهت صلاحية بعض العناصر (24 ساعة)", "error");
             }
         }
 
-        // --- UI UPDATES ---
+        window.loginWithGoogle = async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (e) {}
+        };
+
         function updateUI() {
             const u = window.currentUserData;
             if(!u) return;
-
             document.getElementById('userName').innerText = u.displayName;
             document.getElementById('userAvatar').src = u.photoURL;
             document.getElementById('userID').innerText = u.customId;
@@ -408,243 +301,96 @@
             
             const frameImg = document.getElementById('activeFrame');
             if (u.activeFrame) {
-                const frame = window.storeItems.frames.find(f => f.id === u.activeFrame);
-                if (frame) { frameImg.src = frame.image; frameImg.style.display = 'block'; }
+                const frameObj = window.storeItems.frames.find(f => f.id === u.activeFrame);
+                if (frameObj) { frameImg.src = frameObj.image; frameImg.style.display = 'block'; }
             } else frameImg.style.display = 'none';
 
             renderLevel(u.wealthLevel || 1, 'wealth');
             renderLevel(u.magicLevel || 1, 'magic');
-            
             lucide.createIcons();
         }
 
         function renderLevel(level, type) {
-            const imgEl = document.getElementById(`${type}-img`);
-            const numEl = document.getElementById(`${type}-num`);
-            
-            const tierIndex = Math.floor(level / 10); 
-            numEl.innerText = level;
-
-            const fallbackWealth = [
-                "https://cdn-icons-png.flaticon.com/512/2535/2535556.png",
-                "https://cdn-icons-png.flaticon.com/512/2535/2535583.png", 
-                "https://cdn-icons-png.flaticon.com/512/2535/2535606.png"
-            ];
-            const fallbackMagic = [
-                "https://cdn-icons-png.flaticon.com/512/867/867906.png",
-                "https://cdn-icons-png.flaticon.com/512/867/867926.png",
-                "https://cdn-icons-png.flaticon.com/512/867/867954.png"
-            ];
-
-            const assetKey = `${type}_${tierIndex}`;
-            let imgSrc;
-
-            if (window.levelAssets && window.levelAssets[assetKey]) {
-                imgSrc = window.levelAssets[assetKey];
-            } else {
-                const arr = type === 'wealth' ? fallbackWealth : fallbackMagic;
-                imgSrc = arr[Math.min(tierIndex, arr.length - 1)];
-            }
-            imgEl.src = imgSrc;
+            document.getElementById(`${type}-num`).innerText = level;
+            const tier = Math.floor(level / 10);
+            const fallbacks = {
+                wealth: ["https://cdn-icons-png.flaticon.com/512/2535/2535556.png", "https://cdn-icons-png.flaticon.com/512/2535/2535583.png"],
+                magic: ["https://cdn-icons-png.flaticon.com/512/867/867906.png", "https://cdn-icons-png.flaticon.com/512/867/867926.png"]
+            };
+            document.getElementById(`${type}-img`).src = fallbacks[type][Math.min(tier, 1)];
         }
 
         async function loadInitialData() {
-            loadBanners();
-            loadLevelAssets();
-            loadStoreItems();
-        }
-
-        async function loadLevelAssets() {
-            try {
-                const docSnap = await getDoc(doc(db, "system_assets", "levels"));
-                if (docSnap.exists()) {
-                    window.levelAssets = docSnap.data();
-                    updateUI();
-                }
-            } catch(e) {}
-        }
-
-        async function loadBanners() {
-            const snap = await getDocs(collection(db, "banners"));
-            const container = document.getElementById('bannerContainer');
-            if(snap.empty) {
-                container.innerHTML = `<img src="https://images.unsplash.com/photo-1614850523060-8da1d56ae167?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover">`;
-                return;
-            }
-            container.innerHTML = '';
-            snap.forEach(doc => {
-                container.innerHTML = `<img src="${doc.data().imageUrl}" class="w-full h-full object-cover">`;
-            });
-        }
-
-        async function loadStoreItems() {
             const fSnap = await getDocs(collection(db, "frames"));
-            window.storeItems.frames = [];
-            fSnap.forEach(doc => window.storeItems.frames.push({ id: doc.id, ...doc.data() }));
-            
+            window.storeItems.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
             const bSnap = await getDocs(collection(db, "badges"));
-            window.storeItems.badges = [];
-            bSnap.forEach(doc => window.storeItems.badges.push({ id: doc.id, ...doc.data() }));
-            
+            window.storeItems.badges = bSnap.docs.map(d => ({id: d.id, ...d.data()}));
             filterStore('frames');
         }
 
-        // --- Store & Bag Logic ---
         window.filterStore = (type) => {
             const container = document.getElementById('storeItems');
-            const framesBtn = document.getElementById('framesBtn');
-            const badgesBtn = document.getElementById('badgesBtn');
-
-            if (type === 'frames') {
-                framesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition bg-white text-gray-800 shadow-sm";
-                badgesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition text-gray-500 hover:bg-gray-100";
-            } else {
-                badgesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition bg-white text-gray-800 shadow-sm";
-                framesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold transition text-gray-500 hover:bg-gray-100";
-            }
-
             container.innerHTML = '';
             window.storeItems[type].forEach(item => {
-                const isOwned = (type === 'frames' ? window.currentUserData.purchasedFrames : window.currentUserData.purchasedBadges)?.includes(item.id);
-                let btnHtml = '';
-                if (isOwned) {
-                    btnHtml = `<button disabled class="action-btn bg-gray-100 text-gray-400 cursor-default">مملوك</button>`;
-                } else {
-                    btnHtml = `<button onclick="buyItem('${type}', '${item.id}', ${item.price})" class="action-btn btn-buy">شراء (${item.price})</button>`;
-                }
-
                 container.innerHTML += `
-                    <div class="store-card ${isOwned ? 'owned' : ''}">
-                        <div class="h-16 flex items-center justify-center mb-2 w-full">
+                    <div class="store-card">
+                        <div class="h-16 flex items-center justify-center mb-2">
                             ${type === 'frames' ? `<img src="${item.image}" class="w-14 h-14 object-contain">` : `<span class="text-4xl">${item.icon}</span>`}
                         </div>
-                        <div class="font-bold text-xs text-gray-700 w-full truncate">${item.name}</div>
-                        ${btnHtml}
-                    </div>
-                `;
+                        <div class="font-bold text-[10px] text-gray-700">${item.name}</div>
+                        <button onclick="buyItem('${type}', '${item.id}', ${item.price})" class="action-btn btn-buy">شراء (${item.price})</button>
+                    </div>`;
             });
         };
 
         window.buyItem = async (type, itemId, price) => {
-            if (!auth.currentUser) return;
-            if (window.currentUserData.balance < price) { showToast("رصيدك غير كافٍ!", "error"); return; }
-
+            if (window.currentUserData.balance < price) return showToast("رصيد غير كافٍ", "error");
             const userRef = doc(db, "users", auth.currentUser.uid);
-            const updateData = { balance: increment(-price) };
+            const newItem = { id: itemId, purchasedAt: Date.now() };
             
-            if (type === 'frames') updateData.purchasedFrames = [ ...(window.currentUserData.purchasedFrames || []), itemId ];
-            else updateData.purchasedBadges = [ ...(window.currentUserData.purchasedBadges || []), itemId ];
+            const field = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
+            const currentList = window.currentUserData[field] || [];
             
-            try { await updateDoc(userRef, updateData); showToast("تم الشراء بنجاح!", "success"); } 
-            catch (e) { showToast("حدث خطأ ما", "error"); }
+            await updateDoc(userRef, {
+                balance: increment(-price),
+                [field]: [...currentList, newItem]
+            });
+            showToast("تم الشراء! صالح لمدة يوم", "success");
         };
 
         window.updateBag = () => {
             const container = document.getElementById('bagItems');
             container.innerHTML = '';
             const u = window.currentUserData;
-            let hasItems = false;
-            
-            (u.purchasedFrames || []).forEach(fid => {
-                const item = window.storeItems.frames.find(f => f.id === fid);
-                if (item) {
-                    hasItems = true;
-                    const isEquipped = u.activeFrame === fid;
-                    const btnHtml = isEquipped 
-                        ? `<button disabled class="action-btn btn-equipped">مستخدم</button>`
-                        : `<button onclick="equipItem('frame', '${fid}')" class="action-btn btn-equip">ارتداء</button>`;
-                    
-                    container.innerHTML += `
-                        <div class="store-card ${isEquipped ? 'equipped' : ''}">
-                            <div class="absolute top-2 left-2 text-[10px] text-gray-400 font-bold">إطار</div>
-                            <img src="${item.image}" class="w-14 h-14 mx-auto mb-2 mt-2 object-contain">
-                            <div class="text-xs font-bold text-gray-700">${item.name}</div>
-                            ${btnHtml}
-                        </div>`;
-                }
-            });
-            
-            (u.purchasedBadges || []).forEach(bid => {
-                const item = window.storeItems.badges.find(b => b.id === bid);
-                if (item) {
-                    hasItems = true;
-                    container.innerHTML += `
-                        <div class="store-card">
-                            <div class="absolute top-2 left-2 text-[10px] text-gray-400 font-bold">شارة</div>
-                            <span class="text-4xl block mb-2 mt-2">${item.icon}</span>
-                            <div class="text-xs font-bold text-gray-700">${item.name}</div>
-                            <button class="action-btn bg-gray-100 text-gray-500 cursor-default">بالخزينة</button>
-                        </div>`;
-                }
-            });
 
-            if (!hasItems) container.innerHTML = `<div class="col-span-2 text-center text-gray-400 py-10">الحقيبة فارغة.</div>`;
+            (u.purchasedFrames || []).forEach((pItem, index) => {
+                const item = window.storeItems.frames.find(f => f.id === pItem.id);
+                if (item) {
+                    const isActive = u.activeFrame === item.id;
+                    container.innerHTML += `
+                        <div class="store-card ${isActive ? 'equipped' : ''}">
+                            <img src="${item.image}" class="w-12 h-12 object-contain">
+                            <div class="text-[9px] font-bold">${item.name}</div>
+                            ${isActive ? 
+                                `<button onclick="equipItem('frame', null)" class="action-btn btn-unequip">خلع</button>` : 
+                                `<button onclick="equipItem('frame', '${item.id}')" class="action-btn btn-equip">ارتداء</button>`
+                            }
+                        </div>`;
+                }
+            });
         };
 
         window.equipItem = async (type, id) => {
             const userRef = doc(db, "users", auth.currentUser.uid);
-            try { if (type === 'frame') await updateDoc(userRef, { activeFrame: id }); showToast("تم التغيير", "success"); } 
-            catch(e) { showToast("فشل التغيير", "error"); }
+            await updateDoc(userRef, { activeFrame: id });
+            showToast(id ? "تم الارتداء" : "تم الخلع");
         };
 
-        // --- Profile Actions ---
-        window.openEditProfile = () => {
-            document.getElementById('newDisplayName').value = window.currentUserData.displayName || '';
-            document.getElementById('newPhotoURL').value = window.currentUserData.photoURL || '';
-            document.getElementById('editProfileModal').classList.add('active');
-        };
-
-        window.closeEditProfile = () => document.getElementById('editProfileModal').classList.remove('active');
-
-        window.saveProfileChanges = async () => {
-            const name = document.getElementById('newDisplayName').value;
-            const photo = document.getElementById('newPhotoURL').value;
-            
-            if(!name) return showToast("الاسم مطلوب", "error");
-            
-            try {
-                const userRef = doc(db, "users", auth.currentUser.uid);
-                await updateDoc(userRef, { displayName: name, photoURL: photo });
-                showToast("تم تحديث الملف الشخصي", "success");
-                closeEditProfile();
-            } catch(e) {
-                showToast("حدث خطأ", "error");
-            }
-        };
-
-        window.copyID = () => {
-            const id = document.getElementById('userID').innerText;
-            navigator.clipboard.writeText(id).then(() => {
-                showToast("تم نسخ الـ ID", "success");
-            }).catch(() => {
-                // Fallback
-                const el = document.createElement('textarea');
-                el.value = id;
-                document.body.appendChild(el);
-                el.select();
-                document.execCommand('copy');
-                document.body.removeChild(el);
-                showToast("تم نسخ الـ ID", "success");
-            });
-        };
-
-        // --- Navigation ---
         window.switchView = (view) => {
             document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
-            const activeView = document.getElementById('view-' + view);
-            activeView.classList.add('active');
-            
-            const titles = { 'home': 'الرئيسية', 'wallet': 'المحفظة', 'store': 'المتجر', 'bag': 'حقيبتي' };
-            document.getElementById('view-title').innerText = titles[view];
-            document.getElementById('main-tabs').style.display = view === 'home' ? 'flex' : 'none';
-            
+            document.getElementById('view-' + view).classList.add('active');
+            document.getElementById('view-title').innerText = view;
             if (view === 'bag') updateBag();
-            if (view === 'store') filterStore('frames'); 
-
-            if (window.innerWidth < 768) {
-                document.getElementById('sidebar').classList.remove('open');
-                document.getElementById('overlay').classList.remove('active');
-            }
         };
 
         window.toggleSidebar = () => {
@@ -652,22 +398,33 @@
             document.getElementById('overlay').classList.toggle('active');
         };
 
-        window.logout = async () => { await signOut(auth); location.reload(); };
+        window.copyID = () => {
+            navigator.clipboard.writeText(window.currentUserData.customId);
+            showToast("تم نسخ الـ ID");
+        };
+
+        window.openEditProfile = () => document.getElementById('editProfileModal').classList.add('active');
+        window.closeEditProfile = () => document.getElementById('editProfileModal').classList.remove('active');
+        window.saveProfileChanges = async () => {
+            const name = document.getElementById('newDisplayName').value;
+            const photo = document.getElementById('newPhotoURL').value;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { displayName: name, photoURL: photo });
+            closeEditProfile();
+        };
+
+        window.logout = () => signOut(auth);
 
         function showToast(msg, type = 'success') {
             const container = document.getElementById('toastContainer');
             const div = document.createElement('div');
-            const color = type === 'success' ? 'bg-green-500' : 'bg-red-500';
-            div.className = `${color} text-white px-6 py-3 rounded-full shadow-lg mb-2 font-bold text-sm transform transition-all duration-300 translate-y-10 opacity-0`;
+            div.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-2 rounded-full shadow-lg mb-2 text-xs font-bold transition-all duration-300`;
             div.innerText = msg;
             container.appendChild(div);
-            setTimeout(() => { div.classList.remove('translate-y-10', 'opacity-0'); }, 10);
-            setTimeout(() => { div.classList.add('opacity-0', 'translate-y-full'); setTimeout(() => div.remove(), 300); }, 3000);
+            setTimeout(() => div.remove(), 3000);
         }
 
         lucide.createIcons();
     </script>
 </body>
 </html>
-
 
