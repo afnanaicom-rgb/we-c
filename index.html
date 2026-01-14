@@ -19,7 +19,7 @@
         /* بروفايل السايدبار */
         .profile-container { position: relative; width: 100px; height: 100px; margin: 0 auto; }
         .avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; position: absolute; top: 10px; left: 10px; z-index: 1; }
-        .user-frame { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; display: none; }
+        .user-frame { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; }
         
         .level-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 10px; color: white; margin: 2px; }
         .wealth-lv { background: linear-gradient(to left, #f59e0b, #d97706); }
@@ -27,6 +27,7 @@
 
         .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px; width: 100%; max-width: 200px; margin: 0 auto; }
         .badge-slot { width: 40px; height: 40px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px dashed #ccc; }
+        .badge-slot.has-badge { border: 2px solid #f59e0b; background: linear-gradient(135deg, #fff5e6, #ffedd5); }
 
         /* تصميم كرت المحفظة */
         .wallet-card { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; border-radius: 30px; padding: 30px; margin: 20px; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
@@ -39,6 +40,17 @@
         .sidebar.open { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 2500; display: none; backdrop-filter: blur(4px); }
         .overlay.active { display: block; }
+
+        /* البحث */
+        .search-container { position: fixed; top: 70px; right: 0; left: 0; background: white; padding: 1rem; border-bottom: 1px solid #eee; z-index: 999; display: none; }
+        .search-container.active { display: block; }
+        .search-input { width: 100%; padding: 12px 16px; border: 2px solid #f3f4f6; border-radius: 12px; font-size: 14px; background: #fafafa; }
+
+        /* عناصر المتجر */
+        .store-item { background: white; border-radius: 16px; padding: 16px; text-align: center; border: 1px solid #eee; transition: 0.2s; }
+        .store-item:active { transform: scale(0.98); }
+        .store-item.owned { opacity: 0.6; }
+        .store-item.equipped { border: 2px solid #10b981; }
     </style>
 </head>
 <body>
@@ -57,17 +69,26 @@
         <header class="app-header">
             <button onclick="toggleSidebar()" class="p-2 bg-gray-50 rounded-lg"><i data-lucide="menu"></i></button>
             <div class="font-bold" id="view-title">الرئيسية</div>
-            <div class="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-full cursor-pointer" onclick="switchView('wallet')">
-                <span id="header-balance" class="text-xs font-bold text-orange-600">0</span>
-                <span>💰</span>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleSearch()" class="p-2 bg-gray-50 rounded-lg"><i data-lucide="search"></i></button>
+                <div class="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-full cursor-pointer" onclick="switchView('wallet')">
+                    <span id="header-balance" class="text-xs font-bold text-orange-600">0</span>
+                    <span>💰</span>
+                </div>
             </div>
         </header>
+
+        <!-- شريط البحث -->
+        <div id="searchContainer" class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن مستخدم برقم ID...">
+            <div id="searchResults" class="mt-3 max-h-60 overflow-y-auto"></div>
+        </div>
 
         <div id="sidebar" class="sidebar overflow-y-auto">
             <div class="p-6 text-center border-b">
                 <div class="profile-container">
                     <img id="userAvatar" src="https://i.pravatar.cc/150" class="avatar-img">
-                    <img id="activeFrame" src="" class="user-frame">
+                    <img id="activeFrame" src="" class="user-frame" style="display: none;">
                 </div>
                 <div id="userName" class="font-bold mt-2 text-gray-800">تحميل...</div>
                 <div class="flex justify-center gap-1 my-2">
@@ -77,7 +98,10 @@
                 <div class="text-[10px] text-gray-400 font-bold mb-3">ID: <span id="userID">88291034</span></div>
                 
                 <div class="badges-grid" id="userBadges">
-                    <div class="badge-slot"></div><div class="badge-slot"></div><div class="badge-slot"></div><div class="badge-slot"></div>
+                    <div class="badge-slot"></div>
+                    <div class="badge-slot"></div>
+                    <div class="badge-slot"></div>
+                    <div class="badge-slot"></div>
                 </div>
             </div>
             
@@ -136,7 +160,25 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            getDoc, 
+            updateDoc, 
+            collection, 
+            query, 
+            where, 
+            getDocs,
+            increment
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
@@ -149,54 +191,271 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        window.loginWithGoogle = () => {
-            const provider = new GoogleAuthProvider();
-            signInWithPopup(auth, provider).catch(e => alert(e.message));
+        // تعريف المتجر
+        const storeItems = {
+            frames: [
+                { id: 'frame1', name: 'إطار ذهبي', price: 5000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
+                { id: 'frame2', name: 'إطار فضي', price: 3000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
+                { id: 'frame3', name: 'إطار ماسي', price: 10000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
+                { id: 'frame4', name: 'إطار سحري', price: 15000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }
+            ],
+            badges: [
+                { id: 'badge1', name: 'شارة الملك', price: 1000, type: 'badge', icon: '👑' },
+                { id: 'badge2', name: 'شارة النجم', price: 800, type: 'badge', icon: '⭐' },
+                { id: 'badge3', name: 'شارة النار', price: 1200, type: 'badge', icon: '🔥' },
+                { id: 'badge4', name: 'شارة السحر', price: 2000, type: 'badge', icon: '✨' },
+                { id: 'badge5', name: 'شارة التاج', price: 1500, type: 'badge', icon: '👑' },
+                { id: 'badge6', name: 'شارة القلب', price: 700, type: 'badge', icon: '❤️' },
+                { id: 'badge7', name: 'شارة الدرع', price: 2500, type: 'badge', icon: '🛡️' }
+            ]
         };
+
+        window.loginWithGoogle = async () => {
+            try {
+                const provider = new GoogleAuthProvider();
+                const result = await signInWithPopup(auth, provider);
+                const user = result.user;
+                
+                // إنشاء/تحميل بيانات المستخدم
+                await initUserData(user);
+                
+            } catch (error) {
+                console.error("خطأ في التسجيل:", error);
+                showToast("حدث خطأ أثناء التسجيل");
+            }
+        };
+
+        async function initUserData(user) {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            
+            if (!userSnap.exists()) {
+                // إنشاء بيانات جديدة للمستخدم
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    balance: 0,
+                    wealthLv: 1,
+                    magicLv: 1,
+                    purchasedFrames: [],
+                    purchasedBadges: [],
+                    activeFrame: null,
+                    activeBadges: [],
+                    createdAt: new Date()
+                });
+            }
+            
+            // تحديث الواجهة
+            loadUserData(user.uid);
+        }
+
+        async function loadUserData(uid) {
+            const userRef = doc(db, "users", uid);
+            const userSnap = await getDoc(userRef);
+            
+            if (userSnap.exists()) {
+                const userData = userSnap.data();
+                updateUI(userData);
+            }
+        }
 
         window.logout = () => signOut(auth);
 
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                document.getElementById('userName').innerText = user.displayName;
-                document.getElementById('userAvatar').src = user.photoURL;
+                await loadUserData(user.uid);
                 initApp();
             } else {
                 document.getElementById('loginPage').style.display = 'flex';
                 document.getElementById('main-app').style.display = 'none';
             }
         });
+
+        // وظيفة الشحن
+        window.recharge = async (amount, dollars) => {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            try {
+                const userRef = doc(db, "users", user.uid);
+                await updateDoc(userRef, {
+                    balance: increment(amount),
+                    wealthLv: increment(dollars)
+                });
+                
+                // تحديث البيانات
+                await loadUserData(user.uid);
+                showToast(`💎 تم شحن ${amount.toLocaleString()} عملة بنجاح!`);
+            } catch (error) {
+                console.error("خطأ في الشحن:", error);
+                showToast("حدث خطأ أثناء الشحن");
+            }
+        };
+
+        // وظيفة الشراء
+        window.buyItem = async (item) => {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.data();
+                
+                // التحقق من الرصيد
+                if (userData.balance < item.price) {
+                    showToast("رصيدك غير كافي للشراء");
+                    return;
+                }
+                
+                // التحقق إذا كان العنصر مملوك بالفعل
+                if (item.type === 'frame') {
+                    if (userData.purchasedFrames.includes(item.id)) {
+                        showToast("لديك هذا الإطار بالفعل");
+                        return;
+                    }
+                } else if (item.type === 'badge') {
+                    if (userData.purchasedBadges.includes(item.id)) {
+                        showToast("لديك هذه الشارة بالفعل");
+                        return;
+                    }
+                }
+                
+                // خصم السعر وإضافة العنصر
+                let updates = {
+                    balance: increment(-item.price)
+                };
+                
+                if (item.type === 'frame') {
+                    updates.purchasedFrames = [...userData.purchasedFrames, item.id];
+                    updates.activeFrame = item.id; // تفعيل الإطار تلقائياً
+                } else if (item.type === 'badge') {
+                    updates.purchasedBadges = [...userData.purchasedBadges, item.id];
+                    
+                    // إضافة الشارة إذا كان هناك مكان
+                    if (userData.activeBadges.length < 4) {
+                        updates.activeBadges = [...userData.activeBadges, item.id];
+                    }
+                }
+                
+                await updateDoc(userRef, updates);
+                await loadUserData(user.uid);
+                showToast(`✅ تم شراء ${item.name} بنجاح!`);
+                
+            } catch (error) {
+                console.error("خطأ في الشراء:", error);
+                showToast("حدث خطأ أثناء الشراء");
+            }
+        };
+
+        // البحث عن مستخدمين
+        window.searchUsers = async () => {
+            const searchInput = document.getElementById('searchInput').value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (searchInput.length < 3) {
+                resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">اكتب 3 أحرف على الأقل</div>';
+                return;
+            }
+            
+            try {
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("uid", "==", searchInput));
+                const querySnapshot = await getDocs(q);
+                
+                resultsContainer.innerHTML = '';
+                
+                if (querySnapshot.empty) {
+                    resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">لم يتم العثور على مستخدم</div>';
+                    return;
+                }
+                
+                querySnapshot.forEach((doc) => {
+                    const user = doc.data();
+                    resultsContainer.innerHTML += `
+                        <div class="bg-white p-4 rounded-xl border mb-2 flex items-center gap-3">
+                            <img src="${user.photoURL || 'https://i.pravatar.cc/150'}" class="w-10 h-10 rounded-full">
+                            <div class="flex-1">
+                                <div class="font-bold text-sm">${user.displayName}</div>
+                                <div class="text-xs text-gray-500">ID: ${user.uid}</div>
+                                <div class="text-xs mt-1">
+                                    <span class="text-orange-500">💰 ${user.balance || 0}</span>
+                                    <span class="mx-2">•</span>
+                                    <span class="text-purple-500">سحر: ${user.magicLv || 1}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+            } catch (error) {
+                console.error("خطأ في البحث:", error);
+                resultsContainer.innerHTML = '<div class="text-center text-red-500 py-4">حدث خطأ في البحث</div>';
+            }
+        };
     </script>
 
     <script>
-        let userData = { balance: 0, wealthLv: 1, purchasedBadges: [] };
+        let currentUserData = null;
 
         function initApp() {
             renderRooms();
-            updateUI();
+            filterStore('frames');
             lucide.createIcons();
-        }
-
-        // وظيفة الشحن المحدثة
-        function recharge(amount, dollars) {
-            userData.balance += amount;
-            // رفع لفل الثروة (كل 1 دولار يرفع لفل واحد مثلاً)
-            userData.wealthLv += dollars;
-            updateUI();
-            showToast(`💎 تم شحن ${amount.toLocaleString()} عملة بنجاح!`);
-        }
-
-        function updateUI() {
-            document.getElementById('header-balance').innerText = userData.balance.toLocaleString();
-            document.getElementById('wallet-balance-big').innerText = userData.balance.toLocaleString();
-            document.getElementById('wealth-lv').innerText = `ثروة LV ${userData.wealthLv}`;
             
+            // إضافة مستمع حدث للبحث أثناء الكتابة
+            document.getElementById('searchInput').addEventListener('input', debounce(searchUsers, 500));
+        }
+
+        function updateUI(userData) {
+            currentUserData = userData;
+            
+            // تحديث المعلومات الأساسية
+            document.getElementById('userName').innerText = userData.displayName;
+            document.getElementById('userAvatar').src = userData.photoURL || 'https://i.pravatar.cc/150';
+            document.getElementById('userID').innerText = userData.uid.substring(0, 8);
+            
+            // تحديث الرصيد والمستويات
+            document.getElementById('header-balance').innerText = userData.balance?.toLocaleString() || '0';
+            document.getElementById('wallet-balance-big').innerText = userData.balance?.toLocaleString() || '0';
+            document.getElementById('wealth-lv').innerText = `ثروة LV ${userData.wealthLv || 1}`;
+            document.getElementById('magic-lv').innerText = `سحر LV ${userData.magicLv || 1}`;
+            
+            // تحديث الإطار النشط
+            const activeFrameImg = document.getElementById('activeFrame');
+            if (userData.activeFrame) {
+                const frame = storeItems.frames.find(f => f.id === userData.activeFrame);
+                if (frame) {
+                    activeFrameImg.src = frame.image;
+                    activeFrameImg.style.display = 'block';
+                }
+            } else {
+                activeFrameImg.style.display = 'none';
+            }
+            
+            // تحديث الشارات
+            updateBadgesDisplay(userData.activeBadges || []);
+        }
+
+        function updateBadgesDisplay(activeBadges) {
             const badgeSlots = document.querySelectorAll('.badge-slot');
-            userData.purchasedBadges.forEach((icon, index) => {
-                if (badgeSlots[index]) badgeSlots[index].innerText = icon;
+            badgeSlots.forEach((slot, index) => {
+                slot.innerHTML = '';
+                slot.classList.remove('has-badge');
+                
+                if (index < activeBadges.length) {
+                    const badgeId = activeBadges[index];
+                    const badge = storeItems.badges.find(b => b.id === badgeId);
+                    if (badge) {
+                        slot.innerHTML = badge.icon;
+                        slot.classList.add('has-badge');
+                    }
+                }
             });
         }
 
@@ -217,24 +476,71 @@
         function filterStore(type) {
             const container = document.getElementById('storeItems');
             container.innerHTML = "";
-            const items = type === 'frames' ? 
-                [{id:1, name:'إطار ذهبي', price:5000, img:'https://png.pngtree.com/png-clipart/20210310/original/pngtree-gold-luxury-circle-frame-png-image_5930064.png'}] :
-                [{id:2, name:'شارة الملك', price:1000, icon:'👑'}];
-
+            const items = storeItems[type];
+            
             items.forEach(item => {
+                const isOwned = type === 'frames' 
+                    ? (currentUserData?.purchasedFrames || []).includes(item.id)
+                    : (currentUserData?.purchasedBadges || []).includes(item.id);
+                
+                const isEquipped = type === 'frames'
+                    ? currentUserData?.activeFrame === item.id
+                    : (currentUserData?.activeBadges || []).includes(item.id);
+                
                 container.innerHTML += `
-                    <div class="bg-white p-4 rounded-2xl border text-center">
-                        <div class="text-3xl mb-2">${item.icon || `<img src="${item.img}" class="w-12 h-12 mx-auto">`}</div>
-                        <div class="font-bold text-xs">${item.name}</div>
-                        <button class="w-full bg-orange-500 text-white mt-2 py-2 rounded-xl text-[10px] font-bold" onclick="buy('${type}', '${item.id}')">${item.price} 💰</button>
+                    <div class="store-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}" 
+                         onclick="${isOwned ? 'equipItem' : 'buyItem'}(${JSON.stringify(item)})">
+                        <div class="text-3xl mb-2">${item.icon || `<img src="${item.image}" class="w-12 h-12 mx-auto">`}</div>
+                        <div class="font-bold text-xs mb-1">${item.name}</div>
+                        <div class="text-[10px] text-gray-500 mb-2">${item.price.toLocaleString()} 💰</div>
+                        <button class="w-full ${isOwned ? 'bg-green-500' : 'bg-orange-500'} text-white py-2 rounded-xl text-[10px] font-bold">
+                            ${isOwned ? (isEquipped ? '💎 مُفعّل' : 'تفعيل') : 'شراء'}
+                        </button>
                     </div>
                 `;
             });
         }
 
-        function buy(type, id) {
-            // منطق الشراء البسيط
-            showToast("جاري المعالجة...");
+        function equipItem(item) {
+            const user = auth.currentUser;
+            if (!user || !currentUserData) return;
+            
+            import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
+                .then(({ doc, updateDoc, getFirestore }) => {
+                    const db = getFirestore();
+                    const userRef = doc(db, "users", user.uid);
+                    
+                    let updates = {};
+                    if (item.type === 'frame') {
+                        updates.activeFrame = item.id;
+                    } else if (item.type === 'badge') {
+                        // إضافة الشارة إذا لم تكن موجودة، أو إزالتها إذا كانت موجودة
+                        let activeBadges = [...(currentUserData.activeBadges || [])];
+                        const index = activeBadges.indexOf(item.id);
+                        
+                        if (index > -1) {
+                            activeBadges.splice(index, 1); // إزالة
+                        } else {
+                            if (activeBadges.length < 4) {
+                                activeBadges.push(item.id); // إضافة
+                            } else {
+                                showToast("لا يمكنك إضافة أكثر من 4 شارات");
+                                return;
+                            }
+                        }
+                        updates.activeBadges = activeBadges;
+                    }
+                    
+                    return updateDoc(userRef, updates);
+                })
+                .then(() => {
+                    loadUserData(user.uid);
+                    showToast(`✅ تم ${item.type === 'frame' ? 'تفعيل الإطار' : 'تحديث الشارات'}`);
+                })
+                .catch(error => {
+                    console.error("خطأ في التفعيل:", error);
+                    showToast("حدث خطأ أثناء التفعيل");
+                });
         }
 
         function toggleSidebar() {
@@ -242,19 +548,47 @@
             document.getElementById('overlay').classList.toggle('active');
         }
 
+        function toggleSearch() {
+            document.getElementById('searchContainer').classList.toggle('active');
+            if (document.getElementById('searchContainer').classList.contains('active')) {
+                document.getElementById('searchInput').focus();
+            }
+        }
+
         function switchView(v) {
             document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
             document.getElementById(`view-${v}`).classList.add('active');
-            document.getElementById('view-title').innerText = v === 'rooms' ? 'الرئيسية' : (v === 'wallet' ? 'المحفظة' : 'المتجر');
+            
+            const titles = {
+                'rooms': 'الرئيسية',
+                'wallet': 'المحفظة',
+                'store': 'المتجر'
+            };
+            document.getElementById('view-title').innerText = titles[v] || v;
+            
             if (document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
+            if (document.getElementById('searchContainer').classList.contains('active')) toggleSearch();
         }
 
-        function showToast(m) {
-            const t = document.createElement('div');
-            t.className = "bg-gray-900 text-white px-6 py-3 rounded-2xl text-xs font-bold mb-2 shadow-2xl animate-bounce";
-            t.innerText = m;
-            document.getElementById('toastContainer').appendChild(t);
-            setTimeout(() => t.remove(), 2500);
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = "bg-gray-900 text-white px-6 py-3 rounded-2xl text-xs font-bold mb-2 shadow-2xl animate-bounce";
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
         }
 
         window.onload = () => lucide.createIcons();
