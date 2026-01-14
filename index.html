@@ -51,6 +51,9 @@
         .store-item:active { transform: scale(0.98); }
         .store-item.owned { opacity: 0.6; }
         .store-item.equipped { border: 2px solid #10b981; }
+        
+        .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid #f3f3f3; border-top: 3px solid #f59e0b; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -59,10 +62,15 @@
 
     <div id="loginPage" class="fixed inset-0 bg-white z-[10000] flex flex-col items-center justify-center p-6">
         <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-24 mb-6">
-        <button onclick="loginWithGoogle()" class="w-full max-w-xs flex items-center justify-center gap-3 border p-4 rounded-2xl font-bold shadow-sm">
+        <button onclick="loginWithGoogle()" class="w-full max-w-xs flex items-center justify-center gap-3 border p-4 rounded-2xl font-bold shadow-sm hover:bg-gray-50">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5">
             دخول عبر جوجل
         </button>
+        <div id="loginError" class="mt-4 text-red-500 text-sm hidden"></div>
+        <div id="loginLoading" class="mt-4 hidden">
+            <div class="loading"></div>
+            <span class="text-gray-600 text-sm mr-2">جاري تسجيل الدخول...</span>
+        </div>
     </div>
 
     <div id="main-app" style="display: none;">
@@ -80,7 +88,10 @@
 
         <!-- شريط البحث -->
         <div id="searchContainer" class="search-container">
-            <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن مستخدم برقم ID...">
+            <div class="flex gap-2">
+                <input type="text" id="searchInput" class="search-input flex-1" placeholder="ابحث عن مستخدم برقم ID...">
+                <button onclick="searchUsers()" class="bg-orange-500 text-white px-4 rounded-xl font-bold text-sm">بحث</button>
+            </div>
             <div id="searchResults" class="mt-3 max-h-60 overflow-y-auto"></div>
         </div>
 
@@ -91,6 +102,7 @@
                     <img id="activeFrame" src="" class="user-frame" style="display: none;">
                 </div>
                 <div id="userName" class="font-bold mt-2 text-gray-800">تحميل...</div>
+                <div id="userEmail" class="text-xs text-gray-500 mb-1"></div>
                 <div class="flex justify-center gap-1 my-2">
                     <span id="wealth-lv" class="level-badge wealth-lv">ثروة LV 1</span>
                     <span id="magic-lv" class="level-badge magic-lv">سحر LV 1</span>
@@ -149,8 +161,8 @@
 
         <div id="view-store" class="view-screen">
             <div class="flex justify-center gap-2 p-4">
-                <button class="px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold" onclick="filterStore('frames')">إطارات</button>
-                <button class="px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold" onclick="filterStore('badges')">شارات</button>
+                <button id="framesBtn" class="px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold" onclick="filterStore('frames')">إطارات</button>
+                <button id="badgesBtn" class="px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold" onclick="filterStore('badges')">شارات</button>
             </div>
             <div id="storeItems" class="grid grid-cols-2 gap-4 p-4"></div>
         </div>
@@ -177,7 +189,8 @@
             query, 
             where, 
             getDocs,
-            increment
+            increment,
+            serverTimestamp
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -196,73 +209,208 @@
         // تعريف المتجر
         const storeItems = {
             frames: [
-                { id: 'frame1', name: 'إطار ذهبي', price: 5000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
-                { id: 'frame2', name: 'إطار فضي', price: 3000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
-                { id: 'frame3', name: 'إطار ماسي', price: 10000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' },
-                { id: 'frame4', name: 'إطار سحري', price: 15000, type: 'frame', image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png' }
+                { 
+                    id: 'gold_frame_1', 
+                    name: 'إطار ذهبي', 
+                    price: 5000, 
+                    type: 'frame', 
+                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                    description: 'إطار ذهبي متميز'
+                },
+                { 
+                    id: 'silver_frame_2', 
+                    name: 'إطار فضي', 
+                    price: 3000, 
+                    type: 'frame', 
+                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                    description: 'إطار فضي أنيق'
+                },
+                { 
+                    id: 'diamond_frame_3', 
+                    name: 'إطار ماسي', 
+                    price: 10000, 
+                    type: 'frame', 
+                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                    description: 'إطار ماسي نادر'
+                },
+                { 
+                    id: 'magic_frame_4', 
+                    name: 'إطار سحري', 
+                    price: 15000, 
+                    type: 'frame', 
+                    image: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                    description: 'إطار سحري متوهج'
+                }
             ],
             badges: [
-                { id: 'badge1', name: 'شارة الملك', price: 1000, type: 'badge', icon: '👑' },
-                { id: 'badge2', name: 'شارة النجم', price: 800, type: 'badge', icon: '⭐' },
-                { id: 'badge3', name: 'شارة النار', price: 1200, type: 'badge', icon: '🔥' },
-                { id: 'badge4', name: 'شارة السحر', price: 2000, type: 'badge', icon: '✨' },
-                { id: 'badge5', name: 'شارة التاج', price: 1500, type: 'badge', icon: '👑' },
-                { id: 'badge6', name: 'شارة القلب', price: 700, type: 'badge', icon: '❤️' },
-                { id: 'badge7', name: 'شارة الدرع', price: 2500, type: 'badge', icon: '🛡️' }
+                { 
+                    id: 'king_badge_1', 
+                    name: 'شارة الملك', 
+                    price: 1000, 
+                    type: 'badge', 
+                    icon: '👑',
+                    description: 'شارة العظمة والقيادة'
+                },
+                { 
+                    id: 'star_badge_2', 
+                    name: 'شارة النجم', 
+                    price: 800, 
+                    type: 'badge', 
+                    icon: '⭐',
+                    description: 'شارة التميز والإبداع'
+                },
+                { 
+                    id: 'fire_badge_3', 
+                    name: 'شارة النار', 
+                    price: 1200, 
+                    type: 'badge', 
+                    icon: '🔥',
+                    description: 'شارة الحماس والطاقة'
+                },
+                { 
+                    id: 'magic_badge_4', 
+                    name: 'شارة السحر', 
+                    price: 2000, 
+                    type: 'badge', 
+                    icon: '✨',
+                    description: 'شارة الغموض والسحر'
+                },
+                { 
+                    id: 'crown_badge_5', 
+                    name: 'شارة التاج', 
+                    price: 1500, 
+                    type: 'badge', 
+                    icon: '👑',
+                    description: 'شارة السيادة'
+                },
+                { 
+                    id: 'heart_badge_6', 
+                    name: 'شارة القلب', 
+                    price: 700, 
+                    type: 'badge', 
+                    icon: '❤️',
+                    description: 'شارة الحب والوفاء'
+                },
+                { 
+                    id: 'shield_badge_7', 
+                    name: 'شارة الدرع', 
+                    price: 2500, 
+                    type: 'badge', 
+                    icon: '🛡️',
+                    description: 'شارة الحماية والقوة'
+                }
             ]
+        };
+
+        // دالة لعرض الرسائل
+        window.showToast = function(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            let bgColor = 'bg-gray-900';
+            if (type === 'success') bgColor = 'bg-green-600';
+            if (type === 'error') bgColor = 'bg-red-600';
+            if (type === 'warning') bgColor = 'bg-orange-500';
+            
+            toast.className = `${bgColor} text-white px-6 py-3 rounded-2xl text-xs font-bold mb-2 shadow-2xl animate-bounce`;
+            toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
         };
 
         window.loginWithGoogle = async () => {
             try {
+                document.getElementById('loginLoading').classList.remove('hidden');
+                document.getElementById('loginError').classList.add('hidden');
+                
                 const provider = new GoogleAuthProvider();
+                provider.addScope('email');
+                provider.addScope('profile');
+                
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
+                
+                showToast(`مرحباً ${user.displayName}!`, 'success');
                 
                 // إنشاء/تحميل بيانات المستخدم
                 await initUserData(user);
                 
             } catch (error) {
                 console.error("خطأ في التسجيل:", error);
-                showToast("حدث خطأ أثناء التسجيل");
+                document.getElementById('loginError').innerText = `خطأ: ${error.message}`;
+                document.getElementById('loginError').classList.remove('hidden');
+                showToast("حدث خطأ أثناء التسجيل", 'error');
+            } finally {
+                document.getElementById('loginLoading').classList.add('hidden');
             }
         };
 
         async function initUserData(user) {
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
-            
-            if (!userSnap.exists()) {
-                // إنشاء بيانات جديدة للمستخدم
-                await setDoc(userRef, {
-                    uid: user.uid,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    balance: 0,
-                    wealthLv: 1,
-                    magicLv: 1,
-                    purchasedFrames: [],
-                    purchasedBadges: [],
-                    activeFrame: null,
-                    activeBadges: [],
-                    createdAt: new Date()
-                });
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (!userSnap.exists()) {
+                    // إنشاء بيانات جديدة للمستخدم
+                    await setDoc(userRef, {
+                        uid: user.uid,
+                        displayName: user.displayName || 'مستخدم',
+                        email: user.email || '',
+                        photoURL: user.photoURL || 'https://i.pravatar.cc/150',
+                        balance: 1000, // رصيد ابتدائي
+                        wealthLv: 1,
+                        magicLv: 1,
+                        purchasedFrames: [],
+                        purchasedBadges: [],
+                        activeFrame: null,
+                        activeBadges: [],
+                        createdAt: serverTimestamp(),
+                        lastLogin: serverTimestamp()
+                    });
+                    showToast("تم إنشاء حسابك بنجاح! 🎉", 'success');
+                } else {
+                    // تحديث آخر دخول
+                    await updateDoc(userRef, {
+                        lastLogin: serverTimestamp()
+                    });
+                }
+                
+                // تحديث الواجهة
+                await loadUserData(user.uid);
+                
+            } catch (error) {
+                console.error("خطأ في إنشاء بيانات المستخدم:", error);
+                showToast("حدث خطأ في تهيئة البيانات", 'error');
+                throw error;
             }
-            
-            // تحديث الواجهة
-            loadUserData(user.uid);
         }
 
         async function loadUserData(uid) {
-            const userRef = doc(db, "users", uid);
-            const userSnap = await getDoc(userRef);
-            
-            if (userSnap.exists()) {
-                const userData = userSnap.data();
-                updateUI(userData);
+            try {
+                const userRef = doc(db, "users", uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    updateUI(userData);
+                } else {
+                    showToast("لم يتم العثور على بيانات المستخدم", 'error');
+                }
+            } catch (error) {
+                console.error("خطأ في تحميل بيانات المستخدم:", error);
+                showToast("خطأ في تحميل البيانات", 'error');
             }
         }
 
-        window.logout = () => signOut(auth);
+        window.logout = async () => {
+            try {
+                await signOut(auth);
+                showToast("تم تسجيل الخروج بنجاح", 'info');
+            } catch (error) {
+                console.error("خطأ في تسجيل الخروج:", error);
+                showToast("حدث خطأ أثناء تسجيل الخروج", 'error');
+            }
+        };
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -279,49 +427,67 @@
         // وظيفة الشحن
         window.recharge = async (amount, dollars) => {
             const user = auth.currentUser;
-            if (!user) return;
+            if (!user) {
+                showToast("يجب تسجيل الدخول أولاً", 'error');
+                return;
+            }
             
             try {
+                showToast("جاري معالجة الشحن...", 'info');
                 const userRef = doc(db, "users", user.uid);
+                
+                // الحصول على البيانات الحالية
+                const userSnap = await getDoc(userRef);
+                const currentData = userSnap.data();
+                
+                // حساب مستوى الثروة الجديد (كل 5 دولارات ترفع مستوى)
+                const newWealthLv = currentData.wealthLv + Math.floor(dollars / 5);
+                
                 await updateDoc(userRef, {
                     balance: increment(amount),
-                    wealthLv: increment(dollars)
+                    wealthLv: newWealthLv > currentData.wealthLv ? newWealthLv : currentData.wealthLv,
+                    totalSpent: increment(dollars)
                 });
                 
                 // تحديث البيانات
                 await loadUserData(user.uid);
-                showToast(`💎 تم شحن ${amount.toLocaleString()} عملة بنجاح!`);
+                showToast(`💎 تم شحن ${amount.toLocaleString()} عملة بنجاح!`, 'success');
+                
             } catch (error) {
                 console.error("خطأ في الشحن:", error);
-                showToast("حدث خطأ أثناء الشحن");
+                showToast("حدث خطأ أثناء الشحن", 'error');
             }
         };
 
         // وظيفة الشراء
         window.buyItem = async (item) => {
             const user = auth.currentUser;
-            if (!user) return;
+            if (!user) {
+                showToast("يجب تسجيل الدخول أولاً", 'error');
+                return;
+            }
             
             try {
+                showToast("جاري معالجة الشراء...", 'info');
                 const userRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userRef);
                 const userData = userSnap.data();
                 
                 // التحقق من الرصيد
                 if (userData.balance < item.price) {
-                    showToast("رصيدك غير كافي للشراء");
+                    showToast("رصيدك غير كافي للشراء", 'error');
                     return;
                 }
                 
                 // التحقق إذا كان العنصر مملوك بالفعل
                 if (item.type === 'frame') {
-                    if (userData.purchasedFrames.includes(item.id)) {
-                        showToast("لديك هذا الإطار بالفعل");
+                    if (userData.purchasedFrames?.includes(item.id)) {
+                        showToast("لديك هذا الإطار بالفعل", 'warning');
                         return;
                     }
                 } else if (item.type === 'badge') {
-                    if (userData.purchasedBadges.includes(item.id)) {
-                        showToast("لديك هذه الشارة بالفعل");
+                    if (userData.purchasedBadges?.includes(item.id)) {
+                        showToast("لديك هذه الشارة بالفعل", 'warning');
                         return;
                     }
                 }
@@ -332,24 +498,27 @@
                 };
                 
                 if (item.type === 'frame') {
-                    updates.purchasedFrames = [...userData.purchasedFrames, item.id];
+                    updates.purchasedFrames = [...(userData.purchasedFrames || []), item.id];
                     updates.activeFrame = item.id; // تفعيل الإطار تلقائياً
                 } else if (item.type === 'badge') {
-                    updates.purchasedBadges = [...userData.purchasedBadges, item.id];
+                    updates.purchasedBadges = [...(userData.purchasedBadges || []), item.id];
                     
                     // إضافة الشارة إذا كان هناك مكان
-                    if (userData.activeBadges.length < 4) {
-                        updates.activeBadges = [...userData.activeBadges, item.id];
+                    if ((userData.activeBadges?.length || 0) < 4) {
+                        updates.activeBadges = [...(userData.activeBadges || []), item.id];
                     }
                 }
                 
                 await updateDoc(userRef, updates);
                 await loadUserData(user.uid);
-                showToast(`✅ تم شراء ${item.name} بنجاح!`);
+                showToast(`✅ تم شراء ${item.name} بنجاح!`, 'success');
+                
+                // تحديث المتجر
+                filterStore(item.type === 'frame' ? 'frames' : 'badges');
                 
             } catch (error) {
                 console.error("خطأ في الشراء:", error);
-                showToast("حدث خطأ أثناء الشراء");
+                showToast("حدث خطأ أثناء الشراء", 'error');
             }
         };
 
@@ -358,20 +527,27 @@
             const searchInput = document.getElementById('searchInput').value.trim();
             const resultsContainer = document.getElementById('searchResults');
             
-            if (searchInput.length < 3) {
-                resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">اكتب 3 أحرف على الأقل</div>';
+            if (!searchInput) {
+                resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">اكتب ID المستخدم للبحث</div>';
                 return;
             }
             
             try {
+                showToast("جاري البحث...", 'info');
                 const usersRef = collection(db, "users");
-                const q = query(usersRef, where("uid", "==", searchInput));
+                
+                // البحث بالـ UID أو اسم المستخدم
+                const q = query(
+                    usersRef,
+                    where("uid", "==", searchInput)
+                );
+                
                 const querySnapshot = await getDocs(q);
                 
                 resultsContainer.innerHTML = '';
                 
                 if (querySnapshot.empty) {
-                    resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">لم يتم العثور على مستخدم</div>';
+                    resultsContainer.innerHTML = '<div class="text-center text-gray-500 py-4">لم يتم العثور على مستخدم بهذا الـ ID</div>';
                     return;
                 }
                 
@@ -379,23 +555,86 @@
                     const user = doc.data();
                     resultsContainer.innerHTML += `
                         <div class="bg-white p-4 rounded-xl border mb-2 flex items-center gap-3">
-                            <img src="${user.photoURL || 'https://i.pravatar.cc/150'}" class="w-10 h-10 rounded-full">
+                            <div class="relative">
+                                <img src="${user.photoURL || 'https://i.pravatar.cc/150'}" 
+                                     class="w-12 h-12 rounded-full object-cover">
+                                ${user.activeFrame ? '<div class="absolute inset-0 border-2 border-yellow-500 rounded-full"></div>' : ''}
+                            </div>
                             <div class="flex-1">
-                                <div class="font-bold text-sm">${user.displayName}</div>
-                                <div class="text-xs text-gray-500">ID: ${user.uid}</div>
-                                <div class="text-xs mt-1">
-                                    <span class="text-orange-500">💰 ${user.balance || 0}</span>
-                                    <span class="mx-2">•</span>
-                                    <span class="text-purple-500">سحر: ${user.magicLv || 1}</span>
+                                <div class="font-bold text-sm">${user.displayName || 'مستخدم'}</div>
+                                <div class="text-xs text-gray-500">${user.email || ''}</div>
+                                <div class="text-[10px] text-gray-400 font-bold mt-1">ID: ${user.uid.substring(0, 8)}...</div>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <span class="text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded">💰 ${user.balance?.toLocaleString() || 0}</span>
+                                    <span class="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded">👑 ${user.wealthLv || 1}</span>
+                                    <span class="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded">✨ ${user.magicLv || 1}</span>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
                 
+                showToast(`تم العثور على ${querySnapshot.size} مستخدم`, 'success');
+                
             } catch (error) {
                 console.error("خطأ في البحث:", error);
                 resultsContainer.innerHTML = '<div class="text-center text-red-500 py-4">حدث خطأ في البحث</div>';
+                showToast("حدث خطأ في البحث", 'error');
+            }
+        };
+
+        // تفعيل العنصر
+        window.equipItem = async (item) => {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.data();
+                
+                let updates = {};
+                if (item.type === 'frame') {
+                    // التحقق من ملكية الإطار
+                    if (!userData.purchasedFrames?.includes(item.id)) {
+                        showToast("يجب شراء هذا الإطار أولاً", 'error');
+                        return;
+                    }
+                    updates.activeFrame = item.id;
+                    showToast(`✅ تم تفعيل الإطار: ${item.name}`, 'success');
+                } else if (item.type === 'badge') {
+                    // التحقق من ملكية الشارة
+                    if (!userData.purchasedBadges?.includes(item.id)) {
+                        showToast("يجب شراء هذه الشارة أولاً", 'error');
+                        return;
+                    }
+                    
+                    let activeBadges = [...(userData.activeBadges || [])];
+                    const index = activeBadges.indexOf(item.id);
+                    
+                    if (index > -1) {
+                        activeBadges.splice(index, 1);
+                        showToast(`تم إزالة الشارة: ${item.name}`, 'info');
+                    } else {
+                        if (activeBadges.length >= 4) {
+                            showToast("لا يمكنك إضافة أكثر من 4 شارات", 'error');
+                            return;
+                        }
+                        activeBadges.push(item.id);
+                        showToast(`✅ تم تفعيل الشارة: ${item.name}`, 'success');
+                    }
+                    updates.activeBadges = activeBadges;
+                }
+                
+                await updateDoc(userRef, updates);
+                await loadUserData(user.uid);
+                
+                // تحديث عرض المتجر
+                filterStore(item.type === 'frame' ? 'frames' : 'badges');
+                
+            } catch (error) {
+                console.error("خطأ في التفعيل:", error);
+                showToast("حدث خطأ أثناء التفعيل", 'error');
             }
         };
     </script>
@@ -408,15 +647,18 @@
             filterStore('frames');
             lucide.createIcons();
             
-            // إضافة مستمع حدث للبحث أثناء الكتابة
-            document.getElementById('searchInput').addEventListener('input', debounce(searchUsers, 500));
+            // تحديث الأيقونات
+            setTimeout(() => {
+                lucide.createIcons();
+            }, 100);
         }
 
         function updateUI(userData) {
             currentUserData = userData;
             
             // تحديث المعلومات الأساسية
-            document.getElementById('userName').innerText = userData.displayName;
+            document.getElementById('userName').innerText = userData.displayName || 'مستخدم';
+            document.getElementById('userEmail').innerText = userData.email || '';
             document.getElementById('userAvatar').src = userData.photoURL || 'https://i.pravatar.cc/150';
             document.getElementById('userID').innerText = userData.uid.substring(0, 8);
             
@@ -462,85 +704,66 @@
         function renderRooms() {
             const container = document.getElementById('roomsContainer');
             container.innerHTML = "";
-            for (let i = 1; i <= 7; i++) {
+            const roomNames = [
+                "غرفة الأحلام", "غرفة النجوم", "غرفة السحر", 
+                "غرفة الذهب", "غرفة الألماس", "غرفة الأسرار", "غرفة التحدي"
+            ];
+            
+            for (let i = 0; i < 7; i++) {
                 container.innerHTML += `
-                    <div class="bg-white p-3 rounded-2xl border text-center shadow-sm">
-                        <img src="https://picsum.photos/seed/${i+10}/200" class="w-full h-24 object-cover rounded-xl mb-2">
-                        <div class="font-bold text-[11px]">غرفة أفنان ${i}</div>
-                        <button class="w-full bg-gray-50 mt-2 py-1.5 rounded-lg text-[10px] font-bold">دخول</button>
+                    <div class="bg-white p-3 rounded-2xl border text-center shadow-sm hover:shadow-md transition-shadow">
+                        <div class="relative">
+                            <img src="https://picsum.photos/seed/room${i}/200" class="w-full h-24 object-cover rounded-xl mb-2">
+                            <div class="absolute top-2 left-2 bg-black/50 text-white text-[10px] px-2 py-1 rounded-full">${i + 1}</div>
+                        </div>
+                        <div class="font-bold text-[11px]">${roomNames[i]}</div>
+                        <button class="w-full bg-orange-500 text-white mt-2 py-1.5 rounded-lg text-[10px] font-bold hover:bg-orange-600">
+                            دخول
+                        </button>
                     </div>
                 `;
             }
         }
 
         function filterStore(type) {
+            // تحديث أزرار التصفية
+            document.getElementById('framesBtn').className = type === 'frames' 
+                ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold'
+                : 'px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold';
+            
+            document.getElementById('badgesBtn').className = type === 'badges'
+                ? 'px-4 py-2 bg-orange-500 text-white rounded-xl text-xs font-bold'
+                : 'px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold';
+            
             const container = document.getElementById('storeItems');
             container.innerHTML = "";
             const items = storeItems[type];
             
+            if (!items || !currentUserData) return;
+            
             items.forEach(item => {
                 const isOwned = type === 'frames' 
-                    ? (currentUserData?.purchasedFrames || []).includes(item.id)
-                    : (currentUserData?.purchasedBadges || []).includes(item.id);
+                    ? (currentUserData.purchasedFrames || []).includes(item.id)
+                    : (currentUserData.purchasedBadges || []).includes(item.id);
                 
                 const isEquipped = type === 'frames'
-                    ? currentUserData?.activeFrame === item.id
-                    : (currentUserData?.activeBadges || []).includes(item.id);
+                    ? currentUserData.activeFrame === item.id
+                    : (currentUserData.activeBadges || []).includes(item.id);
                 
                 container.innerHTML += `
                     <div class="store-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}" 
-                         onclick="${isOwned ? 'equipItem' : 'buyItem'}(${JSON.stringify(item)})">
+                         onclick="${isOwned ? 'equipItem' : 'buyItem'}(${JSON.stringify(item).replace(/'/g, "\\'")})">
                         <div class="text-3xl mb-2">${item.icon || `<img src="${item.image}" class="w-12 h-12 mx-auto">`}</div>
                         <div class="font-bold text-xs mb-1">${item.name}</div>
+                        <div class="text-[10px] text-gray-500 mb-2">${item.description || ''}</div>
                         <div class="text-[10px] text-gray-500 mb-2">${item.price.toLocaleString()} 💰</div>
-                        <button class="w-full ${isOwned ? 'bg-green-500' : 'bg-orange-500'} text-white py-2 rounded-xl text-[10px] font-bold">
+                        <button class="w-full ${isOwned ? (isEquipped ? 'bg-green-500' : 'bg-blue-500') : 'bg-orange-500'} 
+                                    text-white py-2 rounded-xl text-[10px] font-bold hover:opacity-90">
                             ${isOwned ? (isEquipped ? '💎 مُفعّل' : 'تفعيل') : 'شراء'}
                         </button>
                     </div>
                 `;
             });
-        }
-
-        function equipItem(item) {
-            const user = auth.currentUser;
-            if (!user || !currentUserData) return;
-            
-            import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js")
-                .then(({ doc, updateDoc, getFirestore }) => {
-                    const db = getFirestore();
-                    const userRef = doc(db, "users", user.uid);
-                    
-                    let updates = {};
-                    if (item.type === 'frame') {
-                        updates.activeFrame = item.id;
-                    } else if (item.type === 'badge') {
-                        // إضافة الشارة إذا لم تكن موجودة، أو إزالتها إذا كانت موجودة
-                        let activeBadges = [...(currentUserData.activeBadges || [])];
-                        const index = activeBadges.indexOf(item.id);
-                        
-                        if (index > -1) {
-                            activeBadges.splice(index, 1); // إزالة
-                        } else {
-                            if (activeBadges.length < 4) {
-                                activeBadges.push(item.id); // إضافة
-                            } else {
-                                showToast("لا يمكنك إضافة أكثر من 4 شارات");
-                                return;
-                            }
-                        }
-                        updates.activeBadges = activeBadges;
-                    }
-                    
-                    return updateDoc(userRef, updates);
-                })
-                .then(() => {
-                    loadUserData(user.uid);
-                    showToast(`✅ تم ${item.type === 'frame' ? 'تفعيل الإطار' : 'تحديث الشارات'}`);
-                })
-                .catch(error => {
-                    console.error("خطأ في التفعيل:", error);
-                    showToast("حدث خطأ أثناء التفعيل");
-                });
         }
 
         function toggleSidebar() {
@@ -549,9 +772,11 @@
         }
 
         function toggleSearch() {
-            document.getElementById('searchContainer').classList.toggle('active');
-            if (document.getElementById('searchContainer').classList.contains('active')) {
+            const searchContainer = document.getElementById('searchContainer');
+            searchContainer.classList.toggle('active');
+            if (searchContainer.classList.contains('active')) {
                 document.getElementById('searchInput').focus();
+                document.getElementById('searchResults').innerHTML = '<div class="text-center text-gray-500 py-4">اكتب ID المستخدم للبحث</div>';
             }
         }
 
@@ -568,30 +793,16 @@
             
             if (document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
             if (document.getElementById('searchContainer').classList.contains('active')) toggleSearch();
+            
+            // إذا كانت واجهة المتجر، قم بتحديثها
+            if (v === 'store') {
+                filterStore('frames');
+            }
         }
 
-        function showToast(message) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = "bg-gray-900 text-white px-6 py-3 rounded-2xl text-xs font-bold mb-2 shadow-2xl animate-bounce";
-            toast.innerText = message;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        window.onload = () => lucide.createIcons();
+        window.onload = () => {
+            lucide.createIcons();
+        };
     </script>
 </body>
 </html>
