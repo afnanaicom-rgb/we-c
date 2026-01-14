@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - متجر الشبكة</title>
+    <title>Afnan AI - المحفظة والشحن</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,42 +11,34 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; }
         body, html { height: 100%; margin: 0; background-color: #f8f9fa; color: #1a1a1a; overflow-x: hidden; }
         
-        /* شاشات العرض */
         .view-screen { position: absolute; inset: 0; width: 100%; height: 100%; background: #f8f9fa; display: none; flex-direction: column; z-index: 10; padding-top: 70px; overflow-y: auto; }
         .view-screen.active { display: flex; }
 
-        /* الهيدر */
         .app-header { position: fixed; top: 0; right: 0; left: 0; height: 70px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; padding: 0 1rem; z-index: 1000; }
 
-        /* نظام الملف الشخصي المتطور */
+        /* بروفايل السايدبار */
         .profile-container { position: relative; width: 100px; height: 100px; margin: 0 auto; }
         .avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; position: absolute; top: 10px; left: 10px; z-index: 1; }
         .user-frame { position: absolute; inset: 0; z-index: 2; width: 100%; height: 100%; pointer-events: none; display: none; }
         
-        /* المستويات */
         .level-badge { font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 10px; color: white; margin: 2px; }
         .wealth-lv { background: linear-gradient(to left, #f59e0b, #d97706); }
         .magic-lv { background: linear-gradient(to left, #8b5cf6, #6d28d9); }
 
-        /* نظام الشارات (4 في كل سطر) */
         .badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; padding: 10px; width: 100%; max-width: 200px; margin: 0 auto; }
         .badge-slot { width: 40px; height: 40px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px dashed #ccc; }
 
-        /* الغرف */
-        .rooms-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 1rem; }
-        .room-card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #eee; }
+        /* تصميم كرت المحفظة */
+        .wallet-card { background: linear-gradient(135deg, #1e293b, #0f172a); color: white; border-radius: 30px; padding: 30px; margin: 20px; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+        .wallet-card::after { content: ''; position: absolute; top: -50%; right: -50%; width: 200px; height: 200px; background: rgba(245, 158, 11, 0.1); border-radius: 50%; }
 
-        /* المتجر */
-        .store-tab { padding: 10px 20px; border-radius: 12px; font-size: 12px; font-weight: bold; background: #eee; color: #666; cursor: pointer; }
-        .store-tab.active { background: #f59e0b; color: white; }
+        .buy-card { background: white; border: 1px solid #eee; border-radius: 20px; padding: 15px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; transition: 0.2s; }
+        .buy-card:active { transform: scale(0.98); border-color: #f59e0b; }
 
         .sidebar { position: fixed; top: 0; right: -300px; width: 300px; height: 100%; background: white; z-index: 4000; transition: 0.4s; border-left: 1px solid #eee; }
         .sidebar.open { right: 0; }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 2500; display: none; backdrop-filter: blur(4px); }
         .overlay.active { display: block; }
-        
-        .buy-btn { width: 100%; background: #f9fafb; border: 1px solid #eee; padding: 8px; border-radius: 12px; font-size: 11px; font-weight: bold; margin-top: 8px; transition: 0.2s; }
-        .buy-btn:active { background: #f59e0b; color: white; }
     </style>
 </head>
 <body>
@@ -55,7 +47,6 @@
 
     <div id="loginPage" class="fixed inset-0 bg-white z-[10000] flex flex-col items-center justify-center p-6">
         <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-24 mb-6">
-        <h1 class="text-xl font-bold mb-6">مرحباً بك في عالم أفنان</h1>
         <button onclick="loginWithGoogle()" class="w-full max-w-xs flex items-center justify-center gap-3 border p-4 rounded-2xl font-bold shadow-sm">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5">
             دخول عبر جوجل
@@ -66,7 +57,7 @@
         <header class="app-header">
             <button onclick="toggleSidebar()" class="p-2 bg-gray-50 rounded-lg"><i data-lucide="menu"></i></button>
             <div class="font-bold" id="view-title">الرئيسية</div>
-            <div class="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-full">
+            <div class="flex items-center gap-2 bg-orange-50 px-3 py-1 rounded-full cursor-pointer" onclick="switchView('wallet')">
                 <span id="header-balance" class="text-xs font-bold text-orange-600">0</span>
                 <span>💰</span>
             </div>
@@ -78,12 +69,12 @@
                     <img id="userAvatar" src="https://i.pravatar.cc/150" class="avatar-img">
                     <img id="activeFrame" src="" class="user-frame">
                 </div>
-                <div id="userName" class="font-bold mt-2">اسم المستخدم</div>
+                <div id="userName" class="font-bold mt-2 text-gray-800">تحميل...</div>
                 <div class="flex justify-center gap-1 my-2">
                     <span id="wealth-lv" class="level-badge wealth-lv">ثروة LV 1</span>
                     <span id="magic-lv" class="level-badge magic-lv">سحر LV 1</span>
                 </div>
-                <div class="text-[10px] text-gray-400">ID: <span id="userID">88291034</span></div>
+                <div class="text-[10px] text-gray-400 font-bold mb-3">ID: <span id="userID">88291034</span></div>
                 
                 <div class="badges-grid" id="userBadges">
                     <div class="badge-slot"></div><div class="badge-slot"></div><div class="badge-slot"></div><div class="badge-slot"></div>
@@ -92,20 +83,50 @@
             
             <div class="p-4">
                 <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('rooms')"><i data-lucide="home"></i> الرئيسية</div>
+                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('wallet')"><i data-lucide="wallet"></i> المحفظة</div>
                 <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer" onclick="switchView('store')"><i data-lucide="shopping-bag"></i> المتجر</div>
-                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer text-red-500" onclick="logout()"><i data-lucide="log-out"></i> تسجيل الخروج</div>
+                <div class="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl cursor-pointer text-red-500" onclick="logout()"><i data-lucide="log-out"></i> خروج</div>
             </div>
         </div>
 
         <div id="view-rooms" class="view-screen active">
-            <div class="rooms-grid" id="roomsContainer"></div>
+            <div class="p-4 grid grid-cols-2 gap-4" id="roomsContainer"></div>
+        </div>
+
+        <div id="view-wallet" class="view-screen">
+            <div class="wallet-card">
+                <div class="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">رصيدك الحالي</div>
+                <div class="flex items-baseline gap-2">
+                    <span id="wallet-balance-big" class="text-4xl font-bold">0</span>
+                    <span class="text-orange-500 font-bold">💰</span>
+                </div>
+            </div>
+
+            <div class="px-5">
+                <h3 class="font-bold text-gray-800 mb-4 px-2">باقات الشحن</h3>
+                
+                <div class="buy-card">
+                    <div>
+                        <div class="font-bold text-gray-800">باقة المبتدئ</div>
+                        <div class="text-[11px] text-orange-500 font-bold">+27,000 عملة</div>
+                    </div>
+                    <button onclick="recharge(27000, 1)" class="bg-orange-500 text-white px-6 py-2 rounded-xl font-bold text-sm shadow-lg shadow-orange-100">1$ شراء</button>
+                </div>
+
+                <div class="buy-card">
+                    <div>
+                        <div class="font-bold text-gray-800">باقة النخبة</div>
+                        <div class="text-[11px] text-orange-500 font-bold">+150,000 عملة</div>
+                    </div>
+                    <button onclick="recharge(150000, 5)" class="bg-gray-800 text-white px-6 py-2 rounded-xl font-bold text-sm">5$ شراء</button>
+                </div>
+            </div>
         </div>
 
         <div id="view-store" class="view-screen">
             <div class="flex justify-center gap-2 p-4">
-                <div class="store-tab active" onclick="filterStore('frames', this)">الإطارات</div>
-                <div class="store-tab" onclick="filterStore('bubbles', this)">فقاعات</div>
-                <div class="store-tab" onclick="filterStore('badges', this)">شارات</div>
+                <button class="px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold" onclick="filterStore('frames')">إطارات</button>
+                <button class="px-4 py-2 bg-gray-100 rounded-xl text-xs font-bold" onclick="filterStore('badges')">شارات</button>
             </div>
             <div id="storeItems" class="grid grid-cols-2 gap-4 p-4"></div>
         </div>
@@ -151,37 +172,32 @@
     </script>
 
     <script>
-        let userData = {
-            balance: 50000,
-            wealthLv: 1,
-            magicLv: 1,
-            purchasedBadges: [],
-            activeFrame: null
-        };
-
-        const storeData = {
-            frames: [
-                { id: 'f1', name: 'إطار ذهبي', price: 5000, img: 'https://png.pngtree.com/png-clipart/20210310/original/pngtree-gold-luxury-circle-frame-png-image_5930064.png' },
-                { id: 'f2', name: 'إطار ملكي', price: 15000, img: 'https://png.pngtree.com/png-clipart/20230301/original/pngtree-luxury-golden-circle-frame-with-crown-png-image_8969312.png' }
-            ],
-            bubbles: [
-                { id: 'b1', name: 'فقاعة زرقاء', price: 2000 },
-                { id: 'b2', name: 'فقاعة نارية', price: 8000 }
-            ],
-            badges: [
-                { id: 's1', name: 'شعلة', icon: '🔥', price: 1000 },
-                { id: 's2', name: 'جوهرة', icon: '💎', price: 5000 },
-                { id: 's3', name: 'صاروخ', icon: '🚀', price: 10000 },
-                { id: 's4', name: 'تاج', icon: '👑', price: 20000 },
-                { id: 's5', name: 'قلب', icon: '❤️', price: 500 }
-            ]
-        };
+        let userData = { balance: 0, wealthLv: 1, purchasedBadges: [] };
 
         function initApp() {
             renderRooms();
-            filterStore('frames', document.querySelector('.store-tab'));
             updateUI();
             lucide.createIcons();
+        }
+
+        // وظيفة الشحن المحدثة
+        function recharge(amount, dollars) {
+            userData.balance += amount;
+            // رفع لفل الثروة (كل 1 دولار يرفع لفل واحد مثلاً)
+            userData.wealthLv += dollars;
+            updateUI();
+            showToast(`💎 تم شحن ${amount.toLocaleString()} عملة بنجاح!`);
+        }
+
+        function updateUI() {
+            document.getElementById('header-balance').innerText = userData.balance.toLocaleString();
+            document.getElementById('wallet-balance-big').innerText = userData.balance.toLocaleString();
+            document.getElementById('wealth-lv').innerText = `ثروة LV ${userData.wealthLv}`;
+            
+            const badgeSlots = document.querySelectorAll('.badge-slot');
+            userData.purchasedBadges.forEach((icon, index) => {
+                if (badgeSlots[index]) badgeSlots[index].innerText = icon;
+            });
         }
 
         function renderRooms() {
@@ -189,66 +205,36 @@
             container.innerHTML = "";
             for (let i = 1; i <= 7; i++) {
                 container.innerHTML += `
-                    <div class="room-card p-4 text-center">
-                        <img src="https://picsum.photos/seed/${i}/200" class="w-full h-32 object-cover rounded-xl mb-2">
-                        <div class="font-bold text-sm">غرفة أفنان ${i}</div>
-                        <button class="buy-btn" onclick="showToast('جاري الدخول...')">دخول</button>
+                    <div class="bg-white p-3 rounded-2xl border text-center shadow-sm">
+                        <img src="https://picsum.photos/seed/${i+10}/200" class="w-full h-24 object-cover rounded-xl mb-2">
+                        <div class="font-bold text-[11px]">غرفة أفنان ${i}</div>
+                        <button class="w-full bg-gray-50 mt-2 py-1.5 rounded-lg text-[10px] font-bold">دخول</button>
                     </div>
                 `;
             }
         }
 
-        function filterStore(type, el) {
-            document.querySelectorAll('.store-tab').forEach(t => t.classList.remove('active'));
-            el.classList.add('active');
-            
+        function filterStore(type) {
             const container = document.getElementById('storeItems');
             container.innerHTML = "";
-            
-            storeData[type].forEach(item => {
+            const items = type === 'frames' ? 
+                [{id:1, name:'إطار ذهبي', price:5000, img:'https://png.pngtree.com/png-clipart/20210310/original/pngtree-gold-luxury-circle-frame-png-image_5930064.png'}] :
+                [{id:2, name:'شارة الملك', price:1000, icon:'👑'}];
+
+            items.forEach(item => {
                 container.innerHTML += `
                     <div class="bg-white p-4 rounded-2xl border text-center">
-                        <div class="text-3xl mb-2">${item.img ? `<img src="${item.img}" class="w-12 h-12 mx-auto">` : (item.icon || '💬')}</div>
+                        <div class="text-3xl mb-2">${item.icon || `<img src="${item.img}" class="w-12 h-12 mx-auto">`}</div>
                         <div class="font-bold text-xs">${item.name}</div>
-                        <div class="text-orange-500 text-[10px] font-bold">${item.price} 💰</div>
-                        <button class="buy-btn" onclick="buyItem('${type}', '${item.id}')">شراء وتفعيل</button>
+                        <button class="w-full bg-orange-500 text-white mt-2 py-2 rounded-xl text-[10px] font-bold" onclick="buy('${type}', '${item.id}')">${item.price} 💰</button>
                     </div>
                 `;
             });
         }
 
-        function buyItem(type, id) {
-            const item = storeData[type].find(i => i.id === id);
-            if (userData.balance >= item.price) {
-                userData.balance -= item.price;
-                userData.wealthLv += Math.floor(item.price / 1000); // رفع لفل الثروة
-                
-                if (type === 'frames') {
-                    const frameImg = document.getElementById('activeFrame');
-                    frameImg.src = item.img;
-                    frameImg.style.display = 'block';
-                } else if (type === 'badges') {
-                    if (!userData.purchasedBadges.includes(item.icon)) {
-                        userData.purchasedBadges.push(item.icon);
-                    }
-                }
-                
-                updateUI();
-                showToast("✅ تم الشراء والتفعيل فوراً!");
-            } else {
-                showToast("❌ رصيدك غير كافٍ");
-            }
-        }
-
-        function updateUI() {
-            document.getElementById('header-balance').innerText = userData.balance.toLocaleString();
-            document.getElementById('wealth-lv').innerText = `ثروة LV ${userData.wealthLv}`;
-            
-            // تحديث الشارات
-            const badgeSlots = document.querySelectorAll('.badge-slot');
-            userData.purchasedBadges.forEach((icon, index) => {
-                if (badgeSlots[index]) badgeSlots[index].innerText = icon;
-            });
+        function buy(type, id) {
+            // منطق الشراء البسيط
+            showToast("جاري المعالجة...");
         }
 
         function toggleSidebar() {
@@ -259,17 +245,19 @@
         function switchView(v) {
             document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
             document.getElementById(`view-${v}`).classList.add('active');
-            document.getElementById('view-title').innerText = v === 'rooms' ? 'الرئيسية' : 'المتجر';
-            toggleSidebar();
+            document.getElementById('view-title').innerText = v === 'rooms' ? 'الرئيسية' : (v === 'wallet' ? 'المحفظة' : 'المتجر');
+            if (document.getElementById('sidebar').classList.contains('open')) toggleSidebar();
         }
 
         function showToast(m) {
             const t = document.createElement('div');
-            t.className = "bg-black text-white px-6 py-3 rounded-full text-xs font-bold mb-2 shadow-xl animate-bounce";
+            t.className = "bg-gray-900 text-white px-6 py-3 rounded-2xl text-xs font-bold mb-2 shadow-2xl animate-bounce";
             t.innerText = m;
             document.getElementById('toastContainer').appendChild(t);
-            setTimeout(() => t.remove(), 2000);
+            setTimeout(() => t.remove(), 2500);
         }
+
+        window.onload = () => lucide.createIcons();
     </script>
 </body>
 </html>
