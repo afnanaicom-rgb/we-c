@@ -21,31 +21,31 @@
             transition: background-color 0.3s ease;
         }
         
-        /* Theme Variables */
+        /* Theme Variables - Updated to White and Light Cyan */
         :root {
-            --bg-primary: #0f0f23;
-            --bg-secondary: #1a1a2e;
-            --bg-card: #2d2d44;
-            --bg-surface: #3a3a5d;
-            --text-primary: #f0f0ff;
-            --text-secondary: #b8b8d1;
-            --accent: #ff6b35;
+            --bg-primary: #f0f9ff; /* Light Cyan background */
+            --bg-secondary: #ffffff; /* White */
+            --bg-card: #ffffff;
+            --bg-surface: #e0f2fe;
+            --text-primary: #0c4a6e;
+            --text-secondary: #334155;
+            --accent: #0ea5e9; /* Cyan accent */
             --accent-secondary: #00d4aa;
             --accent-magic: #9d4edd;
-            --border-color: #444466;
-            --gradient-primary: linear-gradient(135deg, #ff6b35 0%, #ff8e53 100%);
+            --border-color: #bae6fd;
+            --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
             --gradient-secondary: linear-gradient(135deg, #00d4aa 0%, #00f5d4 100%);
             --gradient-magic: linear-gradient(135deg, #9d4edd 0%, #c77dff 100%);
         }
         
-        .light-mode {
-            --bg-primary: #f5f5ff;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --bg-surface: #f0f0ff;
-            --text-primary: #1a1a2e;
-            --text-secondary: #4a4a6e;
-            --border-color: #d0d0e0;
+        .dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --bg-surface: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border-color: #334155;
         }
         
         body {
@@ -60,7 +60,7 @@
             right: 0; 
             left: 0; 
             height: 70px; 
-            background: rgba(15, 15, 35, 0.95); 
+            background: rgba(255, 255, 255, 0.9); 
             backdrop-filter: blur(20px); 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
@@ -71,1118 +71,389 @@
             transition: all 0.3s ease;
         }
         
-        .light-mode .app-header {
-            background: rgba(245, 245, 255, 0.95);
+        .dark-mode .app-header {
+            background: rgba(15, 23, 42, 0.9);
         }
         
-        /* Search Modal */
-        .search-modal {
-            position: fixed;
-            top: 70px;
-            right: 0;
-            left: 0;
+        /* Sidebar */
+        #sidebar {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Profile Avatar - Smaller */
+        .profile-avatar {
+            width: 80px;
             height: 80px;
-            background: var(--bg-secondary);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            padding: 0 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .search-modal.active {
-            display: flex;
-        }
-        
-        /* Enhanced Sidebar */
-        .sidebar { 
-            position: fixed; 
-            top: 0; 
-            right: -400px; 
-            width: 380px; 
-            height: 100%; 
-            background: var(--bg-secondary); 
-            z-index: 4000; 
-            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-            border-left: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.5);
-            overflow-y: auto;
-        }
-        
-        .sidebar.open { 
-            right: 0; 
-        }
-        
-        /* Sidebar Header */
-        .sidebar-header {
-            padding: 2rem 1.5rem 1.5rem;
-            border-bottom: 1px solid var(--border-color);
-            background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(26, 26, 46, 0.9) 100%);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-        
-        /* User Profile in Sidebar */
-        .user-profile-sidebar {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .user-avatar-sidebar {
-            width: 70px;
-            height: 70px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid var(--accent);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .user-avatar-frame {
-            position: absolute;
-            top: -5px;
-            left: -5px;
-            right: -5px;
-            bottom: -5px;
-            border-radius: 50%;
-            overflow: hidden;
-            z-index: 2;
-            pointer-events: none;
-        }
-        
-        .user-info-sidebar {
-            flex: 1;
-        }
-        
-        .user-name-sidebar {
-            font-size: 1.25rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        
-        .user-id-sidebar {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        
-        /* Level Display in Sidebar */
-        .level-sidebar {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .level-sidebar::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--gradient-primary);
-        }
-        
-        .level-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        
-        .level-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .level-number {
-            font-size: 2rem;
-            font-weight: 900;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .level-progress-container {
-            margin-bottom: 1rem;
-        }
-        
-        .level-progress-text {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .level-progress-bar {
-            height: 8px;
-            background: var(--bg-surface);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .level-progress-fill {
-            height: 100%;
-            background: var(--gradient-primary);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        
-        .level-image-sidebar {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-            margin: 0 auto;
-            display: block;
-            border: 2px solid var(--border-color);
-        }
-        
-        /* Magic Level in Sidebar */
-        .magic-sidebar {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .magic-sidebar::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gradient-magic);
-            opacity: 0.05;
-        }
-        
-        .magic-icon {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--gradient-magic);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .magic-content {
-            margin-right: 3rem;
-        }
-        
-        /* Stats in Sidebar */
-        .stats-sidebar {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        .stat-item {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 900;
-            margin-bottom: 0.25rem;
-        }
-        
-        .stat-label {
-            font-size: 0.75rem;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        /* Navigation in Sidebar */
-        .sidebar-nav {
-            padding: 0 1.5rem;
-            flex: 1;
-        }
-        
-        .nav-section {
-            margin-bottom: 1.5rem;
-        }
-        
-        .nav-title {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 0.75rem;
-            padding-right: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .nav-links {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.875rem 1rem;
-            border-radius: 12px;
-            color: var(--text-primary);
-            text-decoration: none;
-            transition: all 0.2s ease;
-            position: relative;
-            border: 1px solid transparent;
-        }
-        
-        .nav-link:hover {
-            background: var(--bg-surface);
-            border-color: var(--border-color);
-            transform: translateX(-4px);
-        }
-        
-        .nav-link.active {
-            background: var(--gradient-primary);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
-        }
-        
-        .nav-link.active .nav-icon {
-            color: white;
-        }
-        
-        .nav-icon {
-            width: 20px;
-            height: 20px;
-            color: var(--text-secondary);
-        }
-        
-        /* Sidebar Footer */
-        .sidebar-footer {
-            padding: 1.5rem;
-            border-top: 1px solid var(--border-color);
-            background: var(--bg-card);
-            position: sticky;
-            bottom: 0;
-        }
-        
-        /* Logout Button */
-        .logout-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
+            margin-bottom: 12px;
             transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
         }
         
-        .logout-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-        }
-        
-        /* Overlay */
-        .overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 3500;
-            display: none;
-            backdrop-filter: blur(5px);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .overlay.active {
-            display: block;
-            opacity: 1;
-        }
-        
-        /* Enhanced Level System */
+        /* Level System - Cleaned up */
         .level-display {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.25rem;
-            border: 1px solid var(--border-color);
-            margin: 1rem;
-            position: relative;
-            overflow: hidden;
+            padding: 1rem;
+            margin: 0.5rem 1rem;
+            background: transparent; /* Removed the box */
+            border: none; /* Removed the border */
         }
         
         .level-info {
-            flex: 1;
+            width: 100%;
+            text-align: center;
         }
         
         .level-current {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 900;
-            background: var(--gradient-primary);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--accent);
             line-height: 1;
+            margin-bottom: 4px;
         }
         
         .level-label {
-            font-size: 14px;
+            font-size: 12px;
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .level-progress {
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: var(--bg-surface);
-            border-radius: 4px;
+            border-radius: 10px;
             overflow: hidden;
-            margin: 0.75rem 0;
+            margin: 0.5rem 0;
         }
         
         .level-progress-bar {
             height: 100%;
             background: var(--gradient-primary);
-            border-radius: 4px;
+            border-radius: 10px;
             transition: width 0.5s ease;
         }
         
         .level-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 12px;
-            object-fit: cover;
-            border: 2px solid var(--accent);
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-top: 10px;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
-        
-        /* Views */
-        .view-screen { 
-            position: absolute; 
-            inset: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: var(--bg-primary); 
-            display: none; 
-            flex-direction: column; 
-            z-index: 10; 
-            padding-top: 70px; 
-            overflow-y: auto; 
-            padding-bottom: 80px; 
-            transition: background-color 0.3s ease;
-        }
-        .view-screen.active { display: flex; }
-        
-        /* Navigation Bar */
-        .nav-bar {
-            position: fixed;
+
+        /* Edit Profile Button */
+        .edit-profile-btn {
+            position: absolute;
             bottom: 0;
-            right: 0;
-            left: 0;
-            height: 70px;
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            padding: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border-radius: 12px;
-            min-width: 60px;
-        }
-        
-        .nav-item.active {
-            color: var(--accent);
-            background: rgba(255, 107, 53, 0.1);
-        }
-        
-        .nav-item i {
-            width: 24px;
-            height: 24px;
-        }
-        
-        .nav-item span {
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        /* Enhanced Store */
-        .store-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
-            padding: 16px; 
-        }
-        .store-card { 
-            background: var(--bg-card); 
-            border-radius: 16px; 
-            padding: 16px; 
-            text-align: center; 
-            border: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: relative; 
-            height: 220px; 
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .store-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-            border-color: var(--accent);
-        }
-        
-        /* Enhanced Wallet */
-        .wallet-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 12px;
-            padding: 16px;
-        }
-        
-        .wallet-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px 16px;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .wallet-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-3px);
-        }
-        
-        /* Enhanced Rooms */
-        .rooms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 12px;
-            padding: 16px;
-        }
-        
-        .room-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .room-card:hover {
-            transform: translateY(-3px);
-            border-color: var(--accent);
-        }
-        
-        /* Enhanced Buttons */
-        .modern-btn {
-            background: var(--gradient-primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            min-height: 44px;
-        }
-        
-        .modern-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
-        }
-        
-        .secondary-btn {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-        }
-        
-        .secondary-btn:hover {
-            background: var(--bg-card);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Toast Notifications */
-        .toast {
-            position: fixed;
-            bottom: 100px;
-            right: 50%;
-            transform: translateX(50%);
-            background: var(--bg-card);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            z-index: 11000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 1px solid var(--border-color);
-            min-width: 300px;
-            max-width: 90%;
-            animation: slideInUp 0.3s ease;
-        }
-        
-        @keyframes slideInUp {
-            from { transform: translateX(50%) translateY(100px); opacity: 0; }
-            to { transform: translateX(50%) translateY(0); opacity: 1; }
-        }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg-surface);
-        }
-        
-        ::-webkit-scrollbar-thumb {
+            left: 50%;
+            transform: translateX(-50%) translateY(50%);
             background: var(--accent);
-            border-radius: 4px;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--bg-secondary);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
         }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 24px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 16px; }
+        .stat-card { background: var(--bg-surface); padding: 12px; border-radius: 16px; text-align: center; }
+        .stat-value { font-weight: bold; font-size: 18px; }
+        .stat-label { font-size: 12px; color: var(--text-secondary); }
+        
+        .secondary-btn { background: var(--bg-surface); color: var(--text-primary); border-radius: 12px; padding: 8px; transition: all 0.2s; }
+        .modern-btn { background: var(--gradient-primary); color: white; border-radius: 12px; padding: 12px; font-weight: bold; width: 100%; }
+        
+        .view-screen { display: none; padding-top: 80px; padding-bottom: 100px; }
+        .view-screen.active { display: block; }
+        
+        .fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
-<body class="dark">
+<body class="light">
+
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="modal">
+    <div class="modal-content">
+        <h3 class="text-xl font-bold mb-6">تعديل الملف الشخصي</h3>
+        <div class="input-group">
+            <label>الاسم</label>
+            <input type="text" id="editNameInput" placeholder="أدخل اسمك الجديد">
+        </div>
+        <div class="input-group">
+            <label>رابط صورة البروفيل</label>
+            <input type="text" id="editAvatarInput" placeholder="https://example.com/image.jpg">
+        </div>
+        <div class="flex gap-3 mt-6">
+            <button onclick="saveProfileChanges()" class="modern-btn flex-1">حفظ التغييرات</button>
+            <button onclick="closeEditModal()" class="secondary-btn flex-1">إلغاء</button>
+        </div>
+    </div>
+</div>
 
 <!-- Main App -->
-<div id="main-app" style="display: none;">
+<div id="main-app">
     <!-- Header -->
     <header class="app-header">
         <div class="flex items-center gap-3">
-            <button onclick="toggleSidebar()" class="secondary-btn" style="padding: 8px">
+            <button onclick="toggleSidebar()" class="secondary-btn">
                 <i data-lucide="menu" class="w-5 h-5"></i>
             </button>
             <h1 id="view-title" class="text-lg font-bold">الرئيسية</h1>
         </div>
         
         <div class="flex items-center gap-3">
-            <button onclick="toggleSearch()" class="secondary-btn" style="padding: 8px">
-                <i data-lucide="search" class="w-5 h-5"></i>
-            </button>
-            <button onclick="toggleTheme()" class="secondary-btn" style="padding: 8px">
-                <i data-lucide="sun" class="w-5 h-5 dark:block hidden"></i>
-                <i data-lucide="moon" class="w-5 h-5 dark:hidden block"></i>
-            </button>
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <i data-lucide="sun" class="w-5 h-5"></i>
+            </div>
         </div>
     </header>
 
-    <!-- Search Modal -->
-    <div id="searchModal" class="search-modal">
-        <div class="flex-1 relative">
-            <input type="text" 
-                   placeholder="ابحث في الغرف، المستخدمين، المحتوى..." 
-                   class="w-full p-3 pr-12 bg-var(--bg-surface) border border-var(--border-color) rounded-xl text-var(--text-primary) placeholder-var(--text-secondary) focus:outline-none focus:border-var(--accent)">
-            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-var(--text-secondary)"></i>
-        </div>
-        <button onclick="toggleSearch()" class="secondary-btn mr-3" style="padding: 8px">
-            <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-    </div>
-
     <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <!-- User Profile -->
-            <div class="user-profile-sidebar">
+    <div id="sidebar" class="fixed top-0 right-[-320px] w-80 h-full z-[4000] transition-all duration-300 border-l border-var(--border-color) flex flex-col shadow-2xl">
+        <div class="p-6 text-center border-b border-var(--border-color)">
+            <div class="relative inline-block mb-6">
                 <div class="relative">
-                    <img id="userAvatar" src="" class="user-avatar-sidebar">
-                    <div id="activeFrame" class="user-avatar-frame" style="display: none;"></div>
-                </div>
-                <div class="user-info-sidebar">
-                    <div class="user-name-sidebar" id="userName">...</div>
-                    <div class="user-id-sidebar">
-                        <span id="userID">00000000</span>
-                        <button onclick="copyID()" class="text-var(--text-secondary) hover:text-var(--accent)">
-                            <i data-lucide="copy" class="w-3 h-3"></i>
-                        </button>
-                    </div>
+                    <img id="userAvatar" src="https://via.placeholder.com/80" class="profile-avatar">
+                    <img id="activeFrame" src="" class="absolute inset-0 w-full h-full" style="display: none;">
+                    <button onclick="openEditModal()" class="edit-profile-btn">
+                        <i data-lucide="edit-2" class="w-4 h-4"></i>
+                    </button>
                 </div>
             </div>
             
-            <!-- Level Display -->
-            <div class="level-sidebar">
-                <div class="level-header">
-                    <div class="level-title">مستوى الخبرة</div>
-                    <div class="level-number" id="currentLevel">1</div>
-                </div>
-                <div class="level-progress-container">
-                    <div class="level-progress-text">
-                        <span id="currentXP">0 XP</span>
-                        <span id="nextLevelXP">1000 XP</span>
+            <h2 id="userName" class="text-xl font-bold mb-1">...</h2>
+            <div class="text-xs text-var(--text-secondary) mb-4 font-mono" id="userID">ID: 00000000</div>
+            
+            <!-- Level Display - Simplified -->
+            <div class="level-display">
+                <div class="level-info">
+                    <div class="level-label">المستوى</div>
+                    <div class="level-current" id="currentLevel">1</div>
+                    <div class="level-progress">
+                        <div id="levelProgressBar" class="level-progress-bar" style="width: 20%"></div>
                     </div>
-                    <div class="level-progress-bar">
-                        <div class="level-progress-fill" id="levelProgressBar" style="width: 20%"></div>
+                    <div class="text-[10px] text-var(--text-secondary) mt-1">
+                        <span id="currentXP">0</span> / <span id="nextLevelXP">1000</span> XP
                     </div>
                 </div>
-                <img id="levelImage" src="" class="level-image-sidebar">
+                <!-- Badge/Level Image from Firebase -->
+                <img id="levelImage" src="" class="level-image" onerror="this.style.display='none'">
             </div>
             
-            <!-- Magic Level -->
-            <div class="magic-sidebar">
-                <div class="magic-icon">
-                    <i data-lucide="sparkles" class="w-5 h-5 text-white"></i>
-                </div>
-                <div class="magic-content">
-                    <div class="level-title">مستوى السحر</div>
-                    <div class="level-number" id="magicLevel">1</div>
-                    <div class="level-progress-text">
-                        <span id="currentMagicXP">0 نقاط</span>
-                        <span id="nextMagicXP">500 نقاط</span>
-                    </div>
-                    <div class="level-progress-bar">
-                        <div class="level-progress-fill" id="magicProgressBar" style="width: 10%"></div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Stats -->
-            <div class="stats-sidebar">
-                <div class="stat-item">
+            <div class="stats-grid">
+                <div class="stat-card">
                     <div class="stat-value" id="walletBalance">0</div>
-                    <div class="stat-label">💎 الرصيد</div>
+                    <div class="stat-label">💎 رصيد</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-card">
                     <div class="stat-value" id="giftCount">0</div>
-                    <div class="stat-label">🎁 الهدايا</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="friendsCount">0</div>
-                    <div class="stat-label">👥 الأصدقاء</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="roomCount">0</div>
-                    <div class="stat-label">🎮 الغرف</div>
+                    <div class="stat-label">🎁 هدايا</div>
                 </div>
             </div>
         </div>
         
-        <!-- Navigation -->
-        <div class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-title">الحساب</div>
-                <div class="nav-links">
-                    <a href="#" onclick="switchView('profile')" class="nav-link">
-                        <i data-lucide="user" class="nav-icon"></i>
-                        <span>الملف الشخصي</span>
-                    </a>
-                    <a href="#" onclick="switchView('gifts')" class="nav-link">
-                        <i data-lucide="gift" class="nav-icon"></i>
-                        <span>الهدايا والسحر</span>
-                    </a>
-                    <a href="#" onclick="switchView('badges')" class="nav-link">
-                        <i data-lucide="award" class="nav-icon"></i>
-                        <span>شاراتي</span>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">المحتوى</div>
-                <div class="nav-links">
-                    <a href="#" onclick="switchView('store')" class="nav-link">
-                        <i data-lucide="shopping-bag" class="nav-icon"></i>
-                        <span>المتجر</span>
-                    </a>
-                    <a href="#" onclick="switchView('inventory')" class="nav-link">
-                        <i data-lucide="package" class="nav-icon"></i>
-                        <span>المخزن</span>
-                    </a>
-                    <a href="#" onclick="switchView('frames')" class="nav-link">
-                        <i data-lucide="image" class="nav-icon"></i>
-                        <span>إطاراتي</span>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">المجتمع</div>
-                <div class="nav-links">
-                    <a href="#" onclick="switchView('friends')" class="nav-link">
-                        <i data-lucide="users" class="nav-icon"></i>
-                        <span>الأصدقاء</span>
-                    </a>
-                    <a href="#" onclick="switchView('leaderboard')" class="nav-link">
-                        <i data-lucide="trophy" class="nav-icon"></i>
-                        <span>لوحة المتصدرين</span>
-                    </a>
-                    <a href="#" onclick="showAllRooms()" class="nav-link">
-                        <i data-lucide="message-square" class="nav-icon"></i>
-                        <span>جميع الغرف</span>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">الإعدادات</div>
-                <div class="nav-links">
-                    <a href="#" onclick="openSettings()" class="nav-link">
-                        <i data-lucide="settings" class="nav-icon"></i>
-                        <span>الإعدادات</span>
-                    </a>
-                    <a href="#" onclick="openNotifications()" class="nav-link">
-                        <i data-lucide="bell" class="nav-icon"></i>
-                        <span>الإشعارات</span>
-                        <span class="badge">3</span>
-                    </a>
-                    <a href="#" onclick="openPrivacy()" class="nav-link">
-                        <i data-lucide="shield" class="nav-icon"></i>
-                        <span>الخصوصية</span>
-                    </a>
-                </div>
-            </div>
-        </div>
+        <nav class="p-4 space-y-2 flex-1 overflow-y-auto">
+            <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all">
+                <i data-lucide="home" class="w-5 h-5 text-var(--accent)"></i>
+                <span class="font-medium">الرئيسية</span>
+            </button>
+            <button onclick="switchView('profile')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all">
+                <i data-lucide="user" class="w-5 h-5 text-var(--accent)"></i>
+                <span class="font-medium">الملف الشخصي</span>
+            </button>
+            <button onclick="switchView('gifts')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all">
+                <i data-lucide="gift" class="w-5 h-5 text-var(--accent-magic)"></i>
+                <span class="font-medium">الهدايا</span>
+            </button>
+        </nav>
         
-        <!-- Footer -->
-        <div class="sidebar-footer">
-            <button onclick="logout()" class="logout-btn">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-                تسجيل الخروج
+        <div class="p-4 border-t border-var(--border-color)">
+            <button onclick="logout()" class="w-full p-3 bg-red-50 text-red-600 rounded-xl font-bold text-sm hover:bg-red-100 transition-all">
+                تسجيل خروج
             </button>
         </div>
     </div>
 
-    <!-- Overlay -->
-    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
-
-    <!-- Views -->
-    <div id="view-home" class="view-screen active">
-        <div class="p-4">
-            <!-- Banner will be loaded here -->
-            <div id="bannerContainer" class="rounded-2xl overflow-hidden shadow-xl h-[200px] bg-gradient-to-r from-var(--accent)/20 to-var(--accent-magic)/20 border border-var(--border-color) mb-6">
-                <!-- Banner content -->
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <button onclick="switchView('wallet')" class="bg-var(--bg-card) border border-var(--border-color) rounded-xl p-4 text-center hover:border-var(--accent) transition-all">
-                    <div class="text-2xl mb-2">💎</div>
-                    <div class="font-bold">المحفظة</div>
-                    <div class="text-sm text-var(--text-secondary)" id="quickBalance">0 عملة</div>
-                </button>
-                <button onclick="switchView('gifts')" class="bg-var(--bg-card) border border-var(--border-color) rounded-xl p-4 text-center hover:border-var(--accent-magic) transition-all">
-                    <div class="text-2xl mb-2">✨</div>
-                    <div class="font-bold">السحر</div>
-                    <div class="text-sm text-var(--text-secondary)" id="quickMagic">مستوى 1</div>
-                </button>
-            </div>
-            
-            <!-- Rooms Section -->
-            <h2 class="text-xl font-bold mb-4">الغرف النشطة</h2>
-            <div class="rooms-grid" id="roomsList">
-                <!-- Rooms will be loaded here -->
+    <!-- Content Area -->
+    <main>
+        <div id="view-home" class="view-screen active px-4">
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-sky-100 mb-6">
+                <h2 class="text-2xl font-black text-sky-900 mb-2">أهلاً بك في Afnan AI</h2>
+                <p class="text-sky-600">استكشف عالم الذكاء الاصطناعي المتطور</p>
             </div>
         </div>
-    </div>
-
-    <!-- Other views (wallet, store, profile, etc.) will be similar to previous design -->
-    
-    <!-- Navigation Bar -->
-    <div class="nav-bar">
-        <div class="nav-item active" onclick="switchView('home')">
-            <i data-lucide="home"></i>
-            <span>الرئيسية</span>
+        
+        <div id="view-profile" class="view-screen px-4">
+            <h2 class="text-xl font-bold mb-4">الملف الشخصي</h2>
+            <!-- Profile content here -->
         </div>
-        <div class="nav-item" onclick="switchView('store')">
-            <i data-lucide="shopping-bag"></i>
-            <span>المتجر</span>
-        </div>
-        <div class="nav-item" onclick="switchView('wallet')">
-            <i data-lucide="wallet"></i>
-            <span>المحفظة</span>
-        </div>
-        <div class="nav-item" onclick="switchView('profile')">
-            <i data-lucide="user"></i>
-            <span>الملف</span>
-        </div>
-    </div>
-
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
+    </main>
 </div>
 
 <script type="module">
+    // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, collection, getDocs, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+    // Firebase Config (User should provide this, using placeholders)
     const firebaseConfig = {
-        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-        authDomain: "rtx3090-28439.firebaseapp.com",
-        projectId: "rtx3090-28439",
-        storageBucket: "rtx3090-28439.firebasestorage.app",
-        messagingSenderId: "178612030690",
-        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb"
+        // Your config here
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let userData = null;
-    
-    // Initialize app
-    document.addEventListener('DOMContentLoaded', () => {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                document.getElementById('main-app').style.display = 'block';
-                await loadUserData(user);
-                updateUI();
-                lucide.createIcons();
-            }
-        });
-    });
+    let uData = null;
 
-    async function loadUserData(user) {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        
-        if (userSnap.exists()) {
-            userData = { uid: user.uid, ...userSnap.data() };
-            
-            // Subscribe to updates
-            onSnapshot(userRef, (snap) => {
-                userData = { uid: user.uid, ...snap.data() };
-                updateUI();
+    // Initialize Lucide Icons
+    lucide.createIcons();
+
+    // Sidebar Toggle
+    window.toggleSidebar = () => {
+        const sidebar = document.getElementById('sidebar');
+        const isOpen = sidebar.style.right === '0px';
+        sidebar.style.right = isOpen ? '-320px' : '0px';
+    };
+
+    // Theme Toggle
+    window.toggleTheme = () => {
+        document.body.classList.toggle('dark-mode');
+    };
+
+    // Switch Views
+    window.switchView = (viewId) => {
+        document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
+        const targetView = document.getElementById(`view-${viewId}`);
+        if (targetView) targetView.classList.add('active');
+        document.getElementById('view-title').textContent = 
+            viewId === 'home' ? 'الرئيسية' : 
+            viewId === 'profile' ? 'الملف الشخصي' : 'الهدايا';
+        toggleSidebar();
+    };
+
+    // Real-time Profile Updates
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            onSnapshot(doc(db, "users", user.uid), (doc) => {
+                if (doc.exists()) {
+                    uData = doc.data();
+                    updateUI();
+                }
             });
         }
-    }
+    });
 
     function updateUI() {
-        if (!userData) return;
+        if (!uData) return;
         
-        // Update user info
-        document.getElementById('userName').textContent = userData.displayName || 'مستخدم';
-        document.getElementById('userID').textContent = userData.customId || '00000000';
-        document.getElementById('userAvatar').src = userData.photoURL || 'https://ui-avatars.com/api/?name=مستخدم&background=ff6b35&color=fff';
+        document.getElementById('userName').textContent = uData.name || 'مستخدم';
+        document.getElementById('userAvatar').src = uData.avatar || 'https://via.placeholder.com/80';
+        document.getElementById('userID').textContent = `ID: ${uData.id || '00000000'}`;
+        document.getElementById('walletBalance').textContent = uData.balance || 0;
         
-        // Update level
-        const level = userData.level || 1;
-        const xp = userData.xp || 0;
-        const nextLevelXP = 1000 * Math.pow(1.2, level - 1);
-        const progress = Math.min(100, (xp / nextLevelXP) * 100);
+        // Level System
+        const level = uData.level || 1;
+        const xp = uData.xp || 0;
+        const nextXP = level * 1000;
+        const progress = (xp / nextXP) * 100;
         
         document.getElementById('currentLevel').textContent = level;
-        document.getElementById('currentXP').textContent = `${Math.floor(xp).toLocaleString()} XP`;
-        document.getElementById('nextLevelXP').textContent = `${Math.floor(nextLevelXP).toLocaleString()} XP`;
+        document.getElementById('currentXP').textContent = xp;
+        document.getElementById('nextLevelXP').textContent = nextXP;
         document.getElementById('levelProgressBar').style.width = `${progress}%`;
         
-        // Update level image
-        const levelImage = document.getElementById('levelImage');
-        if (level <= 10) {
-            levelImage.src = `https://i.postimg.cc/${['G4PtHLMS', '8F15v23K', 'DW2ZG9DC', 'NygMX3VC', 'cKsH3pj5'][level-1] || 'G4PtHLMS'}/level${level}.webp`;
-        }
-        
-        // Update magic level
-        const magicLevel = userData.magicLevel || 1;
-        const magicXP = userData.magicXP || 0;
-        const nextMagicXP = 500 * Math.pow(1.5, magicLevel - 1);
-        const magicProgress = Math.min(100, (magicXP / nextMagicXP) * 100);
-        
-        document.getElementById('magicLevel').textContent = magicLevel;
-        document.getElementById('currentMagicXP').textContent = `${Math.floor(magicXP).toLocaleString()} نقاط`;
-        document.getElementById('nextMagicXP').textContent = `${Math.floor(nextMagicXP).toLocaleString()} نقاط`;
-        document.getElementById('magicProgressBar').style.width = `${magicProgress}%`;
-        
-        // Update stats
-        document.getElementById('walletBalance').textContent = (userData.balance || 0).toLocaleString();
-        document.getElementById('giftCount').textContent = (userData.giftsReceived?.length || 0);
-        document.getElementById('friendsCount').textContent = (userData.friends?.length || 0);
-        document.getElementById('roomCount').textContent = (userData.roomsCreated || 0);
-        document.getElementById('quickBalance').textContent = `${(userData.balance || 0).toLocaleString()} عملة`;
-        document.getElementById('quickMagic').textContent = `مستوى ${magicLevel}`;
-        
-        // Update active frame
-        const activeFrame = document.getElementById('activeFrame');
-        if (userData.activeFrame) {
-            activeFrame.innerHTML = `<img src="${userData.activeFrame}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            activeFrame.style.display = 'block';
+        // Level Badge from Firebase
+        const levelImg = document.getElementById('levelImage');
+        if (uData.levelBadgeUrl) {
+            levelImg.src = uData.levelBadgeUrl;
+            levelImg.style.display = 'block';
         } else {
-            activeFrame.style.display = 'none';
+            levelImg.style.display = 'none';
         }
-    }
 
-    window.toggleSidebar = (show) => {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        
-        if (typeof show === 'boolean') {
-            if (show) {
-                sidebar.classList.add('open');
-                overlay.classList.add('active');
-            } else {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('active');
-            }
-        } else {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
-    };
-
-    window.switchView = (view) => {
-        // Hide all views
-        document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
-        
-        // Show selected view
-        const selectedView = document.getElementById(`view-${view}`);
-        if (selectedView) {
-            selectedView.classList.add('active');
-        }
-        
-        // Update view title
-        const titles = {
-            'home': 'الرئيسية',
-            'wallet': 'المحفظة',
-            'store': 'المتجر',
-            'profile': 'الملف الشخصي'
-        };
-        document.getElementById('view-title').textContent = titles[view] || 'Afnan AI';
-        
-        // Update navigation
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        if (view === 'home' || view === 'wallet' || view === 'store' || view === 'profile') {
-            const navItem = document.querySelector(`.nav-item[onclick="switchView('${view}')"]`);
-            if (navItem) navItem.classList.add('active');
-        }
-        
-        // Close sidebar
-        toggleSidebar(false);
-    };
-
-    window.toggleTheme = () => {
-        const body = document.body;
-        if (body.classList.contains('dark')) {
-            body.classList.remove('dark');
-            body.classList.add('light-mode');
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark');
-        }
-    };
-
-    window.toggleSearch = () => {
-        const modal = document.getElementById('searchModal');
-        modal.classList.toggle('active');
-        if (modal.classList.contains('active')) {
-            modal.querySelector('input').focus();
-        }
-    };
-
-    window.copyID = () => {
-        if (!userData) return;
-        navigator.clipboard.writeText(userData.customId);
-        showToast("تم نسخ المعرف", "success");
-    };
-
-    window.logout = async () => {
-        try {
-            await signOut(auth);
-            document.getElementById('main-app').style.display = 'none';
-            showToast("تم تسجيل الخروج بنجاح", "success");
-        } catch (error) {
-            showToast("حدث خطأ أثناء تسجيل الخروج", "error");
-        }
-    };
-
-    function showToast(message, type = 'success') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        
-        const icons = {
-            success: 'check-circle',
-            error: 'alert-circle',
-            info: 'info',
-            warning: 'alert-triangle'
-        };
-        
-        toast.className = 'toast';
-        toast.innerHTML = `
-            <i data-lucide="${icons[type]}" class="w-5 h-5 ${type === 'success' ? 'text-green-500' : type === 'error' ? 'text-red-500' : type === 'info' ? 'text-blue-500' : 'text-yellow-500'}"></i>
-            <span>${message}</span>
-        `;
-        
-        container.appendChild(toast);
         lucide.createIcons();
-        
-        setTimeout(() => {
-            toast.style.animation = 'slideInUp 0.3s ease reverse';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
     }
 
-    // Placeholder functions for sidebar navigation
-    window.showAllRooms = () => {
-        showToast("عرض جميع الغرف", "info");
-        switchView('home');
-    };
-    
-    window.openSettings = () => {
-        showToast("فتح الإعدادات", "info");
-    };
-    
-    window.openNotifications = () => {
-        showToast("فتح الإشعارات", "info");
-    };
-    
-    window.openPrivacy = () => {
-        showToast("فتح إعدادات الخصوصية", "info");
+    // Edit Profile Logic
+    window.openEditModal = () => {
+        document.getElementById('editNameInput').value = uData.name || '';
+        document.getElementById('editAvatarInput').value = uData.avatar || '';
+        document.getElementById('editProfileModal').classList.add('active');
     };
 
-    // Initialize icons
-    lucide.createIcons();
+    window.closeEditModal = () => {
+        document.getElementById('editProfileModal').classList.remove('active');
+    };
+
+    window.saveProfileChanges = async () => {
+        const newName = document.getElementById('editNameInput').value;
+        const newAvatar = document.getElementById('editAvatarInput').value;
+        
+        if (!newName) return alert('يرجى إدخال الاسم');
+
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, {
+                name: newName,
+                avatar: newAvatar
+            });
+            closeEditModal();
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            alert('حدث خطأ أثناء التحديث');
+        }
+    };
+
+    window.logout = () => signOut(auth);
+
 </script>
 </body>
-    </html>
+</html>
