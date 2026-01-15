@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - النسخة المتقدمة</title>
+    <title>Afnan AI - الرئيسية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -25,22 +25,26 @@
         .avatar-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; z-index: 1; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .user-frame { position: absolute; width: 115%; height: 115%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; pointer-events: none; object-fit: contain; }
         
-        /* --- Level Styles --- */
+        /* --- Level Styles (Updated) --- */
         .level-container { display: flex; justify-content: center; gap: 15px; margin-top: 15px; padding: 0 10px; }
-        .level-badge-wrapper { position: relative; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
+        .level-badge-wrapper { position: relative; width: 45px; height: 45px; display: flex; align-items: center; justify-content: center; }
         .level-img { width: 100%; height: 100%; object-fit: contain; }
         
-        /* رقم ليفل مدمج، صغير، وجهة اليمين */
+        /* جعل الرقم مدمجاً وأصغر وإلى اليمين قليلاً */
         .level-number { 
             position: absolute; 
-            bottom: 8px;
-            right: 6px; 
-            color: white; 
+            bottom: 4px;
+            right: 4px;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: #fff; 
             font-size: 10px; 
             font-weight: 900; 
-            z-index: 5; 
-            line-height: 1;
-            pointer-events: none;
+            z-index: 5;
+            background: rgba(0,0,0,0.2);
+            padding: 1px 4px;
+            border-radius: 4px;
         }
 
         /* --- Glowing ID Style --- */
@@ -49,27 +53,26 @@
             50% { text-shadow: 0 0 10px rgba(120, 50, 255, 0.8); color: #8b5cf6; }
             100% { text-shadow: 0 0 5px rgba(0, 0, 255, 0.5); color: #3b82f6; }
         }
-        .glowing-id { font-family: 'Courier New', monospace; font-weight: 900; animation: glow-red-blue 3s infinite alternate; }
+        .glowing-id { font-family: 'Courier New', monospace; font-weight: 900; letter-spacing: 1px; animation: glow-red-blue 3s infinite alternate; }
 
+        /* Store & Items */
         .store-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         .store-card { background: white; border-radius: 18px; padding: 12px; text-align: center; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; position: relative; transition: 0.2s; }
         .store-card.equipped { border: 2px solid #10b981; background: #ecfdf5; }
         
-        .action-btn { width: 100%; padding: 8px 0; border-radius: 12px; font-size: 11px; font-weight: bold; margin-top: 8px; cursor: pointer; border: none; transition: 0.2s; }
-        .btn-buy { background: #f59e0b; color: white; }
+        .action-btn { width: 100%; padding: 8px 0; border-radius: 12px; font-size: 12px; font-weight: bold; margin-top: 8px; cursor: pointer; border: none; transition: 0.2s; }
+        .btn-buy { background: #f59e0b; color: white; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2); }
         .btn-equip { background: #3b82f6; color: white; }
         .btn-unequip { background: #ef4444; color: white; }
+        .btn-equipped { background: #10b981; color: white; cursor: default; }
 
         .sidebar { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: white; z-index: 4000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-left: 1px solid #eee; display: flex; flex-direction: column; }
         .sidebar.open { right: 0; box-shadow: -10px 0 30px rgba(0,0,0,0.05); }
         .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 2500; display: none; backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s; }
         .overlay.active { display: block; opacity: 1; }
 
-        .wallet-card { background: linear-gradient(135deg, #0f172a, #334155); color: white; border-radius: 24px; padding: 30px; margin: 20px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2); }
+        .wallet-card { background: linear-gradient(135deg, #0f172a, #334155); color: white; border-radius: 24px; padding: 30px; margin: 20px; position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.2); }
         .login-btn { width: 100%; max-width: 280px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 14px; border-radius: 18px; font-weight: bold; margin-bottom: 12px; }
-        .btn-google { background: white; border: 1px solid #eee; color: #333; }
-        .btn-x { background: #000; color: white; }
-
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal.active { display: flex; }
         .modal-content { background: white; width: 90%; max-width: 350px; padding: 25px; border-radius: 25px; animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
@@ -81,131 +84,143 @@
 
     <div id="toastContainer" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[11000] transition-all duration-300"></div>
 
-    <!-- Login -->
     <div id="loginPage" class="fixed inset-0 bg-white z-[10000] flex flex-col items-center justify-center p-8">
-        <div class="w-32 h-32 bg-orange-50 rounded-full flex items-center justify-center mb-6">
-             <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-24">
+        <div class="w-32 h-32 bg-orange-50 rounded-full flex items-center justify-center mb-6 animate-pulse">
+             <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-24 drop-shadow-lg">
         </div>
         <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Afnan AI</h1>
-        <div class="w-full flex flex-col items-center gap-2">
-            <button onclick="loginWithGoogle()" class="login-btn btn-google">
+        <p class="text-gray-400 mb-10 text-sm">عالمك الافتراضي المتكامل</p>
+        <div id="userLoginSection" class="w-full flex flex-col items-center gap-2">
+            <button onclick="loginWithGoogle()" class="login-btn bg-white border border-gray-100 text-gray-800 shadow-sm flex items-center justify-center gap-3">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5">
                 <span>تسجيل الدخول عبر جوجل</span>
             </button>
         </div>
     </div>
 
-    <!-- Main -->
     <div id="main-app" style="display: none;">
         <header class="app-header">
             <div class="header-top">
-                <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl"><i data-lucide="menu"></i></button>
+                <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl hover:bg-gray-100 transition"><i data-lucide="menu" class="text-gray-600"></i></button>
                 <div class="font-bold text-lg text-gray-800" id="view-title">الرئيسية</div>
-                <div onclick="switchView('wallet')" class="flex items-center gap-2 bg-orange-50 px-4 py-1.5 rounded-full border border-orange-100 shadow-sm cursor-pointer">
-                    <span id="header-balance" class="text-sm font-bold text-orange-600">0</span>
-                    <span class="text-lg">💰</span>
+                <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 bg-gradient-to-l from-orange-100 to-orange-50 px-4 py-1.5 rounded-full cursor-pointer border border-orange-100 shadow-sm" onclick="switchView('wallet')">
+                        <span id="header-balance" class="text-sm font-bold text-orange-600">0</span>
+                        <span class="text-lg">💰</span>
+                    </div>
                 </div>
             </div>
             <div class="header-tabs" id="main-tabs">
-                <div class="tab-link active">غرف عامة</div>
-                <div class="tab-link">خاص بي</div>
+                <div id="tab-public" class="tab-link active" onclick="switchTab('public')">غرف عامة</div>
+                <div id="tab-private" class="tab-link" onclick="switchTab('private')">خاص بي</div>
             </div>
         </header>
 
-        <div id="sidebar" class="sidebar overflow-y-auto">
+        <div id="sidebar" class="sidebar overflow-y-auto custom-scrollbar">
             <div class="p-6 text-center border-b border-gray-100 pb-8">
                 <div class="profile-container mb-3">
-                    <img id="userAvatar" src="" class="avatar-img">
+                    <img id="userAvatar" src="https://i.pravatar.cc/150" class="avatar-img">
                     <img id="activeFrame" src="" class="user-frame" style="display: none;">
                 </div>
+                
                 <div class="flex items-center justify-center gap-2 mb-1">
-                    <div id="userName" class="font-bold text-lg">...</div>
-                    <button onclick="openEditProfile()" class="text-gray-400 bg-gray-50 p-1 rounded-full"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
+                    <div id="userName" class="font-bold text-lg text-gray-800">...</div>
+                    <button onclick="openEditProfile()" class="text-gray-400 hover:text-blue-500 bg-gray-50 p-1 rounded-full"><i data-lucide="edit-3" class="w-3 h-3"></i></button>
                 </div>
+
                 <div class="inline-flex items-center gap-2 px-3 py-1 bg-gray-50 rounded-lg text-[12px] mb-4 border border-gray-100 shadow-sm">
+                    <span class="text-gray-400">ID:</span>
                     <span id="userID" class="glowing-id">00000000</span>
-                    <button onclick="copyID()" class="text-gray-400 hover:text-green-500"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                    <button onclick="copyID()" class="text-gray-400 hover:text-green-500 active:scale-90 transition"><i data-lucide="copy" class="w-3 h-3"></i></button>
                 </div>
 
                 <div class="level-container">
-                    <div class="flex flex-col items-center">
+                    <div class="flex flex-col items-center gap-1">
                         <div class="level-badge-wrapper">
                             <img id="wealth-img" src="" class="level-img">
                             <div id="wealth-num" class="level-number">0</div>
                         </div>
-                        <span class="text-[9px] font-bold text-gray-400">ثروة</span>
+                        <span class="text-[10px] font-bold text-gray-400">ثروة</span>
                     </div>
-                    <div class="flex flex-col items-center">
+                    <div class="flex flex-col items-center gap-1">
                         <div class="level-badge-wrapper">
                             <img id="magic-img" src="" class="level-img">
                             <div id="magic-num" class="level-number">0</div>
                         </div>
-                        <span class="text-[9px] font-bold text-gray-400">سحر</span>
+                        <span class="text-[10px] font-bold text-gray-400">سحر</span>
                     </div>
                 </div>
             </div>
             
             <nav class="p-4 space-y-1">
-                <button onclick="switchView('home')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
-                    <i data-lucide="home"></i><span class="font-bold text-sm">الرئيسية</span>
+                <button onclick="switchView('home')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
+                    <i data-lucide="home" class="w-5 h-5"></i><span class="font-bold text-sm">الرئيسية</span>
                 </button>
-                <button onclick="switchView('wallet')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
-                    <i data-lucide="wallet"></i><span class="font-bold text-sm">المحفظة</span>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
+                    <i data-lucide="wallet" class="w-5 h-5"></i><span class="font-bold text-sm">المحفظة</span>
                 </button>
-                <button onclick="switchView('store')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
-                    <i data-lucide="shopping-bag"></i><span class="font-bold text-sm">المتجر</span>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
+                    <i data-lucide="shopping-bag" class="w-5 h-5"></i><span class="font-bold text-sm">المتجر</span>
                 </button>
-                <button onclick="switchView('bag')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 rounded-xl text-gray-600">
-                    <i data-lucide="briefcase"></i><span class="font-bold text-sm">حقيبتي</span>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-3 p-3.5 hover:bg-orange-50 hover:text-orange-600 rounded-xl transition text-gray-600">
+                    <i data-lucide="briefcase" class="w-5 h-5"></i><span class="font-bold text-sm">حقيبتي</span>
                 </button>
             </nav>
-            
-            <div class="mt-auto p-4">
-                 <button onclick="logout()" class="w-full flex items-center justify-center gap-2 p-3 bg-red-50 text-red-500 rounded-xl font-bold text-sm"> خروج </button>
+        </div>
+
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-lg">تعديل الملف الشخصي</h3>
+                    <button onclick="closeEditProfile()" class="text-gray-400"><i data-lucide="x"></i></button>
+                </div>
+                <div class="space-y-3">
+                    <input type="text" id="newDisplayName" class="form-input" placeholder="اسمك الجديد">
+                    <input type="text" id="newPhotoURL" class="form-input" placeholder="رابط الصورة الشخصية">
+                    <button onclick="saveProfileChanges()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold mt-2">حفظ التعديلات</button>
+                </div>
             </div>
         </div>
 
-        <!-- Home View -->
         <div id="view-home" class="view-screen active">
-            <div id="bannerContainer" class="mx-4 mb-6 rounded-2xl h-[180px] bg-gray-200"></div>
+            <div id="bannerContainer" class="mx-4 mb-6 rounded-2xl overflow-hidden shadow-sm h-[180px] bg-gray-200"></div>
             <div class="px-4 pb-20">
                 <h3 class="font-bold text-gray-800 text-lg mb-4">الغرف النشطة</h3>
                 <div id="roomsList" class="flex flex-col gap-3"></div>
             </div>
         </div>
 
-        <!-- Wallet -->
         <div id="view-wallet" class="view-screen">
             <div class="wallet-card">
                 <div class="text-xs text-gray-300 mb-2">رصيدك الحالي</div>
                 <div class="text-4xl font-extrabold"><span id="wallet-balance-big">0</span> 💰</div>
             </div>
+            <div class="px-5">
+                <h3 class="font-bold mb-4">شراء العملات</h3>
+                <div class="bg-white border p-4 rounded-2xl flex justify-between items-center">
+                    <div>
+                        <div class="font-bold">باقة 1$</div>
+                        <div class="text-orange-500 text-xs">+27,000 عملة</div>
+                    </div>
+                    <button onclick="recharge(27000)" class="bg-black text-white px-4 py-2 rounded-xl text-xs">شراء</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Store -->
         <div id="view-store" class="view-screen">
-            <div class="flex p-4 gap-2 sticky top-[110px] bg-[#f8f9fa] z-20">
-                <button id="framesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold bg-white shadow-sm" onclick="filterStore('frames')">إطارات</button>
-                <button id="badgesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold text-gray-500" onclick="filterStore('badges')">شارات</button>
+            <div class="sticky top-[110px] bg-[#f8f9fa] z-20 pb-2 pt-2 px-4 shadow-sm">
+                <div class="flex p-1 bg-gray-200 rounded-xl">
+                    <button id="framesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold" onclick="filterStore('frames')">إطارات</button>
+                    <button id="badgesBtn" class="flex-1 py-2 rounded-lg text-xs font-bold" onclick="filterStore('badges')">شارات</button>
+                </div>
             </div>
             <div id="storeItems" class="store-grid"></div>
         </div>
 
-        <!-- Bag -->
         <div id="view-bag" class="view-screen">
-            <div class="px-5">
-                <h3 class="font-bold text-gray-800 mb-4">حقيبتي (صلاحية العناصر 24 ساعة)</h3>
+            <div class="px-5 pb-20">
+                <h3 class="font-bold text-gray-800 mb-4">حقيبتي</h3>
                 <div id="bagItems" class="store-grid"></div>
-            </div>
-        </div>
-
-        <div id="editProfileModal" class="modal">
-            <div class="modal-content">
-                <h3 class="font-bold text-lg mb-4">تعديل البروفايل</h3>
-                <input type="text" id="newDisplayName" class="form-input" placeholder="الاسم">
-                <input type="text" id="newPhotoURL" class="form-input" placeholder="رابط الصورة">
-                <button onclick="saveProfileChanges()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">حفظ</button>
-                <button onclick="closeEditProfile()" class="w-full mt-2 text-gray-400 text-sm">إلغاء</button>
             </div>
         </div>
 
@@ -239,14 +254,13 @@
                 userUnsubscribe = onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                     if (docSnap.exists()) {
                         window.currentUserData = docSnap.data();
-                        checkItemExpiration(); // فحص انتهاء الصلاحية عند كل تحديث
+                        checkExpiredItems(); // تحقق من الصلاحية عند كل تحديث
                         updateUI();
-                        if(document.getElementById('view-bag').classList.contains('active')) updateBag();
                     }
                 });
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('main-app').style.display = 'block';
-                loadInitialData();
+                loadStoreItems();
             } else {
                 if (userUnsubscribe) userUnsubscribe();
                 document.getElementById('loginPage').style.display = 'flex';
@@ -254,45 +268,50 @@
             }
         });
 
-        async function checkItemExpiration() {
-            const u = window.currentUserData;
+        window.loginWithGoogle = async () => {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            const userRef = doc(db, "users", result.user.uid);
+            const snap = await getDoc(userRef);
+            if (!snap.exists()) {
+                await setDoc(userRef, {
+                    uid: result.user.uid,
+                    displayName: result.user.displayName,
+                    photoURL: result.user.photoURL,
+                    balance: 50000,
+                    wealthLevel: 1,
+                    magicLevel: 1,
+                    customId: Math.floor(10000000 + Math.random() * 90000000).toString(),
+                    purchasedItems: [] // سنستخدم مصفوفة كائنات {id, expiry, type}
+                });
+            }
+        };
+
+        // دالة التحقق من انتهاء الصلاحية
+        async function checkExpiredItems() {
+            if (!window.currentUserData) return;
             const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            let changed = false;
+            const items = window.currentUserData.purchasedItems || [];
+            const validItems = items.filter(item => item.expiry > now);
             
-            // فحص الإطارات
-            const validFrames = (u.purchasedFrames || []).filter(item => {
-                if (now - item.purchasedAt > oneDay) { changed = true; return false; }
-                return true;
-            });
-
-            // فحص الشارات
-            const validBadges = (u.purchasedBadges || []).filter(item => {
-                if (now - item.purchasedAt > oneDay) { changed = true; return false; }
-                return true;
-            });
-
-            if (changed) {
+            if (validItems.length !== items.length) {
                 const userRef = doc(db, "users", auth.currentUser.uid);
-                const updates = { purchasedFrames: validFrames, purchasedBadges: validBadges };
+                let updateData = { purchasedItems: validItems };
                 
                 // خلع الإطار إذا انتهى
-                if (u.activeFrame && !validFrames.find(f => f.id === u.activeFrame)) {
-                    updates.activeFrame = null;
+                if (window.currentUserData.activeFrame) {
+                    const stillExists = validItems.find(i => i.id === window.currentUserData.activeFrame);
+                    if (!stillExists) updateData.activeFrame = null;
                 }
                 
-                await updateDoc(userRef, updates);
-                showToast("انتهت صلاحية بعض العناصر (24 ساعة)", "error");
+                await updateDoc(userRef, updateData);
             }
         }
-
-        window.loginWithGoogle = async () => {
-            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (e) {}
-        };
 
         function updateUI() {
             const u = window.currentUserData;
             if(!u) return;
+
             document.getElementById('userName').innerText = u.displayName;
             document.getElementById('userAvatar').src = u.photoURL;
             document.getElementById('userID').innerText = u.customId;
@@ -301,26 +320,21 @@
             
             const frameImg = document.getElementById('activeFrame');
             if (u.activeFrame) {
-                const frameObj = window.storeItems.frames.find(f => f.id === u.activeFrame);
-                if (frameObj) { frameImg.src = frameObj.image; frameImg.style.display = 'block'; }
+                const frame = window.storeItems.frames.find(f => f.id === u.activeFrame);
+                if (frame) { frameImg.src = frame.image; frameImg.style.display = 'block'; }
             } else frameImg.style.display = 'none';
 
-            renderLevel(u.wealthLevel || 1, 'wealth');
-            renderLevel(u.magicLevel || 1, 'magic');
+            // تحديث الليفل بالتصميم الجديد
+            document.getElementById('wealth-num').innerText = u.wealthLevel || 1;
+            document.getElementById('magic-num').innerText = u.magicLevel || 1;
+            document.getElementById('wealth-img').src = "https://cdn-icons-png.flaticon.com/512/2535/2535556.png";
+            document.getElementById('magic-img').src = "https://cdn-icons-png.flaticon.com/512/867/867906.png";
+
+            if(document.getElementById('view-bag').classList.contains('active')) updateBag();
             lucide.createIcons();
         }
 
-        function renderLevel(level, type) {
-            document.getElementById(`${type}-num`).innerText = level;
-            const tier = Math.floor(level / 10);
-            const fallbacks = {
-                wealth: ["https://cdn-icons-png.flaticon.com/512/2535/2535556.png", "https://cdn-icons-png.flaticon.com/512/2535/2535583.png"],
-                magic: ["https://cdn-icons-png.flaticon.com/512/867/867906.png", "https://cdn-icons-png.flaticon.com/512/867/867926.png"]
-            };
-            document.getElementById(`${type}-img`).src = fallbacks[type][Math.min(tier, 1)];
-        }
-
-        async function loadInitialData() {
+        async function loadStoreItems() {
             const fSnap = await getDocs(collection(db, "frames"));
             window.storeItems.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
             const bSnap = await getDocs(collection(db, "badges"));
@@ -330,101 +344,125 @@
 
         window.filterStore = (type) => {
             const container = document.getElementById('storeItems');
+            const framesBtn = document.getElementById('framesBtn');
+            const badgesBtn = document.getElementById('badgesBtn');
+
+            if (type === 'frames') {
+                framesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-white text-gray-800 shadow-sm";
+                badgesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-gray-100";
+            } else {
+                badgesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold bg-white text-gray-800 shadow-sm";
+                framesBtn.className = "flex-1 py-2 rounded-lg text-xs font-bold text-gray-500 hover:bg-gray-100";
+            }
+
             container.innerHTML = '';
             window.storeItems[type].forEach(item => {
+                // الشراء دائماً متاح بناءً على طلبك
                 container.innerHTML += `
                     <div class="store-card">
-                        <div class="h-16 flex items-center justify-center mb-2">
+                        <div class="h-16 flex items-center justify-center mb-2 w-full">
                             ${type === 'frames' ? `<img src="${item.image}" class="w-14 h-14 object-contain">` : `<span class="text-4xl">${item.icon}</span>`}
                         </div>
-                        <div class="font-bold text-[10px] text-gray-700">${item.name}</div>
+                        <div class="font-bold text-xs text-gray-700 w-full truncate">${item.name}</div>
+                        <div class="text-[9px] text-gray-400 mt-1">المدة: 1 يوم</div>
                         <button onclick="buyItem('${type}', '${item.id}', ${item.price})" class="action-btn btn-buy">شراء (${item.price})</button>
-                    </div>`;
+                    </div>
+                `;
             });
         };
 
         window.buyItem = async (type, itemId, price) => {
-            if (window.currentUserData.balance < price) return showToast("رصيد غير كافٍ", "error");
+            if (window.currentUserData.balance < price) { showToast("رصيدك غير كافٍ!", "error"); return; }
+            
             const userRef = doc(db, "users", auth.currentUser.uid);
-            const newItem = { id: itemId, purchasedAt: Date.now() };
+            const expiry = Date.now() + (24 * 60 * 60 * 1000); // 24 ساعة
             
-            const field = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
-            const currentList = window.currentUserData[field] || [];
-            
-            await updateDoc(userRef, {
+            const newItem = { id: itemId, expiry: expiry, type: type };
+            const updatedItems = [...(window.currentUserData.purchasedItems || []), newItem];
+
+            await updateDoc(userRef, { 
                 balance: increment(-price),
-                [field]: [...currentList, newItem]
+                purchasedItems: updatedItems
             });
-            showToast("تم الشراء! صالح لمدة يوم", "success");
+            showToast("تم الشراء! متاح لمدة 24 ساعة", "success");
         };
 
         window.updateBag = () => {
             const container = document.getElementById('bagItems');
             container.innerHTML = '';
-            const u = window.currentUserData;
+            const items = window.currentUserData.purchasedItems || [];
+            
+            if (items.length === 0) {
+                container.innerHTML = `<div class="col-span-2 text-center text-gray-400 py-10">الحقيبة فارغة.</div>`;
+                return;
+            }
 
-            (u.purchasedFrames || []).forEach((pItem, index) => {
-                const item = window.storeItems.frames.find(f => f.id === pItem.id);
-                if (item) {
-                    const isActive = u.activeFrame === item.id;
-                    container.innerHTML += `
-                        <div class="store-card ${isActive ? 'equipped' : ''}">
-                            <img src="${item.image}" class="w-12 h-12 object-contain">
-                            <div class="text-[9px] font-bold">${item.name}</div>
-                            ${isActive ? 
-                                `<button onclick="equipItem('frame', null)" class="action-btn btn-unequip">خلع</button>` : 
-                                `<button onclick="equipItem('frame', '${item.id}')" class="action-btn btn-equip">ارتداء</button>`
-                            }
-                        </div>`;
+            items.forEach((userItem, index) => {
+                const itemData = window.storeItems[userItem.type].find(i => i.id === userItem.id);
+                if (!itemData) return;
+
+                const isEquipped = window.currentUserData.activeFrame === userItem.id;
+                let actionBtn = '';
+                
+                if (userItem.type === 'frames') {
+                    actionBtn = isEquipped 
+                        ? `<button onclick="equipItem('none')" class="action-btn btn-unequip">نزع</button>`
+                        : `<button onclick="equipItem('${userItem.id}')" class="action-btn btn-equip">ارتداء</button>`;
+                } else {
+                    actionBtn = `<button class="action-btn bg-gray-100 text-gray-400">شارة مفعلة</button>`;
                 }
+
+                const timeLeft = Math.round((userItem.expiry - Date.now()) / (60 * 60 * 1000));
+
+                container.innerHTML += `
+                    <div class="store-card ${isEquipped ? 'equipped' : ''}">
+                        <div class="h-16 flex items-center justify-center mb-2">
+                            ${userItem.type === 'frames' ? `<img src="${itemData.image}" class="w-14 h-14 object-contain">` : `<span class="text-4xl">${itemData.icon}</span>`}
+                        </div>
+                        <div class="text-[10px] font-bold text-gray-700">${itemData.name}</div>
+                        <div class="text-[9px] text-orange-500 font-bold mt-1">ينتهي خلال: ${timeLeft} س</div>
+                        ${actionBtn}
+                    </div>
+                `;
             });
         };
 
-        window.equipItem = async (type, id) => {
+        window.equipItem = async (frameId) => {
             const userRef = doc(db, "users", auth.currentUser.uid);
-            await updateDoc(userRef, { activeFrame: id });
-            showToast(id ? "تم الارتداء" : "تم الخلع");
+            await updateDoc(userRef, { activeFrame: frameId === 'none' ? null : frameId });
+            showToast(frameId === 'none' ? "تم نزع الإطار" : "تم ارتداء الإطار", "success");
         };
 
         window.switchView = (view) => {
             document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
             document.getElementById('view-' + view).classList.add('active');
-            document.getElementById('view-title').innerText = view;
-            if (view === 'bag') updateBag();
+            document.getElementById('view-title').innerText = {'home':'الرئيسية','wallet':'المحفظة','store':'المتجر','bag':'حقيبتي'}[view];
+            if(view === 'bag') updateBag();
+            toggleSidebar(false);
         };
 
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('active');
+        window.toggleSidebar = (open = null) => {
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('overlay');
+            if (open === false) { s.classList.remove('open'); o.classList.remove('active'); }
+            else { s.classList.toggle('open'); o.classList.toggle('active'); }
         };
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const div = document.createElement('div');
+            div.className = `${type==='success'?'bg-green-500':'bg-red-500'} text-white px-6 py-3 rounded-full shadow-lg mb-2 font-bold text-sm transition-all duration-300`;
+            div.innerText = msg;
+            container.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
 
         window.copyID = () => {
             navigator.clipboard.writeText(window.currentUserData.customId);
             showToast("تم نسخ الـ ID");
         };
 
-        window.openEditProfile = () => document.getElementById('editProfileModal').classList.add('active');
-        window.closeEditProfile = () => document.getElementById('editProfileModal').classList.remove('active');
-        window.saveProfileChanges = async () => {
-            const name = document.getElementById('newDisplayName').value;
-            const photo = document.getElementById('newPhotoURL').value;
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { displayName: name, photoURL: photo });
-            closeEditProfile();
-        };
-
-        window.logout = () => signOut(auth);
-
-        function showToast(msg, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const div = document.createElement('div');
-            div.className = `${type === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white px-6 py-2 rounded-full shadow-lg mb-2 text-xs font-bold transition-all duration-300`;
-            div.innerText = msg;
-            container.appendChild(div);
-            setTimeout(() => div.remove(), 3000);
-        }
-
         lucide.createIcons();
     </script>
 </body>
 </html>
-
