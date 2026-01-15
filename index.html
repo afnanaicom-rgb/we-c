@@ -3,870 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - النسخة المتطورة</title>
+    <title>Afnan AI - Elite Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: 'Noto Sans Arabic', sans-serif; 
-        }
-        body, html { 
-            height: 100%; 
-            margin: 0; 
-            color: #1a1a1a; 
-            overflow-x: hidden; 
-            transition: background-color 0.3s ease;
-        }
-        
-        /* Theme Variables */
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-card: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --accent: #f59e0b;
-            --accent-secondary: #1da1f2;
-            --border-color: #475569;
-        }
-        
-        .light-mode {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-        }
-        
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-        }
-        
-        .view-screen { 
-            position: absolute; 
-            inset: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: var(--bg-primary); 
-            display: none; 
-            flex-direction: column; 
-            z-index: 10; 
-            padding-top: 80px; 
-            overflow-y: auto; 
-            padding-bottom: 100px; 
-            transition: background-color 0.3s ease;
-        }
-        .view-screen.active { display: flex; }
-        
-        /* Enhanced Header */
-        .app-header { 
-            position: fixed; 
-            top: 0; 
-            right: 0; 
-            left: 0; 
-            height: 80px; 
-            background: rgba(15, 23, 42, 0.95); 
-            backdrop-filter: blur(20px); 
-            border-bottom: 1px solid var(--border-color); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 1.5rem; 
-            z-index: 1000; 
-            transition: all 0.3s ease;
-        }
-        
-        .light-mode .app-header {
-            background: rgba(248, 250, 252, 0.95);
-        }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .theme-toggle {
-            width: 44px;
-            height: 24px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            position: relative;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-        }
-        
-        .theme-toggle::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--accent);
-            border-radius: 50%;
-            top: 1px;
-            right: 2px;
-            transition: transform 0.3s ease;
-        }
-        
-        .light-mode .theme-toggle::after {
-            transform: translateX(-20px);
-        }
-        
-        /* Search Modal */
-        .search-modal {
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(10px);
-        }
-        
-        .search-modal.active {
-            display: flex;
-        }
-        
-        .search-container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-        
-        /* Profile Styles */
-        .profile-container { 
-            position: relative; 
-            width: 70px; 
-            height: 70px; 
-            margin: 0 auto; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .avatar-img { 
-            width: 55px; 
-            height: 55px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            z-index: 1; 
-            border: 2px solid var(--accent); 
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3); 
-        }
-        .user-frame { 
-            position: absolute; 
-            width: 140%; 
-            height: 140%; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            z-index: 2; 
-            pointer-events: none; 
-            object-fit: contain; 
-            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
-        }
-        
-        /* Enhanced Level System */
-        .level-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background: var(--bg-card);
-            border-radius: 20px;
-            border: 1px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .level-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #f59e0b, #3b82f6, #8b5cf6);
-        }
-        
-        .level-current {
-            font-size: 48px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #f59e0b, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        
-        .level-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .level-progress {
-            width: 100%;
-            height: 8px;
-            background: var(--bg-secondary);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-        
-        .level-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #f59e0b, #3b82f6);
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-        
-        .level-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-        }
-        
-        .level-icon-large {
-            position: absolute;
-            top: 50%;
-            left: 20px;
-            transform: translateY(-50%);
-            font-size: 40px;
-            opacity: 0.1;
-        }
-        
-        /* Badges Grid */
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-            margin-top: 0.5rem;
-        }
-        
-        .badge-item {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            border: 2px solid var(--border-color);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        .badge-item.active {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
-            transform: scale(1.1);
-        }
-        
-        .badge-item:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 11px;
-            white-space: nowrap;
-            margin-bottom: 5px;
-        }
-        
-        /* Store & Items */
-        .store-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
-            padding: 15px; 
-        }
-        .store-card { 
-            background: var(--bg-card); 
-            border-radius: 20px; 
-            padding: 15px; 
-            text-align: center; 
-            border: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: relative; 
-            height: 200px; 
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .store-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .item-label { 
-            position: absolute; 
-            top: 8px; 
-            right: 8px; 
-            font-size: 9px; 
-            font-weight: 800; 
-            color: var(--text-secondary); 
-            text-transform: uppercase; 
-            background: rgba(0,0,0,0.3);
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-        
-        .action-btn { 
-            width: 100%; 
-            padding: 10px 0; 
-            border-radius: 12px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            margin-top: auto; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            border: none;
-            font-family: inherit;
-        }
-        .btn-buy { 
-            background: linear-gradient(135deg, #f59e0b, #d97706); 
-            color: white; 
-        }
-        .btn-buy:hover {
-            background: linear-gradient(135deg, #d97706, #f59e0b);
-        }
-        .btn-equip { 
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8); 
-            color: white; 
-        }
-        .btn-equip:hover {
-            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-        }
-        .btn-unequip { 
-            background: linear-gradient(135deg, #ef4444, #dc2626); 
-            color: white; 
-        }
-        .btn-unequip:hover {
-            background: linear-gradient(135deg, #dc2626, #ef4444);
-        }
-        
-        /* Sidebar */
-        .sidebar { 
-            position: fixed; 
-            top: 0; 
-            right: -320px; 
-            width: 320px; 
-            height: 100%; 
-            background: var(--bg-secondary); 
-            z-index: 4000; 
-            transition: 0.3s ease; 
-            border-left: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
-        }
-        .sidebar.open { right: 0; }
-        
-        .overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.7); 
-            z-index: 2500; 
-            display: none; 
-            backdrop-filter: blur(5px); 
-        }
-        .overlay.active { display: block; }
-        
-        /* Rooms Grid */
-        .rooms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            padding: 1.5rem;
-        }
-        
-        .room-card {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .room-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.1);
-        }
-        
-        .room-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .room-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        
-        .room-users {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        /* Recharge Cards */
-        .recharge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            padding: 1.5rem;
-        }
-        
-        .recharge-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.5rem 1rem;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .recharge-card:hover {
-            border-color: var(--accent);
-            transform: scale(1.05);
-        }
-        
-        /* Modern Button */
-        .modern-btn {
-            background: linear-gradient(135deg, var(--accent), #d97706);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .modern-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
-        }
-        
-        .twitter-btn {
-            background: linear-gradient(135deg, #1da1f2, #0c85d0);
-        }
-        
-        .twitter-btn:hover {
-            background: linear-gradient(135deg, #0c85d0, #1da1f2);
-            box-shadow: 0 10px 20px rgba(29, 161, 242, 0.3);
-        }
-        
-        /* Login Page */
-        .login-container {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-        
-        .login-logo {
-            position: relative;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        
-        /* Level Images */
-        .level-image {
-            width: 80px;
-            height: 80px;
-            object-fit: contain;
-            margin: 0 auto;
-        }
-        
-        /* Glowing Effects */
-        .glow-effect {
-            position: relative;
-        }
-        
-        .glow-effect::after {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(45deg, #f59e0b, #3b82f6, #8b5cf6, #ec4899);
-            border-radius: inherit;
-            z-index: -1;
-            filter: blur(10px);
-            opacity: 0.3;
-            animation: glow 3s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            0% { opacity: 0.2; }
-            100% { opacity: 0.5; }
-        }
-        
-        /* Wallet Balance */
-        .wallet-balance {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            border-radius: 24px;
-            padding: 2rem;
-            margin: 1.5rem;
-            border: 1px solid var(--border-color);
-            text-align: center;
-        }
-        
-        .light-mode .wallet-balance {
-            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
-        }
-        
-        /* Tab Navigation */
-        .tab-nav {
-            display: flex;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            padding: 4px;
-            margin: 1rem;
-            border: 1px solid var(--border-color);
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .tab-btn.active {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-        }
-        
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        /* Level Badge */
-        .level-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(245, 158, 11, 0.1);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-        }
-        
-        .level-badge-number {
-            font-weight: 900;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; transition: all 0.3s ease; }
+        .light-mode { background-color: #f1f5f9; color: #0f172a; }
+
+        /* UI Elements */
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
+        .light-mode .glass-card { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.05); }
+        
+        .view-screen { display: none; padding: 100px 1rem 120px; min-height: 100vh; }
+        .view-screen.active { display: block; animation: fadeIn 0.4s ease-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Profile & ID */
+        .profile-glow { position: relative; width: 85px; height: 85px; margin: 0 auto; }
+        .avatar-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #f59e0b; padding: 3px; }
+        .frame-overlay { position: absolute; inset: -15px; z-index: 10; pointer-events: none; }
+
+        .id-badge { background: linear-gradient(135deg, #f59e0b, #9a3412); padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.75rem; color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
+
+        /* Navigation */
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: space-around; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; transition: 0.3s; cursor: pointer; }
+        .nav-item.active { color: #f59e0b; transform: translateY(-5px); }
+
+        /* Modal */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
+        .modal.active { display: flex; }
     </style>
 </head>
-<body class="dark">
+<body>
 
-<!-- Login Page -->
-<div id="loginPage" class="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-[10000] flex flex-col items-center justify-center p-8 login-container">
-    <div class="login-logo mb-8">
-        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-40 relative z-10">
+<!-- Login -->
+<div id="loginPage" class="fixed inset-0 bg-slate-900 z-[10000] flex flex-col items-center justify-center p-8">
+    <div class="mb-8 relative">
+        <div class="absolute inset-0 bg-orange-500 blur-3xl opacity-20 animate-pulse"></div>
+        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-32 relative">
     </div>
-    <h1 class="text-5xl font-black bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent mb-2">Afnan AI</h1>
-    <p class="text-slate-400 mb-10 text-center text-lg">النسخة المتطورة - مستقبل الذكاء الاصطناعي</p>
-    
-    <div class="w-full max-w-sm space-y-4">
-        <button onclick="loginWithGoogle()" class="modern-btn w-full">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
-            تسجيل الدخول عبر جوجل
-        </button>
-        
-        <button onclick="loginWithTwitter()" class="modern-btn twitter-btn w-full">
-            <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-            </svg>
-            تسجيل الدخول عبر X (تويتر)
-        </button>
-    </div>
+    <h1 class="text-4xl font-black mb-2 text-white">AFNAN <span class="text-orange-500">AI</span></h1>
+    <p class="text-slate-400 mb-10 text-center">قم بتسجيل الدخول لبدء رحلتك</p>
+    <button onclick="login()" class="w-full max-w-xs bg-white text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6">
+        دخول عبر جوجل
+    </button>
 </div>
 
-<!-- Main App -->
-<div id="main-app" style="display: none;">
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-content">
-            <div class="header-left">
-                <button onclick="toggleSidebar()" class="modern-btn" style="padding: 10px">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
-                </button>
-                <h1 id="view-title" class="text-xl font-bold">الرئيسية</h1>
-            </div>
-            <div class="header-right">
-                <div class="theme-toggle" onclick="toggleTheme()"></div>
-                <button onclick="toggleSearch()" class="modern-btn" style="padding: 10px">
-                    <i data-lucide="search" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Search Modal -->
-    <div id="searchModal" class="search-modal">
-        <div class="search-container fade-in">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold">بحث متقدم</h2>
-                <button onclick="toggleSearch()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <div class="relative">
-                <input type="text" 
-                       placeholder="ابحث في الغرف، المستخدمين، المحتوى..." 
-                       class="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500">
-                <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-            </div>
-            <div class="mt-4">
-                <h3 class="text-sm font-semibold text-slate-400 mb-2">البحث السريع</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 bg-slate-800 rounded-lg text-sm cursor-pointer hover:bg-slate-700">#عامة</span>
-                    <span class="px-3 py-1 bg-slate-800 rounded-lg text-sm cursor-pointer hover:bg-slate-700">#خاصة</span>
-                    <span class="px-3 py-1 bg-slate-800 rounded-lg text-sm cursor-pointer hover:bg-slate-700">#ذكاء اصطناعي</span>
-                </div>
-            </div>
-        </div>
+<!-- Header -->
+<header class="fixed top-0 inset-x-0 h-20 flex items-center justify-between px-6 z-50 transition-all" id="mainHeader">
+    <div class="flex items-center gap-3">
+        <button onclick="openProfileEdit()" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
+            <i data-lucide="settings" class="w-5 h-5 text-slate-300"></i>
+        </button>
+        <span class="font-bold text-lg" id="headerName">...</span>
     </div>
+    <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 bg-orange-500/10 px-3 py-1.5 rounded-full border border-orange-500/20">
+            <span class="font-bold text-orange-500" id="headerBalance">0</span>
+            <span class="text-xs">💰</span>
+        </div>
+        <button onclick="toggleTheme()" class="text-slate-400"><i data-lucide="moon" id="themeIcon"></i></button>
+    </div>
+</header>
 
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <div class="p-6 text-center border-b border-slate-700">
-            <div class="profile-container mb-4">
-                <img id="userAvatar" src="" class="avatar-img">
-                <img id="activeFrame" src="" class="user-frame" style="display: none;">
+<!-- Main App Content -->
+<div id="mainApp" class="hidden">
+    <!-- View: Home -->
+    <main id="view-home" class="view-screen active">
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+            <div class="profile-glow mb-4">
+                <img id="userAvatar" src="" class="avatar-main">
+                <img id="activeFrame" src="" class="frame-overlay hidden">
             </div>
-            <div class="flex items-center justify-center gap-2 mb-3">
-                <div id="userName" class="font-bold text-lg">...</div>
-                <button onclick="openEditProfile()" class="text-gray-400 hover:text-orange-500">
-                    <i data-lucide="edit-3" class="w-4 h-4"></i>
-                </button>
+            <h2 class="text-2xl font-black mb-1" id="userName">...</h2>
+            <div class="id-badge flex items-center gap-2 mb-4" onclick="copyMyID()">
+                <span id="userID">00000000</span>
+                <i data-lucide="copy" class="w-3 h-3"></i>
             </div>
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-lg text-sm mb-4">
-                <span class="glowing-id" id="userID">00000000</span>
-                <button onclick="copyID()" class="hover:text-orange-500">
-                    <i data-lucide="copy" class="w-3 h-3"></i>
-                </button>
-            </div>
-
-            <!-- Level Display -->
-            <div class="level-display">
-                <div class="level-icon-large">🎮</div>
-                <div class="level-label">مستواك الحالي</div>
-                <div class="level-current" id="currentLevel">1</div>
-                <div class="level-progress">
-                    <div class="level-progress-bar" id="levelProgressBar" style="width: 20%"></div>
+            
+            <div class="w-full space-y-3">
+                <div class="flex justify-between text-xs font-bold px-1">
+                    <span>مستوى <span id="userLevel">1</span></span>
+                    <span id="userXP">0 / 1000 XP</span>
                 </div>
-                <div class="level-info">
-                    <span id="currentXP">0 XP</span>
-                    <span id="nextLevelXP">1000 XP</span>
-                </div>
-                <img id="levelImage" src="https://i.postimg.cc/G4PtHLMS/ga.webp" class="level-image mt-4">
-            </div>
-
-            <!-- Badges Section -->
-            <div class="mt-4">
-                <h4 class="text-sm font-semibold text-slate-400 mb-2">شاراتي</h4>
-                <div class="badges-grid" id="badgesGrid">
-                    <!-- Badges will be injected here -->
+                <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                    <div id="xpProgress" class="h-full bg-gradient-to-r from-orange-500 to-yellow-400 transition-all duration-1000" style="width: 0%"></div>
                 </div>
             </div>
+
+            <div class="flex gap-2 mt-6 overflow-x-auto w-full py-2" id="userBadges">
+                <!-- Badges will be loaded here -->
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="glass-card p-4 text-center">
+                <div class="text-2xl mb-1">🔥</div>
+                <div class="text-xs text-slate-400">سحر الثروة</div>
+                <div class="font-black text-orange-500" id="wealthPower">0</div>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <div class="text-2xl mb-1">✨</div>
+                <div class="text-xs text-slate-400">قوة التأثير</div>
+                <div class="font-black text-blue-500" id="influencePower">0</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- View: Store -->
+    <main id="view-store" class="view-screen">
+        <h2 class="text-2xl font-black mb-6 px-2">المتجر الملكي</h2>
+        <div class="grid grid-cols-2 gap-4" id="storeGrid">
+            <!-- Items from Firestore -->
+        </div>
+    </main>
+
+    <!-- View: Wallet -->
+    <main id="view-wallet" class="view-screen">
+        <div class="glass-card p-8 text-center mb-8 bg-gradient-to-br from-orange-500 to-red-600 border-none">
+            <div class="text-white/80 text-sm mb-2">رصيدك الحالي</div>
+            <div class="text-5xl font-black text-white mb-4" id="walletBalance">0</div>
+            <button class="bg-white text-orange-600 px-8 py-3 rounded-2xl font-bold shadow-xl">سحب الأرباح</button>
         </div>
         
-        <nav class="p-4 space-y-1 flex-1">
-            <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="home" class="w-5 h-5 text-orange-500"></i>
-                <span class="font-bold text-sm">الرئيسية</span>
-            </button>
-            <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="wallet" class="w-5 h-5 text-green-500"></i>
-                <span class="font-bold text-sm">المحفظة</span>
-            </button>
-            <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-500"></i>
-                <span class="font-bold text-sm">المتجر</span>
-            </button>
-            <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="briefcase" class="w-5 h-5 text-purple-500"></i>
-                <span class="font-bold text-sm">حقيبتي</span>
-            </button>
-        </nav>
-        
-        <div class="p-4 border-t border-slate-700">
-            <button onclick="logout()" class="w-full p-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-sm hover:from-red-700 hover:to-red-800 transition-all duration-200">
-                <i data-lucide="log-out" class="w-4 h-4 inline ml-2"></i>
-                تسجيل خروج
-            </button>
-        </div>
-    </div>
-
-    <!-- Views -->
-    <div id="view-home" class="view-screen active">
-        <!-- Banner -->
-        <div id="bannerContainer" class="mx-4 mt-4 mb-6 rounded-2xl overflow-hidden shadow-xl h-[180px] bg-gradient-to-r from-orange-500/20 to-blue-500/20 border border-orange-500/30">
-            <!-- Banner will be loaded here -->
-        </div>
-        
-        <!-- Rooms Navigation -->
-        <div class="tab-nav">
-            <button onclick="switchTab('public')" class="tab-btn active">🌐 غرف عامة</button>
-            <button onclick="switchTab('private')" class="tab-btn">🔒 خاص بي</button>
-        </div>
-        
-        <!-- Rooms Grid -->
-        <div class="rooms-grid" id="roomsList">
-            <!-- Rooms will be loaded here -->
-        </div>
-    </div>
-
-    <div id="view-wallet" class="view-screen">
-        <div class="wallet-balance slide-in">
-            <div class="text-sm text-slate-400 mb-2">الرصيد المتوفر</div>
-            <div class="text-5xl font-black mb-4">
-                <span id="wallet-balance-big">0</span> 
-                <span class="text-3xl">💰</span>
-            </div>
-            <div class="text-sm text-slate-400">أخر تحديث: اليوم</div>
-        </div>
-        
-        <div class="px-5">
-            <h3 class="text-lg font-bold mb-4">شحن الرصيد</h3>
-            <div class="recharge-grid">
-                <div class="recharge-card" onclick="recharge(27000, 1)">
-                    <div class="text-2xl mb-2">💎</div>
-                    <div class="font-bold text-lg">27,000</div>
-                    <div class="text-sm text-slate-400 mb-2">باقة المبتدئين</div>
-                    <div class="modern-btn text-sm py-2">1.00$</div>
+        <h3 class="font-bold mb-4">شحن الذهب</h3>
+        <div class="space-y-3">
+            <div onclick="recharge(5000)" class="glass-card p-4 flex justify-between items-center active:bg-orange-500/10">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📦</span>
+                    <div>
+                        <div class="font-bold">5,000 قطعة</div>
+                        <div class="text-xs text-slate-400">باقة المبتدئ</div>
+                    </div>
                 </div>
-                <div class="recharge-card" onclick="recharge(55000, 1.99)">
-                    <div class="text-2xl mb-2">💎💎</div>
-                    <div class="font-bold text-lg">55,000</div>
-                    <div class="text-sm text-slate-400 mb-2">باقة المتوسط</div>
-                    <div class="modern-btn text-sm py-2">1.99$</div>
-                </div>
-                <div class="recharge-card" onclick="recharge(120000, 3.99)">
-                    <div class="text-2xl mb-2">💎💎💎</div>
-                    <div class="font-bold text-lg">120,000</div>
-                    <div class="text-sm text-slate-400 mb-2">باقة المحترفين</div>
-                    <div class="modern-btn text-sm py-2">3.99$</div>
-                </div>
+                <div class="bg-orange-500 px-4 py-1.5 rounded-xl font-bold text-sm">$0.99</div>
             </div>
         </div>
-    </div>
+    </main>
+</div>
 
-    <div id="view-store" class="view-screen">
-        <div class="tab-nav mx-4 mt-4">
-            <button onclick="filterStore('frames')" id="fBtn" class="tab-btn active">🖼️ إطارات</button>
-            <button onclick="filterStore('badges')" id="bBtn" class="tab-btn">🏷️ شارات</button>
+<!-- Navigation Bar -->
+<nav class="bottom-nav">
+    <div onclick="switchView('home')" class="nav-item active" id="nav-home">
+        <i data-lucide="user"></i>
+        <span class="text-[10px] font-bold">حسابي</span>
+    </div>
+    <div onclick="switchView('store')" class="nav-item" id="nav-store">
+        <i data-lucide="shopping-bag"></i>
+        <span class="text-[10px] font-bold">المتجر</span>
+    </div>
+    <div onclick="switchView('wallet')" class="nav-item" id="nav-wallet">
+        <i data-lucide="wallet"></i>
+        <span class="text-[10px] font-bold">المحفظة</span>
+    </div>
+</nav>
+
+<!-- Modal: Profile Edit -->
+<div id="editModal" class="modal">
+    <div class="glass-card w-full max-w-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">تعديل البروفايل</h3>
+            <button onclick="closeModal()"><i data-lucide="x"></i></button>
         </div>
-        <div id="storeItems" class="store-grid"></div>
+        
+        <div class="space-y-4">
+            <div>
+                <label class="text-xs text-slate-400 mb-1 block">رابط الصورة الشخصية</label>
+                <input type="text" id="editAvatar" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-xl text-sm outline-none focus:border-orange-500" placeholder="ضع رابط URL للصورة...">
+            </div>
+            <div>
+                <label class="text-xs text-slate-400 mb-1 block">الاسم المستعار</label>
+                <input type="text" id="editName" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-xl text-sm outline-none focus:border-orange-500">
+            </div>
+            <button onclick="saveProfile()" class="w-full bg-orange-500 py-4 rounded-xl font-bold text-white shadow-lg shadow-orange-500/20">حفظ التغييرات</button>
+        </div>
     </div>
-
-    <div id="view-bag" class="view-screen">
-        <div id="bagItems" class="store-grid"></div>
-    </div>
-
-    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
-
-    <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[11000] flex flex-col items-center gap-2"></div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
@@ -881,593 +203,188 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let uData = null;
-    let storeData = { frames: [], badges: [] };
-    let currentTheme = 'dark';
-    
-    // Level Images Map (1-50)
-    const levelImages = {
-        1: 'https://i.postimg.cc/G4PtHLMS/ga.webp',
-        2: 'https://i.postimg.cc/8F15v23K/gb.webp',
-        3: 'https://i.postimg.cc/DW2ZG9DC/gc.webp',
-        4: 'https://i.postimg.cc/NygMX3VC/gd.webp',
-        5: 'https://i.postimg.cc/cKsH3pj5/ge.webp',
-        6: 'https://i.postimg.cc/NygMX3Vn/gf.webp',
-        7: 'https://i.postimg.cc/WD23ZBKH/gg.webp',
-        8: 'https://i.postimg.cc/068QST33/gh.webp',
-        9: 'https://i.postimg.cc/4KJdcDMq/gi.webp',
-        10: 'https://i.postimg.cc/Ff9RSMq2/gj.webp',
-        11: 'https://i.postimg.cc/yJVdRM5M/gk.webp',
-        12: 'https://i.postimg.cc/Js30GrTg/gl.webp',
-        13: 'https://i.postimg.cc/rd8m4B36/gm.webp',
-        14: 'https://i.postimg.cc/GBc2DWVw/gn.webp',
-        15: 'https://i.postimg.cc/xk0CmwhV/go.webp',
-        16: 'https://i.postimg.cc/t1XT6KwH/gp.webp',
-        17: 'https://i.postimg.cc/VSY6txp8/gq.webp',
-        18: 'https://i.postimg.cc/cKsH3p2W/gr.webp',
-        19: 'https://i.postimg.cc/d7q1Cbpw/gs.webp',
-        20: 'https://i.postimg.cc/R3MFtky9/gt.webp',
-        21: 'https://i.postimg.cc/3yKRGsVK/gu.webp',
-        22: 'https://i.postimg.cc/QBXt72wj/gv.webp',
-        23: 'https://i.postimg.cc/TKj1pdks/gw.webp',
-        24: 'https://i.postimg.cc/rd8m4B3F/gx.webp',
-        25: 'https://i.postimg.cc/SXys9B3x/gy.webp',
-        26: 'https://i.postimg.cc/DW2ZG9Hz/gz.webp',
-        27: 'https://i.postimg.cc/JyPh5TC4/h.webp',
-        28: 'https://i.postimg.cc/DW2ZG9HZ/h0.webp',
-        29: 'https://i.postimg.cc/6793Zkgq/h1.webp',
-        30: 'https://i.postimg.cc/xk0Cmwhq/h2.webp',
-        31: 'https://i.postimg.cc/t12gNrGj/h3.webp',
-        32: 'https://i.postimg.cc/3ynwFLQ7/h4.webp',
-        33: 'https://i.postimg.cc/t12gNrG9/h5.webp',
-        34: 'https://i.postimg.cc/wt0BQWYq/h6.webp',
-        35: 'https://i.postimg.cc/tsdJYqrw/h7.webp',
-        36: 'https://i.postimg.cc/7CmLnBrP/h8.webp',
-        37: 'https://i.postimg.cc/mc8rydWg/h9.webp',
-        38: 'https://i.postimg.cc/Y4bSzXB9/ha.webp',
-        39: 'https://i.postimg.cc/SXDKfZbR/hb.webp',
-        40: 'https://i.postimg.cc/XZQvk26X/hc.webp',
-        41: 'https://i.postimg.cc/GBqpxMnH/he.webp',
-        42: 'https://i.postimg.cc/3ynwFLQk/hf.webp',
-        43: 'https://i.postimg.cc/bG3v96fG/hg.webp',
-        44: 'https://i.postimg.cc/Js30GrTS/hh.webp',
-        45: 'https://i.postimg.cc/d740jWck/hi.webp',
-        46: 'https://i.postimg.cc/CZF183t7/hj.webp',
-        47: 'https://i.postimg.cc/PLtxDgcK/hk.webp',
-        48: 'https://i.postimg.cc/rd8m4BbQ/hl.webp',
-        49: 'https://i.postimg.cc/4KJdcDMW/hm.webp',
-        50: 'https://i.postimg.cc/4KJdcDMW/hm.webp' // You can add specific image for level 50
-    };
+    let userData = null;
 
-    // XP required for each level (1-50)
-    const xpRequirements = [];
-    for (let i = 1; i <= 50; i++) {
-        xpRequirements[i] = 1000 * Math.pow(1.2, i - 1);
-    }
-
-    // Theme Management
-    function toggleTheme() {
-        const body = document.body;
-        if (currentTheme === 'dark') {
-            body.classList.add('light-mode');
-            body.classList.remove('dark');
-            currentTheme = 'light';
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark');
-            currentTheme = 'dark';
-        }
-        localStorage.setItem('theme', currentTheme);
-    }
-
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        const body = document.body;
-        if (savedTheme === 'light') {
-            body.classList.add('light-mode');
-            body.classList.remove('dark');
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark');
-        }
-        currentTheme = savedTheme;
-    }
-
-    // Search Modal
-    function toggleSearch() {
-        const modal = document.getElementById('searchModal');
-        modal.classList.toggle('active');
-        if (modal.classList.contains('active')) {
-            modal.querySelector('input').focus();
-        }
-    }
-
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            loadTheme();
-            onSnapshot(doc(db, "users", user.uid), (snap) => {
-                if (snap.exists()) {
-                    uData = snap.data();
-                    checkExpiredItems();
-                    updateUI();
-                    loadRooms();
-                }
-            });
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            loadStore();
-            loadBanners();
-            lucide.createIcons();
-        } else {
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('main-app').style.display = 'none';
-        }
-    });
-
-    async function checkExpiredItems() {
-        if (!uData.purchasedFrames) return;
-        const now = Date.now();
-        let changed = false;
-        const newFrames = uData.purchasedFrames.filter(item => {
-            if (now > item.expiry) { changed = true; return false; }
-            return true;
-        });
-        if (changed) {
-            const update = { purchasedFrames: newFrames };
-            if (uData.activeFrame && !newFrames.find(f => f.id === uData.activeFrame)) {
-                update.activeFrame = null;
-            }
-            await updateDoc(doc(db, "users", auth.currentUser.uid), update);
-        }
-    }
-
-    function updateUI() {
-        document.getElementById('userName').innerText = uData.displayName || 'مستخدم';
-        document.getElementById('userAvatar').src = uData.photoURL || 'https://via.placeholder.com/55';
-        document.getElementById('userID').innerText = uData.customId || '00000000';
-        document.getElementById('wallet-balance-big').innerText = (uData.balance || 0).toLocaleString();
-        
-        // Update Level System
-        const level = uData.level || 1;
-        const xp = uData.xp || 0;
-        const nextLevelXP = xpRequirements[level] || 1000;
-        const progress = Math.min(100, (xp / nextLevelXP) * 100);
-        
-        document.getElementById('currentLevel').innerText = level;
-        document.getElementById('currentXP').innerText = `${xp.toLocaleString()} XP`;
-        document.getElementById('nextLevelXP').innerText = `${Math.round(nextLevelXP).toLocaleString()} XP`;
-        document.getElementById('levelProgressBar').style.width = `${progress}%`;
-        
-        // Update Level Image
-        const levelImg = document.getElementById('levelImage');
-        if (levelImages[level]) {
-            levelImg.src = levelImages[level];
-        } else if (level >= 50) {
-            levelImg.src = levelImages[50];
-        } else {
-            levelImg.src = levelImages[1];
-        }
-        
-        // Active frame
-        const frameImg = document.getElementById('activeFrame');
-        if (uData.activeFrame) {
-            const f = storeData.frames.find(x => x.id === uData.activeFrame);
-            if (f) { 
-                frameImg.src = f.image; 
-                frameImg.style.display = 'block'; 
-            }
-        } else {
-            frameImg.style.display = 'none';
-        }
-
-        // Update badges
-        const badgesGrid = document.getElementById('badgesGrid');
-        badgesGrid.innerHTML = '';
-        if (uData.purchasedBadges && uData.purchasedBadges.length > 0) {
-            uData.purchasedBadges.forEach(badge => {
-                const badgeData = storeData.badges.find(b => b.id === badge.id);
-                if (badgeData) {
-                    const isActive = uData.activeBadges && uData.activeBadges.includes(badge.id);
-                    badgesGrid.innerHTML += `
-                        <div class="badge-item ${isActive ? 'active' : ''}" 
-                             title="${badgeData.name}"
-                             onclick="toggleBadge('${badge.id}')">
-                            ${badgeData.icon || '🏅'}
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        lucide.createIcons();
-    }
-
-    async function loadStore() {
+    // Authentication
+    window.login = async () => {
+        const provider = new GoogleAuthProvider();
         try {
-            const f = await getDocs(collection(db, "frames"));
-            storeData.frames = f.docs.map(d => ({id: d.id, ...d.data()}));
-            const b = await getDocs(collection(db, "badges"));
-            storeData.badges = b.docs.map(d => ({id: d.id, ...d.data()}));
-            filterStore('frames');
-        } catch (error) {
-            console.error('Error loading store:', error);
-        }
-    }
-
-    window.filterStore = (type) => {
-        const container = document.getElementById('storeItems');
-        container.innerHTML = '';
-        
-        // Update active tab
-        document.querySelectorAll('#fBtn, #bBtn').forEach(btn => btn.classList.remove('active'));
-        if (type === 'frames') {
-            document.getElementById('fBtn').classList.add('active');
-        } else {
-            document.getElementById('bBtn').classList.add('active');
-        }
-
-        storeData[type].forEach(item => {
-            container.innerHTML += `
-                <div class="store-card fade-in">
-                    <span class="item-label">${type === 'frames' ? 'إطار' : 'شارة'}</span>
-                    <div class="h-24 flex items-center justify-center mt-4">
-                        ${type === 'frames' 
-                            ? `<img src="${item.image}" class="w-20 h-20 object-contain">` 
-                            : `<span class="text-5xl">${item.icon || '🏅'}</span>`
-                        }
-                    </div>
-                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
-                    <div class="text-xs text-slate-400 mb-2">${item.description || ''}</div>
-                    <button onclick="buyItem('${type}', '${item.id}', ${item.price})" class="action-btn btn-buy">
-                        <i data-lucide="shopping-cart" class="w-3 h-3 inline ml-1"></i>
-                        شراء ${item.price.toLocaleString()}💰
-                    </button>
-                </div>
-            `;
-        });
-        lucide.createIcons();
-    };
-
-    window.buyItem = async (type, id, price) => {
-        if (uData.balance < price) {
-            showToast("رصيدك غير كافٍ", "error");
-            return;
-        }
-        
-        const expiry = Date.now() + (24 * 60 * 60 * 1000); // 1 Day
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        
-        const listKey = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
-        const currentList = uData[listKey] || [];
-        
-        const newList = currentList.filter(x => x.id !== id);
-        newList.push({ id, expiry });
-
-        try {
-            await updateDoc(userRef, {
-                balance: increment(-price),
-                [listKey]: newList
-            });
-            showToast("تم الشراء لمدة يوم واحد", "success");
-        } catch (error) {
-            showToast("حدث خطأ أثناء الشراء", "error");
-        }
-    };
-
-    window.toggleBadge = async (badgeId) => {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const currentBadges = uData.activeBadges || [];
-        
-        let newBadges;
-        if (currentBadges.includes(badgeId)) {
-            newBadges = currentBadges.filter(id => id !== badgeId);
-            showToast("تم إزالة الشارة", "info");
-        } else {
-            newBadges = [...currentBadges, badgeId];
-            showToast("تم تفعيل الشارة", "success");
-        }
-        
-        try {
-            await updateDoc(userRef, {
-                activeBadges: newBadges
-            });
-        } catch (error) {
-            showToast("حدث خطأ", "error");
-        }
-    };
-
-    window.switchView = (v) => {
-        document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
-        const view = document.getElementById('view-' + v);
-        if (view) {
-            view.classList.add('active');
-            view.classList.add('fade-in');
-        }
-        
-        const titles = {
-            'home': 'الرئيسية',
-            'wallet': 'المحفظة',
-            'store': 'المتجر',
-            'bag': 'حقيبتي'
-        };
-        document.getElementById('view-title').innerText = titles[v] || 'Afnan AI';
-        if (v === 'bag') loadBag();
-        toggleSidebar(false);
-    };
-
-    function loadBag() {
-        const container = document.getElementById('bagItems');
-        container.innerHTML = '';
-        
-        if (!uData.purchasedFrames || uData.purchasedFrames.length === 0) {
-            container.innerHTML = `
-                <div class="col-span-2 text-center py-8">
-                    <i data-lucide="package-open" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                    <p class="text-slate-400">الحقيبة فارغة</p>
-                </div>
-            `;
-            lucide.createIcons();
-            return;
-        }
-
-        uData.purchasedFrames.forEach(itemRef => {
-            const item = storeData.frames.find(x => x.id === itemRef.id);
-            if (!item) return;
-            
-            const isEquipped = uData.activeFrame === item.id;
-            const timeLeft = Math.max(0, itemRef.expiry - Date.now());
-            const hoursLeft = Math.ceil(timeLeft / (1000 * 60 * 60));
-            
-            container.innerHTML += `
-                <div class="store-card fade-in">
-                    <span class="item-label">${hoursLeft} ساعة</span>
-                    <img src="${item.image}" class="w-16 h-16 object-contain mt-6">
-                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
-                    <div class="text-xs text-slate-400 mb-2">متبقي ${hoursLeft} ساعة</div>
-                    <button onclick="${isEquipped ? `equip('null')` : `equip('${item.id}')`}" 
-                            class="action-btn ${isEquipped ? 'btn-unequip' : 'btn-equip'}">
-                        <i data-lucide="${isEquipped ? 'x' : 'check'}" class="w-3 h-3 inline ml-1"></i>
-                        ${isEquipped ? 'خلع' : 'ارتداء'}
-                    </button>
-                </div>
-            `;
-        });
-        lucide.createIcons();
-    }
-
-    window.equip = async (id) => {
-        try {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-                activeFrame: id === 'null' ? null : id 
-            });
-            showToast(id === 'null' ? "تم خلع الإطار" : "تم ارتداء الإطار", "success");
-            loadBag();
-        } catch (error) {
-            showToast("حدث خطأ", "error");
-        }
-    };
-
-    window.recharge = async (amt, price) => {
-        try {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-                balance: increment(amt),
-                xp: increment(amt * 0.1) // Add XP when recharging
-            });
-            showToast(`تم شحن ${amt.toLocaleString()} عملة بنجاح`, "success");
-            checkLevelUp();
-        } catch (error) {
-            showToast("حدث خطأ أثناء الشحن", "error");
-        }
-    };
-
-    async function checkLevelUp() {
-        if (!uData) return;
-        
-        const level = uData.level || 1;
-        const xp = uData.xp || 0;
-        const nextLevelXP = xpRequirements[level] || 1000;
-        
-        if (xp >= nextLevelXP && level < 50) {
-            const newLevel = level + 1;
-            try {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    level: newLevel
-                });
-                showToast(`🎉 مبروك! لقد تقدمت للمستوى ${newLevel}!`, "success");
-            } catch (error) {
-                console.error('Error updating level:', error);
-            }
-        }
-    }
-
-    window.toggleSidebar = (show) => {
-        const side = document.getElementById('sidebar');
-        const over = document.getElementById('overlay');
-        if (show === false) { 
-            side.classList.remove('open'); 
-            over.classList.remove('active'); 
-            return; 
-        }
-        side.classList.toggle('open');
-        over.classList.toggle('active');
-    };
-
-    async function loadBanners() {
-        try {
-            const snap = await getDocs(collection(db, "banners"));
-            const container = document.getElementById('bannerContainer');
-            if (snap.empty) {
-                container.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-orange-500/20 to-blue-500/20">
-                        <div class="text-center">
-                            <div class="text-3xl mb-2">🎉</div>
-                            <p class="font-bold">مرحباً في Afnan AI</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            const banner = snap.docs[0].data();
-            container.innerHTML = `
-                <img src="${banner.imageUrl}" class="w-full h-full object-cover">
-                <div class="absolute bottom-4 right-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3">
-                    <p class="text-white text-sm font-bold">${banner.title || 'عرض خاص'}</p>
-                    <p class="text-white/80 text-xs">${banner.description || ''}</p>
-                </div>
-            `;
-        } catch (error) {
-            console.error('Error loading banners:', error);
-        }
-    }
-
-    async function loadRooms() {
-        try {
-            const snap = await getDocs(collection(db, "rooms"));
-            const container = document.getElementById('roomsList');
-            if (snap.empty) {
-                container.innerHTML = `
-                    <div class="col-span-2 text-center py-8">
-                        <i data-lucide="users" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                        <p class="text-slate-400">لا توجد غرف متاحة حالياً</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = '';
-            snap.docs.forEach(doc => {
-                const room = doc.data();
-                container.innerHTML += `
-                    <div class="room-card fade-in" onclick="enterRoom('${doc.id}')">
-                        <div class="room-header">
-                            <div class="room-icon">
-                                ${room.icon || '💬'}
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-lg">${room.name}</h3>
-                                <p class="text-sm text-slate-400">${room.description || ''}</p>
-                            </div>
-                        </div>
-                        <div class="room-users">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                            <span>${room.users || 0} مستخدم</span>
-                        </div>
-                    </div>
-                `;
-            });
-            lucide.createIcons();
-        } catch (error) {
-            console.error('Error loading rooms:', error);
-        }
-    }
-
-    window.switchTab = (tab) => {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        showToast(`تم التبديل إلى ${tab === 'public' ? 'الغرف العامة' : 'الخاصة'}`, "info");
-    };
-
-    window.loginWithGoogle = async () => {
-        try {
-            const provider = new GoogleAuthProvider();
             const res = await signInWithPopup(auth, provider);
-            await setupUserData(res.user);
-            showToast("مرحباً بك في Afnan AI", "success");
-        } catch (error) {
-            showToast("حدث خطأ أثناء التسجيل", "error");
-        }
+            await checkUser(res.user);
+        } catch (err) { console.error(err); }
     };
 
-    window.loginWithTwitter = async () => {
-        try {
-            const provider = new TwitterAuthProvider();
-            const res = await signInWithPopup(auth, provider);
-            await setupUserData(res.user);
-            showToast("مرحباً بك في Afnan AI", "success");
-        } catch (error) {
-            showToast("حدث خطأ أثناء التسجيل", "error");
-        }
-    };
-
-    async function setupUserData(user) {
+    async function checkUser(user) {
         const userRef = doc(db, "users", user.uid);
         const snap = await getDoc(userRef);
         
         if (!snap.exists()) {
-            const twitterUsername = user.displayName?.includes('@') ? user.displayName : `@${user.displayName?.split(' ').join('')}`;
-            
-            await setDoc(userRef, {
+            const newData = {
+                uid: user.uid,
                 displayName: user.displayName,
                 photoURL: user.photoURL,
-                email: user.email,
-                balance: 1000,
+                balance: 1500,
                 level: 1,
                 xp: 0,
+                wealth: 0,
+                influence: 0,
                 customId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-                purchasedFrames: [],
-                purchasedBadges: [],
+                inventory: [],
                 activeFrame: null,
-                activeBadges: [],
-                provider: user.providerData[0]?.providerId,
-                twitterUsername: twitterUsername,
-                createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString()
-            });
-        } else {
-            await updateDoc(userRef, {
-                lastLogin: new Date().toISOString()
-            });
+                activeBadges: []
+            };
+            await setDoc(userRef, newData);
         }
     }
 
-    function showToast(message, type = 'success') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // Real-time Sync
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                userData = snap.data();
+                updateUI();
+            });
+            loadStore();
+        } else {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+        }
+    });
+
+    function updateUI() {
+        if (!userData) return;
         
-        const colors = {
-            success: 'bg-gradient-to-r from-green-600 to-emerald-600',
-            error: 'bg-gradient-to-r from-red-600 to-rose-600',
-            info: 'bg-gradient-to-r from-blue-600 to-indigo-600',
-            warning: 'bg-gradient-to-r from-orange-600 to-amber-600'
-        };
+        // General Info
+        document.getElementById('userName').innerText = userData.displayName;
+        document.getElementById('headerName').innerText = userData.displayName;
+        document.getElementById('userAvatar').src = userData.photoURL;
+        document.getElementById('userID').innerText = userData.customId;
+        document.getElementById('walletBalance').innerText = userData.balance.toLocaleString();
+        document.getElementById('headerBalance').innerText = userData.balance.toLocaleString();
         
-        toast.className = `${colors[type]} text-white px-6 py-3 rounded-xl text-sm font-bold shadow-xl flex items-center gap-2 slide-in`;
-        toast.innerHTML = `
-            <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info'}" class="w-4 h-4"></i>
-            ${message}
-        `;
+        // Stats
+        document.getElementById('wealthPower').innerText = userData.wealth;
+        document.getElementById('influencePower').innerText = userData.influence;
+        document.getElementById('userLevel').innerText = userData.level;
         
-        container.appendChild(toast);
+        const xpNeeded = userData.level * 1000;
+        document.getElementById('userXP').innerText = `${userData.xp} / ${xpNeeded} XP`;
+        document.getElementById('xpProgress').style.width = `${(userData.xp / xpNeeded) * 100}%`;
+
+        // Frame
+        const frameEl = document.getElementById('activeFrame');
+        if (userData.activeFrame) {
+            frameEl.src = userData.activeFrame;
+            frameEl.classList.remove('hidden');
+        } else {
+            frameEl.classList.add('hidden');
+        }
+
+        // Badges (Real Images from Firestore)
+        const badgeContainer = document.getElementById('userBadges');
+        badgeContainer.innerHTML = '';
+        if (userData.activeBadges) {
+            userData.activeBadges.forEach(url => {
+                badgeContainer.innerHTML += `<img src="${url}" class="w-10 h-10 object-contain drop-shadow-lg">`;
+            });
+        }
+        
         lucide.createIcons();
-        
-        setTimeout(() => {
-            toast.classList.remove('slide-in');
-            toast.classList.add('fade-out');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
     }
 
-    window.copyID = () => { 
-        navigator.clipboard.writeText(uData.customId); 
-        showToast("تم نسخ المعرف", "success");
-    };
-    
-    window.logout = () => {
-        signOut(auth);
-        showToast("تم تسجيل الخروج", "info");
-    };
-    
-    window.enterRoom = (roomId) => {
-        showToast("جاري الدخول إلى الغرفة...", "info");
-        // Implement room entry logic here
-    };
-    
-    window.openEditProfile = () => {
-        showToast("ميزة تعديل الملف الشخصي قريباً", "info");
+    // Store Logic
+    async function loadStore() {
+        // Here you would fetch from collection "store"
+        // For this demo, let's assume we fetch items:
+        const storeGrid = document.getElementById('storeGrid');
+        storeGrid.innerHTML = `
+            <div class="glass-card p-4 flex flex-col items-center">
+                <img src="https://i.postimg.cc/qR5mFq2x/frame-gold.png" class="w-20 mb-3">
+                <div class="font-bold text-sm">الإطار الذهبي</div>
+                <div class="text-xs text-slate-400 mb-3">دائم</div>
+                <button onclick="buyItem('frame', 'https://i.postimg.cc/qR5mFq2x/frame-gold.png', 5000)" class="w-full bg-slate-800 py-2 rounded-xl text-xs font-bold">5000 💰</button>
+            </div>
+            <div class="glass-card p-4 flex flex-col items-center">
+                <img src="https://i.postimg.cc/G296SptC/badge-vip.png" class="w-16 mb-3">
+                <div class="font-bold text-sm">شارة الـ VIP</div>
+                <div class="text-xs text-slate-400 mb-3">عضو متميز</div>
+                <button onclick="buyItem('badge', 'https://i.postimg.cc/G296SptC/badge-vip.png', 10000)" class="w-full bg-slate-800 py-2 rounded-xl text-xs font-bold">10000 💰</button>
+            </div>
+        `;
+    }
+
+    window.buyItem = async (type, url, price) => {
+        if (userData.balance < price) return alert("الرصيد غير كافٍ!");
+        
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        let update = { balance: increment(-price) };
+        
+        if (type === 'frame') update.activeFrame = url;
+        if (type === 'badge') {
+            const newBadges = userData.activeBadges || [];
+            if (!newBadges.includes(url)) newBadges.push(url);
+            update.activeBadges = newBadges;
+        }
+        
+        await updateDoc(userRef, update);
+        alert("تم الشراء والتفعيل بنجاح!");
     };
 
-    // Initialize icons
+    // Profile Editing
+    window.openProfileEdit = () => {
+        document.getElementById('editName').value = userData.displayName;
+        document.getElementById('editAvatar').value = userData.photoURL;
+        document.getElementById('editModal').classList.add('active');
+    };
+
+    window.closeModal = () => document.getElementById('editModal').classList.remove('active');
+
+    window.saveProfile = async () => {
+        const name = document.getElementById('editName').value;
+        const avatar = document.getElementById('editAvatar').value;
+        
+        if (!name || !avatar) return;
+        
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            displayName: name,
+            photoURL: avatar
+        });
+        closeModal();
+    };
+
+    window.copyMyID = () => {
+        navigator.clipboard.writeText(userData.customId);
+        alert("تم نسخ الـ ID بنجاح!");
+    };
+
+    window.switchView = (view) => {
+        document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        document.getElementById('view-' + view).classList.add('active');
+        document.getElementById('nav-' + view).classList.add('active');
+    };
+
+    window.toggleTheme = () => {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        document.getElementById('themeIcon').setAttribute('data-lucide', isLight ? 'sun' : 'moon');
+        lucide.createIcons();
+    };
+
+    window.recharge = async (amt) => {
+        await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            balance: increment(amt),
+            wealth: increment(Math.floor(amt / 100))
+        });
+        alert(`تم شحن ${amt} ذهبة بنجاح!`);
+    };
+
     lucide.createIcons();
 </script>
 </body>
 </html>
+
