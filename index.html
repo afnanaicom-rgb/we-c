@@ -3,192 +3,958 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - Elite Edition</title>
+    <title>Afnan AI - النسخة المتطورة</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; }
-        body { background-color: #0f172a; color: #f8fafc; transition: all 0.3s ease; }
-        .light-mode { background-color: #f1f5f9; color: #0f172a; }
-
-        /* UI Elements */
-        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; }
-        .light-mode .glass-card { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.05); }
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: 'Noto Sans Arabic', sans-serif; 
+        }
+        body, html { 
+            height: 100%; 
+            margin: 0; 
+            color: #1a1a1a; 
+            overflow-x: hidden; 
+            transition: background-color 0.3s ease;
+        }
         
-        .view-screen { display: none; padding: 100px 1rem 120px; min-height: 100vh; }
-        .view-screen.active { display: block; animation: fadeIn 0.4s ease-out; }
-
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Profile & ID */
-        .profile-glow { position: relative; width: 85px; height: 85px; margin: 0 auto; }
-        .avatar-main { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #f59e0b; padding: 3px; }
-        .frame-overlay { position: absolute; inset: -15px; z-index: 10; pointer-events: none; }
-
-        .id-badge { background: linear-gradient(135deg, #f59e0b, #9a3412); padding: 4px 12px; border-radius: 50px; font-weight: 800; font-size: 0.75rem; color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4); }
-
-        /* Navigation */
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(20px); border-radius: 35px; border: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: space-around; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #94a3b8; transition: 0.3s; cursor: pointer; }
-        .nav-item.active { color: #f59e0b; transform: translateY(-5px); }
-
-        /* Modal */
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5000; display: none; align-items: center; justify-content: center; padding: 1.5rem; }
-        .modal.active { display: flex; }
+        /* Theme Variables */
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #2d2d44;
+            --bg-surface: #3a3a5d;
+            --text-primary: #f0f0ff;
+            --text-secondary: #b8b8d1;
+            --accent: #ff6b35;
+            --accent-secondary: #00d4aa;
+            --accent-magic: #9d4edd;
+            --border-color: #444466;
+            --gradient-primary: linear-gradient(135deg, #ff6b35 0%, #ff8e53 100%);
+            --gradient-secondary: linear-gradient(135deg, #00d4aa 0%, #00f5d4 100%);
+            --gradient-magic: linear-gradient(135deg, #9d4edd 0%, #c77dff 100%);
+        }
+        
+        .light-mode {
+            --bg-primary: #f5f5ff;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --bg-surface: #f0f0ff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a4a6e;
+            --border-color: #d0d0e0;
+        }
+        
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+        
+        /* Enhanced Header */
+        .app-header { 
+            position: fixed; 
+            top: 0; 
+            right: 0; 
+            left: 0; 
+            height: 70px; 
+            background: rgba(15, 15, 35, 0.95); 
+            backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 1.5rem; 
+            z-index: 1000; 
+            transition: all 0.3s ease;
+        }
+        
+        .light-mode .app-header {
+            background: rgba(245, 245, 255, 0.95);
+        }
+        
+        /* Search Modal */
+        .search-modal {
+            position: fixed;
+            top: 70px;
+            right: 0;
+            left: 0;
+            height: 80px;
+            background: var(--bg-secondary);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            padding: 0 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .search-modal.active {
+            display: flex;
+        }
+        
+        /* Enhanced Level System */
+        .level-display {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            margin: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .level-info {
+            flex: 1;
+        }
+        
+        .level-current {
+            font-size: 32px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+        
+        .level-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .level-progress {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-surface);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.75rem 0;
+        }
+        
+        .level-progress-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .level-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid var(--accent);
+        }
+        
+        /* Magic Level Display */
+        .magic-level-display {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.25rem;
+            border: 1px solid var(--border-color);
+            margin: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .magic-level-display::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-magic);
+            opacity: 0.1;
+        }
+        
+        .magic-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: var(--gradient-magic);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        /* Enhanced Store */
+        .store-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            padding: 16px; 
+        }
+        .store-card { 
+            background: var(--bg-card); 
+            border-radius: 16px; 
+            padding: 16px; 
+            text-align: center; 
+            border: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: relative; 
+            height: 220px; 
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .store-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border-color: var(--accent);
+        }
+        
+        .store-card-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            background: var(--bg-surface);
+            padding: 8px;
+        }
+        
+        .badge-card-image {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+        }
+        
+        /* Enhanced Wallet */
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+            padding: 16px;
+        }
+        
+        .wallet-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .wallet-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+        
+        .wallet-card-premium {
+            border: 2px solid #ffd700;
+        }
+        
+        .wallet-card-premium::before {
+            content: '⭐';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            font-size: 12px;
+        }
+        
+        /* Enhanced Rooms */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 12px;
+            padding: 16px;
+        }
+        
+        .room-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.1);
+        }
+        
+        .create-room-card {
+            border: 2px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: var(--bg-surface);
+        }
+        
+        .create-room-card:hover {
+            border-color: var(--accent);
+            background: var(--bg-card);
+        }
+        
+        /* Gift System */
+        .gifts-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 16px;
+        }
+        
+        .gift-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .gift-item:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-magic);
+        }
+        
+        /* Enhanced Buttons */
+        .modern-btn {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 44px;
+        }
+        
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.3);
+        }
+        
+        .secondary-btn {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .secondary-btn:hover {
+            background: var(--bg-card);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .magic-btn {
+            background: var(--gradient-magic);
+        }
+        
+        .magic-btn:hover {
+            box-shadow: 0 8px 20px rgba(157, 78, 221, 0.3);
+        }
+        
+        /* Badges Grid */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 16px;
+        }
+        
+        .badge-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .badge-item.active {
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+        
+        .badge-item img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 16px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--bg-surface);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+        
+        /* Views */
+        .view-screen { 
+            position: absolute; 
+            inset: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: var(--bg-primary); 
+            display: none; 
+            flex-direction: column; 
+            z-index: 10; 
+            padding-top: 70px; 
+            overflow-y: auto; 
+            padding-bottom: 80px; 
+            transition: background-color 0.3s ease;
+        }
+        .view-screen.active { display: flex; }
+        
+        /* Navigation Bar */
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            height: 70px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            min-width: 60px;
+        }
+        
+        .nav-item.active {
+            color: var(--accent);
+            background: rgba(255, 107, 53, 0.1);
+        }
+        
+        .nav-item i {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .nav-item span {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            right: 50%;
+            transform: translateX(50%);
+            background: var(--bg-card);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 11000;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border-color);
+            min-width: 300px;
+            max-width: 90%;
+            animation: slideInUp 0.3s ease;
+        }
+        
+        @keyframes slideInUp {
+            from { transform: translateX(50%) translateY(100px); opacity: 0; }
+            to { transform: translateX(50%) translateY(0); opacity: 1; }
+        }
+        
+        /* Room Modal */
+        .room-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .room-modal.active {
+            display: flex;
+        }
+        
+        .room-modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+        
+        /* Profile Section */
+        .profile-section {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--accent);
+            margin-bottom: 16px;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--bg-surface);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body>
+<body class="dark">
 
-<!-- Login -->
-<div id="loginPage" class="fixed inset-0 bg-slate-900 z-[10000] flex flex-col items-center justify-center p-8">
-    <div class="mb-8 relative">
-        <div class="absolute inset-0 bg-orange-500 blur-3xl opacity-20 animate-pulse"></div>
-        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-32 relative">
-    </div>
-    <h1 class="text-4xl font-black mb-2 text-white">AFNAN <span class="text-orange-500">AI</span></h1>
-    <p class="text-slate-400 mb-10 text-center">قم بتسجيل الدخول لبدء رحلتك</p>
-    <button onclick="login()" class="w-full max-w-xs bg-white text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-6">
-        دخول عبر جوجل
-    </button>
-</div>
-
-<!-- Header -->
-<header class="fixed top-0 inset-x-0 h-20 flex items-center justify-between px-6 z-50 transition-all" id="mainHeader">
-    <div class="flex items-center gap-3">
-        <button onclick="openProfileEdit()" class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center border border-slate-700">
-            <i data-lucide="settings" class="w-5 h-5 text-slate-300"></i>
-        </button>
-        <span class="font-bold text-lg" id="headerName">...</span>
-    </div>
-    <div class="flex items-center gap-4">
-        <div class="flex items-center gap-2 bg-orange-500/10 px-3 py-1.5 rounded-full border border-orange-500/20">
-            <span class="font-bold text-orange-500" id="headerBalance">0</span>
-            <span class="text-xs">💰</span>
+<!-- Main App -->
+<div id="main-app" style="display: none;">
+    <!-- Header -->
+    <header class="app-header">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="secondary-btn" style="padding: 8px">
+                <i data-lucide="menu" class="w-5 h-5"></i>
+            </button>
+            <h1 id="view-title" class="text-lg font-bold">الرئيسية</h1>
         </div>
-        <button onclick="toggleTheme()" class="text-slate-400"><i data-lucide="moon" id="themeIcon"></i></button>
-    </div>
-</header>
-
-<!-- Main App Content -->
-<div id="mainApp" class="hidden">
-    <!-- View: Home -->
-    <main id="view-home" class="view-screen active">
-        <div class="glass-card p-6 mb-6 flex flex-col items-center">
-            <div class="profile-glow mb-4">
-                <img id="userAvatar" src="" class="avatar-main">
-                <img id="activeFrame" src="" class="frame-overlay hidden">
+        
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSearch()" class="secondary-btn" style="padding: 8px">
+                <i data-lucide="search" class="w-5 h-5"></i>
+            </button>
+            <div class="theme-toggle" onclick="toggleTheme()">
+                <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
             </div>
-            <h2 class="text-2xl font-black mb-1" id="userName">...</h2>
-            <div class="id-badge flex items-center gap-2 mb-4" onclick="copyMyID()">
-                <span id="userID">00000000</span>
-                <i data-lucide="copy" class="w-3 h-3"></i>
+        </div>
+    </header>
+
+    <!-- Search Modal -->
+    <div id="searchModal" class="search-modal">
+        <div class="flex-1 relative">
+            <input type="text" 
+                   placeholder="ابحث في الغرف، المستخدمين، المحتوى..." 
+                   class="w-full p-3 pr-12 bg-var(--bg-surface) border border-var(--border-color) rounded-xl text-var(--text-primary) placeholder-var(--text-secondary) focus:outline-none focus:border-var(--accent)">
+            <i data-lucide="search" class="absolute left-3 top-1/2 transform -translate-y-1/2 text-var(--text-secondary)"></i>
+        </div>
+        <button onclick="toggleSearch()" class="secondary-btn mr-3" style="padding: 8px">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="fixed top-0 right-[-320px] w-80 h-full bg-var(--bg-secondary) z-4000 transition-all duration-300 border-l border-var(--border-color) flex flex-col shadow-2xl">
+        <div class="p-6 text-center border-b border-var(--border-color)">
+            <div class="relative mb-4">
+                <img id="userAvatar" src="" class="profile-avatar">
+                <img id="activeFrame" src="" class="absolute inset-0 w-full h-full" style="display: none;">
+            </div>
+            <h2 id="userName" class="text-xl font-bold mb-2">...</h2>
+            <div class="flex items-center justify-center gap-2 mb-4">
+                <div class="px-3 py-1 bg-var(--bg-surface) rounded-lg text-sm">
+                    <span id="userID" class="font-mono">00000000</span>
+                </div>
+                <button onclick="copyID()" class="secondary-btn" style="padding: 4px 8px">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                </button>
             </div>
             
-            <div class="w-full space-y-3">
-                <div class="flex justify-between text-xs font-bold px-1">
-                    <span>مستوى <span id="userLevel">1</span></span>
-                    <span id="userXP">0 / 1000 XP</span>
-                </div>
-                <div class="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
-                    <div id="xpProgress" class="h-full bg-gradient-to-r from-orange-500 to-yellow-400 transition-all duration-1000" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <div class="flex gap-2 mt-6 overflow-x-auto w-full py-2" id="userBadges">
-                <!-- Badges will be loaded here -->
-            </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-            <div class="glass-card p-4 text-center">
-                <div class="text-2xl mb-1">🔥</div>
-                <div class="text-xs text-slate-400">سحر الثروة</div>
-                <div class="font-black text-orange-500" id="wealthPower">0</div>
-            </div>
-            <div class="glass-card p-4 text-center">
-                <div class="text-2xl mb-1">✨</div>
-                <div class="text-xs text-slate-400">قوة التأثير</div>
-                <div class="font-black text-blue-500" id="influencePower">0</div>
-            </div>
-        </div>
-    </main>
-
-    <!-- View: Store -->
-    <main id="view-store" class="view-screen">
-        <h2 class="text-2xl font-black mb-6 px-2">المتجر الملكي</h2>
-        <div class="grid grid-cols-2 gap-4" id="storeGrid">
-            <!-- Items from Firestore -->
-        </div>
-    </main>
-
-    <!-- View: Wallet -->
-    <main id="view-wallet" class="view-screen">
-        <div class="glass-card p-8 text-center mb-8 bg-gradient-to-br from-orange-500 to-red-600 border-none">
-            <div class="text-white/80 text-sm mb-2">رصيدك الحالي</div>
-            <div class="text-5xl font-black text-white mb-4" id="walletBalance">0</div>
-            <button class="bg-white text-orange-600 px-8 py-3 rounded-2xl font-bold shadow-xl">سحب الأرباح</button>
-        </div>
-        
-        <h3 class="font-bold mb-4">شحن الذهب</h3>
-        <div class="space-y-3">
-            <div onclick="recharge(5000)" class="glass-card p-4 flex justify-between items-center active:bg-orange-500/10">
-                <div class="flex items-center gap-3">
-                    <span class="text-2xl">📦</span>
-                    <div>
-                        <div class="font-bold">5,000 قطعة</div>
-                        <div class="text-xs text-slate-400">باقة المبتدئ</div>
+            <div class="level-display mb-4">
+                <div class="level-info">
+                    <div class="level-label">مستوى الخبرة</div>
+                    <div class="level-current" id="currentLevel">1</div>
+                    <div class="level-progress">
+                        <div class="level-progress-bar" id="levelProgressBar" style="width: 20%"></div>
+                    </div>
+                    <div class="text-xs text-var(--text-secondary) mt-2">
+                        <span id="currentXP">0</span> / <span id="nextLevelXP">1000</span> XP
                     </div>
                 </div>
-                <div class="bg-orange-500 px-4 py-1.5 rounded-xl font-bold text-sm">$0.99</div>
+                <img id="levelImage" src="" class="level-image">
             </div>
-        </div>
-    </main>
-</div>
-
-<!-- Navigation Bar -->
-<nav class="bottom-nav">
-    <div onclick="switchView('home')" class="nav-item active" id="nav-home">
-        <i data-lucide="user"></i>
-        <span class="text-[10px] font-bold">حسابي</span>
-    </div>
-    <div onclick="switchView('store')" class="nav-item" id="nav-store">
-        <i data-lucide="shopping-bag"></i>
-        <span class="text-[10px] font-bold">المتجر</span>
-    </div>
-    <div onclick="switchView('wallet')" class="nav-item" id="nav-wallet">
-        <i data-lucide="wallet"></i>
-        <span class="text-[10px] font-bold">المحفظة</span>
-    </div>
-</nav>
-
-<!-- Modal: Profile Edit -->
-<div id="editModal" class="modal">
-    <div class="glass-card w-full max-w-md p-6">
-        <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold">تعديل البروفايل</h3>
-            <button onclick="closeModal()"><i data-lucide="x"></i></button>
+            
+            <div class="magic-level-display mb-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-sm text-var(--text-secondary) mb-1">مستوى السحر</div>
+                        <div class="text-2xl font-bold" id="magicLevel">1</div>
+                        <div class="text-xs text-var(--text-secondary) mt-2" id="magicXP">0/500 نقاط سحر</div>
+                    </div>
+                    <div class="magic-icon">
+                        <i data-lucide="sparkles"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="walletBalance">0</div>
+                    <div class="stat-label">💰 رصيد</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="giftCount">0</div>
+                    <div class="stat-label">🎁 هدايا</div>
+                </div>
+            </div>
         </div>
         
-        <div class="space-y-4">
-            <div>
-                <label class="text-xs text-slate-400 mb-1 block">رابط الصورة الشخصية</label>
-                <input type="text" id="editAvatar" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-xl text-sm outline-none focus:border-orange-500" placeholder="ضع رابط URL للصورة...">
-            </div>
-            <div>
-                <label class="text-xs text-slate-400 mb-1 block">الاسم المستعار</label>
-                <input type="text" id="editName" class="w-full bg-slate-800 border border-slate-700 p-4 rounded-xl text-sm outline-none focus:border-orange-500">
-            </div>
-            <button onclick="saveProfile()" class="w-full bg-orange-500 py-4 rounded-xl font-bold text-white shadow-lg shadow-orange-500/20">حفظ التغييرات</button>
+        <nav class="p-4 space-y-2 flex-1">
+            <button onclick="switchView('profile')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all duration-200">
+                <i data-lucide="user" class="w-5 h-5 text-var(--accent)"></i>
+                <span class="font-medium">الملف الشخصي</span>
+            </button>
+            <button onclick="switchView('gifts')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all duration-200">
+                <i data-lucide="gift" class="w-5 h-5 text-var(--accent-magic)"></i>
+                <span class="font-medium">نظام الهدايا</span>
+            </button>
+            <button onclick="switchView('badges')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all duration-200">
+                <i data-lucide="award" class="w-5 h-5 text-yellow-500"></i>
+                <span class="font-medium">شاراتي</span>
+            </button>
+            <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all duration-200">
+                <i data-lucide="users" class="w-5 h-5 text-green-500"></i>
+                <span class="font-medium">الأصدقاء</span>
+            </button>
+        </nav>
+        
+        <div class="p-4 border-t border-var(--border-color)">
+            <button onclick="logout()" class="w-full p-3 bg-gradient-to-r from-red-600 to-rose-600 text-white rounded-xl font-bold text-sm hover:from-red-700 hover:to-rose-700 transition-all duration-200">
+                <i data-lucide="log-out" class="w-4 h-4 inline ml-2"></i>
+                تسجيل خروج
+            </button>
         </div>
     </div>
+
+    <!-- Main Views -->
+    <div id="view-home" class="view-screen active">
+        <!-- Banner -->
+        <div id="bannerContainer" class="mx-4 mt-4 mb-6 rounded-2xl overflow-hidden shadow-xl h-[200px] bg-gradient-to-r from-var(--accent)/20 to-var(--accent-magic)/20 border border-var(--border-color)">
+            <!-- Banner will be loaded here -->
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="stats-grid">
+            <div class="stat-card" onclick="switchView('wallet')">
+                <div class="stat-value text-var(--accent)" id="quickBalance">0</div>
+                <div class="stat-label">💎 الرصيد</div>
+            </div>
+            <div class="stat-card" onclick="switchView('gifts')">
+                <div class="stat-value text-var(--accent-magic)" id="quickMagic">0</div>
+                <div class="stat-label">✨ السحر</div>
+            </div>
+        </div>
+        
+        <!-- Rooms Navigation -->
+        <div class="flex mx-4 mb-4 gap-2">
+            <button onclick="loadRooms('public')" class="flex-1 modern-btn py-3">
+                <i data-lucide="globe" class="w-4 h-4"></i>
+                غرف عامة
+            </button>
+            <button onclick="loadRooms('private')" class="flex-1 secondary-btn py-3">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+                غرف خاصة
+            </button>
+        </div>
+        
+        <!-- Create Room Button -->
+        <button onclick="openCreateRoomModal()" class="mx-4 mb-4 magic-btn py-3">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            إنشاء غرفة جديدة
+        </button>
+        
+        <!-- Rooms Grid -->
+        <div class="rooms-grid" id="roomsList">
+            <!-- Rooms will be loaded here -->
+        </div>
+    </div>
+
+    <div id="view-wallet" class="view-screen">
+        <div class="p-6 text-center">
+            <div class="text-5xl font-black mb-2">
+                <span id="wallet-balance-big">0</span> 
+                <span class="text-3xl">💎</span>
+            </div>
+            <div class="text-sm text-var(--text-secondary) mb-6">رصيد المحفظة الحالي</div>
+            
+            <div class="wallet-grid">
+                <div class="wallet-card" onclick="recharge(27000, 1)">
+                    <div class="text-3xl mb-3">💎</div>
+                    <div class="font-bold text-xl mb-1">27,000</div>
+                    <div class="text-sm text-var(--text-secondary) mb-3">باقة المبتدئين</div>
+                    <div class="modern-btn text-sm py-2">1.00$</div>
+                </div>
+                <div class="wallet-card wallet-card-premium" onclick="recharge(55000, 1.99)">
+                    <div class="text-3xl mb-3">💎💎</div>
+                    <div class="font-bold text-xl mb-1">55,000</div>
+                    <div class="text-sm text-var(--text-secondary) mb-3">باقة المتوسط</div>
+                    <div class="modern-btn text-sm py-2">1.99$</div>
+                </div>
+                <div class="wallet-card" onclick="recharge(120000, 3.99)">
+                    <div class="text-3xl mb-3">💎💎💎</div>
+                    <div class="font-bold text-xl mb-1">120,000</div>
+                    <div class="text-sm text-var(--text-secondary) mb-3">باقة المحترفين</div>
+                    <div class="modern-btn text-sm py-2">3.99$</div>
+                </div>
+                <div class="wallet-card wallet-card-premium" onclick="recharge(300000, 7.99)">
+                    <div class="text-3xl mb-3">💎💎💎💎</div>
+                    <div class="font-bold text-xl mb-1">300,000</div>
+                    <div class="text-sm text-var(--text-secondary) mb-3">باقة الأسطورية</div>
+                    <div class="modern-btn text-sm py-2">7.99$</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-store" class="view-screen">
+        <div class="flex mx-4 mt-4 mb-4 gap-2">
+            <button onclick="filterStore('frames')" id="fBtn" class="flex-1 modern-btn py-3">🖼️ إطارات</button>
+            <button onclick="filterStore('badges')" id="bBtn" class="flex-1 secondary-btn py-3">🏷️ شارات</button>
+        </div>
+        <div id="storeItems" class="store-grid"></div>
+    </div>
+
+    <div id="view-profile" class="view-screen">
+        <div class="profile-section">
+            <div class="relative inline-block">
+                <img id="profileAvatar" src="" class="profile-avatar">
+                <button onclick="openEditAvatar()" class="absolute bottom-2 left-2 bg-var(--accent) text-white p-2 rounded-full">
+                    <i data-lucide="camera" class="w-4 h-4"></i>
+                </button>
+            </div>
+            <h2 id="profileName" class="text-2xl font-bold mb-2">...</h2>
+            <p class="text-var(--text-secondary) mb-4" id="profileEmail">...</p>
+            
+            <button onclick="openEditProfile()" class="modern-btn mb-4">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                تعديل الملف الشخصي
+            </button>
+        </div>
+        
+        <div class="p-4">
+            <h3 class="text-lg font-bold mb-4">معلومات الحساب</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center p-3 bg-var(--bg-surface) rounded-lg">
+                    <span class="text-var(--text-secondary)">تاريخ الانضمام</span>
+                    <span class="font-medium" id="joinDate">...</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-var(--bg-surface) rounded-lg">
+                    <span class="text-var(--text-secondary)">آخر دخول</span>
+                    <span class="font-medium" id="lastLogin">...</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-var(--bg-surface) rounded-lg">
+                    <span class="text-var(--text-secondary)">المستوى الحالي</span>
+                    <span class="font-medium" id="profileLevel">1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-gifts" class="view-screen">
+        <div class="p-6 text-center">
+            <div class="magic-icon mx-auto mb-4">
+                <i data-lucide="gift"></i>
+            </div>
+            <div class="text-3xl font-bold mb-2" id="totalMagicXP">0</div>
+            <div class="text-sm text-var(--text-secondary) mb-6">إجمالي نقاط السحر</div>
+            
+            <h3 class="text-lg font-bold mb-4 text-right mr-4">إرسال هدايا</h3>
+            <div class="gifts-grid">
+                <!-- Gift items will be loaded here -->
+            </div>
+            
+            <h3 class="text-lg font-bold mb-4 text-right mr-4 mt-6">الهدايا المستلمة</h3>
+            <div class="p-4" id="receivedGifts">
+                <!-- Received gifts will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <div id="view-badges" class="view-screen">
+        <div class="p-4">
+            <h3 class="text-lg font-bold mb-4">شاراتي</h3>
+            <div class="badges-grid" id="userBadgesGrid">
+                <!-- User badges will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <div class="nav-bar">
+        <div class="nav-item active" onclick="switchView('home')">
+            <i data-lucide="home"></i>
+            <span>الرئيسية</span>
+        </div>
+        <div class="nav-item" onclick="switchView('store')">
+            <i data-lucide="shopping-bag"></i>
+            <span>المتجر</span>
+        </div>
+        <div class="nav-item" onclick="switchView('wallet')">
+            <i data-lucide="wallet"></i>
+            <span>المحفظة</span>
+        </div>
+        <div class="nav-item" onclick="switchView('profile')">
+            <i data-lucide="user"></i>
+            <span>الملف</span>
+        </div>
+    </div>
+
+    <!-- Room Creation Modal -->
+    <div id="roomModal" class="room-modal">
+        <div class="room-modal-content fade-in">
+            <div class="p-6 border-b border-var(--border-color)">
+                <h2 class="text-xl font-bold">إنشاء غرفة جديدة</h2>
+            </div>
+            
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">اسم الغرفة</label>
+                    <input type="text" id="roomName" class="w-full p-3 bg-var(--bg-surface) border border-var(--border-color) rounded-lg" placeholder="أدخل اسم الغرفة">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">وصف الغرفة</label>
+                    <textarea id="roomDescription" class="w-full p-3 bg-var(--bg-surface) border border-var(--border-color) rounded-lg" rows="3" placeholder="أدخل وصف الغرفة"></textarea>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">نوع الغرفة</label>
+                    <select id="roomType" class="w-full p-3 bg-var(--bg-surface) border border-var(--border-color) rounded-lg">
+                        <option value="public">عامة</option>
+                        <option value="private">خاصة</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium mb-2">الحد الأقصى للمستخدمين</label>
+                    <input type="number" id="roomMaxUsers" class="w-full p-3 bg-var(--bg-surface) border border-var(--border-color) rounded-lg" value="50" min="2" max="100">
+                </div>
+            </div>
+            
+            <div class="p-6 border-t border-var(--border-color) flex gap-3">
+                <button onclick="closeRoomModal()" class="flex-1 secondary-btn">إلغاء</button>
+                <button onclick="createRoom()" class="flex-1 modern-btn">إنشاء الغرفة</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+</div>
+
+<!-- Admin Panel Link (Hidden from main app) -->
+<div id="adminPanelLink" style="display: none; position: fixed; bottom: 20px; left: 20px;">
+    <a href="admin.html" target="_blank" class="bg-red-600 text-white p-3 rounded-full shadow-lg">
+        <i data-lucide="settings"></i>
+    </a>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot, increment, addDoc, query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
@@ -203,188 +969,759 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let userData = null;
+    let uData = null;
+    let storeData = { frames: [], badges: [] };
+    let giftsData = [];
+    let currentTheme = 'dark';
+    
+    // XP required for each level (1-50)
+    const xpRequirements = [];
+    for (let i = 1; i <= 50; i++) {
+        xpRequirements[i] = 1000 * Math.pow(1.2, i - 1);
+    }
+    
+    // Magic XP required for each magic level (1-10)
+    const magicXPRequirements = [0, 500, 1200, 2500, 5000, 10000, 20000, 40000, 80000, 150000, 300000];
 
-    // Authentication
-    window.login = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            const res = await signInWithPopup(auth, provider);
-            await checkUser(res.user);
-        } catch (err) { console.error(err); }
-    };
-
-    async function checkUser(user) {
-        const userRef = doc(db, "users", user.uid);
-        const snap = await getDoc(userRef);
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check if user is admin and show admin panel link
+        if (localStorage.getItem('isAdmin') === 'true') {
+            document.getElementById('adminPanelLink').style.display = 'block';
+        }
         
-        if (!snap.exists()) {
-            const newData = {
+        // Initialize icons
+        lucide.createIcons();
+        
+        // Check auth state
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in
+                document.getElementById('main-app').style.display = 'block';
+                
+                // Load user data
+                await loadUserData(user);
+                
+                // Load store data
+                await loadStore();
+                
+                // Load gifts data
+                await loadGifts();
+                
+                // Load banners
+                await loadBanners();
+                
+                // Load rooms
+                await loadRooms('public');
+                
+                // Update UI
+                updateUI();
+                
+                // Create icons
+                lucide.createIcons();
+            } else {
+                // Show login page
+                showLoginPage();
+            }
+        });
+    });
+
+    async function loadUserData(user) {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (!userSnap.exists()) {
+            // Create new user
+            await setDoc(userRef, {
+                displayName: user.displayName || 'مستخدم جديد',
+                photoURL: user.photoURL || 'https://ui-avatars.com/api/?name=مستخدم&background=ff6b35&color=fff',
+                email: user.email || '',
+                balance: 1000,
+                level: 1,
+                xp: 0,
+                magicLevel: 1,
+                magicXP: 0,
+                customId: generateCustomId(),
+                purchasedFrames: [],
+                purchasedBadges: [],
+                activeFrame: null,
+                activeBadges: [],
+                giftsReceived: [],
+                giftsSent: [],
+                friends: [],
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                isAdmin: false
+            });
+            
+            uData = {
                 uid: user.uid,
                 displayName: user.displayName,
                 photoURL: user.photoURL,
-                balance: 1500,
+                email: user.email,
+                balance: 1000,
                 level: 1,
                 xp: 0,
-                wealth: 0,
-                influence: 0,
-                customId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-                inventory: [],
+                magicLevel: 1,
+                magicXP: 0,
+                customId: generateCustomId(),
+                purchasedFrames: [],
+                purchasedBadges: [],
                 activeFrame: null,
-                activeBadges: []
+                activeBadges: [],
+                giftsReceived: [],
+                giftsSent: [],
+                friends: [],
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString(),
+                isAdmin: false
             };
-            await setDoc(userRef, newData);
+        } else {
+            uData = { uid: user.uid, ...userSnap.data() };
+            // Update last login
+            await updateDoc(userRef, {
+                lastLogin: new Date().toISOString()
+            });
+        }
+        
+        // Subscribe to user data changes
+        onSnapshot(userRef, (snap) => {
+            uData = { uid: user.uid, ...snap.data() };
+            updateUI();
+        });
+    }
+
+    function generateCustomId() {
+        return Math.floor(10000000 + Math.random() * 90000000).toString();
+    }
+
+    function showLoginPage() {
+        // Remove main app and show login
+        document.getElementById('main-app').style.display = 'none';
+        
+        // Create login page if not exists
+        if (!document.getElementById('loginPage')) {
+            const loginPage = document.createElement('div');
+            loginPage.id = 'loginPage';
+            loginPage.className = 'fixed inset-0 bg-gradient-to-br from-[#0f0f23] via-[#1a1a2e] to-[#2d2d44] z-10000 flex flex-col items-center justify-center p-8';
+            loginPage.innerHTML = `
+                <div class="text-center mb-12">
+                    <h1 class="text-5xl font-black bg-gradient-to-r from-[#ff6b35] via-[#ff8e53] to-[#ff6b35] bg-clip-text text-transparent mb-4">
+                        Afnan AI
+                    </h1>
+                    <p class="text-[#b8b8d1] text-lg">النسخة المتطورة - مستقبل الذكاء الاصطناعي</p>
+                </div>
+                
+                <div class="w-full max-w-sm space-y-4">
+                    <button onclick="loginWithGoogle()" class="w-full modern-btn py-4">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                        تسجيل الدخول عبر جوجل
+                    </button>
+                    
+                    <button onclick="loginWithTwitter()" class="w-full modern-btn py-4" style="background: linear-gradient(135deg, #1da1f2, #0c85d0)">
+                        <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        تسجيل الدخول عبر X (تويتر)
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(loginPage);
+        } else {
+            document.getElementById('loginPage').style.display = 'flex';
         }
     }
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            document.getElementById('loginPage').classList.add('hidden');
-            document.getElementById('mainApp').classList.remove('hidden');
-            
-            // Real-time Sync
-            onSnapshot(doc(db, "users", user.uid), (snap) => {
-                userData = snap.data();
-                updateUI();
-            });
-            loadStore();
-        } else {
-            document.getElementById('loginPage').classList.remove('hidden');
-            document.getElementById('mainApp').classList.add('hidden');
+    window.loginWithGoogle = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            showToast("مرحباً بك في Afnan AI", "success");
+        } catch (error) {
+            showToast("حدث خطأ أثناء التسجيل", "error");
         }
-    });
+    };
+
+    window.loginWithTwitter = async () => {
+        try {
+            const provider = new TwitterAuthProvider();
+            const result = await signInWithPopup(auth, provider);
+            showToast("مرحباً بك في Afnan AI", "success");
+        } catch (error) {
+            showToast("حدث خطأ أثناء التسجيل", "error");
+        }
+    };
 
     function updateUI() {
-        if (!userData) return;
+        if (!uData) return;
         
-        // General Info
-        document.getElementById('userName').innerText = userData.displayName;
-        document.getElementById('headerName').innerText = userData.displayName;
-        document.getElementById('userAvatar').src = userData.photoURL;
-        document.getElementById('userID').innerText = userData.customId;
-        document.getElementById('walletBalance').innerText = userData.balance.toLocaleString();
-        document.getElementById('headerBalance').innerText = userData.balance.toLocaleString();
+        // Update user info
+        document.getElementById('userName').textContent = uData.displayName || 'مستخدم';
+        document.getElementById('userID').textContent = uData.customId || '00000000';
+        document.getElementById('userAvatar').src = uData.photoURL || 'https://ui-avatars.com/api/?name=مستخدم&background=ff6b35&color=fff';
+        document.getElementById('profileAvatar').src = uData.photoURL || 'https://ui-avatars.com/api/?name=مستخدم&background=ff6b35&color=fff';
+        document.getElementById('profileName').textContent = uData.displayName || 'مستخدم';
+        document.getElementById('profileEmail').textContent = uData.email || '';
+        document.getElementById('joinDate').textContent = new Date(uData.createdAt).toLocaleDateString('ar-SA');
+        document.getElementById('lastLogin').textContent = new Date(uData.lastLogin).toLocaleDateString('ar-SA');
         
-        // Stats
-        document.getElementById('wealthPower').innerText = userData.wealth;
-        document.getElementById('influencePower').innerText = userData.influence;
-        document.getElementById('userLevel').innerText = userData.level;
+        // Update wallet
+        document.getElementById('wallet-balance-big').textContent = uData.balance?.toLocaleString() || '0';
+        document.getElementById('walletBalance').textContent = uData.balance?.toLocaleString() || '0';
+        document.getElementById('quickBalance').textContent = uData.balance?.toLocaleString() || '0';
         
-        const xpNeeded = userData.level * 1000;
-        document.getElementById('userXP').innerText = `${userData.xp} / ${xpNeeded} XP`;
-        document.getElementById('xpProgress').style.width = `${(userData.xp / xpNeeded) * 100}%`;
-
-        // Frame
-        const frameEl = document.getElementById('activeFrame');
-        if (userData.activeFrame) {
-            frameEl.src = userData.activeFrame;
-            frameEl.classList.remove('hidden');
+        // Update level
+        const level = uData.level || 1;
+        const xp = uData.xp || 0;
+        const nextLevelXP = xpRequirements[level] || 1000;
+        const progress = Math.min(100, (xp / nextLevelXP) * 100);
+        
+        document.getElementById('currentLevel').textContent = level;
+        document.getElementById('profileLevel').textContent = level;
+        document.getElementById('currentXP').textContent = Math.floor(xp).toLocaleString();
+        document.getElementById('nextLevelXP').textContent = Math.floor(nextLevelXP).toLocaleString();
+        document.getElementById('levelProgressBar').style.width = `${progress}%`;
+        
+        // Update level image
+        const levelImage = document.getElementById('levelImage');
+        if (level <= 10) {
+            levelImage.src = `https://i.postimg.cc/${['G4PtHLMS', '8F15v23K', 'DW2ZG9DC', 'NygMX3VC', 'cKsH3pj5'][level-1] || 'G4PtHLMS'}/level${level}.webp`;
+        }
+        
+        // Update magic level
+        const magicLevel = uData.magicLevel || 1;
+        const magicXP = uData.magicXP || 0;
+        const nextMagicXP = magicXPRequirements[magicLevel] || 500;
+        const magicProgress = Math.min(100, (magicXP / nextMagicXP) * 100);
+        
+        document.getElementById('magicLevel').textContent = magicLevel;
+        document.getElementById('magicXP').textContent = `${Math.floor(magicXP).toLocaleString()}/${Math.floor(nextMagicXP).toLocaleString()} نقاط سحر`;
+        document.getElementById('quickMagic').textContent = magicLevel;
+        document.getElementById('totalMagicXP').textContent = Math.floor(magicXP).toLocaleString();
+        
+        // Update gifts count
+        const giftCount = uData.giftsReceived?.length || 0;
+        document.getElementById('giftCount').textContent = giftCount;
+        
+        // Update active frame
+        const activeFrameImg = document.getElementById('activeFrame');
+        if (uData.activeFrame) {
+            const frame = storeData.frames.find(f => f.id === uData.activeFrame);
+            if (frame) {
+                activeFrameImg.src = frame.image;
+                activeFrameImg.style.display = 'block';
+            }
         } else {
-            frameEl.classList.add('hidden');
+            activeFrameImg.style.display = 'none';
         }
+        
+        // Update badges
+        updateBadgesGrid();
+    }
 
-        // Badges (Real Images from Firestore)
-        const badgeContainer = document.getElementById('userBadges');
-        badgeContainer.innerHTML = '';
-        if (userData.activeBadges) {
-            userData.activeBadges.forEach(url => {
-                badgeContainer.innerHTML += `<img src="${url}" class="w-10 h-10 object-contain drop-shadow-lg">`;
-            });
+    async function loadStore() {
+        try {
+            // Load frames
+            const framesSnap = await getDocs(collection(db, "frames"));
+            storeData.frames = framesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Load badges
+            const badgesSnap = await getDocs(collection(db, "badges"));
+            storeData.badges = badgesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Initial store filter
+            filterStore('frames');
+        } catch (error) {
+            console.error('Error loading store:', error);
         }
+    }
+
+    async function loadGifts() {
+        try {
+            const giftsSnap = await getDocs(collection(db, "gifts"));
+            giftsData = giftsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Update gifts grid
+            updateGiftsGrid();
+        } catch (error) {
+            console.error('Error loading gifts:', error);
+        }
+    }
+
+    function updateGiftsGrid() {
+        const giftsGrid = document.querySelector('.gifts-grid');
+        if (!giftsGrid) return;
+        
+        giftsGrid.innerHTML = '';
+        giftsData.forEach(gift => {
+            giftsGrid.innerHTML += `
+                <div class="gift-item" onclick="sendGift('${gift.id}', ${gift.price}, ${gift.magicXP})">
+                    ${gift.image ? `<img src="${gift.image}" class="w-12 h-12 mx-auto mb-2">` : `<div class="text-2xl mb-2">${gift.icon || '🎁'}</div>`}
+                    <div class="text-sm font-bold">${gift.name}</div>
+                    <div class="text-xs text-var(--text-secondary)">${gift.price} 💎</div>
+                </div>
+            `;
+        });
+    }
+
+    async function sendGift(giftId, price, magicXP) {
+        if (!uData || uData.balance < price) {
+            showToast("رصيدك غير كافي لإرسال هذه الهدية", "error");
+            return;
+        }
+        
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            
+            // Update user balance
+            await updateDoc(userRef, {
+                balance: increment(-price),
+                giftsSent: [...(uData.giftsSent || []), { giftId, sentAt: new Date().toISOString() }]
+            });
+            
+            // Show success message
+            showToast("تم إرسال الهدية بنجاح!", "success");
+        } catch (error) {
+            console.error('Error sending gift:', error);
+            showToast("حدث خطأ أثناء إرسال الهدية", "error");
+        }
+    }
+
+    window.filterStore = (type) => {
+        const container = document.getElementById('storeItems');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        // Update active buttons
+        document.querySelectorAll('#fBtn, #bBtn').forEach(btn => {
+            btn.classList.remove('modern-btn');
+            btn.classList.add('secondary-btn');
+        });
+        
+        if (type === 'frames') {
+            document.getElementById('fBtn').classList.remove('secondary-btn');
+            document.getElementById('fBtn').classList.add('modern-btn');
+        } else {
+            document.getElementById('bBtn').classList.remove('secondary-btn');
+            document.getElementById('bBtn').classList.add('modern-btn');
+        }
+        
+        const items = storeData[type];
+        items.forEach(item => {
+            container.innerHTML += `
+                <div class="store-card fade-in">
+                    <div class="h-32 flex items-center justify-center">
+                        ${type === 'frames' 
+                            ? `<img src="${item.image}" class="store-card-image">` 
+                            : `<img src="${item.image || 'https://via.placeholder.com/80'}" class="badge-card-image">`
+                        }
+                    </div>
+                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
+                    <div class="text-xs text-var(--text-secondary) mb-3 px-2">${item.description || ''}</div>
+                    <button onclick="buyItem('${type}', '${item.id}', ${item.price || 0})" 
+                            class="action-btn modern-btn" style="width: calc(100% - 32px); margin: 0 16px;">
+                        <i data-lucide="shopping-cart" class="w-3 h-3"></i>
+                        شراء ${(item.price || 0).toLocaleString()} 💎
+                    </button>
+                </div>
+            `;
+        });
         
         lucide.createIcons();
-    }
+    };
 
-    // Store Logic
-    async function loadStore() {
-        // Here you would fetch from collection "store"
-        // For this demo, let's assume we fetch items:
-        const storeGrid = document.getElementById('storeGrid');
-        storeGrid.innerHTML = `
-            <div class="glass-card p-4 flex flex-col items-center">
-                <img src="https://i.postimg.cc/qR5mFq2x/frame-gold.png" class="w-20 mb-3">
-                <div class="font-bold text-sm">الإطار الذهبي</div>
-                <div class="text-xs text-slate-400 mb-3">دائم</div>
-                <button onclick="buyItem('frame', 'https://i.postimg.cc/qR5mFq2x/frame-gold.png', 5000)" class="w-full bg-slate-800 py-2 rounded-xl text-xs font-bold">5000 💰</button>
-            </div>
-            <div class="glass-card p-4 flex flex-col items-center">
-                <img src="https://i.postimg.cc/G296SptC/badge-vip.png" class="w-16 mb-3">
-                <div class="font-bold text-sm">شارة الـ VIP</div>
-                <div class="text-xs text-slate-400 mb-3">عضو متميز</div>
-                <button onclick="buyItem('badge', 'https://i.postimg.cc/G296SptC/badge-vip.png', 10000)" class="w-full bg-slate-800 py-2 rounded-xl text-xs font-bold">10000 💰</button>
-            </div>
-        `;
-    }
-
-    window.buyItem = async (type, url, price) => {
-        if (userData.balance < price) return alert("الرصيد غير كافٍ!");
-        
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        let update = { balance: increment(-price) };
-        
-        if (type === 'frame') update.activeFrame = url;
-        if (type === 'badge') {
-            const newBadges = userData.activeBadges || [];
-            if (!newBadges.includes(url)) newBadges.push(url);
-            update.activeBadges = newBadges;
+    window.buyItem = async (type, itemId, price) => {
+        if (!uData || uData.balance < price) {
+            showToast("رصيدك غير كافي للشراء", "error");
+            return;
         }
         
-        await updateDoc(userRef, update);
-        alert("تم الشراء والتفعيل بنجاح!");
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            const expiryDate = new Date();
+            expiryDate.setDate(expiryDate.getDate() + 1); // 1 day expiry
+            
+            if (type === 'frames') {
+                const newFrames = [...(uData.purchasedFrames || []), {
+                    id: itemId,
+                    purchasedAt: new Date().toISOString(),
+                    expiresAt: expiryDate.toISOString()
+                }];
+                
+                await updateDoc(userRef, {
+                    balance: increment(-price),
+                    purchasedFrames: newFrames
+                });
+            } else {
+                const newBadges = [...(uData.purchasedBadges || []), {
+                    id: itemId,
+                    purchasedAt: new Date().toISOString()
+                }];
+                
+                await updateDoc(userRef, {
+                    balance: increment(-price),
+                    purchasedBadges: newBadges
+                });
+            }
+            
+            showToast("تم الشراء بنجاح!", "success");
+        } catch (error) {
+            console.error('Error buying item:', error);
+            showToast("حدث خطأ أثناء الشراء", "error");
+        }
     };
 
-    // Profile Editing
-    window.openProfileEdit = () => {
-        document.getElementById('editName').value = userData.displayName;
-        document.getElementById('editAvatar').value = userData.photoURL;
-        document.getElementById('editModal').classList.add('active');
-    };
-
-    window.closeModal = () => document.getElementById('editModal').classList.remove('active');
-
-    window.saveProfile = async () => {
-        const name = document.getElementById('editName').value;
-        const avatar = document.getElementById('editAvatar').value;
+    function updateBadgesGrid() {
+        const badgesGrid = document.getElementById('userBadgesGrid');
+        if (!badgesGrid || !uData || !storeData.badges) return;
         
-        if (!name || !avatar) return;
+        badgesGrid.innerHTML = '';
         
-        await updateDoc(doc(db, "users", auth.currentUser.uid), {
-            displayName: name,
-            photoURL: avatar
+        (uData.purchasedBadges || []).forEach(badgeRef => {
+            const badge = storeData.badges.find(b => b.id === badgeRef.id);
+            if (!badge) return;
+            
+            const isActive = uData.activeBadges?.includes(badge.id);
+            
+            badgesGrid.innerHTML += `
+                <div class="badge-item ${isActive ? 'active' : ''}" onclick="toggleBadge('${badge.id}')">
+                    <img src="${badge.image || 'https://via.placeholder.com/40'}" alt="${badge.name}">
+                    <div class="text-xs mt-2 font-medium">${badge.name}</div>
+                </div>
+            `;
         });
-        closeModal();
+    }
+
+    window.toggleBadge = async (badgeId) => {
+        if (!uData) return;
+        
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            const currentBadges = uData.activeBadges || [];
+            let newBadges;
+            
+            if (currentBadges.includes(badgeId)) {
+                newBadges = currentBadges.filter(id => id !== badgeId);
+                showToast("تم إزالة الشارة", "info");
+            } else {
+                newBadges = [...currentBadges, badgeId];
+                showToast("تم تفعيل الشارة", "success");
+            }
+            
+            await updateDoc(userRef, {
+                activeBadges: newBadges
+            });
+        } catch (error) {
+            console.error('Error toggling badge:', error);
+            showToast("حدث خطأ", "error");
+        }
     };
 
-    window.copyMyID = () => {
-        navigator.clipboard.writeText(userData.customId);
-        alert("تم نسخ الـ ID بنجاح!");
+    async function loadBanners() {
+        try {
+            const bannersSnap = await getDocs(collection(db, "banners"));
+            const container = document.getElementById('bannerContainer');
+            
+            if (!bannersSnap.empty) {
+                const banner = bannersSnap.docs[0].data();
+                container.innerHTML = `
+                    <img src="${banner.imageUrl}" class="w-full h-full object-cover">
+                    <div class="absolute bottom-0 right-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-4">
+                        <h3 class="text-white text-lg font-bold">${banner.title || ''}</h3>
+                        <p class="text-white/80 text-sm">${banner.description || ''}</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error loading banners:', error);
+        }
+    }
+
+    async function loadRooms(type) {
+        try {
+            const roomsSnap = await getDocs(collection(db, "rooms"));
+            const container = document.getElementById('roomsList');
+            
+            if (roomsSnap.empty) {
+                container.innerHTML = `
+                    <div class="col-span-2 text-center py-12">
+                        <i data-lucide="users" class="w-16 h-16 mx-auto text-var(--text-secondary) mb-4"></i>
+                        <p class="text-var(--text-secondary)">لا توجد غرف متاحة حالياً</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            // Add create room card
+            if (type === 'private') {
+                container.innerHTML += `
+                    <div class="room-card create-room-card" onclick="openCreateRoomModal()">
+                        <i data-lucide="plus-circle" class="w-12 h-12 text-var(--text-secondary) mb-4"></i>
+                        <h3 class="text-lg font-bold">إنشاء غرفة جديدة</h3>
+                        <p class="text-sm text-var(--text-secondary)">أنشئ غرفتك الخاصة</p>
+                    </div>
+                `;
+            }
+            
+            roomsSnap.docs.forEach(doc => {
+                const room = doc.data();
+                if ((type === 'private' && room.type === 'private' && room.owner === auth.currentUser.uid) || 
+                    (type === 'public' && room.type === 'public')) {
+                    
+                    container.innerHTML += `
+                        <div class="room-card" onclick="enterRoom('${doc.id}')">
+                            <div class="flex items-start gap-3">
+                                <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-var(--accent) to-var(--accent-magic) flex items-center justify-center">
+                                    <i data-lucide="${room.type === 'public' ? 'globe' : 'lock'}" class="w-6 h-6 text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-lg font-bold mb-1">${room.name}</h3>
+                                    <p class="text-sm text-var(--text-secondary) mb-2">${room.description || ''}</p>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-1 text-sm text-var(--text-secondary)">
+                                            <i data-lucide="users" class="w-4 h-4"></i>
+                                            <span>${room.userCount || 0}/${room.maxUsers || 50}</span>
+                                        </div>
+                                        <div class="text-xs px-2 py-1 bg-var(--bg-surface) rounded">
+                                            ${room.category || 'عام'}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            lucide.createIcons();
+        } catch (error) {
+            console.error('Error loading rooms:', error);
+        }
+    }
+
+    window.openCreateRoomModal = () => {
+        document.getElementById('roomModal').classList.add('active');
+    };
+
+    window.closeRoomModal = () => {
+        document.getElementById('roomModal').classList.remove('active');
+    };
+
+    window.createRoom = async () => {
+        const name = document.getElementById('roomName').value;
+        const description = document.getElementById('roomDescription').value;
+        const type = document.getElementById('roomType').value;
+        const maxUsers = document.getElementById('roomMaxUsers').value;
+        
+        if (!name.trim()) {
+            showToast("الرجاء إدخال اسم الغرفة", "error");
+            return;
+        }
+        
+        try {
+            await addDoc(collection(db, "rooms"), {
+                name,
+                description,
+                type,
+                maxUsers: parseInt(maxUsers),
+                owner: auth.currentUser.uid,
+                ownerName: uData.displayName,
+                userCount: 1,
+                category: 'عام',
+                createdAt: new Date().toISOString(),
+                lastActivity: new Date().toISOString()
+            });
+            
+            closeRoomModal();
+            showToast("تم إنشاء الغرفة بنجاح", "success");
+            loadRooms('private');
+        } catch (error) {
+            console.error('Error creating room:', error);
+            showToast("حدث خطأ أثناء إنشاء الغرفة", "error");
+        }
+    };
+
+    window.enterRoom = async (roomId) => {
+        showToast("جاري الدخول إلى الغرفة...", "info");
+        // هنا يمكنك إضافة منطق الدخول إلى الغرفة
+        // يمكنك فتح نافذة محادثة أو صفحة غرفة منفصلة
+    };
+
+    window.recharge = async (amount, price) => {
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, {
+                balance: increment(amount),
+                xp: increment(amount * 0.1) // إضافة نقاط خبرة عند الشحن
+            });
+            
+            showToast(`تم شحن ${amount.toLocaleString()} عملة بنجاح`, "success");
+            
+            // التحقق من الترقية في المستوى
+            await checkLevelUp();
+        } catch (error) {
+            console.error('Error recharging:', error);
+            showToast("حدث خطأ أثناء الشحن", "error");
+        }
+    };
+
+    async function checkLevelUp() {
+        if (!uData) return;
+        
+        const level = uData.level || 1;
+        const xp = uData.xp || 0;
+        const nextLevelXP = xpRequirements[level] || 1000;
+        
+        if (xp >= nextLevelXP && level < 50) {
+            const newLevel = level + 1;
+            try {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                await updateDoc(userRef, {
+                    level: newLevel
+                });
+                showToast(`🎉 مبروك! لقد تقدمت للمستوى ${newLevel}!`, "success");
+            } catch (error) {
+                console.error('Error updating level:', error);
+            }
+        }
+    }
+
+    window.toggleTheme = () => {
+        const body = document.body;
+        if (currentTheme === 'dark') {
+            body.classList.add('light-mode');
+            currentTheme = 'light';
+        } else {
+            body.classList.remove('light-mode');
+            currentTheme = 'dark';
+        }
+        localStorage.setItem('theme', currentTheme);
+    };
+
+    window.toggleSearch = () => {
+        const modal = document.getElementById('searchModal');
+        modal.classList.toggle('active');
+        if (modal.classList.contains('active')) {
+            modal.querySelector('input').focus();
+        }
     };
 
     window.switchView = (view) => {
-        document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        // Hide all views
+        document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
         
-        document.getElementById('view-' + view).classList.add('active');
-        document.getElementById('nav-' + view).classList.add('active');
+        // Show selected view
+        const selectedView = document.getElementById(`view-${view}`);
+        if (selectedView) {
+            selectedView.classList.add('active');
+            selectedView.classList.add('fade-in');
+        }
+        
+        // Update view title
+        const titles = {
+            'home': 'الرئيسية',
+            'wallet': 'المحفظة',
+            'store': 'المتجر',
+            'profile': 'الملف الشخصي',
+            'gifts': 'نظام الهدايا',
+            'badges': 'شاراتي',
+            'friends': 'الأصدقاء'
+        };
+        document.getElementById('view-title').textContent = titles[view] || 'Afnan AI';
+        
+        // Update navigation
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        if (view === 'home' || view === 'wallet' || view === 'store' || view === 'profile') {
+            const navItem = document.querySelector(`.nav-item[onclick="switchView('${view}')"]`);
+            if (navItem) navItem.classList.add('active');
+        }
+        
+        // Load specific data for view
+        if (view === 'badges') {
+            updateBadgesGrid();
+        }
     };
 
-    window.toggleTheme = () => {
-        document.body.classList.toggle('light-mode');
-        const isLight = document.body.classList.contains('light-mode');
-        document.getElementById('themeIcon').setAttribute('data-lucide', isLight ? 'sun' : 'moon');
+    window.toggleSidebar = (show) => {
+        const sidebar = document.getElementById('sidebar');
+        if (show === false) {
+            sidebar.style.right = '-320px';
+            return;
+        }
+        
+        if (sidebar.style.right === '0px') {
+            sidebar.style.right = '-320px';
+        } else {
+            sidebar.style.right = '0px';
+        }
+    };
+
+    window.copyID = () => {
+        if (!uData) return;
+        navigator.clipboard.writeText(uData.customId);
+        showToast("تم نسخ المعرف", "success");
+    };
+
+    window.openEditProfile = () => {
+        showToast("ميزة تعديل الملف الشخصي قريباً", "info");
+    };
+
+    window.openEditAvatar = () => {
+        showToast("ميزة تغيير الصورة قريباً", "info");
+    };
+
+    window.logout = async () => {
+        try {
+            await signOut(auth);
+            showToast("تم تسجيل الخروج بنجاح", "success");
+        } catch (error) {
+            console.error('Error signing out:', error);
+            showToast("حدث خطأ أثناء تسجيل الخروج", "error");
+        }
+    };
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        
+        const icons = {
+            success: 'check-circle',
+            error: 'alert-circle',
+            info: 'info',
+            warning: 'alert-triangle'
+        };
+        
+        const colors = {
+            success: 'border-green-500/30',
+            error: 'border-red-500/30',
+            info: 'border-blue-500/30',
+            warning: 'border-orange-500/30'
+        };
+        
+        toast.className = `toast ${colors[type]}`;
+        toast.innerHTML = `
+            <i data-lucide="${icons[type]}" class="w-5 h-5"></i>
+            <span>${message}</span>
+        `;
+        
+        container.appendChild(toast);
         lucide.createIcons();
-    };
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideInUp 0.3s ease reverse';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 
-    window.recharge = async (amt) => {
-        await updateDoc(doc(db, "users", auth.currentUser.uid), {
-            balance: increment(amt),
-            wealth: increment(Math.floor(amt / 100))
-        });
-        alert(`تم شحن ${amt} ذهبة بنجاح!`);
-    };
-
-    lucide.createIcons();
+    // Initialize theme
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        currentTheme = 'light';
+    }
 </script>
 </body>
 </html>
-
