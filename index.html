@@ -10,7 +10,7 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; }
         body, html { height: 100%; margin: 0; background-color: #f8f9fa; color: #1a1a1a; overflow-x: hidden; }
-        
+
         .view-screen { position: absolute; inset: 0; width: 100%; height: 100%; background: #f8f9fa; display: none; flex-direction: column; z-index: 10; padding-top: 120px; overflow-y: auto; padding-bottom: 80px; }
         .view-screen.active { display: flex; }
 
@@ -20,26 +20,16 @@
         .tab-link { font-weight: bold; font-size: 14px; color: #9ca3af; cursor: pointer; padding: 5px 20px; border-radius: 20px; transition: 0.3s; }
         .tab-link.active { color: #f59e0b; background: #fff7ed; }
 
-        /* --- Profile Styles (Reduced Size) --- */
-        .profile-container { position: relative; width: 85px; height: 85px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
-        .avatar-img { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; z-index: 1; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .user-frame { position: absolute; width: 110%; height: 110%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; pointer-events: none; object-fit: contain; }
-        
-        /* --- Integrated Level Design --- */
-        .level-container { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        /* --- Profile Styles (Adjusted) --- */
+        .profile-container { position: relative; width: 100px; height: 100px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
+        .avatar-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; z-index: 1; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .user-frame { position: absolute; width: 120%; height: 120%; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; pointer-events: none; object-fit: contain; }
+
+        /* --- Integrated Level & Badges Design --- */
+        .level-container { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
         .level-badge-wrapper { position: relative; width: 60px; height: 35px; display: flex; align-items: center; }
         .level-img { width: 100%; height: 100%; object-fit: contain; }
-        .level-number { 
-            position: absolute; 
-            right: 8px; /* جهة اليمين قليلاً كما طلبت */
-            top: 50%; 
-            transform: translateY(-50%); 
-            color: white; 
-            font-size: 10px; /* تصغير الرقم */
-            font-weight: 900; 
-            z-index: 5; 
-            pointer-events: none;
-        }
+        .level-number { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: white; font-size: 10px; font-weight: 900; z-index: 5; pointer-events: none; }
 
         .glowing-id { font-family: 'Courier New', monospace; font-weight: 900; animation: glow-red-blue 3s infinite alternate; }
         @keyframes glow-red-blue {
@@ -51,7 +41,7 @@
         .store-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 15px; }
         .store-card { background: white; border-radius: 18px; padding: 12px; text-align: center; border: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; position: relative; height: 180px; }
         .item-label { position: absolute; top: 5px; left: 8px; font-size: 9px; font-weight: 800; color: #9ca3af; text-transform: uppercase; }
-        
+
         .action-btn { width: 100%; padding: 8px 0; border-radius: 12px; font-size: 11px; font-weight: bold; margin-top: auto; cursor: pointer; transition: 0.2s; }
         .btn-buy { background: #f59e0b; color: white; }
         .btn-equip { background: #3b82f6; color: white; }
@@ -63,6 +53,10 @@
         .overlay.active { display: block; }
 
         .nav-icon { width: 22px; height: 22px; object-fit: contain; }
+
+        /* --- Home Page --- */
+        .search-bar { position: fixed; top: 110px; right: 1rem; left: 1rem; height: 45px; background: white; border-radius: 25px; display: flex; align-items: center; padding: 0 15px; border: 1px solid #eee; z-index: 999; }
+        .search-bar input { flex: 1; border: none; outline: none; background: transparent; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -86,10 +80,6 @@
                 <div class="font-bold text-lg" id="view-title">الرئيسية</div>
                 <div class="flex items-center gap-2">
                     <button class="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-xl"><i data-lucide="search" class="w-5"></i></button>
-                    <div class="flex items-center gap-2 bg-orange-50 px-3 py-1.5 rounded-full border border-orange-100" onclick="switchView('wallet')">
-                        <span id="header-balance" class="text-sm font-bold text-orange-600">0</span>
-                        <span class="text-base">💰</span>
-                    </div>
                 </div>
             </div>
             <div class="header-tabs" id="main-tabs">
@@ -97,6 +87,12 @@
                 <div class="tab-link" onclick="switchTab('private')">خاص بي</div>
             </div>
         </header>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <i data-lucide="search" class="w-4 text-gray-400"></i>
+            <input type="text" placeholder="بحث..." class="mx-2">
+        </div>
 
         <!-- Sidebar -->
         <div id="sidebar" class="sidebar">
@@ -115,10 +111,10 @@
                 </div>
 
                 <div class="level-container" id="levels-wrapper">
-                    <!-- Levels injected here only if they exist in DB -->
+                    <!-- Levels and badges injected here -->
                 </div>
             </div>
-            
+
             <nav class="p-4 space-y-1">
                 <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-3 hover:bg-orange-50 rounded-xl transition">
                     <i data-lucide="home" class="w-5 text-gray-400"></i><span class="font-bold text-sm text-gray-600">الرئيسية</span>
@@ -184,7 +180,6 @@
         import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIG (نفس الإعدادات السابقة)
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
             authDomain: "rtx3090-28439.firebaseapp.com",
@@ -243,18 +238,16 @@
             document.getElementById('userID').innerText = uData.customId;
             document.getElementById('header-balance').innerText = uData.balance.toLocaleString();
             document.getElementById('wallet-balance-big').innerText = uData.balance.toLocaleString();
-            
-            // Frame
+
             const frameImg = document.getElementById('activeFrame');
             if (uData.activeFrame) {
                 const f = storeData.frames.find(x => x.id === uData.activeFrame);
                 if (f) { frameImg.src = f.image; frameImg.style.display = 'block'; }
             } else frameImg.style.display = 'none';
 
-            // Levels Logic (Only if exists in DB)
             const lvWrapper = document.getElementById('levels-wrapper');
             lvWrapper.innerHTML = '';
-            
+
             if (uData.wealthLevel) renderLv(uData.wealthLevel, 'wealth', 'https://i.postimg.cc/MX2tc6py/ic_main_me_level.webp');
             if (uData.magicLevel) renderLv(uData.magicLevel, 'magic', 'https://i.postimg.cc/MX2tc6py/ic_main_me_level.webp');
 
@@ -301,13 +294,12 @@
 
         window.buyItem = async (type, id, price) => {
             if (uData.balance < price) return showToast("رصيدك غير كافٍ", "error");
-            const expiry = Date.now() + (24 * 60 * 60 * 1000); // 1 Day
+            const expiry = Date.now() + (24 * 60 * 60 * 1000);
             const userRef = doc(db, "users", auth.currentUser.uid);
-            
+
             const listKey = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
             const currentList = uData[listKey] || [];
-            
-            // نتحقق لو موجود نحذفه أولاً عشان نجدد الوقت (يسمح بإعادة الشراء)
+
             const newList = currentList.filter(x => x.id !== id);
             newList.push({ id, expiry });
 
@@ -329,7 +321,7 @@
         function loadBag() {
             const container = document.getElementById('bagItems');
             container.innerHTML = '';
-            
+
             (uData.purchasedFrames || []).forEach(itemRef => {
                 const item = storeData.frames.find(x => x.id === itemRef.id);
                 if (!item) return;
@@ -339,7 +331,7 @@
                         <span class="item-label">إطار</span>
                         <img src="${item.image}" class="w-16 mt-6">
                         <div class="text-[10px] font-bold mt-1">${item.name}</div>
-                        <button onclick="${isEquipped ? `equip('null')` : `equip('${item.id}')`}" 
+                        <button onclick="${isEquipped ? `equip('null')` : `equip('${item.id}')`}"
                                 class="action-btn ${isEquipped ? 'btn-unequip' : 'btn-equip'}">
                             ${isEquipped ? 'خلع' : 'ارتداء'}
                         </button>
@@ -385,7 +377,7 @@
                     displayName: res.user.displayName,
                     photoURL: res.user.photoURL,
                     balance: 1000,
-                    wealthLevel: 1, // سيظهر فقط لو موجود
+                    wealthLevel: 1,
                     customId: Math.floor(10000000 + Math.random() * 90000000).toString()
                 });
             }
@@ -405,4 +397,3 @@
     </script>
 </body>
 </html>
-
