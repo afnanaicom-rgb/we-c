@@ -21,31 +21,25 @@
             transition: background-color 0.3s ease;
         }
         
-        /* Theme Variables - Updated to White and Light Cyan */
+        /* Theme Variables */
         :root {
-            --bg-primary: #f0f9ff; /* Light Cyan background */
-            --bg-secondary: #ffffff; /* White */
-            --bg-card: #ffffff;
-            --bg-surface: #e0f2fe;
-            --text-primary: #0c4a6e;
-            --text-secondary: #334155;
-            --accent: #0ea5e9; /* Cyan accent */
-            --accent-secondary: #00d4aa;
-            --accent-magic: #9d4edd;
-            --border-color: #bae6fd;
-            --gradient-primary: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
-            --gradient-secondary: linear-gradient(135deg, #00d4aa 0%, #00f5d4 100%);
-            --gradient-magic: linear-gradient(135deg, #9d4edd 0%, #c77dff 100%);
-        }
-        
-        .dark-mode {
             --bg-primary: #0f172a;
             --bg-secondary: #1e293b;
-            --bg-card: #1e293b;
-            --bg-surface: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border-color: #334155;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent: #f59e0b;
+            --accent-cyan: #22d3ee; /* Light Cyan */
+            --border-color: #475569;
+        }
+        
+        .light-mode {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
         }
         
         body {
@@ -53,14 +47,30 @@
             color: var(--text-primary);
         }
         
+        .view-screen { 
+            position: absolute; 
+            inset: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: var(--bg-primary); 
+            display: none; 
+            flex-direction: column; 
+            z-index: 10; 
+            padding-top: 80px; 
+            overflow-y: auto; 
+            padding-bottom: 100px; 
+            transition: background-color 0.3s ease;
+        }
+        .view-screen.active { display: flex; }
+        
         /* Enhanced Header */
         .app-header { 
             position: fixed; 
             top: 0; 
             right: 0; 
             left: 0; 
-            height: 70px; 
-            background: rgba(255, 255, 255, 0.9); 
+            height: 80px; 
+            background: rgba(15, 23, 42, 0.95); 
             backdrop-filter: blur(20px); 
             border-bottom: 1px solid var(--border-color); 
             display: flex; 
@@ -71,280 +81,779 @@
             transition: all 0.3s ease;
         }
         
-        .dark-mode .app-header {
-            background: rgba(15, 23, 42, 0.9);
+        .light-mode .app-header {
+            background: rgba(248, 250, 252, 0.95);
         }
         
-        /* Sidebar */
-        #sidebar {
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
         }
-
-        /* Profile Avatar - Smaller */
-        .profile-avatar {
-            width: 80px;
-            height: 80px;
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .theme-toggle {
+            width: 44px;
+            height: 24px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+        }
+        
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
             border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--accent);
-            margin-bottom: 12px;
-            transition: all 0.3s ease;
+            top: 1px;
+            right: 2px;
+            transition: transform 0.3s ease;
         }
         
-        /* Level System - Cleaned up */
+        .light-mode .theme-toggle::after {
+            transform: translateX(-20px);
+        }
+        
+        /* Modals (Search & Edit Profile) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            backdrop-filter: blur(8px);
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal-container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+        
+        /* Profile Styles Updated */
+        .profile-container { 
+            position: relative; 
+            width: 60px; /* Reduced Size */
+            height: 60px; 
+            margin: 0 auto; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .avatar-img { 
+            width: 45px; /* Reduced Size */
+            height: 45px; 
+            border-radius: 50%; 
+            object-fit: cover; 
+            z-index: 1; 
+            border: 2px solid var(--accent); 
+            box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); 
+        }
+        .user-frame { 
+            position: absolute; 
+            width: 140%; 
+            height: 140%; 
+            top: 50%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            z-index: 2; 
+            pointer-events: none; 
+            object-fit: contain; 
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+        }
+        
+        /* New Minimal Level System */
         .level-display {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 1rem;
-            margin: 0.5rem 1rem;
-            background: transparent; /* Removed the box */
-            border: none; /* Removed the border */
-        }
-        
-        .level-info {
-            width: 100%;
-            text-align: center;
+            margin: 2rem 0;
+            padding: 0;
+            background: transparent; /* No background */
+            border: none; /* No border */
+            position: relative;
         }
         
         .level-current {
-            font-size: 28px;
+            font-size: 64px;
             font-weight: 900;
-            color: var(--accent);
+            color: #ffffff; /* White */
+            text-shadow: 0 0 20px rgba(34, 211, 238, 0.6); /* Cyan Glow */
             line-height: 1;
-            margin-bottom: 4px;
+            margin-bottom: 0.2rem;
         }
         
         .level-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
+            font-size: 16px;
+            color: var(--accent-cyan); /* Light Cyan */
+            font-weight: 700;
             letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
         }
         
-        .level-progress {
-            width: 100%;
+        .level-progress-container {
+            width: 80%;
             height: 6px;
-            background: var(--bg-surface);
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
             overflow: hidden;
-            margin: 0.5rem 0;
+            margin-top: 5px;
         }
         
         .level-progress-bar {
             height: 100%;
-            background: var(--gradient-primary);
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
             border-radius: 10px;
             transition: width 0.5s ease;
         }
         
-        .level-image {
-            width: 60px;
-            height: 60px;
-            object-fit: contain;
-            margin-top: 10px;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        .level-info {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-weight: 500;
         }
-
-        /* Edit Profile Button */
-        .edit-profile-btn {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%) translateY(50%);
-            background: var(--accent);
-            color: white;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
+        
+        /* Badges Grid - Image Based */
+        .badges-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .badge-item {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            /* background: rgba(255,255,255,0.05); REMOVED BG */
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid var(--bg-secondary);
+            transition: all 0.3s ease;
+            position: relative;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .badge-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        }
+
+        .badge-item:hover {
+            transform: scale(1.2);
             z-index: 10;
         }
-
-        /* Modal Styles */
-        .modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
-            display: none;
+        
+        /* Store & Items */
+        .store-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 12px; 
+            padding: 15px; 
+        }
+        .store-card { 
+            background: var(--bg-card); 
+            border-radius: 20px; 
+            padding: 15px; 
+            text-align: center; 
+            border: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            position: relative; 
+            height: 200px; 
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .store-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .item-label { 
+            position: absolute; 
+            top: 8px; 
+            right: 8px; 
+            font-size: 9px; 
+            font-weight: 800; 
+            color: var(--text-secondary); 
+            text-transform: uppercase; 
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .action-btn { 
+            width: 100%; 
+            padding: 10px 0; 
+            border-radius: 12px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-top: auto; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            border: none;
+            font-family: inherit;
+        }
+        .btn-buy { 
+            background: linear-gradient(135deg, #f59e0b, #d97706); 
+            color: white; 
+        }
+        .btn-buy:hover {
+            background: linear-gradient(135deg, #d97706, #f59e0b);
+        }
+        .btn-equip { 
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8); 
+            color: white; 
+        }
+        .btn-equip:hover {
+            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+        }
+        .btn-unequip { 
+            background: linear-gradient(135deg, #ef4444, #dc2626); 
+            color: white; 
+        }
+        .btn-unequip:hover {
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+        }
+        
+        /* Sidebar */
+        .sidebar { 
+            position: fixed; 
+            top: 0; 
+            right: -320px; 
+            width: 320px; 
+            height: 100%; 
+            background: var(--bg-secondary); 
+            z-index: 4000; 
+            transition: 0.3s ease; 
+            border-left: 1px solid var(--border-color); 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar.open { right: 0; }
+        
+        .overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.7); 
+            z-index: 2500; 
+            display: none; 
+            backdrop-filter: blur(5px); 
+        }
+        .overlay.active { display: block; }
+        
+        /* Rooms Grid */
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .room-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .room-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.1);
+        }
+        
+        .room-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .room-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 5000;
-            padding: 20px;
+            font-size: 24px;
         }
-        .modal.active { display: flex; }
-        .modal-content {
+        
+        .room-users {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Recharge Cards */
+        .recharge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .recharge-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .recharge-card:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
+        
+        /* Modern Button */
+        .modern-btn {
+            background: linear-gradient(135deg, var(--accent), #d97706);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .modern-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 158, 11, 0.3);
+        }
+        
+        .twitter-btn {
+            background: linear-gradient(135deg, #1da1f2, #0c85d0);
+        }
+        
+        .twitter-btn:hover {
+            background: linear-gradient(135deg, #0c85d0, #1da1f2);
+            box-shadow: 0 10px 20px rgba(29, 161, 242, 0.3);
+        }
+        
+        /* Login Page */
+        .login-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+        
+        .login-logo {
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+        
+        /* Wallet Balance */
+        .wallet-balance {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border-radius: 24px;
+            padding: 2rem;
+            margin: 1.5rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        
+        .light-mode .wallet-balance {
+            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        }
+        
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
             background: var(--bg-secondary);
-            padding: 24px;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 400px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 4px;
+            margin: 1rem;
+            border: 1px solid var(--border-color);
         }
-        .input-group { margin-bottom: 16px; }
-        .input-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
-        .input-group input {
+        
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+        
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-in {
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        /* Input Styles */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .modern-input {
             width: 100%;
             padding: 12px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
             background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
             color: var(--text-primary);
+            outline: none;
+            transition: 0.3s;
         }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 16px; }
-        .stat-card { background: var(--bg-surface); padding: 12px; border-radius: 16px; text-align: center; }
-        .stat-value { font-weight: bold; font-size: 18px; }
-        .stat-label { font-size: 12px; color: var(--text-secondary); }
         
-        .secondary-btn { background: var(--bg-surface); color: var(--text-primary); border-radius: 12px; padding: 8px; transition: all 0.2s; }
-        .modern-btn { background: var(--gradient-primary); color: white; border-radius: 12px; padding: 12px; font-weight: bold; width: 100%; }
-        
-        .view-screen { display: none; padding-top: 80px; padding-bottom: 100px; }
-        .view-screen.active { display: block; }
-        
-        .fade-in { animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modern-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+        }
     </style>
 </head>
-<body class="light">
+<body class="dark">
 
-<!-- Edit Profile Modal -->
-<div id="editProfileModal" class="modal">
-    <div class="modal-content">
-        <h3 class="text-xl font-bold mb-6">تعديل الملف الشخصي</h3>
-        <div class="input-group">
-            <label>الاسم</label>
-            <input type="text" id="editNameInput" placeholder="أدخل اسمك الجديد">
-        </div>
-        <div class="input-group">
-            <label>رابط صورة البروفيل</label>
-            <input type="text" id="editAvatarInput" placeholder="https://example.com/image.jpg">
-        </div>
-        <div class="flex gap-3 mt-6">
-            <button onclick="saveProfileChanges()" class="modern-btn flex-1">حفظ التغييرات</button>
-            <button onclick="closeEditModal()" class="secondary-btn flex-1">إلغاء</button>
-        </div>
+<!-- Login Page -->
+<div id="loginPage" class="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-[10000] flex flex-col items-center justify-center p-8 login-container">
+    <div class="login-logo mb-8">
+        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-40 relative z-10">
+    </div>
+    <h1 class="text-5xl font-black bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent mb-2">Afnan AI</h1>
+    <p class="text-slate-400 mb-10 text-center text-lg">النسخة المتطورة - مستقبل الذكاء الاصطناعي</p>
+    
+    <div class="w-full max-w-sm space-y-4">
+        <button onclick="loginWithGoogle()" class="modern-btn w-full">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+            تسجيل الدخول عبر جوجل
+        </button>
+        
+        <button onclick="loginWithTwitter()" class="modern-btn twitter-btn w-full">
+            <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
+                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+            </svg>
+            تسجيل الدخول عبر X (تويتر)
+        </button>
     </div>
 </div>
 
 <!-- Main App -->
-<div id="main-app">
+<div id="main-app" style="display: none;">
     <!-- Header -->
     <header class="app-header">
-        <div class="flex items-center gap-3">
-            <button onclick="toggleSidebar()" class="secondary-btn">
-                <i data-lucide="menu" class="w-5 h-5"></i>
-            </button>
-            <h1 id="view-title" class="text-lg font-bold">الرئيسية</h1>
-        </div>
-        
-        <div class="flex items-center gap-3">
-            <div class="theme-toggle" onclick="toggleTheme()">
-                <i data-lucide="sun" class="w-5 h-5"></i>
+        <div class="header-content">
+            <div class="header-left">
+                <button onclick="toggleSidebar()" class="modern-btn" style="padding: 10px">
+                    <i data-lucide="menu" class="w-5 h-5"></i>
+                </button>
+                <h1 id="view-title" class="text-xl font-bold">الرئيسية</h1>
+            </div>
+            <div class="header-right">
+                <div class="theme-toggle" onclick="toggleTheme()"></div>
+                <button onclick="toggleSearch()" class="modern-btn" style="padding: 10px">
+                    <i data-lucide="search" class="w-5 h-5"></i>
+                </button>
             </div>
         </div>
     </header>
 
+    <!-- Search Modal -->
+    <div id="searchModal" class="modal-overlay">
+        <div class="modal-container fade-in">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-xl font-bold">بحث متقدم</h2>
+                <button onclick="toggleSearch()" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            <div class="relative">
+                <input type="text" 
+                       placeholder="ابحث في الغرف، المستخدمين، المحتوى..." 
+                       class="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500">
+                <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="modal-overlay">
+        <div class="modal-container fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-white">تعديل الملف الشخصي</h2>
+                <button onclick="closeEditProfile()" class="text-gray-400 hover:text-white">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">اسم العرض</label>
+                <input type="text" id="editNameInput" class="modern-input" placeholder="اكتب اسمك الجديد">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">رابط الصورة الشخصية (URL)</label>
+                <input type="text" id="editAvatarInput" class="modern-input" placeholder="https://...">
+                <p class="text-xs text-slate-500 mt-1">يفضل استخدام روابط مباشرة للصور (jpg, png, webp)</p>
+            </div>
+
+            <div class="flex gap-2 mt-6">
+                <button onclick="saveProfile()" class="modern-btn flex-1">حفظ التغييرات</button>
+                <button onclick="closeEditProfile()" class="modern-btn bg-gray-600 hover:bg-gray-700 flex-1" style="background: var(--bg-card)">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Sidebar -->
-    <div id="sidebar" class="fixed top-0 right-[-320px] w-80 h-full z-[4000] transition-all duration-300 border-l border-var(--border-color) flex flex-col shadow-2xl">
-        <div class="p-6 text-center border-b border-var(--border-color)">
-            <div class="relative inline-block mb-6">
-                <div class="relative">
-                    <img id="userAvatar" src="https://via.placeholder.com/80" class="profile-avatar">
-                    <img id="activeFrame" src="" class="absolute inset-0 w-full h-full" style="display: none;">
-                    <button onclick="openEditModal()" class="edit-profile-btn">
-                        <i data-lucide="edit-2" class="w-4 h-4"></i>
-                    </button>
-                </div>
+    <div id="sidebar" class="sidebar">
+        <div class="p-6 text-center border-b border-slate-700">
+            <!-- Profile Section -->
+            <div class="profile-container mb-3">
+                <img id="userAvatar" src="" class="avatar-img">
+                <img id="activeFrame" src="" class="user-frame" style="display: none;">
+                <!-- Edit Icon Button -->
+                <button onclick="openEditProfile()" class="absolute -bottom-1 -right-1 w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center border-2 border-slate-800 shadow-lg z-20 hover:bg-blue-600 transition-colors">
+                    <i data-lucide="edit-2" class="w-3 h-3 text-white"></i>
+                </button>
             </div>
-            
-            <h2 id="userName" class="text-xl font-bold mb-1">...</h2>
-            <div class="text-xs text-var(--text-secondary) mb-4 font-mono" id="userID">ID: 00000000</div>
-            
-            <!-- Level Display - Simplified -->
+
+            <div class="flex flex-col items-center justify-center mb-2">
+                <div id="userName" class="font-bold text-lg mb-1">...</div>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-800 rounded-full text-xs mb-4 border border-slate-700">
+                <span class="text-slate-400">ID:</span>
+                <span class="font-mono text-orange-400" id="userID">00000000</span>
+                <button onclick="copyID()" class="hover:text-orange-500">
+                    <i data-lucide="copy" class="w-3 h-3"></i>
+                </button>
+            </div>
+
+            <!-- New Minimal Level Display -->
             <div class="level-display">
+                <div class="level-current" id="currentLevel">1</div>
+                <div class="level-label">LEVEL</div>
+                
+                <div class="level-progress-container">
+                    <div class="level-progress-bar" id="levelProgressBar" style="width: 20%"></div>
+                </div>
                 <div class="level-info">
-                    <div class="level-label">المستوى</div>
-                    <div class="level-current" id="currentLevel">1</div>
-                    <div class="level-progress">
-                        <div id="levelProgressBar" class="level-progress-bar" style="width: 20%"></div>
-                    </div>
-                    <div class="text-[10px] text-var(--text-secondary) mt-1">
-                        <span id="currentXP">0</span> / <span id="nextLevelXP">1000</span> XP
-                    </div>
+                    <span id="currentXP" class="text-cyan-400">0 XP</span>
+                    <span id="nextLevelXP" class="text-slate-500">1000 XP</span>
                 </div>
-                <!-- Badge/Level Image from Firebase -->
-                <img id="levelImage" src="" class="level-image" onerror="this.style.display='none'">
             </div>
-            
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="walletBalance">0</div>
-                    <div class="stat-label">💎 رصيد</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="giftCount">0</div>
-                    <div class="stat-label">🎁 هدايا</div>
+
+            <!-- Badges Section -->
+            <div class="mt-4">
+                <h4 class="text-xs font-bold text-slate-500 mb-2 uppercase tracking-wider">شاراتي</h4>
+                <div class="badges-grid" id="badgesGrid">
+                    <!-- Badges injected here -->
                 </div>
             </div>
         </div>
         
-        <nav class="p-4 space-y-2 flex-1 overflow-y-auto">
-            <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all">
-                <i data-lucide="home" class="w-5 h-5 text-var(--accent)"></i>
-                <span class="font-medium">الرئيسية</span>
+        <nav class="p-4 space-y-1 flex-1 overflow-y-auto">
+            <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200 group">
+                <i data-lucide="home" class="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold text-sm">الرئيسية</span>
             </button>
-            <button onclick="switchView('profile')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all">
-                <i data-lucide="user" class="w-5 h-5 text-var(--accent)"></i>
-                <span class="font-medium">الملف الشخصي</span>
+            <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200 group">
+                <i data-lucide="wallet" class="w-5 h-5 text-green-500 group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold text-sm">المحفظة</span>
             </button>
-            <button onclick="switchView('gifts')" class="w-full flex items-center gap-4 p-3 hover:bg-var(--bg-surface) rounded-xl transition-all">
-                <i data-lucide="gift" class="w-5 h-5 text-var(--accent-magic)"></i>
-                <span class="font-medium">الهدايا</span>
+            <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200 group">
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold text-sm">المتجر</span>
+            </button>
+            <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200 group">
+                <i data-lucide="briefcase" class="w-5 h-5 text-purple-500 group-hover:scale-110 transition-transform"></i>
+                <span class="font-bold text-sm">حقيبتي</span>
             </button>
         </nav>
         
-        <div class="p-4 border-t border-var(--border-color)">
-            <button onclick="logout()" class="w-full p-3 bg-red-50 text-red-600 rounded-xl font-bold text-sm hover:bg-red-100 transition-all">
+        <div class="p-4 border-t border-slate-700">
+            <button onclick="logout()" class="w-full p-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-sm hover:from-red-700 hover:to-red-800 transition-all duration-200 shadow-lg shadow-red-900/20">
+                <i data-lucide="log-out" class="w-4 h-4 inline ml-2"></i>
                 تسجيل خروج
             </button>
         </div>
     </div>
 
-    <!-- Content Area -->
-    <main>
-        <div id="view-home" class="view-screen active px-4">
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-sky-100 mb-6">
-                <h2 class="text-2xl font-black text-sky-900 mb-2">أهلاً بك في Afnan AI</h2>
-                <p class="text-sky-600">استكشف عالم الذكاء الاصطناعي المتطور</p>
-            </div>
+    <!-- Views -->
+    <div id="view-home" class="view-screen active">
+        <!-- Banner -->
+        <div id="bannerContainer" class="mx-4 mt-4 mb-6 rounded-2xl overflow-hidden shadow-xl h-[180px] bg-gradient-to-r from-orange-500/20 to-blue-500/20 border border-orange-500/30">
+            <!-- Banner will be loaded here -->
         </div>
         
-        <div id="view-profile" class="view-screen px-4">
-            <h2 class="text-xl font-bold mb-4">الملف الشخصي</h2>
-            <!-- Profile content here -->
+        <!-- Rooms Navigation -->
+        <div class="tab-nav">
+            <button onclick="switchTab('public')" class="tab-btn active">🌐 غرف عامة</button>
+            <button onclick="switchTab('private')" class="tab-btn">🔒 خاص بي</button>
         </div>
-    </main>
+        
+        <!-- Rooms Grid -->
+        <div class="rooms-grid" id="roomsList">
+            <!-- Rooms will be loaded here -->
+        </div>
+    </div>
+
+    <div id="view-wallet" class="view-screen">
+        <div class="wallet-balance slide-in">
+            <div class="text-sm text-slate-400 mb-2">الرصيد المتوفر</div>
+            <div class="text-5xl font-black mb-4">
+                <span id="wallet-balance-big">0</span> 
+                <span class="text-3xl">💰</span>
+            </div>
+            <div class="text-sm text-slate-400">أخر تحديث: اليوم</div>
+        </div>
+        
+        <div class="px-5">
+            <h3 class="text-lg font-bold mb-4">شحن الرصيد</h3>
+            <div class="recharge-grid">
+                <div class="recharge-card" onclick="recharge(27000, 1)">
+                    <div class="text-2xl mb-2">💎</div>
+                    <div class="font-bold text-lg">27,000</div>
+                    <div class="text-sm text-slate-400 mb-2">باقة المبتدئين</div>
+                    <div class="modern-btn text-sm py-2">1.00$</div>
+                </div>
+                <div class="recharge-card" onclick="recharge(55000, 1.99)">
+                    <div class="text-2xl mb-2">💎💎</div>
+                    <div class="font-bold text-lg">55,000</div>
+                    <div class="text-sm text-slate-400 mb-2">باقة المتوسط</div>
+                    <div class="modern-btn text-sm py-2">1.99$</div>
+                </div>
+                <div class="recharge-card" onclick="recharge(120000, 3.99)">
+                    <div class="text-2xl mb-2">💎💎💎</div>
+                    <div class="font-bold text-lg">120,000</div>
+                    <div class="text-sm text-slate-400 mb-2">باقة المحترفين</div>
+                    <div class="modern-btn text-sm py-2">3.99$</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="view-store" class="view-screen">
+        <div class="tab-nav mx-4 mt-4">
+            <button onclick="filterStore('frames')" id="fBtn" class="tab-btn active">🖼️ إطارات</button>
+            <button onclick="filterStore('badges')" id="bBtn" class="tab-btn">🏷️ شارات</button>
+        </div>
+        <div id="storeItems" class="store-grid"></div>
+    </div>
+
+    <div id="view-bag" class="view-screen">
+        <div id="bagItems" class="store-grid"></div>
+    </div>
+
+    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[11000] flex flex-col items-center gap-2"></div>
 </div>
 
 <script type="module">
-    // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // Firebase Config (User should provide this, using placeholders)
     const firebaseConfig = {
-        // Your config here
+        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
+        authDomain: "rtx3090-28439.firebaseapp.com",
+        projectId: "rtx3090-28439",
+        storageBucket: "rtx3090-28439.firebasestorage.app",
+        messagingSenderId: "178612030690",
+        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -352,108 +861,592 @@
     const db = getFirestore(app);
 
     let uData = null;
+    let storeData = { frames: [], badges: [] };
+    let currentTheme = 'dark';
+    
+    // XP required for each level (1-50)
+    const xpRequirements = [];
+    for (let i = 1; i <= 50; i++) {
+        xpRequirements[i] = 1000 * Math.pow(1.2, i - 1);
+    }
 
-    // Initialize Lucide Icons
-    lucide.createIcons();
+    // Theme Management
+    function toggleTheme() {
+        const body = document.body;
+        if (currentTheme === 'dark') {
+            body.classList.add('light-mode');
+            body.classList.remove('dark');
+            currentTheme = 'light';
+        } else {
+            body.classList.remove('light-mode');
+            body.classList.add('dark');
+            currentTheme = 'dark';
+        }
+        localStorage.setItem('theme', currentTheme);
+    }
 
-    // Sidebar Toggle
-    window.toggleSidebar = () => {
-        const sidebar = document.getElementById('sidebar');
-        const isOpen = sidebar.style.right === '0px';
-        sidebar.style.right = isOpen ? '-320px' : '0px';
+    function loadTheme() {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        const body = document.body;
+        if (savedTheme === 'light') {
+            body.classList.add('light-mode');
+            body.classList.remove('dark');
+        } else {
+            body.classList.remove('light-mode');
+            body.classList.add('dark');
+        }
+        currentTheme = savedTheme;
+    }
+
+    // Search Modal
+    window.toggleSearch = () => {
+        const modal = document.getElementById('searchModal');
+        modal.classList.toggle('active');
+        if (modal.classList.contains('active')) {
+            modal.querySelector('input').focus();
+        }
     };
 
-    // Theme Toggle
-    window.toggleTheme = () => {
-        document.body.classList.toggle('dark-mode');
+    // Edit Profile Logic
+    window.openEditProfile = () => {
+        const modal = document.getElementById('editProfileModal');
+        const nameInput = document.getElementById('editNameInput');
+        const avatarInput = document.getElementById('editAvatarInput');
+
+        if(uData) {
+            nameInput.value = uData.displayName || '';
+            avatarInput.value = uData.photoURL || '';
+        }
+
+        modal.classList.add('active');
+        toggleSidebar(false);
     };
 
-    // Switch Views
-    window.switchView = (viewId) => {
-        document.querySelectorAll('.view-screen').forEach(v => v.classList.remove('active'));
-        const targetView = document.getElementById(`view-${viewId}`);
-        if (targetView) targetView.classList.add('active');
-        document.getElementById('view-title').textContent = 
-            viewId === 'home' ? 'الرئيسية' : 
-            viewId === 'profile' ? 'الملف الشخصي' : 'الهدايا';
-        toggleSidebar();
+    window.closeEditProfile = () => {
+        document.getElementById('editProfileModal').classList.remove('active');
     };
 
-    // Real-time Profile Updates
-    onAuthStateChanged(auth, (user) => {
+    window.saveProfile = async () => {
+        const newName = document.getElementById('editNameInput').value;
+        const newAvatar = document.getElementById('editAvatarInput').value;
+
+        if (!newName) {
+            showToast("الاسم لا يمكن أن يكون فارغاً", "error");
+            return;
+        }
+
+        try {
+            const userRef = doc(db, "users", auth.currentUser.uid);
+            await updateDoc(userRef, {
+                displayName: newName,
+                photoURL: newAvatar
+            });
+            showToast("تم تحديث الملف الشخصي بنجاح", "success");
+            closeEditProfile();
+        } catch (error) {
+            console.error(error);
+            showToast("حدث خطأ أثناء التحديث", "error");
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
         if (user) {
-            onSnapshot(doc(db, "users", user.uid), (doc) => {
-                if (doc.exists()) {
-                    uData = doc.data();
+            loadTheme();
+            // Load Store Data first to ensure badges render correctly on initial load
+            await loadStore(); 
+            
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                if (snap.exists()) {
+                    uData = snap.data();
+                    checkExpiredItems();
                     updateUI();
+                    loadRooms();
                 }
             });
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            loadBanners();
+            lucide.createIcons();
+        } else {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
         }
     });
 
+    async function checkExpiredItems() {
+        if (!uData.purchasedFrames) return;
+        const now = Date.now();
+        let changed = false;
+        const newFrames = uData.purchasedFrames.filter(item => {
+            if (now > item.expiry) { changed = true; return false; }
+            return true;
+        });
+        if (changed) {
+            const update = { purchasedFrames: newFrames };
+            if (uData.activeFrame && !newFrames.find(f => f.id === uData.activeFrame)) {
+                update.activeFrame = null;
+            }
+            await updateDoc(doc(db, "users", auth.currentUser.uid), update);
+        }
+    }
+
     function updateUI() {
-        if (!uData) return;
+        document.getElementById('userName').innerText = uData.displayName || 'مستخدم';
+        // Handle avatar fallback
+        const avatarSrc = uData.photoURL && uData.photoURL.trim() !== '' 
+            ? uData.photoURL 
+            : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'; // Clean fallback
+        document.getElementById('userAvatar').src = avatarSrc;
+
+        document.getElementById('userID').innerText = uData.customId || '00000000';
+        document.getElementById('wallet-balance-big').innerText = (uData.balance || 0).toLocaleString();
         
-        document.getElementById('userName').textContent = uData.name || 'مستخدم';
-        document.getElementById('userAvatar').src = uData.avatar || 'https://via.placeholder.com/80';
-        document.getElementById('userID').textContent = `ID: ${uData.id || '00000000'}`;
-        document.getElementById('walletBalance').textContent = uData.balance || 0;
-        
-        // Level System
+        // Update Level System - Minimal Design
         const level = uData.level || 1;
         const xp = uData.xp || 0;
-        const nextXP = level * 1000;
-        const progress = (xp / nextXP) * 100;
+        const nextLevelXP = xpRequirements[level] || 1000;
+        const progress = Math.min(100, (xp / nextLevelXP) * 100);
         
-        document.getElementById('currentLevel').textContent = level;
-        document.getElementById('currentXP').textContent = xp;
-        document.getElementById('nextLevelXP').textContent = nextXP;
+        document.getElementById('currentLevel').innerText = level;
+        document.getElementById('currentXP').innerText = `${Math.floor(xp).toLocaleString()} XP`;
+        document.getElementById('nextLevelXP').innerText = `${Math.round(nextLevelXP).toLocaleString()} XP`;
         document.getElementById('levelProgressBar').style.width = `${progress}%`;
         
-        // Level Badge from Firebase
-        const levelImg = document.getElementById('levelImage');
-        if (uData.levelBadgeUrl) {
-            levelImg.src = uData.levelBadgeUrl;
-            levelImg.style.display = 'block';
+        // Active frame
+        const frameImg = document.getElementById('activeFrame');
+        if (uData.activeFrame) {
+            const f = storeData.frames.find(x => x.id === uData.activeFrame);
+            if (f) { 
+                frameImg.src = f.image; 
+                frameImg.style.display = 'block'; 
+            }
         } else {
-            levelImg.style.display = 'none';
+            frameImg.style.display = 'none';
+        }
+
+        // Update badges - Render as Images
+        const badgesGrid = document.getElementById('badgesGrid');
+        badgesGrid.innerHTML = '';
+        if (uData.purchasedBadges && uData.purchasedBadges.length > 0) {
+            uData.purchasedBadges.forEach(badge => {
+                const badgeData = storeData.badges.find(b => b.id === badge.id);
+                if (badgeData) {
+                    const isActive = uData.activeBadges && uData.activeBadges.includes(badge.id);
+                    // Use Image if available, else fallback to icon or placeholder
+                    const badgeContent = badgeData.image 
+                        ? `<img src="${badgeData.image}" class="badge-img" alt="${badgeData.name}">`
+                        : (badgeData.icon || '🏅');
+
+                    badgesGrid.innerHTML += `
+                        <div class="badge-item ${isActive ? 'active' : ''}" 
+                             title="${badgeData.name}"
+                             onclick="toggleBadge('${badge.id}')">
+                            ${badgeContent}
+                        </div>
+                    `;
+                }
+            });
         }
 
         lucide.createIcons();
     }
 
-    // Edit Profile Logic
-    window.openEditModal = () => {
-        document.getElementById('editNameInput').value = uData.name || '';
-        document.getElementById('editAvatarInput').value = uData.avatar || '';
-        document.getElementById('editProfileModal').classList.add('active');
-    };
+    async function loadStore() {
+        try {
+            const f = await getDocs(collection(db, "frames"));
+            storeData.frames = f.docs.map(d => ({id: d.id, ...d.data()}));
+            const b = await getDocs(collection(db, "badges"));
+            storeData.badges = b.docs.map(d => ({id: d.id, ...d.data()}));
+            
+            // Re-render store if view is active
+            if(document.getElementById('view-store').classList.contains('active')) {
+                const isFrame = document.getElementById('fBtn').classList.contains('active');
+                filterStore(isFrame ? 'frames' : 'badges');
+            }
+        } catch (error) {
+            console.error('Error loading store:', error);
+        }
+    }
 
-    window.closeEditModal = () => {
-        document.getElementById('editProfileModal').classList.remove('active');
-    };
-
-    window.saveProfileChanges = async () => {
-        const newName = document.getElementById('editNameInput').value;
-        const newAvatar = document.getElementById('editAvatarInput').value;
+    window.filterStore = (type) => {
+        const container = document.getElementById('storeItems');
+        container.innerHTML = '';
         
-        if (!newName) return alert('يرجى إدخال الاسم');
+        // Update active tab
+        document.querySelectorAll('#fBtn, #bBtn').forEach(btn => btn.classList.remove('active'));
+        if (type === 'frames') {
+            document.getElementById('fBtn').classList.add('active');
+        } else {
+            document.getElementById('bBtn').classList.add('active');
+        }
+
+        storeData[type].forEach(item => {
+            // Determine content based on type (Image for both now mostly)
+            let visual = '';
+            if (type === 'frames') {
+                visual = `<img src="${item.image}" class="w-20 h-20 object-contain">`;
+            } else {
+                // For store display, use image if available, else icon
+                visual = item.image 
+                    ? `<img src="${item.image}" class="w-16 h-16 object-contain">`
+                    : `<span class="text-5xl">${item.icon || '🏅'}</span>`;
+            }
+
+            container.innerHTML += `
+                <div class="store-card fade-in">
+                    <span class="item-label">${type === 'frames' ? 'إطار' : 'شارة'}</span>
+                    <div class="h-24 flex items-center justify-center mt-4">
+                        ${visual}
+                    </div>
+                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
+                    <div class="text-xs text-slate-400 mb-2">${item.description || ''}</div>
+                    <button onclick="buyItem('${type}', '${item.id}', ${item.price})" class="action-btn btn-buy">
+                        <i data-lucide="shopping-cart" class="w-3 h-3 inline ml-1"></i>
+                        شراء ${item.price.toLocaleString()}💰
+                    </button>
+                </div>
+            `;
+        });
+        lucide.createIcons();
+    };
+
+    window.buyItem = async (type, id, price) => {
+        if (uData.balance < price) {
+            showToast("رصيدك غير كافٍ", "error");
+            return;
+        }
+        
+        const expiry = Date.now() + (24 * 60 * 60 * 1000); // 1 Day
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        
+        const listKey = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
+        const currentList = uData[listKey] || [];
+        
+        const newList = currentList.filter(x => x.id !== id);
+        newList.push({ id, expiry });
 
         try {
-            const userRef = doc(db, "users", auth.currentUser.uid);
             await updateDoc(userRef, {
-                name: newName,
-                avatar: newAvatar
+                balance: increment(-price),
+                [listKey]: newList
             });
-            closeEditModal();
+            showToast("تم الشراء لمدة يوم واحد", "success");
         } catch (error) {
-            console.error("Error updating profile:", error);
-            alert('حدث خطأ أثناء التحديث');
+            showToast("حدث خطأ أثناء الشراء", "error");
         }
     };
 
-    window.logout = () => signOut(auth);
+    window.toggleBadge = async (badgeId) => {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const currentBadges = uData.activeBadges || [];
+        
+        let newBadges;
+        if (currentBadges.includes(badgeId)) {
+            newBadges = currentBadges.filter(id => id !== badgeId);
+            showToast("تم إزالة الشارة", "info");
+        } else {
+            newBadges = [...currentBadges, badgeId];
+            showToast("تم تفعيل الشارة", "success");
+        }
+        
+        try {
+            await updateDoc(userRef, {
+                activeBadges: newBadges
+            });
+        } catch (error) {
+            showToast("حدث خطأ", "error");
+        }
+    };
 
+    window.switchView = (v) => {
+        document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
+        const view = document.getElementById('view-' + v);
+        if (view) {
+            view.classList.add('active');
+            view.classList.add('fade-in');
+        }
+        
+        const titles = {
+            'home': 'الرئيسية',
+            'wallet': 'المحفظة',
+            'store': 'المتجر',
+            'bag': 'حقيبتي'
+        };
+        document.getElementById('view-title').innerText = titles[v] || 'Afnan AI';
+        if (v === 'bag') loadBag();
+        toggleSidebar(false);
+    };
+
+    function loadBag() {
+        const container = document.getElementById('bagItems');
+        container.innerHTML = '';
+        
+        if (!uData.purchasedFrames || uData.purchasedFrames.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-2 text-center py-8">
+                    <i data-lucide="package-open" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
+                    <p class="text-slate-400">الحقيبة فارغة</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        uData.purchasedFrames.forEach(itemRef => {
+            const item = storeData.frames.find(x => x.id === itemRef.id);
+            if (!item) return;
+            
+            const isEquipped = uData.activeFrame === item.id;
+            const timeLeft = Math.max(0, itemRef.expiry - Date.now());
+            const hoursLeft = Math.ceil(timeLeft / (1000 * 60 * 60));
+            
+            container.innerHTML += `
+                <div class="store-card fade-in">
+                    <span class="item-label">${hoursLeft} ساعة</span>
+                    <img src="${item.image}" class="w-16 h-16 object-contain mt-6">
+                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
+                    <div class="text-xs text-slate-400 mb-2">متبقي ${hoursLeft} ساعة</div>
+                    <button onclick="${isEquipped ? `equip('null')` : `equip('${item.id}')`}" 
+                            class="action-btn ${isEquipped ? 'btn-unequip' : 'btn-equip'}">
+                        <i data-lucide="${isEquipped ? 'x' : 'check'}" class="w-3 h-3 inline ml-1"></i>
+                        ${isEquipped ? 'خلع' : 'ارتداء'}
+                    </button>
+                </div>
+            `;
+        });
+        lucide.createIcons();
+    }
+
+    window.equip = async (id) => {
+        try {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeFrame: id === 'null' ? null : id 
+            });
+            showToast(id === 'null' ? "تم خلع الإطار" : "تم ارتداء الإطار", "success");
+            loadBag();
+        } catch (error) {
+            showToast("حدث خطأ", "error");
+        }
+    };
+
+    window.recharge = async (amt, price) => {
+        try {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                balance: increment(amt),
+                xp: increment(amt * 0.1) // Add XP when recharging
+            });
+            showToast(`تم شحن ${amt.toLocaleString()} عملة بنجاح`, "success");
+            checkLevelUp();
+        } catch (error) {
+            showToast("حدث خطأ أثناء الشحن", "error");
+        }
+    };
+
+    async function checkLevelUp() {
+        if (!uData) return;
+        
+        const level = uData.level || 1;
+        const xp = uData.xp || 0;
+        const nextLevelXP = xpRequirements[level] || 1000;
+        
+        if (xp >= nextLevelXP && level < 50) {
+            const newLevel = level + 1;
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    level: newLevel
+                });
+                showToast(`🎉 مبروك! لقد تقدمت للمستوى ${newLevel}!`, "success");
+            } catch (error) {
+                console.error('Error updating level:', error);
+            }
+        }
+    }
+
+    window.toggleSidebar = (show) => {
+        const side = document.getElementById('sidebar');
+        const over = document.getElementById('overlay');
+        if (show === false) { 
+            side.classList.remove('open'); 
+            over.classList.remove('active'); 
+            return; 
+        }
+        side.classList.toggle('open');
+        over.classList.toggle('active');
+    };
+
+    async function loadBanners() {
+        try {
+            const snap = await getDocs(collection(db, "banners"));
+            const container = document.getElementById('bannerContainer');
+            if (snap.empty) {
+                container.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-orange-500/20 to-blue-500/20">
+                        <div class="text-center">
+                            <div class="text-3xl mb-2">🎉</div>
+                            <p class="font-bold">مرحباً في Afnan AI</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            const banner = snap.docs[0].data();
+            container.innerHTML = `
+                <img src="${banner.imageUrl}" class="w-full h-full object-cover">
+                <div class="absolute bottom-4 right-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3">
+                    <p class="text-white text-sm font-bold">${banner.title || 'عرض خاص'}</p>
+                    <p class="text-white/80 text-xs">${banner.description || ''}</p>
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error loading banners:', error);
+        }
+    }
+
+    async function loadRooms() {
+        try {
+            const snap = await getDocs(collection(db, "rooms"));
+            const container = document.getElementById('roomsList');
+            if (snap.empty) {
+                container.innerHTML = `
+                    <div class="col-span-2 text-center py-8">
+                        <i data-lucide="users" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
+                        <p class="text-slate-400">لا توجد غرف متاحة حالياً</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            snap.docs.forEach(doc => {
+                const room = doc.data();
+                container.innerHTML += `
+                    <div class="room-card fade-in" onclick="enterRoom('${doc.id}')">
+                        <div class="room-header">
+                            <div class="room-icon">
+                                ${room.icon || '💬'}
+                            </div>
+                            <div class="flex-1">
+                                <h3 class="font-bold text-lg">${room.name}</h3>
+                                <p class="text-sm text-slate-400">${room.description || ''}</p>
+                            </div>
+                        </div>
+                        <div class="room-users">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <span>${room.users || 0} مستخدم</span>
+                        </div>
+                    </div>
+                `;
+            });
+            lucide.createIcons();
+        } catch (error) {
+            console.error('Error loading rooms:', error);
+        }
+    }
+
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        showToast(`تم التبديل إلى ${tab === 'public' ? 'الغرف العامة' : 'الخاصة'}`, "info");
+    };
+
+    window.loginWithGoogle = async () => {
+        try {
+            const provider = new GoogleAuthProvider();
+            const res = await signInWithPopup(auth, provider);
+            await setupUserData(res.user);
+            showToast("مرحباً بك في Afnan AI", "success");
+        } catch (error) {
+            showToast("حدث خطأ أثناء التسجيل", "error");
+        }
+    };
+
+    window.loginWithTwitter = async () => {
+        try {
+            const provider = new TwitterAuthProvider();
+            const res = await signInWithPopup(auth, provider);
+            await setupUserData(res.user);
+            showToast("مرحباً بك في Afnan AI", "success");
+        } catch (error) {
+            showToast("حدث خطأ أثناء التسجيل", "error");
+        }
+    };
+
+    async function setupUserData(user) {
+        const userRef = doc(db, "users", user.uid);
+        const snap = await getDoc(userRef);
+        
+        if (!snap.exists()) {
+            const twitterUsername = user.displayName?.includes('@') ? user.displayName : `@${user.displayName?.split(' ').join('')}`;
+            
+            await setDoc(userRef, {
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                email: user.email,
+                balance: 1000,
+                level: 1,
+                xp: 0,
+                customId: Math.floor(10000000 + Math.random() * 90000000).toString(),
+                purchasedFrames: [],
+                purchasedBadges: [],
+                activeFrame: null,
+                activeBadges: [],
+                provider: user.providerData[0]?.providerId,
+                twitterUsername: twitterUsername,
+                createdAt: new Date().toISOString(),
+                lastLogin: new Date().toISOString()
+            });
+        } else {
+            await updateDoc(userRef, {
+                lastLogin: new Date().toISOString()
+            });
+        }
+    }
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        
+        const colors = {
+            success: 'bg-gradient-to-r from-green-600 to-emerald-600',
+            error: 'bg-gradient-to-r from-red-600 to-rose-600',
+            info: 'bg-gradient-to-r from-blue-600 to-indigo-600',
+            warning: 'bg-gradient-to-r from-orange-600 to-amber-600'
+        };
+        
+        toast.className = `${colors[type]} text-white px-6 py-3 rounded-xl text-sm font-bold shadow-xl flex items-center gap-2 slide-in`;
+        toast.innerHTML = `
+            <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : 'info'}" class="w-4 h-4"></i>
+            ${message}
+        `;
+        
+        container.appendChild(toast);
+        lucide.createIcons();
+        
+        setTimeout(() => {
+            toast.classList.remove('slide-in');
+            toast.classList.add('fade-out');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    window.copyID = () => { 
+        navigator.clipboard.writeText(uData.customId); 
+        showToast("تم نسخ المعرف", "success");
+    };
+    
+    window.logout = () => {
+        signOut(auth);
+        showToast("تم تسجيل الخروج", "info");
+    };
+    
+    window.enterRoom = (roomId) => {
+        showToast("جاري الدخول إلى الغرفة...", "info");
+        // Implement room entry logic here
+    };
+
+    // Initialize icons
+    lucide.createIcons();
 </script>
 </body>
 </html>
+
