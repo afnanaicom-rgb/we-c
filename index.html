@@ -24,7 +24,7 @@
         }
 
         body {
-            background: radial-gradient(circle at 0% 0%, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%);
             color: #1f2937;
             overflow-x: hidden;
             min-height: 100vh;
@@ -32,39 +32,39 @@
 
         /* --- iOS Glassmorphism --- */
         .glass {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.04),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
-                0 1px 3px 0 rgba(0, 0, 0, 0.03);
+                0 4px 6px -1px rgba(0, 0, 0, 0.04),
+                0 2px 4px -1px rgba(0, 0, 0, 0.02),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
         }
 
         .glass-deep {
-            background: rgba(255, 255, 255, 0.92);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(25px) saturate(200%);
             -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border-right: 1px solid rgba(255, 255, 255, 0.95);
+            border-right: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.65);
-            backdrop-filter: blur(15px) saturate(180%);
-            -webkit-backdrop-filter: blur(15px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 
-                0 4px 12px -2px rgba(0, 0, 0, 0.02),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+                0 2px 8px -2px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
         }
 
         .glass-card:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
             box-shadow: 
-                0 2px 6px -1px rgba(0, 0, 0, 0.01),
-                inset 0 2px 0 0 rgba(255, 255, 255, 0.4);
+                0 1px 3px -1px rgba(0, 0, 0, 0.02),
+                inset 0 2px 0 0 rgba(255, 255, 255, 0.3);
         }
 
         /* --- Sidebar Animation --- */
@@ -87,9 +87,9 @@
         .sidebar-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.12);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 40;
             opacity: 0;
             pointer-events: none;
@@ -117,8 +117,8 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.9);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         .user-frame {
@@ -133,23 +133,11 @@
             object-fit: contain;
         }
 
-        /* --- Level Display --- */
-        .level-display {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-        }
-
-        .level-badge-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
-            margin-top: 8px;
+        /* --- Level Indicators --- */
+        .level-badge {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         /* --- General Animations --- */
@@ -160,7 +148,7 @@
         }
 
         .loader {
-            border: 3px solid rgba(0,0,0,0.05);
+            border: 3px solid rgba(0,0,0,0.1);
             border-left-color: #3b82f6;
             border-radius: 50%;
             width: 24px;
@@ -169,9 +157,38 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* --- Gift Animation --- */
+        @keyframes giftFly {
+            0% { transform: translate(-50%, 100%) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(150%, -150%) scale(0.5); opacity: 0; }
+        }
+        .gift-animation {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            z-index: 100;
+            pointer-events: none;
+            animation: giftFly 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
         /* --- Hide Scrollbar --- */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- Chat Styles --- */
+        .chat-bubble-me {
+            background: #1f2937;
+            color: white;
+            border-radius: 20px 20px 4px 20px;
+        }
+        .chat-bubble-them {
+            background: white;
+            color: #1f2937;
+            border-radius: 20px 20px 20px 4px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-100 selection:text-blue-900">
@@ -179,22 +196,33 @@
     <!-- ================= AUTH SCREEN ================= -->
     <div id="loginPage" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 fade-in">
         <div class="glass p-8 rounded-[40px] w-full max-w-sm text-center shadow-2xl relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/15 rounded-full blur-2xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/15 rounded-full blur-2xl"></div>
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl"></div>
 
             <div class="relative z-10">
-                <div class="w-20 h-20 bg-white/70 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-inner">
+                <div class="w-20 h-20 bg-white/50 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-inner">
                     <span class="text-4xl">🤖</span>
                 </div>
                 <h1 class="text-3xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">Afnan AI</h1>
                 <p class="text-gray-500 mb-8 font-medium">تجربة المستقبل، ببساطة وأناقة.</p>
                 
-                <button onclick="loginWithTwitter()" class="w-full py-4 rounded-2xl bg-[#1DA1F2] text-white font-bold text-lg shadow-lg hover:bg-[#1a8cd8] transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
-                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-                    </svg>
-                    دخول عبر تويتر
-                </button>
+                <div class="space-y-3">
+                    <button onclick="loginWithTwitter()" class="w-full py-4 rounded-2xl bg-black text-white font-bold text-lg shadow-lg hover:bg-gray-900 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                        </svg>
+                        دخول عبر تويتر
+                    </button>
+                    <button onclick="loginWithGoogle()" class="w-full py-4 rounded-2xl bg-white border border-gray-200 text-gray-700 font-bold text-lg shadow-sm hover:bg-gray-50 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        دخول عبر جوجل
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -215,53 +243,31 @@
 
             <!-- VIEW: HOME -->
             <div id="view-home" class="view-section fade-in">
-                <!-- Banner from Firestore -->
-                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm">
-                    <!-- Dynamic content loaded from Firestore -->
-                </div>
-
-                <!-- Room Filters -->
-                <div class="flex p-1 bg-white/70 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/60">
+                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
+                <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
                     <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
                     <button id="btn-private" onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
                 </div>
-
-                <!-- Rooms List -->
-                <div id="roomsGrid" class="space-y-3">
-                    <div class="flex justify-center py-10"><div class="loader"></div></div>
-                </div>
+                <div id="roomsGrid" class="space-y-3"></div>
             </div>
 
             <!-- VIEW: WALLET -->
             <div id="view-wallet" class="view-section hidden fade-in">
-                <!-- Card -->
                 <div class="glass-card rounded-[40px] p-8 text-center mb-8 relative overflow-hidden">
-                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/20 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl"></div>
                     <div class="relative z-10">
                         <p class="text-gray-500 text-sm font-semibold mb-2">الرصيد الكلي</p>
                         <h2 class="text-6xl font-black text-gray-900 tracking-tight mb-2" id="walletAmount">0</h2>
-                        <span class="inline-flex items-center gap-1 bg-yellow-100/70 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
+                        <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
                             <i data-lucide="coins" class="w-3 h-3"></i> عملة ذهبية
                         </span>
                     </div>
                 </div>
-
                 <h3 class="font-bold text-xl mb-4 mr-2">شحن الرصيد</h3>
                 <div class="grid grid-cols-2 gap-4">
-                    <div onclick="recharge(50000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all">
-                        <div class="w-12 h-12 rounded-full bg-blue-50/70 flex items-center justify-center text-2xl">💎</div>
-                        <span class="font-bold text-lg">50,000</span>
-                        <span class="text-gray-400 text-xs">الفل ١</span>
-                    </div>
-                    <div onclick="recharge(100000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all">
-                        <div class="w-12 h-12 rounded-full bg-purple-50/70 flex items-center justify-center text-2xl">👑</div>
-                        <span class="font-bold text-lg">100,000</span>
-                        <span class="text-gray-400 text-xs">الفل ٢</span>
-                    </div>
-                    <div onclick="recharge(300000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all col-span-2">
-                        <div class="w-12 h-12 rounded-full bg-green-50/70 flex items-center justify-center text-2xl">🚀</div>
-                        <span class="font-bold text-lg">300,000</span>
-                        <span class="text-gray-400 text-xs">الفل ٣</span>
+                    <div onclick="recharge(85000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition">
+                        <span class="text-2xl font-black text-gray-900">85,000</span>
+                        <span class="text-gray-400 text-xs">$1</span>
                     </div>
                 </div>
             </div>
@@ -272,150 +278,162 @@
                     <button onclick="loadStoreItems('frames')" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
                     <button onclick="loadStoreItems('badges')" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
                 </div>
-                <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20">
-                    <!-- Dynamic -->
-                </div>
+                <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
             </div>
 
             <!-- VIEW: BAG -->
             <div id="view-bag" class="view-section hidden fade-in">
                 <h3 class="font-bold text-lg mb-4 text-gray-800">إطاراتي</h3>
                 <div id="bagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
-                
-                <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي المفعلة</h3>
-                <div id="activeBadgesGrid" class="level-badge-grid">
-                    <!-- Dynamic -->
-                </div>
             </div>
 
             <!-- VIEW: FRIENDS -->
             <div id="view-friends" class="view-section hidden fade-in">
-                <!-- Search Bar -->
                 <div class="relative mb-6">
                     <input type="text" id="searchUserInput" placeholder="ابحث عن مستخدم بواسطة الـ ID..." 
-                           class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm placeholder-gray-400">
+                           class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm">
                     <button onclick="searchUser()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
                 </div>
-
-                <!-- Search Results -->
                 <div id="searchResults" class="space-y-3 mb-8 hidden">
                     <h3 class="font-bold text-lg text-gray-800">نتائج البحث</h3>
                     <div id="userResult" class="glass-card p-4 rounded-3xl"></div>
                 </div>
-
-                <!-- Friends List -->
                 <h3 class="font-bold text-lg mb-4 text-gray-800">أصدقائي</h3>
-                <div id="friendsList" class="space-y-3">
-                    <!-- Dynamic friends list -->
-                </div>
+                <div id="friendsList" class="space-y-3"></div>
             </div>
         </main>
     </div>
 
-    <!-- ================= SIDEBAR (OFF CANVAS) ================= -->
+    <!-- ================= SIDEBAR ================= -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
-    
     <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
-        
-        <!-- Sidebar Header -->
         <div class="pt-12 px-6 flex justify-between items-start">
-             <!-- Close Button -->
-             <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/60 hover:bg-gray-200/60 transition">
+             <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/50 hover:bg-gray-200/50 transition">
                 <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
             </button>
-
-            <!-- Edit Profile Button -->
-            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white/90 transition shadow-sm group">
+            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white transition shadow-sm group">
                 <i data-lucide="edit-3" class="w-5 h-5 text-gray-600 group-hover:text-black"></i>
             </button>
         </div>
-
         <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-2 pb-10">
-            
-            <!-- Avatar & Frame -->
             <div class="mb-6 mt-4">
                 <div class="avatar-wrapper">
                     <img id="sideAvatar" src="https://via.placeholder.com/150" class="avatar-img">
                     <img id="sideFrame" src="" class="user-frame hidden">
                 </div>
             </div>
-
-            <!-- Name & ID -->
-            <div class="text-center mb-8">
+            <div class="text-center mb-6">
                 <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
-                <div class="inline-flex items-center gap-2 bg-gray-100/60 px-3 py-1 rounded-lg border border-gray-200/60">
+                <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
                     <span class="text-xs font-bold text-gray-400">ID:</span>
                     <span id="sideID" class="text-sm font-mono font-medium text-gray-600">...</span>
                     <button onclick="copyID()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
                 </div>
             </div>
-
-            <!-- Magic Level Image from Firestore -->
-            <div class="mb-6">
-                <div class="level-display">
-                    <img id="magicLevelImage" src="" class="w-full h-full object-contain">
+            <div class="flex gap-3 mb-8">
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
+                        <i data-lucide="wand-2" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">السحر</span>
+                    <span id="magicLevelDisplay" class="font-black text-lg text-gray-800">-</span>
                 </div>
-                <!-- Active Badges (5 per row) -->
-                <div id="activeBadgesSidebar" class="level-badge-grid mt-4">
-                    <!-- Dynamic badges will be loaded here -->
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-sm">
+                        <i data-lucide="crown" class="w-4 h-4"></i>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">الثروة</span>
+                    <span id="wealthLevelDisplay" class="font-black text-lg text-gray-800">-</span>
                 </div>
             </div>
-
-            <!-- Navigation Menu -->
             <nav class="space-y-3">
-                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
                     الرئيسية
                 </button>
-                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
                     المحفظة
                 </button>
-                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
                     المتجر
                 </button>
-                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>
                     حقيبتي
                 </button>
-                <!-- Friends Menu Item -->
-                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>
                     أصدقائي
                 </button>
             </nav>
-
-            <!-- Footer / Logout -->
             <div class="mt-8">
-                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/60 text-red-500 font-bold hover:bg-red-100/70 transition flex items-center justify-center gap-2">
+                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                     تسجيل خروج
                 </button>
             </div>
-
         </div>
     </aside>
+
+    <!-- ================= CHAT MODAL ================= -->
+    <div id="chatModal" class="fixed inset-0 z-[60] hidden flex flex-col bg-gray-50">
+        <header class="h-20 glass flex items-center px-6 justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="closeChat()" class="p-2 rounded-full hover:bg-gray-100"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                <div class="flex items-center gap-2">
+                    <img id="chatUserAvatar" src="" class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <h4 id="chatUserName" class="font-bold text-sm">...</h4>
+                        <p class="text-[10px] text-green-500 font-bold">متصل الآن</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="toggleGiftBox(true)" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
+        </header>
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar"></div>
+        <div class="p-4 glass flex gap-2 items-center">
+            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." class="flex-1 p-4 rounded-2xl bg-white border-0 focus:ring-0 text-sm">
+            <button onclick="sendMessage()" class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg"><i data-lucide="send" class="w-5 h-5"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= GIFT BOX ================= -->
+    <div id="giftBox" class="fixed inset-x-0 bottom-0 z-[70] hidden flex flex-col">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="toggleGiftBox(false)"></div>
+        <div class="relative bg-white rounded-t-[40px] h-[45vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-6 flex justify-between items-center border-b border-gray-100">
+                <div class="flex gap-4">
+                    <button onclick="switchGiftTab('fixed')" id="tab-fixed" class="font-bold text-black border-b-2 border-black pb-1">هدايا ثابتة</button>
+                    <button onclick="switchGiftTab('luck')" id="tab-luck" class="font-bold text-gray-400 pb-1">هدايا الحظ</button>
+                </div>
+                <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                    <i data-lucide="coins" class="w-3 h-3 text-yellow-600"></i>
+                    <span id="giftWalletBalance" class="text-xs font-bold text-yellow-700">0</span>
+                </div>
+            </div>
+            <div id="giftGrid" class="flex-1 overflow-y-auto p-6 grid grid-cols-4 gap-4 no-scrollbar"></div>
+        </div>
+    </div>
 
     <!-- ================= EDIT MODAL ================= -->
     <div id="editModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeEditModal()"></div>
         <div class="relative w-full max-w-sm glass-deep rounded-[40px] p-6 shadow-2xl fade-in">
             <h3 class="text-center font-bold text-xl mb-6">تعديل الملف</h3>
-            
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">الاسم الظاهر</label>
-                    <input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/60 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center">
+                    <input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">رابط الصورة</label>
-                    <input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/60 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500">
+                    <input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500">
                 </div>
             </div>
-
             <div class="flex gap-3 mt-8">
                 <button onclick="closeEditModal()" class="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200">إلغاء</button>
                 <button onclick="saveProfileChanges()" class="flex-1 py-3 rounded-2xl bg-black text-white font-bold hover:shadow-lg hover:-translate-y-1 transition">حفظ</button>
@@ -425,76 +443,48 @@
 
     <!-- ================= SCRIPTS ================= -->
     <script type="module">
-        // --- 1. Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getAuth, 
-            TwitterAuthProvider, 
-            signInWithPopup, 
-            signOut, 
-            onAuthStateChanged,
-            updateProfile 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { 
-            getFirestore, 
-            doc, 
-            getDoc, 
-            setDoc, 
-            updateDoc, 
-            onSnapshot, 
-            collection, 
-            getDocs, 
-            increment,
-            query,
-            where,
-            arrayUnion,
-            arrayRemove
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- 2. Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
             authDomain: "rtx3090-28439.firebaseapp.com",
             projectId: "rtx3090-28439",
             storageBucket: "rtx3090-28439.firebasestorage.app",
             messagingSenderId: "178612030690",
-            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb"
+            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const rtdb = getDatabase(app);
         const twitterProvider = new TwitterAuthProvider();
+        const googleProvider = new GoogleAuthProvider();
 
-        // --- 3. State ---
         let userData = {};
-        let storeData = { frames: [], badges: [] };
-        let levelImages = { magic: {}, wealth: {} };
-        let friendsList = [];
-        let currentSearchResult = null;
+        let storeData = { frames: [], badges: [], gifts: [], luckGifts: [] };
+        let currentChatFriend = null;
+        let chatUnsubscribe = null;
 
-        // --- 4. Auth Logic ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                
-                // Real-time listener for user data
                 onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
                     if (docSnap.exists()) {
                         userData = docSnap.data();
                         await updateUI();
-                        await loadLevelImages();
                         await loadFriends();
                     } else {
                         await createUserDoc(user);
                     }
                 });
-
-                // Load Initial Data
                 await loadBanner();
                 await loadStoreData();
-                await loadLevelsData();
                 await loadRooms();
             } else {
                 document.getElementById('loginPage').classList.remove('hidden');
@@ -514,86 +504,20 @@
                 customId: Math.floor(100000 + Math.random() * 900000).toString(),
                 purchasedFrames: [],
                 activeFrame: null,
-                purchasedBadges: [],
-                activeBadges: [],
                 friends: [],
-                followers: [],
-                following: [],
                 createdAt: new Date()
             });
         }
 
-        // --- 5. Level Images Loading ---
-        async function loadLevelsData() {
-            try {
-                // Load Magic Levels
-                const magicSnap = await getDocs(collection(db, "magicLevels"));
-                magicSnap.forEach(doc => {
-                    levelImages.magic[doc.id] = doc.data().image;
-                });
-
-                // Load Wealth Levels
-                const wealthSnap = await getDocs(collection(db, "wealthLevels"));
-                wealthSnap.forEach(doc => {
-                    levelImages.wealth[doc.id] = doc.data().image;
-                });
-            } catch (error) {
-                console.error("Error loading levels:", error);
-            }
-        }
-
-        async function loadLevelImages() {
-            const magicLevel = userData.magicLevel || 1;
-            const magicImage = levelImages.magic[magicLevel];
-            
-            if (magicImage) {
-                document.getElementById('magicLevelImage').src = magicImage;
-            } else {
-                // Default image if not found
-                document.getElementById('magicLevelImage').src = "https://via.placeholder.com/120x120/3b82f6/ffffff?text=Level+" + magicLevel;
-            }
-        }
-
-        // --- 6. Active Badges Display ---
-        function updateActiveBadges() {
-            const badgesContainer = document.getElementById('activeBadgesSidebar');
-            const activeBadges = userData.activeBadges || [];
-            
-            badgesContainer.innerHTML = '';
-            
-            if (activeBadges.length === 0) {
-                badgesContainer.innerHTML = `
-                    <div class="col-span-5 text-center py-4">
-                        <p class="text-gray-400 text-xs">لا توجد شارات مفعلة</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // Group badges by 5 per row
-            for (let i = 0; i < activeBadges.length; i++) {
-                const badgeId = activeBadges[i];
-                const badge = storeData.badges.find(b => b.id === badgeId);
-                
-                if (badge) {
-                    badgesContainer.innerHTML += `
-                        <div class="aspect-square rounded-xl flex items-center justify-center bg-white/70 border border-white/80 shadow-sm">
-                            <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
-                        </div>
-                    `;
-                }
-            }
-        }
-
-        // --- 7. UI Updates ---
         async function updateUI() {
-            // Sidebar
             document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
             document.getElementById('sideID').innerText = userData.customId || "000000";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
+            document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
+            document.getElementById('magicLevelDisplay').innerText = userData.magicLevel || "-";
+            document.getElementById('wealthLevelDisplay').innerText = userData.wealthLevel || "-";
 
-            // Frame Logic
             const frameEl = document.getElementById('sideFrame');
             if (userData.activeFrame) {
                 const frameDoc = storeData.frames.find(f => f.id === userData.activeFrame);
@@ -602,591 +526,294 @@
                     frameEl.classList.remove('hidden');
                 } else {
                     frameEl.classList.add('hidden');
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: null });
                 }
             } else {
                 frameEl.classList.add('hidden');
             }
-
-            // Update Active Badges
-            updateActiveBadges();
         }
 
-        // --- 8. Load Banner from Firestore ---
-        async function loadBanner() {
-            try {
-                const bannerDoc = await getDoc(doc(db, "appData", "banner"));
-                const bannerContainer = document.getElementById('homeBanner');
-                
-                if (bannerDoc.exists()) {
-                    const banner = bannerDoc.data();
-                    bannerContainer.innerHTML = `
-                        <div class="absolute inset-0 bg-gradient-to-r ${banner.gradient || 'from-blue-50/80 to-purple-50/80'}"></div>
-                        <img src="${banner.image || 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop'}" 
-                             class="absolute inset-0 w-full h-full object-cover opacity-40">
-                        <div class="relative z-10 text-center p-6">
-                            <h3 class="font-black text-2xl text-gray-800 mb-1">${banner.title || 'Afnan AI'}</h3>
-                            <p class="text-sm text-gray-600 font-medium">${banner.subtitle || 'مرحباً بك في عالمك الجديد'}</p>
-                        </div>
-                    `;
-                } else {
-                    // Default banner
-                    bannerContainer.innerHTML = `
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50/80 to-purple-50/80"></div>
-                        <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop" 
-                             class="absolute inset-0 w-full h-full object-cover opacity-40">
-                        <div class="relative z-10 text-center">
-                            <h3 class="font-black text-2xl text-gray-800 mb-1">Afnan AI</h3>
-                            <p class="text-sm text-gray-600 font-medium">مرحباً بك في عالمك الجديد</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error("Error loading banner:", error);
-            }
-        }
-
-        // --- 9. Store Logic ---
         async function loadStoreData() {
-            try {
-                // Fetch Frames
-                const fSnap = await getDocs(collection(db, "frames"));
-                storeData.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
-                
-                // Fetch Badges
-                const bSnap = await getDocs(collection(db, "badges"));
-                storeData.badges = bSnap.docs.map(d => ({id: d.id, ...d.data()}));
-
-                // Refresh views if open
-                if(!document.getElementById('view-store').classList.contains('hidden')) {
-                    window.loadStoreItems('frames');
-                }
-            } catch (error) {
-                console.error("Error loading store data:", error);
-            }
+            const fSnap = await getDocs(collection(db, "frames"));
+            storeData.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            const gSnap = await getDocs(collection(db, "gifts"));
+            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            const lSnap = await getDocs(collection(db, "luckGifts"));
+            storeData.luckGifts = lSnap.docs.map(d => ({id: d.id, ...d.data()}));
         }
 
-        window.loadStoreItems = (type) => {
-            const grid = document.getElementById('storeGrid');
-            grid.innerHTML = '';
-            
-            const items = type === 'frames' ? storeData.frames : storeData.badges;
-            
-            if(items.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-2 text-center py-8">
-                        <p class="text-gray-400 mb-2">لا توجد عناصر في المتجر</p>
-                    </div>
-                `;
-                return;
-            }
-
-            items.forEach(item => {
-                const alreadyPurchased = userData[type === 'frames' ? 'purchasedFrames' : 'purchasedBadges']?.some(i => i.id === item.id);
-                
-                grid.innerHTML += `
-                    <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[160px] relative">
-                        ${alreadyPurchased ? `
-                            <div class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                مملوك
-                            </div>
-                        ` : ''}
-                        <div class="w-full flex justify-center mb-2">
-                            <img src="${item.image}" class="w-16 h-16 object-contain">
-                        </div>
-                        <h4 class="font-bold text-sm text-center mb-2 leading-tight">${item.name}</h4>
-                        ${alreadyPurchased ? 
-                            `<button class="w-full py-2 bg-gray-300 text-gray-600 text-xs font-bold rounded-xl cursor-not-allowed">
-                                مملوك ✓
-                            </button>` :
-                            `<button onclick="buyItem('${type}', '${item.id}', ${item.price})" 
-                                class="w-full py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition">
-                                ${item.price} 💰 شراء
-                            </button>`
-                        }
-                    </div>
-                `;
-            });
-        };
-
-        window.buyItem = async (type, id, price) => {
-            if (!auth.currentUser) return;
-            
-            if (userData.balance < price) {
-                alert('رصيدك غير كافٍ!');
-                return;
-            }
-
-            const field = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
-            const currentItems = userData[field] || [];
-            
-            if(currentItems.some(i => i.id === id)) {
-                alert('تمتلك هذا العنصر بالفعل');
-                return;
-            }
-
-            try {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    balance: increment(-price),
-                    [field]: arrayUnion({ id: id, purchasedAt: new Date() })
-                });
-                
-                // Success feedback
-                const btn = event.target;
-                btn.innerHTML = 'تم الشراء ✓';
-                btn.classList.remove('bg-gray-900', 'hover:bg-gray-800');
-                btn.classList.add('bg-green-500', 'cursor-not-allowed');
-            } catch (e) {
-                console.error(e);
-                alert("حدث خطأ أثناء الشراء");
-            }
-        };
-
-        // --- 10. Bag Logic ---
-        function loadBagItems() {
+        window.loadBagItems = async () => {
             const grid = document.getElementById('bagGrid');
             grid.innerHTML = '';
-            
             const frames = userData.purchasedFrames || [];
-            
-            // Clean up invalid frames
-            const validFrames = frames.filter(frame => {
-                const frameExists = storeData.frames.find(f => f.id === frame.id);
-                if (!frameExists) {
-                    removeInvalidFrame(frame.id);
-                    return false;
+            const validFrames = [];
+            for (const f of frames) {
+                const exists = storeData.frames.find(sf => sf.id === f.id);
+                if (exists) {
+                    if (f.expiresAt && new Date(f.expiresAt) < new Date()) {
+                        await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedFrames: arrayRemove(f) });
+                    } else {
+                        validFrames.push(f);
+                    }
+                } else {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedFrames: arrayRemove(f) });
                 }
-                return true;
-            });
-
-            if(validFrames.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-3 text-center py-8">
-                        <i data-lucide="package" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                        <p class="text-gray-400 text-sm">لا تملك إطارات</p>
-                    </div>
-                `;
-                return;
             }
-
             validFrames.forEach(f => {
-                const itemDetails = storeData.frames.find(sf => sf.id === f.id);
-                if (!itemDetails) return;
-                
+                const details = storeData.frames.find(sf => sf.id === f.id);
                 const isEquipped = userData.activeFrame === f.id;
-                
                 grid.innerHTML += `
-                    <div onclick="equipFrame('${f.id}')" 
-                         class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer transition-all duration-200 
-                                ${isEquipped ? 'border-2 border-blue-500 bg-blue-50/60' : 'border border-white/60 hover:bg-white/80 hover:scale-105'}">
-                        <img src="${itemDetails.image}" class="w-10 h-10 mb-2 object-contain">
-                        <span class="text-[10px] font-bold ${isEquipped ? 'text-blue-600' : 'text-gray-500'}">
-                            ${isEquipped ? 'مستخدم ✓' : 'استخدام'}
-                        </span>
-                    </div>
-                `;
+                    <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                        <img src="${details.image}" class="w-12 h-12 object-contain">
+                    </div>`;
             });
-
-            // Active Badges (5 per row)
-            const badgeGrid = document.getElementById('activeBadgesGrid');
-            badgeGrid.innerHTML = '';
-            const badges = userData.purchasedBadges || [];
-            
-            if(badges.length === 0) {
-                badgeGrid.innerHTML = `
-                    <div class="col-span-5 text-center py-4">
-                        <p class="text-gray-400 text-xs">لا تملك شارات</p>
-                    </div>
-                `;
-                return;
-            }
-
-            badges.forEach(b => {
-                const itemDetails = storeData.badges.find(sb => sb.id === b.id);
-                if(!itemDetails) return;
-                
-                const isActive = (userData.activeBadges || []).includes(b.id);
-                badgeGrid.innerHTML += `
-                    <div onclick="toggleBadge('${b.id}')" 
-                         class="aspect-square rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200
-                                ${isActive ? 'bg-blue-100/80 border-2 border-blue-400' : 'bg-white/60 border border-white/80 hover:bg-white/80 hover:scale-105'}">
-                        <img src="${itemDetails.image}" class="w-8 h-8 object-contain ${isActive ? '' : 'opacity-50'}">
-                    </div>
-                `;
-            });
-        }
-
-        async function removeInvalidFrame(frameId) {
-            try {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    purchasedFrames: arrayRemove({ id: frameId })
-                });
-            } catch (error) {
-                console.error("Error removing invalid frame:", error);
-            }
-        }
-
-        // --- 11. Friends System ---
-        async function loadFriends() {
-            try {
-                const friendsListEl = document.getElementById('friendsList');
-                friendsListEl.innerHTML = '<div class="flex justify-center py-4"><div class="loader"></div></div>';
-                
-                const friends = userData.friends || [];
-                if (friends.length === 0) {
-                    friendsListEl.innerHTML = `
-                        <div class="text-center py-8">
-                            <i data-lucide="users" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                            <p class="text-gray-400">لا يوجد أصدقاء</p>
-                            <p class="text-xs text-gray-300 mt-1">ابحث عن أصدقاء باستخدام الـ ID</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Fetch friends data
-                const friendsData = [];
-                for (const friendId of friends) {
-                    const friendDoc = await getDoc(doc(db, "users", friendId));
-                    if (friendDoc.exists()) {
-                        friendsData.push(friendDoc.data());
-                    }
-                }
-
-                // Display friends
-                friendsListEl.innerHTML = '';
-                friendsData.forEach(friend => {
-                    friendsListEl.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <img src="${friend.photoURL || 'https://via.placeholder.com/40'}" 
-                                     class="w-10 h-10 rounded-full object-cover">
-                                <div>
-                                    <h4 class="font-bold text-sm">${friend.displayName || 'مستخدم'}</h4>
-                                    <p class="text-xs text-gray-500">ID: ${friend.customId || '000000'}</p>
-                                </div>
-                            </div>
-                            <button onclick="unfollowUser('${friend.uid}')" 
-                                    class="text-red-500 hover:text-red-700 transition">
-                                <i data-lucide="user-minus" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error loading friends:", error);
-            }
-        }
-
-        window.searchUser = async () => {
-            const searchInput = document.getElementById('searchUserInput');
-            const userId = searchInput.value.trim();
-            
-            if (!userId) {
-                alert('يرجى إدخال ID المستخدم');
-                return;
-            }
-
-            try {
-                // Search by customId
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("customId", "==", userId));
-                const querySnapshot = await getDocs(q);
-                
-                const resultsDiv = document.getElementById('searchResults');
-                const userResultDiv = document.getElementById('userResult');
-                
-                if (querySnapshot.empty) {
-                    userResultDiv.innerHTML = `
-                        <div class="text-center py-4">
-                            <i data-lucide="user-x" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
-                            <p class="text-gray-600">لم يتم العثور على مستخدم بهذا الـ ID</p>
-                        </div>
-                    `;
-                    resultsDiv.classList.remove('hidden');
-                    return;
-                }
-
-                const userDoc = querySnapshot.docs[0];
-                const user = userDoc.data();
-                
-                // Check if already friends
-                const isFriend = userData.friends?.includes(user.uid);
-                const isSelf = user.uid === auth.currentUser.uid;
-                
-                currentSearchResult = user;
-                
-                userResultDiv.innerHTML = `
-                    <div class="flex items-center gap-4 mb-4">
-                        <img src="${user.photoURL || 'https://via.placeholder.com/60'}" 
-                             class="w-16 h-16 rounded-full object-cover border-2 border-white">
-                        <div>
-                            <h4 class="font-bold text-lg">${user.displayName || 'مستخدم'}</h4>
-                            <p class="text-sm text-gray-500">ID: ${user.customId || '000000'}</p>
-                        </div>
-                    </div>
-                    ${isSelf ? 
-                        '<p class="text-center text-gray-400 py-2">هذا حسابك</p>' :
-                        isFriend ? 
-                            `<button onclick="unfollowUser('${user.uid}')" 
-                                    class="w-full py-2 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition">
-                                إلغاء المتابعة
-                            </button>` :
-                            `<button onclick="followUser('${user.uid}')" 
-                                    class="w-full py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">
-                                متابعة
-                            </button>`
-                    }
-                `;
-                
-                resultsDiv.classList.remove('hidden');
-            } catch (error) {
-                console.error("Error searching user:", error);
-                alert("حدث خطأ أثناء البحث");
-            }
-        };
-
-        window.followUser = async (userId) => {
-            if (!auth.currentUser) return;
-            
-            try {
-                // Add to current user's friends
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    friends: arrayUnion(userId)
-                });
-                
-                // Add to target user's followers
-                await updateDoc(doc(db, "users", userId), {
-                    followers: arrayUnion(auth.currentUser.uid)
-                });
-                
-                alert('تمت المتابعة بنجاح!');
-                loadFriends();
-                searchUser(); // Refresh search result
-            } catch (error) {
-                console.error("Error following user:", error);
-                alert("حدث خطأ أثناء المتابعة");
-            }
-        };
-
-        window.unfollowUser = async (userId) => {
-            if (!auth.currentUser) return;
-            
-            try {
-                // Remove from current user's friends
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    friends: arrayRemove(userId)
-                });
-                
-                // Remove from target user's followers
-                await updateDoc(doc(db, "users", userId), {
-                    followers: arrayRemove(auth.currentUser.uid)
-                });
-                
-                alert('تم إلغاء المتابعة');
-                loadFriends();
-                if (currentSearchResult && currentSearchResult.uid === userId) {
-                    searchUser(); // Refresh search result
-                }
-            } catch (error) {
-                console.error("Error unfollowing user:", error);
-                alert("حدث خطأ أثناء إلغاء المتابعة");
-            }
-        };
-
-        // --- 12. View Switching ---
-        window.switchView = (viewName) => {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById('view-' + viewName).classList.remove('hidden');
-            
-            const titles = {
-                home: 'الرئيسية', 
-                wallet: 'المحفظة', 
-                store: 'المتجر', 
-                bag: 'حقيبتي',
-                friends: 'أصدقائي'
-            };
-            document.getElementById('pageTitle').innerText = titles[viewName];
-            
-            toggleSidebar(false);
-            
-            if (viewName === 'store') window.loadStoreItems('frames');
-            if (viewName === 'bag') loadBagItems();
-            if (viewName === 'friends') loadFriends();
         };
 
         window.equipFrame = async (id) => {
             const newFrame = userData.activeFrame === id ? null : id;
             await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: newFrame });
+            loadBagItems();
         };
 
-        window.toggleBadge = async (id) => {
-            let actives = userData.activeBadges || [];
-            if(actives.includes(id)) {
-                actives = actives.filter(a => a !== id);
+        window.searchUser = async () => {
+            const id = document.getElementById('searchUserInput').value.trim();
+            if (!id) return;
+            const q = query(collection(db, "users"), where("customId", "==", id));
+            const snap = await getDocs(q);
+            const results = document.getElementById('searchResults');
+            const container = document.getElementById('userResult');
+            results.classList.remove('hidden');
+            if (snap.empty) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-sm">لم يتم العثور على مستخدم</p>';
             } else {
-                actives.push(id);
+                const user = snap.docs[0].data();
+                const isFollowing = userData.friends?.includes(user.uid);
+                container.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <h4 class="font-bold text-sm">${user.displayName}</h4>
+                                <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                            </div>
+                        </div>
+                        <button onclick="toggleFollow('${user.uid}')" class="px-4 py-2 rounded-xl ${isFollowing ? 'bg-gray-100 text-gray-500' : 'bg-black text-white'} font-bold text-xs">
+                            ${isFollowing ? 'إلغاء المتابعة' : 'متابعة'}
+                        </button>
+                    </div>`;
             }
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { activeBadges: actives });
         };
 
-        // --- 13. Rooms Logic ---
-        async function loadRooms() {
-            const grid = document.getElementById('roomsGrid');
-            try {
-                const snap = await getDocs(collection(db, "rooms"));
-                if(snap.empty) {
-                    grid.innerHTML = `
-                        <div class="text-center py-8">
-                            <i data-lucide="message-square" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                            <p class="text-gray-400">لا توجد غرف متاحة حالياً</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                grid.innerHTML = '';
-                snap.forEach(doc => {
-                    const r = doc.data();
-                    grid.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex items-center gap-4 hover:scale-[1.01] transition cursor-pointer active:scale-95">
-                            <div class="w-12 h-12 rounded-full ${r.color || 'bg-gray-100'} flex items-center justify-center text-xl shadow-sm">
-                                ${r.icon || '💬'}
-                            </div>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-900">${r.name}</h4>
-                                <p class="text-xs text-gray-500">${r.description || 'غرفة محادثة'}</p>
-                                ${r.memberCount ? `<p class="text-xs text-gray-400 mt-1">👥 ${r.memberCount} أعضاء</p>` : ''}
-                            </div>
-                            <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
-                        </div>
-                    `;
-                });
-            } catch (e) {
-                console.error("Error loading rooms:", e);
-                grid.innerHTML = '<p class="text-center text-gray-400 py-10">حدث خطأ في تحميل الغرف</p>';
+        window.toggleFollow = async (uid) => {
+            const isFollowing = userData.friends?.includes(uid);
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friends: isFollowing ? arrayRemove(uid) : arrayUnion(uid)
+            });
+            searchUser();
+        };
+
+        async function loadFriends() {
+            const list = document.getElementById('friendsList');
+            list.innerHTML = '';
+            if (!userData.friends || userData.friends.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا يوجد أصدقاء بعد</p>';
+                return;
             }
+            for (const uid of userData.friends) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const friend = snap.data();
+                    list.innerHTML += `
+                        <div onclick="openChat('${friend.uid}')" class="glass-card p-4 rounded-3xl flex items-center justify-between cursor-pointer hover:bg-white transition">
+                            <div class="flex items-center gap-3">
+                                <img src="${friend.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm">${friend.displayName}</h4>
+                                    <p class="text-xs text-gray-400">ID: ${friend.customId}</p>
+                                </div>
+                            </div>
+                            <i data-lucide="message-circle" class="w-5 h-5 text-gray-300"></i>
+                        </div>`;
+                }
+            }
+            lucide.createIcons();
         }
 
-        window.filterRooms = async (type) => {
-            const btnPub = document.getElementById('btn-public');
-            const btnPriv = document.getElementById('btn-private');
-            
-            if(type === 'public') {
-                btnPub.className = "flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all";
-                btnPriv.className = "flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all";
-                await loadRooms();
-            } else {
-                btnPriv.className = "flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all";
-                btnPub.className = "flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all";
-                document.getElementById('roomsGrid').innerHTML = `
-                    <div class="text-center py-8">
-                        <i data-lucide="lock" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                        <p class="text-gray-400">لا توجد غرف خاصة متاحة</p>
-                        <p class="text-xs text-gray-300 mt-1">يجب أن تتم دعوتك للانضمام</p>
-                    </div>
-                `;
-            }
-        };
-
-        // --- 14. Helpers & Sidebar ---
-        window.toggleSidebar = (show) => {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (show) {
-                sidebar.classList.add('open');
-                overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.add('visible'), 10);
-            } else {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('visible');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
-        };
-
-        window.loginWithTwitter = () => {
-            signInWithPopup(auth, twitterProvider).catch(e => {
-                console.error("Login error:", e);
-                alert('حدث خطأ أثناء التسجيل: ' + e.message);
+        window.openChat = async (uid) => {
+            const snap = await getDoc(doc(db, "users", uid));
+            currentChatFriend = snap.data();
+            document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
+            document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
+            document.getElementById('chatModal').classList.remove('hidden');
+            const chatId = [auth.currentUser.uid, uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}`);
+            if (chatUnsubscribe) chatUnsubscribe();
+            onValue(chatRef, (snapshot) => {
+                const messages = snapshot.val();
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = '';
+                if (messages) {
+                    Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
+                        const isMe = msg.senderId === auth.currentUser.uid;
+                        container.innerHTML += `
+                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
+                                    ${msg.text}
+                                </div>
+                            </div>`;
+                    });
+                    container.scrollTop = container.scrollHeight;
+                }
             });
         };
 
-        window.confirmLogout = () => {
-            if(confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                signOut(auth);
-                toggleSidebar(false);
-            }
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentChatFriend) return;
+            const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}`);
+            await push(chatRef, {
+                senderId: auth.currentUser.uid,
+                text: text,
+                timestamp: Date.now()
+            });
+            input.value = '';
         };
 
-        window.recharge = (amount) => {
-            if (!auth.currentUser) return;
-            
-            // In real app, this would integrate with payment gateway
-            updateDoc(doc(db, "users", auth.currentUser.uid), {
-                balance: increment(amount)
-            }).then(() => {
-                alert(`✅ تم شحن ${amount.toLocaleString()} عملة بنجاح!`);
-            }).catch(e => {
-                alert("حدث خطأ أثناء الشحن");
+        window.closeChat = () => {
+            document.getElementById('chatModal').classList.add('hidden');
+            if (chatUnsubscribe) chatUnsubscribe();
+            currentChatFriend = null;
+        };
+
+        window.toggleGiftBox = (show) => {
+            document.getElementById('giftBox').classList.toggle('hidden', !show);
+            if (show) switchGiftTab('fixed');
+        };
+
+        window.switchGiftTab = (type) => {
+            const grid = document.getElementById('giftGrid');
+            grid.innerHTML = '';
+            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
+            document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            items.forEach(item => {
+                grid.innerHTML += `
+                    <div onclick="sendGift('${item.id}', '${type}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
+                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
+                            <img src="${item.image}" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span>
+                        <span class="text-[8px] text-yellow-600 font-black">${item.price} 💰</span>
+                    </div>`;
             });
         };
 
-        window.openEditProfile = () => {
-            document.getElementById('editNameInp').value = userData.displayName || '';
-            document.getElementById('editPhotoInp').value = userData.photoURL || '';
-            document.getElementById('editModal').classList.remove('hidden');
-            toggleSidebar(false);
-        };
-
-        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
-
-        window.saveProfileChanges = async () => {
-            const name = document.getElementById('editNameInp').value.trim();
-            const photo = document.getElementById('editPhotoInp').value.trim();
-            
-            if (!name) {
-                alert('يرجى إدخال اسم');
+        window.sendGift = async (giftId, type) => {
+            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
+            const gift = items.find(g => g.id === giftId);
+            if (userData.balance < gift.price) {
+                alert('رصيدك غير كافٍ!');
                 return;
             }
 
-            try {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    displayName: name,
-                    photoURL: photo || userData.photoURL
-                });
+            let multiplier = 1;
+            let resultText = `لقد تم استلام هدية ${gift.name} بسعر ${gift.price}`;
+            
+            if (type === 'luck') {
+                const rand = Math.random();
+                if (rand < 0.01) multiplier = 100;
+                else if (rand < 0.1) multiplier = 10;
+                else if (rand < 0.5) multiplier = 1;
+                else multiplier = 0;
                 
-                // Update auth profile
-                await updateProfile(auth.currentUser, {
-                    displayName: name,
-                    photoURL: photo || auth.currentUser.photoURL
-                });
-                
-                closeEditModal();
-                alert('✅ تم حفظ التغييرات');
-            } catch (error) {
-                console.error("Error updating profile:", error);
-                alert("حدث خطأ أثناء حفظ التغييرات");
+                if (multiplier > 0) {
+                    resultText = `هدية حظ! ربحت ${multiplier}x! تم استلام ${gift.name}`;
+                } else {
+                    resultText = `للأسف، لم يحالفك الحظ هذه المرة!`;
+                }
             }
-        };
 
-        window.copyID = () => {
-            const id = userData.customId || "000000";
-            navigator.clipboard.writeText(id).then(() => {
-                const icon = document.querySelector('#sideID + button i');
-                const originalClass = icon.className.baseVal;
-                icon.className.baseVal = originalClass.replace('copy', 'check');
-                icon.style.color = 'green';
-                
-                setTimeout(() => {
-                    icon.className.baseVal = originalClass;
-                    icon.style.color = '';
-                }, 2000);
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                balance: increment(-gift.price + (type === 'luck' ? gift.price * multiplier : 0))
             });
+
+            showGiftAnimation(gift, resultText);
+            toggleGiftBox(false);
         };
 
-        // Initialize Icons
+        function showGiftAnimation(gift, text) {
+            const anim = document.createElement('div');
+            anim.className = 'gift-animation flex flex-col items-center gap-4';
+            anim.innerHTML = `
+                <img src="${gift.image}" class="w-32 h-32 object-contain drop-shadow-2xl">
+                <div class="glass px-6 py-3 rounded-2xl shadow-xl border-2 border-white">
+                    <p class="font-black text-gray-900 text-center">${text}</p>
+                </div>`;
+            document.body.appendChild(anim);
+            setTimeout(() => anim.remove(), 3000);
+        }
+
+        window.loginWithTwitter = () => signInWithPopup(auth, twitterProvider);
+        window.loginWithGoogle = () => signInWithPopup(auth, googleProvider);
+        window.confirmLogout = () => confirm('خروج؟') && signOut(auth);
+        window.toggleSidebar = (show) => {
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('sidebarOverlay');
+            s.classList.toggle('open', show);
+            o.classList.toggle('hidden', !show);
+            if(show) setTimeout(() => o.classList.add('visible'), 10);
+            else o.classList.remove('visible');
+        };
+        window.switchView = (v) => {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('view-' + v).classList.remove('hidden');
+            document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : v === 'bag' ? 'حقيبتي' : 'أصدقائي';
+            if(v === 'bag') loadBagItems();
+            toggleSidebar(false);
+        };
+        window.recharge = (a) => updateDoc(doc(db, "users", auth.currentUser.uid), { balance: increment(a) }).then(() => alert('تم الشحن!'));
+        window.copyID = () => navigator.clipboard.writeText(userData.customId).then(() => alert('تم النسخ'));
+        window.openEditProfile = () => {
+            document.getElementById('editNameInp').value = userData.displayName;
+            document.getElementById('editPhotoInp').value = userData.photoURL;
+            document.getElementById('editModal').classList.remove('hidden');
+            toggleSidebar(false);
+        };
+        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        window.saveProfileChanges = async () => {
+            const n = document.getElementById('editNameInp').value;
+            const p = document.getElementById('editPhotoInp').value;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { displayName: n, photoURL: p });
+            closeEditModal();
+        };
+
+        async function loadBanner() {
+            const bDoc = await getDoc(doc(db, "appData", "banner"));
+            const container = document.getElementById('homeBanner');
+            if (bDoc.exists()) {
+                const b = bDoc.data();
+                container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div><img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay"><div class="relative z-10 text-center p-6"><h3 class="font-black text-2xl text-gray-800 mb-1">${b.title}</h3><p class="text-sm text-gray-500 font-medium">${b.subtitle}</p></div>`;
+            }
+        }
+
+        async function loadRooms() {
+            const rSnap = await getDocs(collection(db, "rooms"));
+            const grid = document.getElementById('roomsGrid');
+            grid.innerHTML = '';
+            rSnap.docs.forEach(d => {
+                const r = d.data();
+                grid.innerHTML += `<div class="glass-card p-4 rounded-3xl flex items-center gap-4"><div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div><div class="flex-1"><h4 class="font-bold text-gray-900">${r.name}</h4><p class="text-xs text-gray-500">${r.description}</p></div><i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i></div>`;
+            });
+        }
+
+        window.filterRooms = (t) => {
+            document.getElementById('btn-public').className = t === 'public' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+            document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+        };
+
         lucide.createIcons();
-        
-        // Refresh icons after dynamic content
         setInterval(() => lucide.createIcons(), 1000);
     </script>
 </body>
