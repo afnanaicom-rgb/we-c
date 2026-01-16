@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Afnan AI - White Edition</title>
-    <!-- استخدام Tailwind CSS (مشابه جداً لـ UnoCSS) للتصميم السريع والأنيق -->
+    <!-- استخدام Tailwind CSS للتصميم السريع والأنيق -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -24,7 +24,6 @@
         /* تصميم الإطارات */
         .avatar-container { position: relative; width: 110px; height: 110px; margin: 0 auto; display: flex; align-items: center; justify-content: center; }
         .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid #f3f4f6; }
-        /* الإطار أكبر بوضوح من الصورة */
         .user-frame { position: absolute; width: 160%; height: 160%; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 10; object-fit: contain; }
 
         /* Scrollbar Hide */
@@ -34,6 +33,13 @@
         /* Store Card Hover */
         .store-card { transition: all 0.2s ease; border: 1px solid #f3f4f6; }
         .store-card:active { transform: scale(0.98); }
+
+        /* ألوان الأيقونات في الشريط الجانبي */
+        .icon-home { color: #3b82f6; }
+        .icon-wallet { color: #10b981; }
+        .icon-store { color: #f59e0b; }
+        .icon-bag { color: #8b5cf6; }
+        .icon-settings { color: #6b7280; }
     </style>
 </head>
 <body class="bg-white">
@@ -53,6 +59,10 @@
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5 bg-white rounded-full p-0.5">
             تسجيل الدخول عبر جوجل
         </button>
+        <button onclick="loginWithTwitter()" class="w-full py-4 bg-[#1DA1F2] text-white rounded-2xl font-bold text-sm hover:bg-[#1a91da] transition flex items-center justify-center gap-3 shadow-lg">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.84 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
+            تسجيل الدخول عبر X
+        </button>
     </div>
 </div>
 
@@ -62,34 +72,28 @@
     <!-- الهيدر (رأس الصفحة) -->
     <header class="fixed top-0 inset-x-0 h-16 bg-white/90 backdrop-blur-md z-40 flex items-center justify-between px-5 border-b border-gray-100">
         <div class="flex items-center gap-4">
-            <!-- أيقونة القائمة سوداء بدون خلفية -->
             <button onclick="toggleSidebar(true)" class="text-black p-1 hover:text-gray-600 transition">
                 <i data-lucide="menu" class="w-7 h-7"></i>
             </button>
             <h1 id="pageTitle" class="text-lg font-bold text-black">الرئيسية</h1>
         </div>
-        <!-- تم حذف زر تبديل الثيم -->
     </header>
 
     <!-- القائمة الجانبية (Sidebar) -->
     <div id="sidebarOverlay" onclick="toggleSidebar(false)" class="fixed inset-0 bg-black/20 z-50 hidden transition-opacity opacity-0"></div>
     <aside id="sidebar" class="sidebar fixed top-0 right-0 h-full w-[300px] bg-white z-[60] shadow-2xl overflow-y-auto no-scrollbar flex flex-col items-center py-8 px-6 border-l border-gray-100">
         
-        <!-- 1. أيقونة تحرير الملف الشخصي (في الأعلى) -->
         <button onclick="openEditProfile()" class="p-3 rounded-full bg-gray-50 text-black hover:bg-gray-100 transition shadow-sm mb-2">
             <i data-lucide="edit-3" class="w-5 h-5"></i>
         </button>
 
-        <!-- مسافة 30px -->
         <div class="h-[30px] w-full"></div>
 
-        <!-- 2. صورة البروفيل والإطار -->
         <div class="avatar-container mb-4">
             <img id="sideAvatar" src="" class="avatar-img shadow-md">
             <img id="sideFrame" src="" class="user-frame hidden">
         </div>
 
-        <!-- 3. الاسم والـ ID -->
         <div class="text-center w-full mb-2">
             <h3 id="sideName" class="text-xl font-bold text-black truncate">...</h3>
             <div class="flex items-center justify-center gap-2 mt-1">
@@ -99,64 +103,49 @@
             </div>
         </div>
 
-        <!-- 4. أيقونة المستوى فقط (بدون نصوص/أرقام) -->
-        <!-- يتم جلبها من فير بيز فقط. اذا لم توجد لا تعرض -->
-        <div id="levelIconContainer" class="w-16 h-16 my-2 flex items-center justify-center">
-            <!-- الصورة تضاف هنا بالجافاسكريبت -->
-        </div>
+        <div id="levelIconContainer" class="w-16 h-16 my-2 flex items-center justify-center"></div>
 
-        <!-- مسافة 30px -->
         <div class="h-[30px] w-full border-b border-gray-50 mb-6"></div>
 
-        <!-- 5. القوائم (الرئيسية، المحفظة، المتجر، الحقيبة) -->
         <nav class="w-full space-y-2 flex-1">
             <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 text-gray-700 font-bold transition">
-                <i data-lucide="home" class="w-6 h-6"></i> الرئيسية
+                <i data-lucide="home" class="w-6 h-6 icon-home"></i> الرئيسية
             </button>
             <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 text-gray-700 font-bold transition">
-                <i data-lucide="wallet" class="w-6 h-6"></i> المحفظة
+                <i data-lucide="wallet" class="w-6 h-6 icon-wallet"></i> المحفظة
             </button>
             <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 text-gray-700 font-bold transition">
-                <i data-lucide="shopping-bag" class="w-6 h-6"></i> المتجر
+                <i data-lucide="shopping-bag" class="w-6 h-6 icon-store"></i> المتجر
             </button>
             <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 text-gray-700 font-bold transition">
-                <i data-lucide="backpack" class="w-6 h-6"></i> حقيبتي
+                <i data-lucide="backpack" class="w-6 h-6 icon-bag"></i> حقيبتي
             </button>
-            <!-- الإعدادات -->
             <button class="w-full flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 text-gray-700 font-bold transition">
-                <i data-lucide="settings" class="w-6 h-6"></i> الإعدادات
+                <i data-lucide="settings" class="w-6 h-6 icon-settings"></i> الإعدادات
             </button>
         </nav>
 
-        <!-- 6. زر تسجيل الخروج في الأسفل -->
         <button onclick="confirmLogout()" class="w-full mt-6 p-4 rounded-2xl bg-red-50 text-red-600 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
             <i data-lucide="log-out" class="w-5 h-5"></i> تسجيل خروج
         </button>
 
     </aside>
 
-    <!-- المحتوى الرئيسي (Views) -->
     <main class="pt-20 px-5">
         
-        <!-- View: Home -->
         <div id="view-home" class="view-section fade-in">
-            <!-- بنر -->
             <div id="homeBanner" class="w-full h-48 rounded-3xl bg-gray-100 mb-6 relative overflow-hidden flex items-center justify-center shadow-inner">
                 <p class="text-gray-400">تحميل البنر...</p>
             </div>
             
-            <!-- تبويب الغرف -->
             <div class="flex p-1 bg-gray-100 rounded-2xl mb-6">
                 <button onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm">عامة</button>
                 <button onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black">خاصة</button>
             </div>
 
-            <div id="roomsGrid" class="grid grid-cols-1 gap-4">
-                <!-- الغرف -->
-            </div>
+            <div id="roomsGrid" class="grid grid-cols-1 gap-4"></div>
         </div>
 
-        <!-- View: Wallet -->
         <div id="view-wallet" class="view-section hidden fade-in">
             <div class="bg-gray-50 rounded-3xl p-8 text-center border border-gray-100 mb-8">
                 <p class="text-gray-400 text-sm mb-2">رصيدك الحالي</p>
@@ -165,7 +154,6 @@
             </div>
             <h3 class="font-bold text-lg mb-4">باقات الشحن</h3>
             <div class="grid grid-cols-2 gap-4">
-                <!-- أمثلة للشحن -->
                 <div class="p-6 rounded-2xl border border-gray-100 text-center hover:shadow-lg transition cursor-pointer" onclick="recharge(1000)">
                     <div class="text-3xl mb-2">💎</div>
                     <div class="font-bold">1,000</div>
@@ -179,32 +167,23 @@
             </div>
         </div>
 
-        <!-- View: Store -->
         <div id="view-store" class="view-section hidden fade-in">
              <div class="flex gap-4 mb-6 overflow-x-auto no-scrollbar">
                 <button onclick="loadStoreItems('frames')" class="px-6 py-2 bg-black text-white rounded-full font-bold whitespace-nowrap">إطارات</button>
                 <button onclick="loadStoreItems('badges')" class="px-6 py-2 bg-gray-100 text-gray-600 rounded-full font-bold whitespace-nowrap hover:bg-gray-200">شارات</button>
             </div>
-            <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-10">
-                <!-- عناصر المتجر -->
-            </div>
+            <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-10"></div>
         </div>
 
-        <!-- View: Bag -->
         <div id="view-bag" class="view-section hidden fade-in">
             <h3 class="font-bold text-lg mb-4">مقتنياتك</h3>
-            <!-- تم تعديل عرض الشارات هنا أيضاً -->
             <div id="bagGrid" class="grid grid-cols-2 gap-4 pb-10"></div>
-            
             <h3 class="font-bold text-lg mt-8 mb-4">شاراتي المفعلة</h3>
-            <div id="activeBadgesGrid" class="grid grid-cols-4 gap-2">
-                <!-- الشارات المفعلة -->
-            </div>
+            <div id="activeBadgesGrid" class="grid grid-cols-4 gap-4"></div>
         </div>
 
     </main>
 
-    <!-- مودال تعديل البروفيل -->
     <div id="editModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl">
             <h3 class="text-xl font-bold mb-4">تعديل الملف</h3>
@@ -219,10 +198,9 @@
 
 </div>
 
-<!-- Firebase Logic -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, TwitterAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -241,18 +219,16 @@
     let userData = {};
     let storeData = { frames: [], badges: [] };
 
-    // Authentication Listener
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             document.getElementById('loginPage').classList.add('hidden');
             document.getElementById('main-app').classList.remove('hidden');
             
-            // Listen to user data
             onSnapshot(doc(db, "users", user.uid), (docSnap) => {
                 if (docSnap.exists()) {
                     userData = docSnap.data();
                     updateUI();
-                    loadUserLevel(userData.level); // Load level image from Firebase
+                    loadUserLevel(userData.level);
                 } else {
                     createUserDoc(user);
                 }
@@ -267,14 +243,14 @@
         }
     });
 
-    // Create User Doc if new
     async function createUserDoc(user) {
         await setDoc(doc(db, "users", user.uid), {
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            email: user.email,
+            displayName: user.displayName || "مستخدم جديد",
+            photoURL: user.photoURL || "",
+            email: user.email || "",
             balance: 1000,
-            level: 1, // Default Level
+            level: 1,
+            totalSpent: 0,
             customId: Math.floor(100000 + Math.random() * 900000).toString(),
             purchasedFrames: [],
             activeFrame: null,
@@ -283,69 +259,52 @@
         });
     }
 
-    // UI Updates
     async function updateUI() {
-        // Sidebar Data
         document.getElementById('sideName').innerText = userData.displayName;
         document.getElementById('sideID').innerText = userData.customId;
         document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
         document.getElementById('walletAmount').innerText = userData.balance.toLocaleString();
 
-        // Frame
         const frameEl = document.getElementById('sideFrame');
         if (userData.activeFrame) {
-            // Find frame details (assuming we have store data or fetching it)
-            // For efficiency, we can store frame URL in user doc or look it up
             const frameDoc = storeData.frames.find(f => f.id === userData.activeFrame);
             if(frameDoc) {
                 frameEl.src = frameDoc.image;
                 frameEl.classList.remove('hidden');
             } else {
-                 // Fallback if store not loaded yet, or fetch direct
-                 frameEl.classList.add('hidden');
+                frameEl.classList.add('hidden');
             }
         } else {
             frameEl.classList.add('hidden');
         }
-
         lucide.createIcons();
     }
 
-    // --- LEVEL LOGIC (FIREBASE ONLY) ---
-    // يحاول جلب صورة المستوى من مجموعة "levels" في فايربيز
     async function loadUserLevel(levelNum) {
         const container = document.getElementById('levelIconContainer');
-        container.innerHTML = ''; // Clear previous
-
+        container.innerHTML = '';
         if(!levelNum) return;
-
         try {
-            // البحث عن وثيقة المستوى برقم المستوى
             const levelRef = doc(db, "levels", String(levelNum));
             const levelSnap = await getDoc(levelRef);
-
             if (levelSnap.exists()) {
                 const data = levelSnap.data();
                 if (data.image) {
                     container.innerHTML = `<img src="${data.image}" class="w-full h-full object-contain drop-shadow-md" alt="Level ${levelNum}">`;
                 }
             }
-            // إذا لم توجد الوثيقة، لا نعرض أي شيء (كما طلبت)
         } catch (error) {
-            console.log("No level data found or error fetching level.");
+            console.log("Error fetching level.");
         }
     }
 
-    // Load Store
     async function loadStoreData() {
         const fSnap = await getDocs(collection(db, "frames"));
         storeData.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
-        
         const bSnap = await getDocs(collection(db, "badges"));
         storeData.badges = bSnap.docs.map(d => ({id: d.id, ...d.data()}));
     }
 
-    // Navigation
     window.switchView = (viewName) => {
         document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
         document.getElementById('view-' + viewName).classList.remove('hidden');
@@ -359,17 +318,14 @@
         if (viewName === 'bag') loadBagItems();
     };
 
-    // Store Rendering
     window.loadStoreItems = (type) => {
         const grid = document.getElementById('storeGrid');
         grid.innerHTML = '';
         const items = type === 'frames' ? storeData.frames : storeData.badges;
-
         if(items.length === 0) {
             grid.innerHTML = '<p class="col-span-2 text-center text-gray-400 py-10">لا توجد عناصر حالياً</p>';
             return;
         }
-
         items.forEach(item => {
             grid.innerHTML += `
                 <div class="store-card p-4 rounded-3xl bg-white text-center flex flex-col items-center justify-between min-h-[180px]">
@@ -387,22 +343,17 @@
         });
     };
 
-    // Buying Logic
     window.buyItem = async (type, id, price) => {
         if (userData.balance < price) {
             alert('رصيدك غير كافٍ!');
             return;
         }
-        
         const field = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
-        // Simple purchase logic (add to array)
         const currentItems = userData[field] || [];
-        // Check if already owned
         if(currentItems.some(i => i.id === id)) {
             alert('تملك هذا العنصر بالفعل');
             return;
         }
-
         await updateDoc(doc(db, "users", auth.currentUser.uid), {
             balance: increment(-price),
             [field]: [...currentItems, { id: id, date: Date.now() }]
@@ -410,12 +361,9 @@
         alert('تم الشراء بنجاح!');
     };
 
-    // Bag Rendering
     window.loadBagItems = () => {
         const grid = document.getElementById('bagGrid');
         grid.innerHTML = '';
-        
-        // Render Frames
         const frames = userData.purchasedFrames || [];
         frames.forEach(f => {
             const itemDetails = storeData.frames.find(sf => sf.id === f.id);
@@ -433,15 +381,12 @@
             }
         });
 
-        // Render Active Badges in a separate grid (4 columns as requested implicitly by resizing)
         const badgeGrid = document.getElementById('activeBadgesGrid');
         badgeGrid.innerHTML = '';
         const badges = userData.purchasedBadges || [];
-        // Show all purchased badges, mark active ones
         badges.forEach(b => {
              const badgeDetails = storeData.badges.find(sb => sb.id === b.id);
              if(badgeDetails) {
-                 // Check if in activeBadges array
                  const isActive = (userData.activeBadges || []).includes(b.id);
                  badgeGrid.innerHTML += `
                     <div onclick="toggleBadge('${b.id}')" class="aspect-square rounded-xl flex items-center justify-center cursor-pointer transition border-2 ${isActive ? 'border-blue-500 bg-blue-50' : 'border-gray-100 bg-white'}">
@@ -454,6 +399,9 @@
 
     window.equipFrame = async (id) => {
         const newFrame = userData.activeFrame === id ? null : id;
+        // تحديث محلي فوري للسرعة
+        userData.activeFrame = newFrame;
+        updateUI();
         await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: newFrame });
     };
 
@@ -464,11 +412,12 @@
         } else {
             actives.push(id);
         }
+        // تحديث محلي فوري للسرعة
+        userData.activeBadges = actives;
+        loadBagItems();
         await updateDoc(doc(db, "users", auth.currentUser.uid), { activeBadges: actives });
-        loadBagItems(); // Refresh
     };
 
-    // Sidebar Toggle
     window.toggleSidebar = (show) => {
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
@@ -483,7 +432,6 @@
         }
     };
 
-    // Logout
     window.confirmLogout = () => {
         if(confirm('هل أنت متأكد من تسجيل الخروج؟')) {
             signOut(auth);
@@ -491,12 +439,9 @@
         }
     };
 
-    // Login
-    window.loginWithGoogle = () => {
-        signInWithPopup(auth, new GoogleAuthProvider());
-    };
+    window.loginWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
+    window.loginWithTwitter = () => signInWithPopup(auth, new TwitterAuthProvider());
 
-    // Edit Profile
     window.openEditProfile = () => {
         document.getElementById('editNameInp').value = userData.displayName || '';
         document.getElementById('editPhotoInp').value = userData.photoURL || '';
@@ -514,25 +459,51 @@
         closeEditModal();
     };
 
-    // Helpers
     window.copyID = () => {
         navigator.clipboard.writeText(userData.customId);
         alert('تم نسخ الـ ID');
     };
 
     async function loadBanners() {
-        // Placeholder implementation
-        document.getElementById('homeBanner').innerHTML = '<div class="text-center font-bold text-2xl text-gray-300">Afnan AI Banner</div>';
+        const bannerEl = document.getElementById('homeBanner');
+        try {
+            const bannerSnap = await getDocs(collection(db, "banners"));
+            if(!bannerSnap.empty) {
+                const bannerData = bannerSnap.docs[0].data();
+                bannerEl.innerHTML = `<img src="${bannerData.image}" class="w-full h-full object-cover">`;
+            } else {
+                bannerEl.innerHTML = '<div class="text-center font-bold text-2xl text-gray-300">Afnan AI</div>';
+            }
+        } catch (e) {
+            bannerEl.innerHTML = '<div class="text-center font-bold text-2xl text-gray-300">Afnan AI</div>';
+        }
     }
 
     async function loadRooms() {
         const grid = document.getElementById('roomsGrid');
-        const snap = await getDocs(collection(db, "rooms"));
-        if(snap.empty) {
-            grid.innerHTML = '<p class="text-center text-gray-400 py-10">لا توجد غرف متاحة</p>';
-            return;
-        }
         grid.innerHTML = '';
+        
+        // غرف ثابتة كما طلب المستخدم
+        const staticRooms = [
+            { name: "خدمة العملاء", description: "دعم فني مباشر", icon: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png" },
+            { name: "وكالة طناخه", description: "أهلاً بكم في وكالتنا", icon: "https://cdn-icons-png.flaticon.com/512/6009/6009864.png" },
+            { name: "روم أحلى أصحاب", description: "تجمع الأصدقاء", icon: "https://cdn-icons-png.flaticon.com/512/3468/3468306.png" }
+        ];
+
+        staticRooms.forEach(r => {
+            grid.innerHTML += `
+                <div class="p-4 rounded-2xl border border-gray-100 bg-white shadow-sm flex items-center gap-4 cursor-pointer hover:shadow-md transition">
+                    <img src="${r.icon}" class="w-12 h-12 rounded-full object-cover">
+                    <div>
+                        <h4 class="font-bold text-black">${r.name}</h4>
+                        <p class="text-xs text-gray-400">${r.description}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        // جلب الغرف من فير بيز أيضاً
+        const snap = await getDocs(collection(db, "rooms"));
         snap.forEach(doc => {
             const r = doc.data();
             grid.innerHTML += `
@@ -546,6 +517,27 @@
             `;
         });
     }
+
+    window.recharge = async (amount) => {
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        const newTotalSpent = (userData.totalSpent || 0) + amount;
+        
+        // حساب المستوى الجديد بناءً على الضعف
+        // ليفل 1: 10000، ليفل 2: 20000، ليفل 3: 40000، ليفل 4: 80000...
+        let newLevel = 1;
+        let threshold = 10000;
+        while (newTotalSpent >= threshold) {
+            newLevel++;
+            threshold *= 2;
+        }
+
+        await updateDoc(userRef, {
+            balance: increment(amount),
+            totalSpent: increment(amount),
+            level: newLevel
+        });
+        alert(`تم شحن ${amount} عملة بنجاح! مستواك الحالي: ${newLevel}`);
+    };
 
     lucide.createIcons();
 </script>
