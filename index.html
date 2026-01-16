@@ -24,7 +24,7 @@
         }
 
         body {
-            background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%);
+            background: radial-gradient(circle at 0% 0%, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
             color: #1f2937;
             overflow-x: hidden;
             min-height: 100vh;
@@ -32,39 +32,39 @@
 
         /* --- iOS Glassmorphism --- */
         .glass {
-            background: rgba(255, 255, 255, 0.75);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.9);
             box-shadow: 
-                0 4px 6px -1px rgba(0, 0, 0, 0.04),
-                0 2px 4px -1px rgba(0, 0, 0, 0.02),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+                0 8px 32px rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5),
+                0 1px 3px 0 rgba(0, 0, 0, 0.03);
         }
 
         .glass-deep {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.92);
             backdrop-filter: blur(25px) saturate(200%);
             -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border-right: 1px solid rgba(255, 255, 255, 0.8);
+            border-right: 1px solid rgba(255, 255, 255, 0.95);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(12px) saturate(180%);
-            -webkit-backdrop-filter: blur(12px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(15px) saturate(180%);
+            -webkit-backdrop-filter: blur(15px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.75);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 
-                0 2px 8px -2px rgba(0, 0, 0, 0.03),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+                0 4px 12px -2px rgba(0, 0, 0, 0.02),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
         }
 
         .glass-card:active {
-            transform: scale(0.97);
+            transform: scale(0.98);
             box-shadow: 
-                0 1px 3px -1px rgba(0, 0, 0, 0.02),
-                inset 0 2px 0 0 rgba(255, 255, 255, 0.3);
+                0 2px 6px -1px rgba(0, 0, 0, 0.01),
+                inset 0 2px 0 0 rgba(255, 255, 255, 0.4);
         }
 
         /* --- Sidebar Animation --- */
@@ -87,9 +87,9 @@
         .sidebar-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
             z-index: 40;
             opacity: 0;
             pointer-events: none;
@@ -117,8 +117,8 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
         }
 
         .user-frame {
@@ -133,11 +133,23 @@
             object-fit: contain;
         }
 
-        /* --- Level Indicators --- */
-        .level-badge {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        /* --- Level Display --- */
+        .level-display {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+        }
+
+        .level-badge-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+            margin-top: 8px;
         }
 
         /* --- General Animations --- */
@@ -148,7 +160,7 @@
         }
 
         .loader {
-            border: 3px solid rgba(0,0,0,0.1);
+            border: 3px solid rgba(0,0,0,0.05);
             border-left-color: #3b82f6;
             border-radius: 50%;
             width: 24px;
@@ -156,14 +168,6 @@
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
 
         /* --- Hide Scrollbar --- */
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -175,12 +179,11 @@
     <!-- ================= AUTH SCREEN ================= -->
     <div id="loginPage" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 fade-in">
         <div class="glass p-8 rounded-[40px] w-full max-w-sm text-center shadow-2xl relative overflow-hidden">
-            <!-- Decorative circle -->
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl"></div>
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/15 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/15 rounded-full blur-2xl"></div>
 
             <div class="relative z-10">
-                <div class="w-20 h-20 bg-white/50 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-inner">
+                <div class="w-20 h-20 bg-white/70 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-inner">
                     <span class="text-4xl">🤖</span>
                 </div>
                 <h1 class="text-3xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">Afnan AI</h1>
@@ -213,12 +216,12 @@
             <!-- VIEW: HOME -->
             <div id="view-home" class="view-section fade-in">
                 <!-- Banner from Firestore -->
-                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group">
+                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm">
                     <!-- Dynamic content loaded from Firestore -->
                 </div>
 
                 <!-- Room Filters -->
-                <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
+                <div class="flex p-1 bg-white/70 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/60">
                     <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
                     <button id="btn-private" onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
                 </div>
@@ -233,11 +236,11 @@
             <div id="view-wallet" class="view-section hidden fade-in">
                 <!-- Card -->
                 <div class="glass-card rounded-[40px] p-8 text-center mb-8 relative overflow-hidden">
-                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/20 rounded-full blur-3xl"></div>
                     <div class="relative z-10">
                         <p class="text-gray-500 text-sm font-semibold mb-2">الرصيد الكلي</p>
                         <h2 class="text-6xl font-black text-gray-900 tracking-tight mb-2" id="walletAmount">0</h2>
-                        <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
+                        <span class="inline-flex items-center gap-1 bg-yellow-100/70 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
                             <i data-lucide="coins" class="w-3 h-3"></i> عملة ذهبية
                         </span>
                     </div>
@@ -245,12 +248,21 @@
 
                 <h3 class="font-bold text-xl mb-4 mr-2">شحن الرصيد</h3>
                 <div class="grid grid-cols-2 gap-4">
-                    <div onclick="recharge(85000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/80">
-                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-2xl">💎</div>
-                        <span class="font-bold text-lg">85,000</span>
-                        <span class="text-gray-400 text-xs">$1</span>
+                    <div onclick="recharge(50000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all">
+                        <div class="w-12 h-12 rounded-full bg-blue-50/70 flex items-center justify-center text-2xl">💎</div>
+                        <span class="font-bold text-lg">50,000</span>
+                        <span class="text-gray-400 text-xs">الفل ١</span>
                     </div>
-                    <!-- Additional recharge options can be added here -->
+                    <div onclick="recharge(100000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all">
+                        <div class="w-12 h-12 rounded-full bg-purple-50/70 flex items-center justify-center text-2xl">👑</div>
+                        <span class="font-bold text-lg">100,000</span>
+                        <span class="text-gray-400 text-xs">الفل ٢</span>
+                    </div>
+                    <div onclick="recharge(300000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all col-span-2">
+                        <div class="w-12 h-12 rounded-full bg-green-50/70 flex items-center justify-center text-2xl">🚀</div>
+                        <span class="font-bold text-lg">300,000</span>
+                        <span class="text-gray-400 text-xs">الفل ٣</span>
+                    </div>
                 </div>
             </div>
 
@@ -271,7 +283,7 @@
                 <div id="bagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
                 
                 <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي المفعلة</h3>
-                <div id="activeBadgesGrid" class="grid grid-cols-4 gap-3 bg-white/40 p-4 rounded-3xl border border-white/50">
+                <div id="activeBadgesGrid" class="level-badge-grid">
                     <!-- Dynamic -->
                 </div>
             </div>
@@ -281,7 +293,7 @@
                 <!-- Search Bar -->
                 <div class="relative mb-6">
                     <input type="text" id="searchUserInput" placeholder="ابحث عن مستخدم بواسطة الـ ID..." 
-                           class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm">
+                           class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm placeholder-gray-400">
                     <button onclick="searchUser()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
@@ -307,15 +319,15 @@
     
     <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
         
-        <!-- Sidebar Header with Edit Button -->
+        <!-- Sidebar Header -->
         <div class="pt-12 px-6 flex justify-between items-start">
              <!-- Close Button -->
-             <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/50 hover:bg-gray-200/50 transition">
+             <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/60 hover:bg-gray-200/60 transition">
                 <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
             </button>
 
             <!-- Edit Profile Button -->
-            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white transition shadow-sm group">
+            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white/90 transition shadow-sm group">
                 <i data-lucide="edit-3" class="w-5 h-5 text-gray-600 group-hover:text-black"></i>
             </button>
         </div>
@@ -331,64 +343,54 @@
             </div>
 
             <!-- Name & ID -->
-            <div class="text-center mb-6">
+            <div class="text-center mb-8">
                 <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
-                <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
+                <div class="inline-flex items-center gap-2 bg-gray-100/60 px-3 py-1 rounded-lg border border-gray-200/60">
                     <span class="text-xs font-bold text-gray-400">ID:</span>
                     <span id="sideID" class="text-sm font-mono font-medium text-gray-600">...</span>
                     <button onclick="copyID()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
                 </div>
             </div>
 
-            <!-- Levels from Firestore -->
-            <div class="flex gap-3 mb-8">
-                <!-- Magic Level -->
-                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-                    <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
-                        <i data-lucide="wand-2" class="w-4 h-4"></i>
-                    </div>
-                    <span class="text-[10px] text-gray-400 font-bold uppercase">السحر</span>
-                    <span id="magicLevelDisplay" class="font-black text-lg text-gray-800">-</span>
+            <!-- Magic Level Image from Firestore -->
+            <div class="mb-6">
+                <div class="level-display">
+                    <img id="magicLevelImage" src="" class="w-full h-full object-contain">
                 </div>
-
-                <!-- Wealth Level -->
-                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-                    <div class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-sm">
-                        <i data-lucide="crown" class="w-4 h-4"></i>
-                    </div>
-                    <span class="text-[10px] text-gray-400 font-bold uppercase">الثروة</span>
-                    <span id="wealthLevelDisplay" class="font-black text-lg text-gray-800">-</span>
+                <!-- Active Badges (5 per row) -->
+                <div id="activeBadgesSidebar" class="level-badge-grid mt-4">
+                    <!-- Dynamic badges will be loaded here -->
                 </div>
             </div>
 
             <!-- Navigation Menu -->
             <nav class="space-y-3">
-                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
                     الرئيسية
                 </button>
-                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
                     المحفظة
                 </button>
-                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
                     المتجر
                 </button>
-                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>
                     حقيبتي
                 </button>
                 <!-- Friends Menu Item -->
-                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50/70 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>
                     أصدقائي
                 </button>
             </nav>
 
             <!-- Footer / Logout -->
             <div class="mt-8">
-                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
+                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/60 text-red-500 font-bold hover:bg-red-100/70 transition flex items-center justify-center gap-2">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                     تسجيل خروج
                 </button>
@@ -406,11 +408,11 @@
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">الاسم الظاهر</label>
-                    <input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center">
+                    <input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/60 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">رابط الصورة</label>
-                    <input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500">
+                    <input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/60 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500">
                 </div>
             </div>
 
@@ -445,8 +447,6 @@
             increment,
             query,
             where,
-            orderBy,
-            limit,
             arrayUnion,
             arrayRemove
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -469,6 +469,7 @@
         // --- 3. State ---
         let userData = {};
         let storeData = { frames: [], badges: [] };
+        let levelImages = { magic: {}, wealth: {} };
         let friendsList = [];
         let currentSearchResult = null;
 
@@ -483,6 +484,7 @@
                     if (docSnap.exists()) {
                         userData = docSnap.data();
                         await updateUI();
+                        await loadLevelImages();
                         await loadFriends();
                     } else {
                         await createUserDoc(user);
@@ -492,6 +494,7 @@
                 // Load Initial Data
                 await loadBanner();
                 await loadStoreData();
+                await loadLevelsData();
                 await loadRooms();
             } else {
                 document.getElementById('loginPage').classList.remove('hidden');
@@ -520,17 +523,75 @@
             });
         }
 
-        // --- 5. UI Updates ---
+        // --- 5. Level Images Loading ---
+        async function loadLevelsData() {
+            try {
+                // Load Magic Levels
+                const magicSnap = await getDocs(collection(db, "magicLevels"));
+                magicSnap.forEach(doc => {
+                    levelImages.magic[doc.id] = doc.data().image;
+                });
+
+                // Load Wealth Levels
+                const wealthSnap = await getDocs(collection(db, "wealthLevels"));
+                wealthSnap.forEach(doc => {
+                    levelImages.wealth[doc.id] = doc.data().image;
+                });
+            } catch (error) {
+                console.error("Error loading levels:", error);
+            }
+        }
+
+        async function loadLevelImages() {
+            const magicLevel = userData.magicLevel || 1;
+            const magicImage = levelImages.magic[magicLevel];
+            
+            if (magicImage) {
+                document.getElementById('magicLevelImage').src = magicImage;
+            } else {
+                // Default image if not found
+                document.getElementById('magicLevelImage').src = "https://via.placeholder.com/120x120/3b82f6/ffffff?text=Level+" + magicLevel;
+            }
+        }
+
+        // --- 6. Active Badges Display ---
+        function updateActiveBadges() {
+            const badgesContainer = document.getElementById('activeBadgesSidebar');
+            const activeBadges = userData.activeBadges || [];
+            
+            badgesContainer.innerHTML = '';
+            
+            if (activeBadges.length === 0) {
+                badgesContainer.innerHTML = `
+                    <div class="col-span-5 text-center py-4">
+                        <p class="text-gray-400 text-xs">لا توجد شارات مفعلة</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group badges by 5 per row
+            for (let i = 0; i < activeBadges.length; i++) {
+                const badgeId = activeBadges[i];
+                const badge = storeData.badges.find(b => b.id === badgeId);
+                
+                if (badge) {
+                    badgesContainer.innerHTML += `
+                        <div class="aspect-square rounded-xl flex items-center justify-center bg-white/70 border border-white/80 shadow-sm">
+                            <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // --- 7. UI Updates ---
         async function updateUI() {
             // Sidebar
             document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
             document.getElementById('sideID').innerText = userData.customId || "000000";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
-            
-            // Levels from Firestore
-            document.getElementById('magicLevelDisplay').innerText = userData.magicLevel || "-";
-            document.getElementById('wealthLevelDisplay').innerText = userData.wealthLevel || "-";
 
             // Frame Logic
             const frameEl = document.getElementById('sideFrame');
@@ -545,9 +606,12 @@
             } else {
                 frameEl.classList.add('hidden');
             }
+
+            // Update Active Badges
+            updateActiveBadges();
         }
 
-        // --- 6. Load Banner from Firestore ---
+        // --- 8. Load Banner from Firestore ---
         async function loadBanner() {
             try {
                 const bannerDoc = await getDoc(doc(db, "appData", "banner"));
@@ -556,23 +620,23 @@
                 if (bannerDoc.exists()) {
                     const banner = bannerDoc.data();
                     bannerContainer.innerHTML = `
-                        <div class="absolute inset-0 bg-gradient-to-r ${banner.gradient || 'from-blue-50 to-purple-50'} opacity-80"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r ${banner.gradient || 'from-blue-50/80 to-purple-50/80'}"></div>
                         <img src="${banner.image || 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop'}" 
-                             class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
+                             class="absolute inset-0 w-full h-full object-cover opacity-40">
                         <div class="relative z-10 text-center p-6">
                             <h3 class="font-black text-2xl text-gray-800 mb-1">${banner.title || 'Afnan AI'}</h3>
-                            <p class="text-sm text-gray-500 font-medium">${banner.subtitle || 'مرحباً بك في عالمك الجديد'}</p>
+                            <p class="text-sm text-gray-600 font-medium">${banner.subtitle || 'مرحباً بك في عالمك الجديد'}</p>
                         </div>
                     `;
                 } else {
                     // Default banner
                     bannerContainer.innerHTML = `
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 opacity-80"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50/80 to-purple-50/80"></div>
                         <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop" 
-                             class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
+                             class="absolute inset-0 w-full h-full object-cover opacity-40">
                         <div class="relative z-10 text-center">
                             <h3 class="font-black text-2xl text-gray-800 mb-1">Afnan AI</h3>
-                            <p class="text-sm text-gray-500 font-medium">مرحباً بك في عالمك الجديد</p>
+                            <p class="text-sm text-gray-600 font-medium">مرحباً بك في عالمك الجديد</p>
                         </div>
                     `;
                 }
@@ -581,7 +645,7 @@
             }
         }
 
-        // --- 7. Store Logic ---
+        // --- 9. Store Logic ---
         async function loadStoreData() {
             try {
                 // Fetch Frames
@@ -611,7 +675,6 @@
                 grid.innerHTML = `
                     <div class="col-span-2 text-center py-8">
                         <p class="text-gray-400 mb-2">لا توجد عناصر في المتجر</p>
-                        <p class="text-xs text-gray-300">قم بإضافة عناصر في Firestore</p>
                     </div>
                 `;
                 return;
@@ -628,7 +691,7 @@
                             </div>
                         ` : ''}
                         <div class="w-full flex justify-center mb-2">
-                            <img src="${item.image}" class="w-16 h-16 object-contain drop-shadow-sm">
+                            <img src="${item.image}" class="w-16 h-16 object-contain">
                         </div>
                         <h4 class="font-bold text-sm text-center mb-2 leading-tight">${item.name}</h4>
                         ${alreadyPurchased ? 
@@ -636,7 +699,7 @@
                                 مملوك ✓
                             </button>` :
                             `<button onclick="buyItem('${type}', '${item.id}', ${item.price})" 
-                                class="w-full py-2 bg-gray-900 text-white text-xs font-bold rounded-xl shadow-md hover:bg-gray-700 transition">
+                                class="w-full py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition">
                                 ${item.price} 💰 شراء
                             </button>`
                         }
@@ -670,38 +733,27 @@
                 // Success feedback
                 const btn = event.target;
                 btn.innerHTML = 'تم الشراء ✓';
-                btn.classList.remove('bg-gray-900', 'hover:bg-gray-700');
+                btn.classList.remove('bg-gray-900', 'hover:bg-gray-800');
                 btn.classList.add('bg-green-500', 'cursor-not-allowed');
-                setTimeout(() => loadStoreItems(type === 'frames' ? 'frames' : 'badges'), 1000);
             } catch (e) {
                 console.error(e);
                 alert("حدث خطأ أثناء الشراء");
             }
         };
 
-        // --- 8. Bag Logic with Frame Validation ---
+        // --- 10. Bag Logic ---
         function loadBagItems() {
             const grid = document.getElementById('bagGrid');
             grid.innerHTML = '';
             
             const frames = userData.purchasedFrames || [];
             
-            // Clean up expired or non-existent frames
+            // Clean up invalid frames
             const validFrames = frames.filter(frame => {
                 const frameExists = storeData.frames.find(f => f.id === frame.id);
                 if (!frameExists) {
-                    // Remove from user's purchased frames if doesn't exist in store
                     removeInvalidFrame(frame.id);
                     return false;
-                }
-                
-                // Check expiration if exists
-                if (frame.expiresAt) {
-                    const isExpired = new Date(frame.expiresAt) < new Date();
-                    if (isExpired) {
-                        removeInvalidFrame(frame.id);
-                        return false;
-                    }
                 }
                 return true;
             });
@@ -725,7 +777,7 @@
                 grid.innerHTML += `
                     <div onclick="equipFrame('${f.id}')" 
                          class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer transition-all duration-200 
-                                ${isEquipped ? 'border-2 border-blue-500 bg-blue-50/50 shadow-inner' : 'border border-white/50 hover:bg-white/70 hover:scale-105'}">
+                                ${isEquipped ? 'border-2 border-blue-500 bg-blue-50/60' : 'border border-white/60 hover:bg-white/80 hover:scale-105'}">
                         <img src="${itemDetails.image}" class="w-10 h-10 mb-2 object-contain">
                         <span class="text-[10px] font-bold ${isEquipped ? 'text-blue-600' : 'text-gray-500'}">
                             ${isEquipped ? 'مستخدم ✓' : 'استخدام'}
@@ -734,14 +786,14 @@
                 `;
             });
 
-            // Active Badges
+            // Active Badges (5 per row)
             const badgeGrid = document.getElementById('activeBadgesGrid');
             badgeGrid.innerHTML = '';
             const badges = userData.purchasedBadges || [];
             
             if(badges.length === 0) {
                 badgeGrid.innerHTML = `
-                    <div class="col-span-4 text-center py-4">
+                    <div class="col-span-5 text-center py-4">
                         <p class="text-gray-400 text-xs">لا تملك شارات</p>
                     </div>
                 `;
@@ -756,8 +808,8 @@
                 badgeGrid.innerHTML += `
                     <div onclick="toggleBadge('${b.id}')" 
                          class="aspect-square rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200
-                                ${isActive ? 'bg-blue-100 border-2 border-blue-400 shadow-inner' : 'bg-white/50 border border-white/70 hover:bg-white/80 hover:scale-105'}">
-                        <img src="${itemDetails.image}" class="w-6 h-6 object-contain ${isActive ? '' : 'opacity-50'}">
+                                ${isActive ? 'bg-blue-100/80 border-2 border-blue-400' : 'bg-white/60 border border-white/80 hover:bg-white/80 hover:scale-105'}">
+                        <img src="${itemDetails.image}" class="w-8 h-8 object-contain ${isActive ? '' : 'opacity-50'}">
                     </div>
                 `;
             });
@@ -773,7 +825,7 @@
             }
         }
 
-        // --- 9. Friends System ---
+        // --- 11. Friends System ---
         async function loadFriends() {
             try {
                 const friendsListEl = document.getElementById('friendsList');
@@ -870,8 +922,6 @@
                         <div>
                             <h4 class="font-bold text-lg">${user.displayName || 'مستخدم'}</h4>
                             <p class="text-sm text-gray-500">ID: ${user.customId || '000000'}</p>
-                            ${user.magicLevel ? `<p class="text-xs text-blue-600">مستوى السحر: ${user.magicLevel}</p>` : ''}
-                            ${user.wealthLevel ? `<p class="text-xs text-yellow-600">مستوى الثروة: ${user.wealthLevel}</p>` : ''}
                         </div>
                     </div>
                     ${isSelf ? 
@@ -943,7 +993,7 @@
             }
         };
 
-        // --- 10. View Switching ---
+        // --- 12. View Switching ---
         window.switchView = (viewName) => {
             document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
             document.getElementById('view-' + viewName).classList.remove('hidden');
@@ -979,7 +1029,7 @@
             await updateDoc(doc(db, "users", auth.currentUser.uid), { activeBadges: actives });
         };
 
-        // --- 11. Rooms Logic ---
+        // --- 13. Rooms Logic ---
         async function loadRooms() {
             const grid = document.getElementById('roomsGrid');
             try {
@@ -1038,7 +1088,7 @@
             }
         };
 
-        // --- 12. Helpers & Sidebar ---
+        // --- 14. Helpers & Sidebar ---
         window.toggleSidebar = (show) => {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
