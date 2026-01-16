@@ -13,11 +13,6 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
     <style>
         /* --- Base Settings --- */
@@ -29,7 +24,7 @@
         }
 
         body {
-            background: radial-gradient(circle at 0% 0%, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+            background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%);
             color: #1f2937;
             overflow-x: hidden;
             min-height: 100vh;
@@ -37,43 +32,39 @@
 
         /* --- iOS Glassmorphism --- */
         .glass {
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(25px) saturate(200%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.95);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.04),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.6),
-                0 1px 3px 0 rgba(0, 0, 0, 0.02);
+                0 4px 6px -1px rgba(0, 0, 0, 0.04),
+                0 2px 4px -1px rgba(0, 0, 0, 0.02),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
         }
 
         .glass-deep {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(30px) saturate(220%);
-            -webkit-backdrop-filter: blur(30px) saturate(220%);
-            border: 1px solid rgba(255, 255, 255, 0.98);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-right: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 
-                0 4px 16px -4px rgba(0, 0, 0, 0.02),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
-        }
-
-        .glass-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 8px 24px -4px rgba(0, 0, 0, 0.04),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.8);
+                0 2px 8px -2px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
         }
 
         .glass-card:active {
-            transform: scale(0.98);
+            transform: scale(0.97);
+            box-shadow: 
+                0 1px 3px -1px rgba(0, 0, 0, 0.02),
+                inset 0 2px 0 0 rgba(255, 255, 255, 0.3);
         }
 
         /* --- Sidebar Animation --- */
@@ -97,8 +88,8 @@
             position: fixed;
             inset: 0;
             background: rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             z-index: 40;
             opacity: 0;
             pointer-events: none;
@@ -110,7 +101,7 @@
             pointer-events: auto;
         }
 
-        /* --- Avatar & Frame --- */
+        /* --- Avatar & Frame Logic --- */
         .avatar-wrapper {
             position: relative;
             width: 100px;
@@ -126,8 +117,8 @@
             height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.95);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         .user-frame {
@@ -142,97 +133,22 @@
             object-fit: contain;
         }
 
-        /* --- Level Display --- */
-        .level-display {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .level-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1));
-        }
-
-        /* --- Chat Bubbles --- */
-        .chat-bubble {
-            max-width: 75%;
-            padding: 12px 16px;
-            border-radius: 20px;
-            position: relative;
-            animation: bubbleAppear 0.3s ease-out;
-        }
-
-        .chat-bubble.sent {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 4px;
-        }
-
-        .chat-bubble.received {
-            background: rgba(255, 255, 255, 0.9);
-            color: #1f2937;
-            margin-right: auto;
-            border-bottom-left-radius: 4px;
-        }
-
-        /* --- Gift Animations --- */
-        @keyframes giftFloat {
-            0% { transform: translateY(100px) scale(0.3); opacity: 0; }
-            20% { transform: translateY(-50px) scale(1.2); opacity: 1; }
-            40% { transform: translateY(-100px) scale(1); opacity: 1; }
-            60% { transform: translateY(-100px) rotate(180deg) scale(1); opacity: 1; }
-            80% { transform: translateY(50px) rotate(360deg) scale(0.8); opacity: 0.8; }
-            100% { transform: translateY(100px) scale(0.5); opacity: 0; }
-        }
-
-        @keyframes giftShine {
-            0% { background-position: -200% center; }
-            100% { background-position: 200% center; }
-        }
-
-        .gift-animation {
-            animation: giftFloat 3s ease-in-out forwards;
-        }
-
-        .gift-shine {
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255,255,255,0.8) 50%, 
-                transparent 100%);
-            background-size: 200% 100%;
-            animation: giftShine 2s ease-in-out infinite;
+        /* --- Level Indicators --- */
+        .level-badge {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
         /* --- General Animations --- */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes bubbleAppear {
-            from { opacity: 0; transform: translateY(10px) scale(0.9); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        .slide-up { animation: slideUp 0.4s cubic-bezier(0.33, 1, 0.68, 1) forwards; }
-
-        /* --- Loader --- */
         .loader {
-            border: 3px solid rgba(0,0,0,0.05);
+            border: 3px solid rgba(0,0,0,0.1);
             border-left-color: #3b82f6;
             border-radius: 50%;
             width: 24px;
@@ -241,9 +157,38 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
+        /* --- Gift Animation --- */
+        @keyframes giftFly {
+            0% { transform: translate(-50%, 100%) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(150%, -150%) scale(0.5); opacity: 0; }
+        }
+        .gift-animation {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            z-index: 100;
+            pointer-events: none;
+            animation: giftFly 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
         /* --- Hide Scrollbar --- */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- Chat Styles --- */
+        .chat-bubble-me {
+            background: #1f2937;
+            color: white;
+            border-radius: 20px 20px 4px 20px;
+        }
+        .chat-bubble-them {
+            background: white;
+            color: #1f2937;
+            border-radius: 20px 20px 20px 4px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-100 selection:text-blue-900">
@@ -251,27 +196,29 @@
     <!-- ================= AUTH SCREEN ================= -->
     <div id="loginPage" class="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 fade-in">
         <div class="glass p-8 rounded-[40px] w-full max-w-sm text-center shadow-2xl relative overflow-hidden">
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/15 rounded-full blur-2xl"></div>
-            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/15 rounded-full blur-2xl"></div>
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-400/20 rounded-full blur-2xl"></div>
 
             <div class="relative z-10">
-                <div class="w-20 h-20 bg-white/80 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-inner">
+                <div class="w-20 h-20 bg-white/50 rounded-2xl mx-auto mb-6 flex items-center justify-center shadow-inner">
                     <span class="text-4xl">🤖</span>
                 </div>
                 <h1 class="text-3xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-gray-800 to-gray-600">Afnan AI</h1>
                 <p class="text-gray-500 mb-8 font-medium">تجربة المستقبل، ببساطة وأناقة.</p>
                 
                 <div class="space-y-3">
-                    <button onclick="loginWithTwitter()" class="w-full py-4 rounded-2xl bg-[#1DA1F2] text-white font-bold text-lg shadow-lg hover:bg-[#1a8cd8] transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
+                    <button onclick="loginWithTwitter()" class="w-full py-4 rounded-2xl bg-black text-white font-bold text-lg shadow-lg hover:bg-gray-900 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
                         </svg>
                         دخول عبر تويتر
                     </button>
-                    
-                    <button onclick="loginWithGoogle()" class="w-full py-4 rounded-2xl bg-white text-gray-800 font-bold text-lg shadow-lg hover:bg-gray-50 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3 border border-gray-200">
+                    <button onclick="loginWithGoogle()" class="w-full py-4 rounded-2xl bg-white border border-gray-200 text-gray-700 font-bold text-lg shadow-sm hover:bg-gray-50 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-3">
                         <svg class="w-5 h-5" viewBox="0 0 24 24">
-                            <path fill="currentColor" d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z"/>
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                         </svg>
                         دخول عبر جوجل
                     </button>
@@ -286,19 +233,9 @@
         <!-- HEADER -->
         <header class="fixed top-0 left-0 right-0 h-20 z-30 px-6 flex items-center justify-between glass">
             <h2 id="pageTitle" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">الرئيسية</h2>
-            <div class="flex items-center gap-3">
-                <!-- Gift Box Button -->
-                <button onclick="openGiftBox()" class="relative">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-yellow-500">
-                        <i data-lucide="gift" class="w-6 h-6"></i>
-                    </div>
-                </button>
-                
-                <!-- Menu Button -->
-                <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition">
-                    <i data-lucide="menu" class="text-black w-6 h-6"></i>
-                </button>
-            </div>
+            <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition">
+                <i data-lucide="menu" class="text-black w-6 h-6"></i>
+            </button>
         </header>
 
         <!-- VIEW CONTAINER -->
@@ -306,48 +243,31 @@
 
             <!-- VIEW: HOME -->
             <div id="view-home" class="view-section fade-in">
-                <!-- Banner from Firestore -->
-                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden">
-                    <!-- Dynamic content loaded from Firestore -->
-                </div>
-
-                <!-- Room Filters -->
-                <div class="flex p-1 bg-white/80 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/70">
+                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
+                <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
                     <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
                     <button id="btn-private" onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
                 </div>
-
-                <!-- Rooms List -->
-                <div id="roomsGrid" class="space-y-3">
-                    <div class="flex justify-center py-10"><div class="loader"></div></div>
-                </div>
+                <div id="roomsGrid" class="space-y-3"></div>
             </div>
 
             <!-- VIEW: WALLET -->
             <div id="view-wallet" class="view-section hidden fade-in">
-                <!-- Card -->
                 <div class="glass-card rounded-[40px] p-8 text-center mb-8 relative overflow-hidden">
-                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/20 rounded-full blur-3xl"></div>
+                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl"></div>
                     <div class="relative z-10">
                         <p class="text-gray-500 text-sm font-semibold mb-2">الرصيد الكلي</p>
                         <h2 class="text-6xl font-black text-gray-900 tracking-tight mb-2" id="walletAmount">0</h2>
-                        <span class="inline-flex items-center gap-1 bg-yellow-100/80 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
+                        <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
                             <i data-lucide="coins" class="w-3 h-3"></i> عملة ذهبية
                         </span>
                     </div>
                 </div>
-
                 <h3 class="font-bold text-xl mb-4 mr-2">شحن الرصيد</h3>
                 <div class="grid grid-cols-2 gap-4">
-                    <div onclick="recharge(85000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all">
-                        <div class="w-12 h-12 rounded-full bg-blue-50/80 flex items-center justify-center text-2xl">💎</div>
-                        <span class="font-bold text-lg">85,000</span>
+                    <div onclick="recharge(85000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition">
+                        <span class="text-2xl font-black text-gray-900">85,000</span>
                         <span class="text-gray-400 text-xs">$1</span>
-                    </div>
-                    <div onclick="recharge(170000)" class="glass-card p-5 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white/90 transition-all">
-                        <div class="w-12 h-12 rounded-full bg-purple-50/80 flex items-center justify-center text-2xl">👑</div>
-                        <span class="font-bold text-lg">170,000</span>
-                        <span class="text-gray-400 text-xs">$2</span>
                     </div>
                 </div>
             </div>
@@ -355,278 +275,151 @@
             <!-- VIEW: STORE -->
             <div id="view-store" class="view-section hidden fade-in">
                 <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2">
-                    <button onclick="loadStoreItems('frames')" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
-                    <button onclick="loadStoreItems('badges')" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
+                    <button onclick="loadStoreItems('frames')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
+                    <button onclick="loadStoreItems('badges')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
                 </div>
-                <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20">
-                    <!-- Dynamic -->
-                </div>
+                <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
             </div>
 
             <!-- VIEW: BAG -->
             <div id="view-bag" class="view-section hidden fade-in">
                 <h3 class="font-bold text-lg mb-4 text-gray-800">إطاراتي</h3>
                 <div id="bagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
-                
                 <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي</h3>
-                <div id="activeBadgesGrid" class="grid grid-cols-5 gap-2">
-                    <!-- Dynamic -->
-                </div>
+                <div id="badgesBagGrid" class="grid grid-cols-4 gap-3"></div>
             </div>
 
             <!-- VIEW: FRIENDS -->
             <div id="view-friends" class="view-section hidden fade-in">
-                <!-- Search Bar -->
                 <div class="relative mb-6">
                     <input type="text" id="searchUserInput" placeholder="ابحث عن مستخدم بواسطة الـ ID..." 
-                           class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm placeholder-gray-400">
+                           class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm">
                     <button onclick="searchUser()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                         <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
                 </div>
-
-                <!-- Search Results -->
                 <div id="searchResults" class="space-y-3 mb-8 hidden">
                     <h3 class="font-bold text-lg text-gray-800">نتائج البحث</h3>
                     <div id="userResult" class="glass-card p-4 rounded-3xl"></div>
                 </div>
-
-                <!-- Friends List -->
                 <h3 class="font-bold text-lg mb-4 text-gray-800">أصدقائي</h3>
-                <div id="friendsList" class="space-y-3">
-                    <!-- Dynamic friends list -->
-                </div>
+                <div id="friendsList" class="space-y-3"></div>
             </div>
-
-            <!-- VIEW: CHAT -->
-            <div id="view-chat" class="view-section hidden fade-in">
-                <!-- Chat Header -->
-                <div class="flex items-center gap-3 mb-6">
-                    <button onclick="switchView('friends')" class="p-2 rounded-full hover:bg-gray-100/50 transition">
-                        <i data-lucide="arrow-right" class="w-5 h-5 text-gray-600"></i>
-                    </button>
-                    <div class="flex items-center gap-3 flex-1">
-                        <img id="chatFriendAvatar" src="" class="w-12 h-12 rounded-full object-cover border-2 border-white">
-                        <div>
-                            <h3 id="chatFriendName" class="font-bold text-lg">...</h3>
-                            <p id="chatFriendStatus" class="text-xs text-gray-500">...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chat Messages Container -->
-                <div id="chatMessages" class="space-y-4 mb-24 max-h-[60vh] overflow-y-auto no-scrollbar">
-                    <!-- Messages will be loaded here -->
-                </div>
-
-                <!-- Chat Input -->
-                <div class="fixed bottom-4 left-4 right-4">
-                    <div class="flex gap-2 glass-card p-2 rounded-2xl">
-                        <input type="text" id="chatInput" placeholder="اكتب رسالتك..." 
-                               class="flex-1 bg-transparent border-0 focus:ring-0 focus:outline-none px-4 py-3">
-                        <button onclick="sendMessage()" class="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition">
-                            <i data-lucide="send" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
         </main>
     </div>
 
-    <!-- ================= SIDEBAR (OFF CANVAS) ================= -->
+    <!-- ================= SIDEBAR ================= -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
-    
     <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
-        
-        <!-- Sidebar Header -->
         <div class="pt-12 px-6 flex justify-between items-start">
-            <!-- Close Button -->
-            <button onclick="toggleSidebar(false)" class="p-2 rounded-full hover:bg-gray-100/50 transition">
-                <i data-lucide="x" class="text-black w-5 h-5"></i>
+             <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/50 hover:bg-gray-200/50 transition">
+                <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
             </button>
-
-            <!-- Edit Profile Button -->
-            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white/90 transition shadow-sm group">
+            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white transition shadow-sm group">
                 <i data-lucide="edit-3" class="w-5 h-5 text-gray-600 group-hover:text-black"></i>
             </button>
         </div>
-
         <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-2 pb-10">
-            
-            <!-- Avatar & Frame -->
             <div class="mb-6 mt-4">
                 <div class="avatar-wrapper">
                     <img id="sideAvatar" src="https://via.placeholder.com/150" class="avatar-img">
                     <img id="sideFrame" src="" class="user-frame hidden">
                 </div>
             </div>
-
-            <!-- Name & ID -->
-            <div class="text-center mb-8">
+            <div class="text-center mb-6">
                 <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
-                <div class="inline-flex items-center gap-2 bg-gray-100/70 px-3 py-1 rounded-lg border border-gray-200/70">
+                <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
                     <span class="text-xs font-bold text-gray-400">ID:</span>
                     <span id="sideID" class="text-sm font-mono font-medium text-gray-600">...</span>
                     <button onclick="copyID()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
                 </div>
             </div>
-
-            <!-- Levels from Firestore -->
-            <div class="mb-6 flex justify-center gap-4">
-                <!-- Magic Level -->
-                <div class="level-display">
-                    <img id="magicLevelImage" src="" class="level-image">
+            <div class="flex gap-3 mb-8">
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
+                        <img id="magicLevelImg" src="" class="w-full h-full object-contain hidden">
+                        <i id="magicLevelIcon" data-lucide="wand-2" class="w-5 h-5 text-blue-400"></i>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">السحر</span>
+                    <span id="magicLevelDisplay" class="font-black text-lg text-gray-800">-</span>
                 </div>
-                
-                <!-- Wealth Level -->
-                <div class="level-display">
-                    <img id="wealthLevelImage" src="" class="level-image">
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center overflow-hidden">
+                        <img id="wealthLevelImg" src="" class="w-full h-full object-contain hidden">
+                        <i id="wealthLevelIcon" data-lucide="crown" class="w-5 h-5 text-yellow-400"></i>
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase">الثروة</span>
+                    <span id="wealthLevelDisplay" class="font-black text-lg text-gray-800">-</span>
                 </div>
             </div>
-
-            <!-- Active Badges -->
-            <div id="activeBadgesSidebar" class="grid grid-cols-5 gap-2 mb-6">
-                <!-- Dynamic badges will be loaded here -->
-            </div>
-
-            <!-- Navigation Menu -->
             <nav class="space-y-3">
-                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/80 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
                     الرئيسية
                 </button>
-                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/80 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
                     المحفظة
                 </button>
-                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/80 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
                     المتجر
                 </button>
-                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/80 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>
                     حقيبتي
                 </button>
-                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white/90 hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50/80 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>
+                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>
                     أصدقائي
                 </button>
             </nav>
-
-            <!-- Footer / Logout -->
             <div class="mt-8">
-                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/70 text-red-500 font-bold hover:bg-red-100/80 transition flex items-center justify-center gap-2">
+                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
                     <i data-lucide="log-out" class="w-5 h-5"></i>
                     تسجيل خروج
                 </button>
             </div>
-
         </div>
     </aside>
 
-    <!-- ================= GIFT BOX MODAL ================= -->
-    <div id="giftModal" class="fixed inset-0 z-[60] hidden flex items-end justify-center px-4">
-        <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeGiftBox()"></div>
-        
-        <div class="relative w-full max-w-lg glass-deep rounded-t-[40px] p-6 shadow-2xl slide-up" style="height: 25vh;">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-center font-bold text-xl flex-1">🎁 صندوق الهدايا</h3>
-                <button onclick="closeGiftBox()" class="p-2 rounded-full hover:bg-gray-100/50 transition">
-                    <i data-lucide="x" class="w-5 h-5 text-gray-600"></i>
-                </button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <!-- Luck Gifts -->
-                <button onclick="openLuckGift()" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center gap-3 hover:bg-white/90 transition-all">
-                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-2xl shadow-lg">
-                        🎲
+    <!-- ================= CHAT MODAL ================= -->
+    <div id="chatModal" class="fixed inset-0 z-[60] hidden flex flex-col bg-gray-50">
+        <header class="h-20 glass flex items-center px-6 justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="closeChat()" class="p-2 rounded-full hover:bg-gray-100"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                <div class="flex items-center gap-2">
+                    <img id="chatUserAvatar" src="" class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <h4 id="chatUserName" class="font-bold text-sm">...</h4>
+                        <p class="text-[10px] text-green-500 font-bold">متصل الآن</p>
                     </div>
-                    <div class="text-center">
-                        <h4 class="font-bold text-sm mb-1">هدايا الحظ</h4>
-                        <p class="text-xs text-gray-500">1x, 10x, 100x</p>
-                    </div>
-                </button>
-
-                <!-- Fixed Gifts -->
-                <button onclick="openFixedGifts()" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center gap-3 hover:bg-white/90 transition-all">
-                    <div class="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-2xl shadow-lg">
-                        🎁
-                    </div>
-                    <div class="text-center">
-                        <h4 class="font-bold text-sm mb-1">هدايا ثابتة</h4>
-                        <p class="text-xs text-gray-500">اختر هديتك</p>
-                    </div>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ================= LUCK GIFTS MODAL ================= -->
-    <div id="luckGiftModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeLuckGift()"></div>
-        
-        <div class="relative w-full max-w-sm glass-deep rounded-[40px] p-8 shadow-2xl text-center fade-in">
-            <h3 class="font-bold text-xl mb-6">🎲 هدايا الحظ</h3>
-            <p class="text-gray-600 mb-6">اختر هدية الحظ وحظك يحدد المردود!</p>
-            
-            <div class="grid grid-cols-3 gap-4 mb-6">
-                <button onclick="claimLuckGift(1)" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center gap-2 hover:bg-white/90 transition-all">
-                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-xl">1x</div>
-                    <span class="font-bold text-sm">مضاعف x1</span>
-                </button>
-                <button onclick="claimLuckGift(10)" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center gap-2 hover:bg-white/90 transition-all">
-                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-xl">10x</div>
-                    <span class="font-bold text-sm">مضاعف x10</span>
-                </button>
-                <button onclick="claimLuckGift(100)" class="glass-card p-4 rounded-3xl flex flex-col items-center justify-center gap-2 hover:bg-white/90 transition-all">
-                    <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-xl">100x</div>
-                    <span class="font-bold text-sm">مضاعف x100</span>
-                </button>
-            </div>
-            
-            <p class="text-sm text-gray-500 mb-4">كل ما زاد الحظ زاد المردود!</p>
-            
-            <button onclick="closeLuckGift()" class="w-full py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition">
-                إلغاء
-            </button>
-        </div>
-    </div>
-
-    <!-- ================= FIXED GIFTS MODAL ================= -->
-    <div id="fixedGiftsModal" class="fixed inset-0 z-[70] hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeFixedGifts()"></div>
-        
-        <div class="relative w-full max-w-lg glass-deep rounded-[40px] p-6 shadow-2xl fade-in">
-            <h3 class="font-bold text-xl mb-6 text-center">🎁 الهدايا الثابتة</h3>
-            
-            <div id="fixedGiftsGrid" class="grid grid-cols-3 gap-4 max-h-[50vh] overflow-y-auto no-scrollbar">
-                <!-- Dynamic gifts will be loaded here -->
-            </div>
-            
-            <button onclick="closeFixedGifts()" class="w-full py-3 mt-6 rounded-2xl bg-gray-100 text-gray-600 font-bold hover:bg-gray-200 transition">
-                إلغاء
-            </button>
-        </div>
-    </div>
-
-    <!-- ================= GIFT ANIMATION CONTAINER ================= -->
-    <div id="giftAnimationContainer" class="fixed inset-0 z-[80] pointer-events-none hidden">
-        <!-- Gift animation will be played here -->
-    </div>
-
-    <!-- ================= GIFT RECEIVED NOTIFICATION ================= -->
-    <div id="giftNotification" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[90] hidden">
-        <div class="glass-card px-6 py-4 rounded-2xl shadow-2xl text-center min-w-[300px] fade-in">
-            <div class="flex items-center justify-center gap-3 mb-2">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
-                    <i data-lucide="gift" class="w-5 h-5 text-white"></i>
                 </div>
-                <h4 class="font-bold text-lg">🎉 هدية جديدة!</h4>
             </div>
-            <p id="giftMessage" class="text-gray-700 mb-2"></p>
-            <p id="giftReward" class="font-bold text-green-600"></p>
+            <button onclick="toggleGiftBox(true)" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
+        </header>
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar"></div>
+        <div class="p-4 glass flex gap-2 items-center">
+            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." class="flex-1 p-4 rounded-2xl bg-white border-0 focus:ring-0 text-sm">
+            <button onclick="sendMessage()" class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg"><i data-lucide="send" class="w-5 h-5"></i></button>
+        </div>
+    </div>
+
+    <!-- ================= GIFT BOX ================= -->
+    <div id="giftBox" class="fixed inset-x-0 bottom-0 z-[70] hidden flex flex-col">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="toggleGiftBox(false)"></div>
+        <div class="relative bg-white rounded-t-[40px] h-[45vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-6 flex justify-between items-center border-b border-gray-100">
+                <div class="flex gap-4">
+                    <button onclick="switchGiftTab('fixed')" id="tab-fixed" class="font-bold text-black border-b-2 border-black pb-1">هدايا ثابتة</button>
+                    <button onclick="switchGiftTab('luck')" id="tab-luck" class="font-bold text-gray-400 pb-1">هدايا الحظ</button>
+                </div>
+                <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                    <i data-lucide="coins" class="w-3 h-3 text-yellow-600"></i>
+                    <span id="giftWalletBalance" class="text-xs font-bold text-yellow-700">0</span>
+                </div>
+            </div>
+            <div id="giftGrid" class="flex-1 overflow-y-auto p-6 grid grid-cols-4 gap-4 no-scrollbar"></div>
         </div>
     </div>
 
@@ -635,18 +428,16 @@
         <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeEditModal()"></div>
         <div class="relative w-full max-w-sm glass-deep rounded-[40px] p-6 shadow-2xl fade-in">
             <h3 class="text-center font-bold text-xl mb-6">تعديل الملف</h3>
-            
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">الاسم الظاهر</label>
-                    <input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/70 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center">
+                    <input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">رابط الصورة</label>
-                    <input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/70 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500">
+                    <input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500">
                 </div>
             </div>
-
             <div class="flex gap-3 mt-8">
                 <button onclick="closeEditModal()" class="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200">إلغاء</button>
                 <button onclick="saveProfileChanges()" class="flex-1 py-3 rounded-2xl bg-black text-white font-bold hover:shadow-lg hover:-translate-y-1 transition">حفظ</button>
@@ -655,70 +446,58 @@
     </div>
 
     <!-- ================= SCRIPTS ================= -->
-    <script>
-        // Firebase Configuration
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
             authDomain: "rtx3090-28439.firebaseapp.com",
             projectId: "rtx3090-28439",
             storageBucket: "rtx3090-28439.firebasestorage.app",
             messagingSenderId: "178612030690",
-            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb"
+            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
         };
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+        const twitterProvider = new TwitterAuthProvider();
+        const googleProvider = new GoogleAuthProvider();
 
-        // Providers
-        const twitterProvider = new firebase.auth.TwitterAuthProvider();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
-
-        // State
         let userData = {};
-        let storeData = { frames: [], badges: [], gifts: [] };
-        let levelImages = { magic: {}, wealth: {} };
-        let friendsList = [];
+        let storeData = { frames: [], badges: [], gifts: [], magicLevels: {}, wealthLevels: {} };
         let currentChatFriend = null;
-        let messagesListener = null;
+        let chatUnsubscribe = null;
 
-        // --- 1. AUTHENTICATION ---
-        auth.onAuthStateChanged(async (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 document.getElementById('loginPage').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                
-                // Real-time listener for user data
-                db.collection("users").doc(user.uid).onSnapshot(async (docSnap) => {
+                onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
                     if (docSnap.exists()) {
                         userData = docSnap.data();
                         await updateUI();
-                        await loadLevelImages();
                         await loadFriends();
                     } else {
                         await createUserDoc(user);
                     }
                 });
-
-                // Load Initial Data
                 await loadBanner();
-                await loadStoreData();
-                await loadLevelsData();
-                await loadGiftsData();
+                await loadGlobalData();
                 await loadRooms();
             } else {
                 document.getElementById('loginPage').classList.remove('hidden');
                 document.getElementById('main-app').classList.add('hidden');
-                if (messagesListener) {
-                    messagesListener();
-                    messagesListener = null;
-                }
             }
         });
 
         async function createUserDoc(user) {
-            await db.collection("users").doc(user.uid).set({
+            await setDoc(doc(db, "users", user.uid), {
                 displayName: user.displayName || "مستخدم جديد",
                 photoURL: user.photoURL || "https://via.placeholder.com/150",
                 email: user.email,
@@ -728,111 +507,53 @@
                 wealthLevel: 1,
                 customId: Math.floor(100000 + Math.random() * 900000).toString(),
                 purchasedFrames: [],
-                activeFrame: null,
                 purchasedBadges: [],
+                activeFrame: null,
                 activeBadges: [],
                 friends: [],
-                followers: [],
-                following: [],
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: new Date()
             });
         }
 
-        window.loginWithTwitter = () => {
-            auth.signInWithPopup(twitterProvider).catch(e => {
-                console.error("Login error:", e);
-                alert('حدث خطأ أثناء التسجيل: ' + e.message);
-            });
-        };
-
-        window.loginWithGoogle = () => {
-            auth.signInWithPopup(googleProvider).catch(e => {
-                console.error("Login error:", e);
-                alert('حدث خطأ أثناء التسجيل: ' + e.message);
-            });
-        };
-
-        // --- 2. LEVELS SYSTEM ---
-        async function loadLevelsData() {
-            try {
-                // Load Magic Levels
-                const magicSnap = await db.collection("magicLevels").get();
-                magicSnap.forEach(doc => {
-                    levelImages.magic[doc.id] = doc.data().image;
-                });
-
-                // Load Wealth Levels
-                const wealthSnap = await db.collection("wealthLevels").get();
-                wealthSnap.forEach(doc => {
-                    levelImages.wealth[doc.id] = doc.data().image;
-                });
-            } catch (error) {
-                console.error("Error loading levels:", error);
-            }
+        async function loadGlobalData() {
+            const fSnap = await getDocs(collection(db, "frames"));
+            storeData.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            const bSnap = await getDocs(collection(db, "badges"));
+            storeData.badges = bSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            const gSnap = await getDocs(collection(db, "gifts"));
+            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            const mlSnap = await getDocs(collection(db, "magicLevels"));
+            mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
+            const wlSnap = await getDocs(collection(db, "wealthLevels"));
+            wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+            await updateUI();
         }
 
-        async function loadLevelImages() {
-            const magicLevel = userData.magicLevel || 1;
-            const wealthLevel = userData.wealthLevel || 1;
-            
-            const magicImage = levelImages.magic[magicLevel];
-            const wealthImage = levelImages.wealth[wealthLevel];
-            
-            if (magicImage) {
-                document.getElementById('magicLevelImage').src = magicImage;
-            } else {
-                document.getElementById('magicLevelImage').src = "https://via.placeholder.com/120/3b82f6/ffffff?text=Magic";
-            }
-            
-            if (wealthImage) {
-                document.getElementById('wealthLevelImage').src = wealthImage;
-            } else {
-                document.getElementById('wealthLevelImage').src = "https://via.placeholder.com/120/f59e0b/ffffff?text=Wealth";
-            }
-        }
-
-        // --- 3. BADGES DISPLAY ---
-        function updateActiveBadges() {
-            const sidebarContainer = document.getElementById('activeBadgesSidebar');
-            const bagContainer = document.getElementById('activeBadgesGrid');
-            const activeBadges = userData.activeBadges || [];
-            
-            [sidebarContainer, bagContainer].forEach(container => {
-                if (!container) return;
-                
-                container.innerHTML = '';
-                
-                if (activeBadges.length === 0) {
-                    container.innerHTML = `
-                        <div class="col-span-5 text-center py-4">
-                            <p class="text-gray-400 text-xs">لا توجد شارات</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                activeBadges.forEach(badgeId => {
-                    const badge = storeData.badges.find(b => b.id === badgeId);
-                    if (badge) {
-                        container.innerHTML += `
-                            <div class="aspect-square rounded-xl flex items-center justify-center bg-white/80 border border-white/90 shadow-sm">
-                                <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
-                            </div>
-                        `;
-                    }
-                });
-            });
-        }
-
-        // --- 4. UI UPDATES ---
         async function updateUI() {
-            // Sidebar
             document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
             document.getElementById('sideID').innerText = userData.customId || "000000";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
+            document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
+            
+            // Levels
+            const ml = userData.magicLevel || 1;
+            const wl = userData.wealthLevel || 1;
+            document.getElementById('magicLevelDisplay').innerText = ml;
+            document.getElementById('wealthLevelDisplay').innerText = wl;
+            
+            if (storeData.magicLevels[ml]) {
+                document.getElementById('magicLevelImg').src = storeData.magicLevels[ml].image;
+                document.getElementById('magicLevelImg').classList.remove('hidden');
+                document.getElementById('magicLevelIcon').classList.add('hidden');
+            }
+            if (storeData.wealthLevels[wl]) {
+                document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wl].image;
+                document.getElementById('wealthLevelImg').classList.remove('hidden');
+                document.getElementById('wealthLevelIcon').classList.add('hidden');
+            }
 
-            // Frame Logic
+            // Frame
             const frameEl = document.getElementById('sideFrame');
             if (userData.activeFrame) {
                 const frameDoc = storeData.frames.find(f => f.id === userData.activeFrame);
@@ -841,851 +562,322 @@
                     frameEl.classList.remove('hidden');
                 } else {
                     frameEl.classList.add('hidden');
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: null });
                 }
             } else {
                 frameEl.classList.add('hidden');
-            }
-
-            // Update Active Badges
-            updateActiveBadges();
-        }
-
-        // --- 5. BANNER ---
-        async function loadBanner() {
-            try {
-                const bannerDoc = await db.collection("appData").doc("banner").get();
-                const bannerContainer = document.getElementById('homeBanner');
-                
-                if (bannerDoc.exists()) {
-                    const banner = bannerDoc.data();
-                    bannerContainer.innerHTML = `
-                        <div class="absolute inset-0 bg-gradient-to-r ${banner.gradient || 'from-blue-50/90 to-purple-50/90'}"></div>
-                        <img src="${banner.image || 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop'}" 
-                             class="absolute inset-0 w-full h-full object-cover opacity-30">
-                        <div class="relative z-10 text-center p-6 h-full flex flex-col items-center justify-center">
-                            <h3 class="font-black text-2xl text-gray-800 mb-1">${banner.title || 'Afnan AI'}</h3>
-                            <p class="text-sm text-gray-600 font-medium">${banner.subtitle || 'مرحباً بك في عالمك الجديد'}</p>
-                        </div>
-                    `;
-                } else {
-                    bannerContainer.innerHTML = `
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-50/90 to-purple-50/90"></div>
-                        <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=1000&auto=format&fit=crop" 
-                             class="absolute inset-0 w-full h-full object-cover opacity-30">
-                        <div class="relative z-10 text-center h-full flex flex-col items-center justify-center">
-                            <h3 class="font-black text-2xl text-gray-800 mb-1">Afnan AI</h3>
-                            <p class="text-sm text-gray-600 font-medium">مرحباً بك في عالمك الجديد</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error("Error loading banner:", error);
-            }
-        }
-
-        // --- 6. STORE DATA ---
-        async function loadStoreData() {
-            try {
-                // Fetch Frames
-                const fSnap = await db.collection("frames").get();
-                storeData.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
-                
-                // Fetch Badges
-                const bSnap = await db.collection("badges").get();
-                storeData.badges = bSnap.docs.map(d => ({id: d.id, ...d.data()}));
-
-                if(!document.getElementById('view-store').classList.contains('hidden')) {
-                    window.loadStoreItems('frames');
-                }
-            } catch (error) {
-                console.error("Error loading store data:", error);
-            }
-        }
-
-        async function loadGiftsData() {
-            try {
-                const gSnap = await db.collection("gifts").get();
-                storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data()}));
-            } catch (error) {
-                console.error("Error loading gifts:", error);
             }
         }
 
         window.loadStoreItems = (type) => {
             const grid = document.getElementById('storeGrid');
             grid.innerHTML = '';
-            
             const items = type === 'frames' ? storeData.frames : storeData.badges;
             
-            if(items.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-2 text-center py-8">
-                        <p class="text-gray-400 mb-2">لا توجد عناصر في المتجر</p>
-                    </div>
-                `;
-                return;
-            }
+            document.getElementById('store-tab-frames').className = type === 'frames' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-badges').className = type === 'badges' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
 
             items.forEach(item => {
-                const alreadyPurchased = userData[type === 'frames' ? 'purchasedFrames' : 'purchasedBadges']?.some(i => i.id === item.id);
-                
+                const field = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
+                const owned = userData[field]?.some(i => i.id === item.id);
                 grid.innerHTML += `
                     <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[160px] relative">
-                        ${alreadyPurchased ? `
-                            <div class="absolute top-2 left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
-                                مملوك
-                            </div>
-                        ` : ''}
-                        <div class="w-full flex justify-center mb-2">
-                            <img src="${item.image}" class="w-16 h-16 object-contain">
-                        </div>
-                        <h4 class="font-bold text-sm text-center mb-2 leading-tight">${item.name}</h4>
-                        ${alreadyPurchased ? 
-                            `<button class="w-full py-2 bg-gray-300 text-gray-600 text-xs font-bold rounded-xl cursor-not-allowed">
-                                مملوك ✓
-                            </button>` :
-                            `<button onclick="buyItem('${type}', '${item.id}', ${item.price})" 
-                                class="w-full py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-gray-800 transition">
-                                ${item.price} 💰 شراء
-                            </button>`
-                        }
-                    </div>
-                `;
+                        <img src="${item.image}" class="w-16 h-16 object-contain mb-2">
+                        <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
+                        <button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" 
+                                class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl">
+                            ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
+                        </button>
+                    </div>`;
             });
         };
 
         window.buyItem = async (type, id, price) => {
-            if (!auth.currentUser) return;
-            
-            if (userData.balance < price) {
-                alert('رصيدك غير كافٍ!');
-                return;
-            }
-
+            if (userData.balance < price) return alert('رصيدك غير كافٍ!');
             const field = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
-            const currentItems = userData[field] || [];
-            
-            if(currentItems.some(i => i.id === id)) {
-                alert('تمتلك هذا العنصر بالفعل');
-                return;
-            }
-
-            try {
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    balance: firebase.firestore.FieldValue.increment(-price),
-                    [field]: firebase.firestore.FieldValue.arrayUnion({ 
-                        id: id, 
-                        purchasedAt: new Date().toISOString() 
-                    })
-                });
-                
-                // Success feedback
-                const btn = event.target;
-                btn.innerHTML = 'تم الشراء ✓';
-                btn.classList.remove('bg-gray-900', 'hover:bg-gray-800');
-                btn.classList.add('bg-green-500', 'cursor-not-allowed');
-            } catch (e) {
-                console.error(e);
-                alert("حدث خطأ أثناء الشراء");
-            }
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                balance: increment(-price),
+                [field]: arrayUnion({ id: id, purchasedAt: new Date() })
+            });
+            loadStoreItems(type);
         };
 
-        // --- 7. BAG LOGIC with Frame Validation ---
-        function loadBagItems() {
-            const grid = document.getElementById('bagGrid');
-            grid.innerHTML = '';
+        window.loadBagItems = async () => {
+            const fGrid = document.getElementById('bagGrid');
+            const bGrid = document.getElementById('badgesBagGrid');
+            fGrid.innerHTML = ''; bGrid.innerHTML = '';
             
+            // Frames
             const frames = userData.purchasedFrames || [];
-            
-            // Clean up invalid frames
-            const validFrames = frames.filter(frame => {
-                const frameExists = storeData.frames.find(f => f.id === frame.id);
-                if (!frameExists) {
-                    removeInvalidFrame(frame.id);
-                    return false;
+            for (const f of frames) {
+                const exists = storeData.frames.find(sf => sf.id === f.id);
+                if (exists) {
+                    const isEquipped = userData.activeFrame === f.id;
+                    fGrid.innerHTML += `
+                        <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                            <img src="${exists.image}" class="w-12 h-12 object-contain">
+                        </div>`;
+                } else {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedFrames: arrayRemove(f) });
                 }
-                
-                // Check expiration if exists
-                if (frame.expiresAt) {
-                    const isExpired = new Date(frame.expiresAt) < new Date();
-                    if (isExpired) {
-                        removeInvalidFrame(frame.id);
-                        return false;
-                    }
+            }
+
+            // Badges
+            const badges = userData.purchasedBadges || [];
+            for (const b of badges) {
+                const exists = storeData.badges.find(sb => sb.id === b.id);
+                if (exists) {
+                    const isActive = userData.activeBadges?.includes(b.id);
+                    bGrid.innerHTML += `
+                        <div onclick="toggleBadge('${b.id}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
+                            <img src="${exists.image}" class="w-8 h-8 object-contain">
+                        </div>`;
+                } else {
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedBadges: arrayRemove(b) });
                 }
-                return true;
-            });
-
-            if(validFrames.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-3 text-center py-8">
-                        <i data-lucide="package" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                        <p class="text-gray-400 text-sm">لا تملك إطارات</p>
-                    </div>
-                `;
-                return;
             }
-
-            validFrames.forEach(f => {
-                const itemDetails = storeData.frames.find(sf => sf.id === f.id);
-                if (!itemDetails) return;
-                
-                const isEquipped = userData.activeFrame === f.id;
-                
-                grid.innerHTML += `
-                    <div onclick="equipFrame('${f.id}')" 
-                         class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer transition-all duration-200 
-                                ${isEquipped ? 'border-2 border-blue-500 bg-blue-50/70' : 'border border-white/70 hover:bg-white/90 hover:scale-105'}">
-                        <img src="${itemDetails.image}" class="w-10 h-10 mb-2 object-contain">
-                        <span class="text-[10px] font-bold ${isEquipped ? 'text-blue-600' : 'text-gray-500'}">
-                            ${isEquipped ? 'مستخدم ✓' : 'استخدام'}
-                        </span>
-                    </div>
-                `;
-            });
-
-            updateActiveBadges();
-        }
-
-        async function removeInvalidFrame(frameId) {
-            try {
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    purchasedFrames: firebase.firestore.FieldValue.arrayRemove({ id: frameId })
-                });
-            } catch (error) {
-                console.error("Error removing invalid frame:", error);
-            }
-        }
-
-        // --- 8. FRIENDS SYSTEM ---
-        async function loadFriends() {
-            try {
-                const friendsListEl = document.getElementById('friendsList');
-                friendsListEl.innerHTML = '<div class="flex justify-center py-4"><div class="loader"></div></div>';
-                
-                const friends = userData.friends || [];
-                if (friends.length === 0) {
-                    friendsListEl.innerHTML = `
-                        <div class="text-center py-8">
-                            <i data-lucide="users" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                            <p class="text-gray-400">لا يوجد أصدقاء</p>
-                            <p class="text-xs text-gray-300 mt-1">ابحث عن أصدقاء باستخدام الـ ID</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Fetch friends data
-                const friendsData = [];
-                for (const friendId of friends) {
-                    const friendDoc = await db.collection("users").doc(friendId).get();
-                    if (friendDoc.exists()) {
-                        friendsData.push({ id: friendId, ...friendDoc.data() });
-                    }
-                }
-
-                // Display friends
-                friendsListEl.innerHTML = '';
-                friendsData.forEach(friend => {
-                    friendsListEl.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex items-center justify-between hover:bg-white/90 transition cursor-pointer"
-                             onclick="openChat('${friend.id}')">
-                            <div class="flex items-center gap-3">
-                                <img src="${friend.photoURL || 'https://via.placeholder.com/40'}" 
-                                     class="w-10 h-10 rounded-full object-cover">
-                                <div>
-                                    <h4 class="font-bold text-sm">${friend.displayName || 'مستخدم'}</h4>
-                                    <p class="text-xs text-gray-500">ID: ${friend.customId || '000000'}</p>
-                                </div>
-                            </div>
-                            <button onclick="event.stopPropagation(); unfollowUser('${friend.id}')" 
-                                    class="text-red-500 hover:text-red-700 transition p-2 rounded-full hover:bg-red-50">
-                                <i data-lucide="user-minus" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error loading friends:", error);
-            }
-        }
-
-        window.searchUser = async () => {
-            const searchInput = document.getElementById('searchUserInput');
-            const userId = searchInput.value.trim();
-            
-            if (!userId) {
-                alert('يرجى إدخال ID المستخدم');
-                return;
-            }
-
-            try {
-                // Search by customId
-                const usersRef = db.collection("users");
-                const querySnapshot = await usersRef.where("customId", "==", userId).get();
-                
-                const resultsDiv = document.getElementById('searchResults');
-                const userResultDiv = document.getElementById('userResult');
-                
-                if (querySnapshot.empty) {
-                    userResultDiv.innerHTML = `
-                        <div class="text-center py-4">
-                            <i data-lucide="user-x" class="w-8 h-8 mx-auto mb-2 text-gray-400"></i>
-                            <p class="text-gray-600">لم يتم العثور على مستخدم بهذا الـ ID</p>
-                        </div>
-                    `;
-                    resultsDiv.classList.remove('hidden');
-                    return;
-                }
-
-                const userDoc = querySnapshot.docs[0];
-                const user = userDoc.data();
-                
-                // Check if already friends
-                const isFriend = userData.friends?.includes(user.uid);
-                const isSelf = user.uid === auth.currentUser.uid;
-                
-                userResultDiv.innerHTML = `
-                    <div class="flex items-center gap-4 mb-4">
-                        <img src="${user.photoURL || 'https://via.placeholder.com/60'}" 
-                             class="w-16 h-16 rounded-full object-cover border-2 border-white">
-                        <div>
-                            <h4 class="font-bold text-lg">${user.displayName || 'مستخدم'}</h4>
-                            <p class="text-sm text-gray-500">ID: ${user.customId || '000000'}</p>
-                            ${user.magicLevel ? `<p class="text-xs text-blue-600">مستوى السحر: ${user.magicLevel}</p>` : ''}
-                            ${user.wealthLevel ? `<p class="text-xs text-yellow-600">مستوى الثروة: ${user.wealthLevel}</p>` : ''}
-                        </div>
-                    </div>
-                    ${isSelf ? 
-                        '<p class="text-center text-gray-400 py-2">هذا حسابك</p>' :
-                        isFriend ? 
-                            `<button onclick="unfollowUser('${user.uid}')" 
-                                    class="w-full py-2 bg-red-50 text-red-600 rounded-xl font-bold hover:bg-red-100 transition">
-                                إلغاء المتابعة
-                            </button>` :
-                            `<button onclick="followUser('${user.uid}')" 
-                                    class="w-full py-2 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition">
-                                متابعة
-                            </button>`
-                    }
-                `;
-                
-                resultsDiv.classList.remove('hidden');
-            } catch (error) {
-                console.error("Error searching user:", error);
-                alert("حدث خطأ أثناء البحث");
-            }
-        };
-
-        window.followUser = async (userId) => {
-            if (!auth.currentUser) return;
-            
-            try {
-                // Add to current user's friends
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    friends: firebase.firestore.FieldValue.arrayUnion(userId)
-                });
-                
-                // Add to target user's followers
-                await db.collection("users").doc(userId).update({
-                    followers: firebase.firestore.FieldValue.arrayUnion(auth.currentUser.uid)
-                });
-                
-                alert('تمت المتابعة بنجاح!');
-                loadFriends();
-                searchUser(); // Refresh search result
-            } catch (error) {
-                console.error("Error following user:", error);
-                alert("حدث خطأ أثناء المتابعة");
-            }
-        };
-
-        window.unfollowUser = async (userId) => {
-            if (!auth.currentUser) return;
-            
-            try {
-                // Remove from current user's friends
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    friends: firebase.firestore.FieldValue.arrayRemove(userId)
-                });
-                
-                // Remove from target user's followers
-                await db.collection("users").doc(userId).update({
-                    followers: firebase.firestore.FieldValue.arrayRemove(auth.currentUser.uid)
-                });
-                
-                alert('تم إلغاء المتابعة');
-                loadFriends();
-                if (currentSearchResult && currentSearchResult.uid === userId) {
-                    searchUser(); // Refresh search result
-                }
-            } catch (error) {
-                console.error("Error unfollowing user:", error);
-                alert("حدث خطأ أثناء إلغاء المتابعة");
-            }
-        };
-
-        // --- 9. CHAT SYSTEM ---
-        window.openChat = async (friendId) => {
-            try {
-                const friendDoc = await db.collection("users").doc(friendId).get();
-                if (!friendDoc.exists()) {
-                    alert('المستخدم غير موجود');
-                    return;
-                }
-                
-                currentChatFriend = friendDoc.data();
-                currentChatFriend.id = friendId;
-                
-                // Update chat header
-                document.getElementById('chatFriendAvatar').src = currentChatFriend.photoURL || 'https://via.placeholder.com/48';
-                document.getElementById('chatFriendName').textContent = currentChatFriend.displayName || 'مستخدم';
-                document.getElementById('chatFriendStatus').textContent = 'متصل الآن';
-                
-                // Switch to chat view
-                switchView('chat');
-                
-                // Load messages
-                loadChatMessages();
-                
-            } catch (error) {
-                console.error("Error opening chat:", error);
-                alert("حدث خطأ أثناء فتح المحادثة");
-            }
-        };
-
-        async function loadChatMessages() {
-            const chatMessages = document.getElementById('chatMessages');
-            chatMessages.innerHTML = '<div class="flex justify-center py-8"><div class="loader"></div></div>';
-            
-            // Stop previous listener if exists
-            if (messagesListener) {
-                messagesListener();
-            }
-            
-            const currentUserId = auth.currentUser.uid;
-            const friendId = currentChatFriend.id;
-            
-            // Create chat room ID (sorted to ensure consistency)
-            const chatId = [currentUserId, friendId].sort().join('_');
-            
-            // Listen for messages in real-time
-            messagesListener = db.collection("chats")
-                .doc(chatId)
-                .collection("messages")
-                .orderBy("timestamp", "asc")
-                .onSnapshot((snapshot) => {
-                    chatMessages.innerHTML = '';
-                    
-                    if (snapshot.empty) {
-                        chatMessages.innerHTML = `
-                            <div class="text-center py-8">
-                                <p class="text-gray-400">ابدأ محادثة جديدة</p>
-                            </div>
-                        `;
-                        return;
-                    }
-                    
-                    snapshot.forEach(doc => {
-                        const message = doc.data();
-                        const isSent = message.senderId === currentUserId;
-                        
-                        const messageDiv = document.createElement('div');
-                        messageDiv.className = `chat-bubble ${isSent ? 'sent' : 'received'}`;
-                        messageDiv.innerHTML = `
-                            <p class="text-sm">${message.text}</p>
-                            <p class="text-xs opacity-70 mt-1 ${isSent ? 'text-blue-100' : 'text-gray-500'}">
-                                ${new Date(message.timestamp?.toDate()).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                        `;
-                        
-                        chatMessages.appendChild(messageDiv);
-                    });
-                    
-                    // Scroll to bottom
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }, error => {
-                    console.error("Error loading messages:", error);
-                });
-        }
-
-        window.sendMessage = async () => {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            
-            if (!text || !currentChatFriend) return;
-            
-            const currentUserId = auth.currentUser.uid;
-            const friendId = currentChatFriend.id;
-            const chatId = [currentUserId, friendId].sort().join('_');
-            
-            try {
-                // Add message to Firestore
-                await db.collection("chats").doc(chatId).collection("messages").add({
-                    text: text,
-                    senderId: currentUserId,
-                    receiverId: friendId,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    read: false
-                });
-                
-                // Update last activity
-                await db.collection("chats").doc(chatId).set({
-                    lastMessage: text,
-                    lastMessageTime: firebase.firestore.FieldValue.serverTimestamp(),
-                    participants: [currentUserId, friendId],
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                
-                // Clear input
-                input.value = '';
-                
-            } catch (error) {
-                console.error("Error sending message:", error);
-                alert("حدث خطأ أثناء إرسال الرسالة");
-            }
-        };
-
-        // --- 10. GIFTS SYSTEM ---
-        window.openGiftBox = () => {
-            document.getElementById('giftModal').classList.remove('hidden');
-        };
-
-        window.closeGiftBox = () => {
-            document.getElementById('giftModal').classList.add('hidden');
-        };
-
-        window.openLuckGift = () => {
-            closeGiftBox();
-            document.getElementById('luckGiftModal').classList.remove('hidden');
-        };
-
-        window.closeLuckGift = () => {
-            document.getElementById('luckGiftModal').classList.add('hidden');
-        };
-
-        window.openFixedGifts = async () => {
-            closeGiftBox();
-            const grid = document.getElementById('fixedGiftsGrid');
-            grid.innerHTML = '<div class="col-span-3 flex justify-center py-8"><div class="loader"></div></div>';
-            
-            document.getElementById('fixedGiftsModal').classList.remove('hidden');
-            
-            // Load gifts
-            if (storeData.gifts.length === 0) {
-                await loadGiftsData();
-            }
-            
-            grid.innerHTML = '';
-            
-            if (storeData.gifts.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-3 text-center py-8">
-                        <p class="text-gray-400">لا توجد هدايا متاحة</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            storeData.gifts.forEach(gift => {
-                grid.innerHTML += `
-                    <button onclick="claimFixedGift('${gift.id}')" 
-                            class="glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-white/90 transition-all">
-                        <img src="${gift.image}" class="w-16 h-16 object-contain">
-                        <h4 class="font-bold text-xs text-center">${gift.name}</h4>
-                        <p class="text-xs text-green-600 font-bold">${gift.reward} 💰</p>
-                    </button>
-                `;
-            });
-        };
-
-        window.closeFixedGifts = () => {
-            document.getElementById('fixedGiftsModal').classList.add('hidden');
-        };
-
-        window.claimLuckGift = async (multiplier) => {
-            const baseAmount = 1000; // Base reward
-            const reward = baseAmount * multiplier;
-            
-            try {
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    balance: firebase.firestore.FieldValue.increment(reward)
-                });
-                
-                closeLuckGift();
-                showGiftAnimation(`مضاعف ${multiplier}x`, reward, '🎲');
-                
-            } catch (error) {
-                console.error("Error claiming luck gift:", error);
-                alert("حدث خطأ أثناء استلام الهدية");
-            }
-        };
-
-        window.claimFixedGift = async (giftId) => {
-            const gift = storeData.gifts.find(g => g.id === giftId);
-            if (!gift) return;
-            
-            try {
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    balance: firebase.firestore.FieldValue.increment(gift.reward)
-                });
-                
-                closeFixedGifts();
-                showGiftAnimation(gift.name, gift.reward, gift.image);
-                
-            } catch (error) {
-                console.error("Error claiming fixed gift:", error);
-                alert("حدث خطأ أثناء استلام الهدية");
-            }
-        };
-
-        function showGiftAnimation(giftName, reward, image) {
-            const container = document.getElementById('giftAnimationContainer');
-            const notification = document.getElementById('giftNotification');
-            const giftMessage = document.getElementById('giftMessage');
-            const giftReward = document.getElementById('giftReward');
-            
-            // Clear previous animation
-            container.innerHTML = '';
-            container.classList.remove('hidden');
-            
-            // Create gift element
-            const giftEl = document.createElement('div');
-            giftEl.className = 'absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2';
-            
-            if (image.includes('http')) {
-                giftEl.innerHTML = `
-                    <div class="relative">
-                        <img src="${image}" class="w-32 h-32 object-contain gift-animation">
-                        <div class="absolute inset-0 gift-shine rounded-full"></div>
-                    </div>
-                `;
-            } else {
-                giftEl.innerHTML = `
-                    <div class="relative">
-                        <div class="w-32 h-32 flex items-center justify-center text-6xl gift-animation">
-                            ${image}
-                        </div>
-                        <div class="absolute inset-0 gift-shine rounded-full"></div>
-                    </div>
-                `;
-            }
-            
-            container.appendChild(giftEl);
-            
-            // Show notification after animation
-            setTimeout(() => {
-                container.classList.add('hidden');
-                
-                giftMessage.textContent = `لقد تم استلام هدية: ${giftName}`;
-                giftReward.textContent = `+${reward.toLocaleString()} عملة`;
-                notification.classList.remove('hidden');
-                
-                setTimeout(() => {
-                    notification.classList.add('hidden');
-                }, 3000);
-                
-            }, 3000);
-        }
-
-        // --- 11. VIEW SWITCHING ---
-        window.switchView = (viewName) => {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById('view-' + viewName).classList.remove('hidden');
-            
-            const titles = {
-                home: 'الرئيسية', 
-                wallet: 'المحفظة', 
-                store: 'المتجر', 
-                bag: 'حقيبتي',
-                friends: 'أصدقائي',
-                chat: 'المحادثة'
-            };
-            document.getElementById('pageTitle').innerText = titles[viewName] || '...';
-            
-            toggleSidebar(false);
-            
-            if (viewName === 'store') window.loadStoreItems('frames');
-            if (viewName === 'bag') loadBagItems();
-            if (viewName === 'friends') loadFriends();
         };
 
         window.equipFrame = async (id) => {
             const newFrame = userData.activeFrame === id ? null : id;
-            await db.collection("users").doc(auth.currentUser.uid).update({ activeFrame: newFrame });
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: newFrame });
+            loadBagItems();
         };
 
         window.toggleBadge = async (id) => {
-            let actives = userData.activeBadges || [];
-            if(actives.includes(id)) {
-                actives = actives.filter(a => a !== id);
-            } else {
-                actives.push(id);
-            }
-            await db.collection("users").doc(auth.currentUser.uid).update({ activeBadges: actives });
+            const isActive = userData.activeBadges?.includes(id);
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                activeBadges: isActive ? arrayRemove(id) : arrayUnion(id)
+            });
+            loadBagItems();
         };
 
-        // --- 12. ROOMS LOGIC ---
-        async function loadRooms() {
-            const grid = document.getElementById('roomsGrid');
-            try {
-                const snap = await db.collection("rooms").get();
-                if(snap.empty) {
-                    grid.innerHTML = `
-                        <div class="text-center py-8">
-                            <i data-lucide="message-square" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                            <p class="text-gray-400">لا توجد غرف متاحة حالياً</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                grid.innerHTML = '';
-                snap.forEach(doc => {
-                    const r = doc.data();
-                    grid.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex items-center gap-4 hover:scale-[1.01] transition cursor-pointer active:scale-95">
-                            <div class="w-12 h-12 rounded-full ${r.color || 'bg-gray-100'} flex items-center justify-center text-xl shadow-sm">
-                                ${r.icon || '💬'}
+        window.searchUser = async () => {
+            const id = document.getElementById('searchUserInput').value.trim();
+            if (!id) return;
+            const q = query(collection(db, "users"), where("customId", "==", id));
+            const snap = await getDocs(q);
+            const results = document.getElementById('searchResults');
+            const container = document.getElementById('userResult');
+            results.classList.remove('hidden');
+            if (snap.empty) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-sm">لم يتم العثور على مستخدم</p>';
+            } else {
+                const user = snap.docs[0].data();
+                const isFollowing = userData.friends?.includes(user.uid);
+                container.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <h4 class="font-bold text-sm">${user.displayName}</h4>
+                                <p class="text-xs text-gray-400">ID: ${user.customId}</p>
                             </div>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-900">${r.name}</h4>
-                                <p class="text-xs text-gray-500">${r.description || 'غرفة محادثة'}</p>
-                                ${r.memberCount ? `<p class="text-xs text-gray-400 mt-1">👥 ${r.memberCount} أعضاء</p>` : ''}
-                            </div>
-                            <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
                         </div>
-                    `;
-                });
-            } catch (e) {
-                console.error("Error loading rooms:", e);
-                grid.innerHTML = '<p class="text-center text-gray-400 py-10">حدث خطأ في تحميل الغرف</p>';
+                        <button onclick="toggleFollow('${user.uid}')" class="px-4 py-2 rounded-xl ${isFollowing ? 'bg-gray-100 text-gray-500' : 'bg-black text-white'} font-bold text-xs">
+                            ${isFollowing ? 'إلغاء المتابعة' : 'متابعة'}
+                        </button>
+                    </div>`;
             }
+        };
+
+        window.toggleFollow = async (uid) => {
+            const isFollowing = userData.friends?.includes(uid);
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friends: isFollowing ? arrayRemove(uid) : arrayUnion(uid)
+            });
+            searchUser();
+        };
+
+        async function loadFriends() {
+            const list = document.getElementById('friendsList');
+            list.innerHTML = '';
+            if (!userData.friends || userData.friends.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا يوجد أصدقاء بعد</p>';
+                return;
+            }
+            for (const uid of userData.friends) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const friend = snap.data();
+                    list.innerHTML += `
+                        <div onclick="openChat('${friend.uid}')" class="glass-card p-4 rounded-3xl flex items-center justify-between cursor-pointer hover:bg-white transition">
+                            <div class="flex items-center gap-3">
+                                <img src="${friend.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm">${friend.displayName}</h4>
+                                    <p class="text-xs text-gray-400">ID: ${friend.customId}</p>
+                                </div>
+                            </div>
+                            <i data-lucide="message-circle" class="w-5 h-5 text-gray-300"></i>
+                        </div>`;
+                }
+            }
+            lucide.createIcons();
         }
 
-        window.filterRooms = async (type) => {
-            const btnPub = document.getElementById('btn-public');
-            const btnPriv = document.getElementById('btn-private');
-            
-            if(type === 'public') {
-                btnPub.className = "flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all";
-                btnPriv.className = "flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all";
-                await loadRooms();
-            } else {
-                btnPriv.className = "flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all";
-                btnPub.className = "flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all";
-                document.getElementById('roomsGrid').innerHTML = `
-                    <div class="text-center py-8">
-                        <i data-lucide="lock" class="w-12 h-12 mx-auto mb-2 text-gray-300"></i>
-                        <p class="text-gray-400">لا توجد غرف خاصة متاحة</p>
-                        <p class="text-xs text-gray-300 mt-1">يجب أن تتم دعوتك للانضمام</p>
-                    </div>
-                `;
-            }
-        };
-
-        // --- 13. HELPERS & SIDEBAR ---
-        window.toggleSidebar = (show) => {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (show) {
-                sidebar.classList.add('open');
-                overlay.classList.remove('hidden');
-                setTimeout(() => overlay.classList.add('visible'), 10);
-            } else {
-                sidebar.classList.remove('open');
-                overlay.classList.remove('visible');
-                setTimeout(() => overlay.classList.add('hidden'), 300);
-            }
-        };
-
-        window.confirmLogout = () => {
-            if(confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                auth.signOut();
-                toggleSidebar(false);
-            }
-        };
-
-        window.recharge = (amount) => {
-            if (!auth.currentUser) return;
-            
-            // Simulate recharge - in real app, integrate with payment gateway
-            db.collection("users").doc(auth.currentUser.uid).update({
-                balance: firebase.firestore.FieldValue.increment(amount)
-            }).then(() => {
-                alert(`✅ تم شحن ${amount.toLocaleString()} عملة بنجاح!`);
-            }).catch(e => {
-                alert("حدث خطأ أثناء الشحن");
+        window.openChat = async (uid) => {
+            const snap = await getDoc(doc(db, "users", uid));
+            currentChatFriend = snap.data();
+            document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
+            document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
+            document.getElementById('chatModal').classList.remove('hidden');
+            const chatId = [auth.currentUser.uid, uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            if (chatUnsubscribe) chatUnsubscribe();
+            onValue(chatRef, (snapshot) => {
+                const messages = snapshot.val();
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = '';
+                if (messages) {
+                    Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
+                        const isMe = msg.senderId === auth.currentUser.uid;
+                        container.innerHTML += `
+                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
+                                    ${msg.text}
+                                </div>
+                            </div>`;
+                    });
+                    container.scrollTop = container.scrollHeight;
+                }
             });
         };
 
-        window.openEditProfile = () => {
-            document.getElementById('editNameInp').value = userData.displayName || '';
-            document.getElementById('editPhotoInp').value = userData.photoURL || '';
-            document.getElementById('editModal').classList.remove('hidden');
-            toggleSidebar(false);
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentChatFriend) return;
+            const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            await push(chatRef, {
+                senderId: auth.currentUser.uid,
+                receiverId: currentChatFriend.uid,
+                text: text,
+                timestamp: Date.now()
+            });
+            input.value = '';
         };
 
-        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        window.closeChat = () => {
+            document.getElementById('chatModal').classList.add('hidden');
+            currentChatFriend = null;
+        };
 
-        window.saveProfileChanges = async () => {
-            const name = document.getElementById('editNameInp').value.trim();
-            const photo = document.getElementById('editPhotoInp').value.trim();
+        window.toggleGiftBox = (show) => {
+            document.getElementById('giftBox').classList.toggle('hidden', !show);
+            if (show) switchGiftTab('fixed');
+        };
+
+        window.switchGiftTab = (type) => {
+            const grid = document.getElementById('giftGrid');
+            grid.innerHTML = '';
+            const items = type === 'fixed' ? storeData.gifts : []; // Luck gifts logic can be added here
+            document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
             
-            if (!name) {
-                alert('يرجى إدخال اسم');
+            if (type === 'luck') {
+                grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">قريباً...</p>';
                 return;
             }
 
-            try {
-                await db.collection("users").doc(auth.currentUser.uid).update({
-                    displayName: name,
-                    photoURL: photo || userData.photoURL
-                });
-                
-                // Update auth profile
-                await auth.currentUser.updateProfile({
-                    displayName: name,
-                    photoURL: photo || auth.currentUser.photoURL
-                });
-                
-                closeEditModal();
-                alert('✅ تم حفظ التغييرات');
-            } catch (error) {
-                console.error("Error updating profile:", error);
-                alert("حدث خطأ أثناء حفظ التغييرات");
-            }
-        };
-
-        window.copyID = () => {
-            const id = userData.customId || "000000";
-            navigator.clipboard.writeText(id).then(() => {
-                const icon = document.querySelector('#sideID + button i');
-                const originalClass = icon.className.baseVal;
-                icon.className.baseVal = originalClass.replace('copy', 'check');
-                icon.style.color = 'green';
-                
-                setTimeout(() => {
-                    icon.className.baseVal = originalClass;
-                    icon.style.color = '';
-                }, 2000);
+            items.forEach(item => {
+                grid.innerHTML += `
+                    <div onclick="sendGift('${item.id}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
+                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
+                            <img src="${item.image}" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span>
+                        <span class="text-[8px] text-yellow-600 font-black">${item.price || 0} 💰</span>
+                    </div>`;
             });
         };
 
-        // Initialize Icons
-        lucide.createIcons();
-        
-        // Initialize chat input event listener
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatInput = document.getElementById('chatInput');
-            if (chatInput) {
-                chatInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                    }
-                });
+        window.sendGift = async (giftId) => {
+            const gift = storeData.gifts.find(g => g.id === giftId);
+            if (userData.balance < (gift.price || 0)) return alert('رصيدك غير كافٍ!');
+
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                balance: increment(-(gift.price || 0))
+            });
+
+            showGiftAnimation(gift, `لقد تم استلام هدية ${gift.name} بسعر ${gift.price || 0}`);
+            toggleGiftBox(false);
+        };
+
+        function showGiftAnimation(gift, text) {
+            const anim = document.createElement('div');
+            anim.className = 'gift-animation flex flex-col items-center gap-4';
+            anim.innerHTML = `
+                <img src="${gift.image}" class="w-32 h-32 object-contain drop-shadow-2xl">
+                <div class="glass px-6 py-3 rounded-2xl shadow-xl border-2 border-white">
+                    <p class="font-black text-gray-900 text-center">${text}</p>
+                </div>`;
+            document.body.appendChild(anim);
+            setTimeout(() => anim.remove(), 3000);
+        }
+
+        window.loginWithTwitter = () => signInWithPopup(auth, twitterProvider);
+        window.loginWithGoogle = () => signInWithPopup(auth, googleProvider);
+        window.confirmLogout = () => confirm('خروج؟') && signOut(auth);
+        window.toggleSidebar = (show) => {
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('sidebarOverlay');
+            s.classList.toggle('open', show);
+            o.classList.toggle('hidden', !show);
+            if(show) setTimeout(() => o.classList.add('visible'), 10);
+            else o.classList.remove('visible');
+        };
+        window.switchView = (v) => {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('view-' + v).classList.remove('hidden');
+            document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : v === 'bag' ? 'حقيبتي' : 'أصدقائي';
+            if(v === 'bag') loadBagItems();
+            if(v === 'store') loadStoreItems('frames');
+            toggleSidebar(false);
+        };
+        window.recharge = (a) => updateDoc(doc(db, "users", auth.currentUser.uid), { balance: increment(a) }).then(() => alert('تم الشحن!'));
+        window.copyID = () => navigator.clipboard.writeText(userData.customId).then(() => alert('تم النسخ'));
+        window.openEditProfile = () => {
+            document.getElementById('editNameInp').value = userData.displayName;
+            document.getElementById('editPhotoInp').value = userData.photoURL;
+            document.getElementById('editModal').classList.remove('hidden');
+            toggleSidebar(false);
+        };
+        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        window.saveProfileChanges = async () => {
+            const n = document.getElementById('editNameInp').value;
+            const p = document.getElementById('editPhotoInp').value;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { displayName: n, photoURL: p });
+            closeEditModal();
+        };
+
+        async function loadBanner() {
+            const bDoc = await getDoc(doc(db, "appData", "banner"));
+            const container = document.getElementById('homeBanner');
+            if (bDoc.exists()) {
+                const b = bDoc.data();
+                container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div><img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay"><div class="relative z-10 text-center p-6"><h3 class="font-black text-2xl text-gray-800 mb-1">${b.title}</h3><p class="text-sm text-gray-500 font-medium">${b.subtitle}</p></div>`;
             }
-        });
+        }
+
+        async function loadRooms() {
+            const rSnap = await getDocs(collection(db, "rooms"));
+            const grid = document.getElementById('roomsGrid');
+            grid.innerHTML = '';
+            rSnap.docs.forEach(d => {
+                const r = d.data();
+                grid.innerHTML += `<div class="glass-card p-4 rounded-3xl flex items-center gap-4"><div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div><div class="flex-1"><h4 class="font-bold text-gray-900">${r.name}</h4><p class="text-xs text-gray-500">${r.description}</p></div><i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i></div>`;
+            });
+        }
+
+        window.filterRooms = (t) => {
+            document.getElementById('btn-public').className = t === 'public' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+            document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+        };
+
+        lucide.createIcons();
+        setInterval(() => lucide.createIcons(), 1000);
     </script>
 </body>
 </html>
