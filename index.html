@@ -2,51 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - النسخة المتطورة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afnan AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { 
-            box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
             font-family: 'Noto Sans Arabic', sans-serif; 
         }
-        body, html { 
-            height: 100%; 
+        body { 
             margin: 0; 
-            color: #1a1a1a; 
-            overflow-x: hidden; 
-            transition: background-color 0.3s ease;
-        }
-        
-        /* Theme Variables */
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-card: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --accent: #0ea5e9;
-            --accent-secondary: #22d3ee;
-            --border-color: #475569;
-        }
-        
-        .light-mode {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-            --accent: #0284c7;
-            --accent-secondary: #06b6d4;
-        }
-        
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            background: #ffffff; 
+            color: #000000; 
+            overflow-x: hidden;
         }
         
         .view-screen { 
@@ -54,677 +24,247 @@
             inset: 0; 
             width: 100%; 
             height: 100%; 
-            background: var(--bg-primary); 
+            background: #ffffff; 
             display: none; 
             flex-direction: column; 
-            z-index: 10; 
             padding-top: 80px; 
             overflow-y: auto; 
             padding-bottom: 100px; 
-            transition: background-color 0.3s ease;
         }
         .view-screen.active { display: flex; }
         
-        /* Enhanced Header */
+        /* Header */
         .app-header { 
             position: fixed; 
             top: 0; 
             right: 0; 
             left: 0; 
             height: 80px; 
-            background: rgba(15, 23, 42, 0.95); 
-            backdrop-filter: blur(20px); 
-            border-bottom: 1px solid var(--border-color); 
+            background: #ffffff; 
+            border-bottom: 1px solid #e5e5e5; 
             display: flex; 
             align-items: center; 
             justify-content: space-between; 
-            padding: 0 1.5rem; 
+            padding: 0 1rem; 
             z-index: 1000; 
-            transition: all 0.3s ease;
         }
         
-        .light-mode .app-header {
-            background: rgba(248, 250, 252, 0.95);
-        }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-        }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .theme-toggle {
-            width: 44px;
-            height: 24px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            position: relative;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-        }
-        
-        .theme-toggle::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--accent);
-            border-radius: 50%;
-            top: 1px;
-            right: 2px;
-            transition: transform 0.3s ease;
-        }
-        
-        .light-mode .theme-toggle::after {
-            transform: translateX(-20px);
-        }
-        
-        /* Search Modal */
-        .search-modal {
-            position: fixed;
-            top: 0;
-            right: 0;
-            left: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(10px);
-        }
-        
-        .search-modal.active {
-            display: flex;
-        }
-        
-        .search-container {
-            width: 100%;
-            max-width: 500px;
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-        
-        /* Profile Styles */
+        /* Profile Frame */
         .profile-container { 
             position: relative; 
-            width: 70px; 
-            height: 70px; 
+            width: 80px; 
+            height: 80px; 
             margin: 0 auto; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
         }
         .avatar-img { 
-            width: 50px; 
-            height: 50px; 
+            width: 30px; 
+            height: 30px; 
             border-radius: 50%; 
             object-fit: cover; 
-            z-index: 1; 
-            border: 2px solid var(--accent); 
-            box-shadow: 0 0 15px rgba(14, 165, 233, 0.3); 
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            border: 2px solid #ffffff;
         }
         .user-frame { 
-            position: absolute; 
-            width: 130%; 
-            height: 130%; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            z-index: 2; 
-            pointer-events: none; 
-            object-fit: contain; 
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
-        }
-        
-        /* Simplified Level Display */
-        .level-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 1rem 0;
-            position: relative;
-        }
-        
-        .level-current {
-            font-size: 42px;
-            font-weight: 900;
-            color: white;
-            text-shadow: 0 0 15px rgba(14, 165, 233, 0.7);
-            line-height: 1;
-            margin-bottom: 0.25rem;
-        }
-        
-        .level-label {
-            font-size: 14px;
-            color: #7dd3fc;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        .level-progress {
-            width: 120px;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-        
-        .level-progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #38bdf8, #7dd3fc);
-            border-radius: 3px;
-            transition: width 0.5s ease;
-        }
-        
-        .level-info {
-            display: flex;
-            justify-content: space-between;
-            width: 120px;
-            font-size: 11px;
-            color: #7dd3fc;
-            margin-top: 0.25rem;
-        }
-        
-        /* Badges as Images */
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-        }
-        
-        .badge-item {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1.5px solid var(--border-color);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .badge-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .badge-item.active {
-            border-color: #38bdf8;
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-            transform: scale(1.05);
-        }
-        
-        /* Edit Profile Button */
-        .edit-profile-btn {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            border: 2px solid var(--bg-secondary);
-            cursor: pointer;
-            z-index: 3;
-            transition: all 0.3s ease;
-        }
-        
-        .edit-profile-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
-        }
-        
-        /* Store & Items */
-        .store-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 12px; 
-            padding: 15px; 
-        }
-        .store-card { 
-            background: var(--bg-card); 
-            border-radius: 20px; 
-            padding: 15px; 
-            text-align: center; 
-            border: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: relative; 
-            height: 200px; 
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        
-        .store-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .item-label { 
-            position: absolute; 
-            top: 8px; 
-            right: 8px; 
-            font-size: 9px; 
-            font-weight: 800; 
-            color: var(--text-secondary); 
-            text-transform: uppercase; 
-            background: rgba(0,0,0,0.3);
-            padding: 2px 8px;
-            border-radius: 10px;
-        }
-        
-        .action-btn { 
             width: 100%; 
-            padding: 10px 0; 
-            border-radius: 12px; 
-            font-size: 12px; 
-            font-weight: bold; 
-            margin-top: auto; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            border: none;
-            font-family: inherit;
-        }
-        .btn-buy { 
-            background: linear-gradient(135deg, #0ea5e9, #0284c7); 
-            color: white; 
-        }
-        .btn-buy:hover {
-            background: linear-gradient(135deg, #0284c7, #0ea5e9);
-        }
-        .btn-equip { 
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8); 
-            color: white; 
-        }
-        .btn-equip:hover {
-            background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-        }
-        .btn-unequip { 
-            background: linear-gradient(135deg, #ef4444, #dc2626); 
-            color: white; 
-        }
-        .btn-unequip:hover {
-            background: linear-gradient(135deg, #dc2626, #ef4444);
+            height: 100%; 
+            object-fit: contain; 
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
         
         /* Sidebar */
         .sidebar { 
             position: fixed; 
             top: 0; 
-            right: -320px; 
-            width: 320px; 
+            right: -280px; 
+            width: 280px; 
             height: 100%; 
-            background: var(--bg-secondary); 
+            background: #ffffff; 
             z-index: 4000; 
             transition: 0.3s ease; 
-            border-left: 1px solid var(--border-color); 
+            border-left: 1px solid #e5e5e5; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: -5px 0 25px rgba(0, 0, 0, 0.2);
         }
         .sidebar.open { right: 0; }
         
         .overlay { 
             position: fixed; 
             inset: 0; 
-            background: rgba(0,0,0,0.7); 
+            background: rgba(0,0,0,0.5); 
             z-index: 2500; 
             display: none; 
-            backdrop-filter: blur(5px); 
         }
         .overlay.active { display: block; }
+        
+        /* Level Icons */
+        .level-icons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .level-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        /* Navigation Items */
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #333;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .nav-item:hover {
+            background: #f5f5f5;
+        }
+        
+        /* Store Grid */
+        .store-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 10px; 
+            padding: 15px; 
+        }
+        .store-card { 
+            background: #f9f9f9; 
+            border-radius: 12px; 
+            padding: 15px; 
+            border: 1px solid #eee; 
+        }
+        
+        /* Button */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-buy { 
+            background: #000; 
+            color: white; 
+        }
+        .btn-buy:hover {
+            background: #333;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translate(-50%, 100px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
+        }
         
         /* Rooms Grid */
         .rooms-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-            padding: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+            padding: 15px;
         }
         
         .room-card {
-            background: var(--bg-card);
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .room-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.1);
-        }
-        
-        .room-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .room-icon {
-            width: 50px;
-            height: 50px;
+            background: #f9f9f9;
             border-radius: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
+            padding: 15px;
+            border: 1px solid #eee;
         }
         
-        .room-users {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        /* Recharge Cards */
+        /* Recharge Grid */
         .recharge-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            padding: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            padding: 15px;
         }
         
         .recharge-card {
-            background: var(--bg-card);
-            border-radius: 16px;
-            padding: 1.5rem 1rem;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-        }
-        
-        .recharge-card:hover {
-            border-color: var(--accent);
-            transform: scale(1.05);
-        }
-        
-        /* Modern Button */
-        .modern-btn {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: white;
-            border: none;
-            padding: 12px 24px;
+            background: #f9f9f9;
             border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .modern-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
-        }
-        
-        .twitter-btn {
-            background: linear-gradient(135deg, #1da1f2, #0c85d0);
-        }
-        
-        .twitter-btn:hover {
-            background: linear-gradient(135deg, #0c85d0, #1da1f2);
-            box-shadow: 0 10px 20px rgba(29, 161, 242, 0.3);
-        }
-        
-        /* Login Page */
-        .login-container {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
-        }
-        
-        .login-logo {
-            position: relative;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        
-        /* Modern Button */
-        .modern-btn {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .modern-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
-        }
-        
-        .twitter-btn {
-            background: linear-gradient(135deg, #1da1f2, #0c85d0);
-        }
-        
-        .twitter-btn:hover {
-            background: linear-gradient(135deg, #0c85d0, #1da1f2);
-            box-shadow: 0 10px 20px rgba(29, 161, 242, 0.3);
-        }
-        
-        /* Glowing Effects */
-        .glow-effect {
-            position: relative;
-        }
-        
-        .glow-effect::after {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            background: linear-gradient(45deg, #0ea5e9, #22d3ee, #38bdf8);
-            border-radius: inherit;
-            z-index: -1;
-            filter: blur(10px);
-            opacity: 0.3;
-            animation: glow 3s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            0% { opacity: 0.2; }
-            100% { opacity: 0.5; }
-        }
-        
-        /* Wallet Balance */
-        .wallet-balance {
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            border-radius: 24px;
-            padding: 2rem;
-            margin: 1.5rem;
-            border: 1px solid var(--border-color);
+            padding: 15px;
             text-align: center;
-        }
-        
-        .light-mode .wallet-balance {
-            background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+            border: 1px solid #eee;
         }
         
         /* Tab Navigation */
         .tab-nav {
             display: flex;
-            background: var(--bg-secondary);
-            border-radius: 12px;
+            background: #f5f5f5;
+            border-radius: 8px;
             padding: 4px;
-            margin: 1rem;
-            border: 1px solid var(--border-color);
+            margin: 10px 15px;
         }
         
         .tab-btn {
             flex: 1;
-            padding: 12px;
+            padding: 10px;
             text-align: center;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            color: #666;
         }
         
         .tab-btn.active {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
+            background: #000;
             color: white;
-        }
-        
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        /* Edit Profile Modal */
-        .edit-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 5000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(10px);
-        }
-        
-        .edit-modal.active {
-            display: flex;
-        }
-        
-        .edit-content {
-            width: 100%;
-            max-width: 400px;
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: 1.5rem;
-            border: 1px solid var(--border-color);
-        }
-        
-        /* Toast Container */
-        #toastContainer {
-            position: fixed;
-            bottom: 6rem;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 11000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .toast {
-            background: linear-gradient(135deg, #0ea5e9, #0284c7);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            font-weight: 600;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            animation: slideUp 0.3s ease;
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
-<body class="dark">
+<body>
 
 <!-- Login Page -->
-<div id="loginPage" class="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-[10000] flex flex-col items-center justify-center p-8 login-container">
-    <div class="login-logo mb-8">
-        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-40 relative z-10">
+<div id="loginPage" class="fixed inset-0 bg-white z-[10000] flex flex-col items-center justify-center p-8">
+    <div class="mb-8">
+        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-32">
     </div>
-    <h1 class="text-5xl font-black bg-gradient-to-r from-sky-400 via-blue-400 to-sky-400 bg-clip-text text-transparent mb-2">Afnan AI</h1>
-    <p class="text-slate-400 mb-10 text-center text-lg">النسخة المتطورة - مستقبل الذكاء الاصطناعي</p>
+    <h1 class="text-3xl font-black text-black mb-2">Afnan AI</h1>
+    <p class="text-gray-600 mb-10 text-center text-sm">النسخة المتطورة</p>
     
-    <div class="w-full max-w-sm space-y-4">
-        <button onclick="loginWithGoogle()" class="modern-btn w-full">
+    <div class="w-full max-w-sm space-y-3">
+        <button onclick="loginWithGoogle()" class="btn btn-buy w-full flex items-center justify-center gap-2">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
             تسجيل الدخول عبر جوجل
         </button>
         
-        <button onclick="loginWithTwitter()" class="modern-btn twitter-btn w-full">
+        <button onclick="loginWithTwitter()" class="btn btn-buy w-full flex items-center justify-center gap-2">
             <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
                 <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
             </svg>
-            تسجيل الدخول عبر X (تويتر)
+            تسجيل الدخول عبر X
         </button>
     </div>
 </div>
@@ -733,120 +273,70 @@
 <div id="main-app" style="display: none;">
     <!-- Header -->
     <header class="app-header">
-        <div class="header-content">
-            <div class="header-left">
-                <button onclick="toggleSidebar()" class="modern-btn" style="padding: 10px">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
-                </button>
-                <h1 id="view-title" class="text-xl font-bold">الرئيسية</h1>
-            </div>
-            <div class="header-right">
-                <div class="theme-toggle" onclick="toggleTheme()"></div>
-                <button onclick="toggleSearch()" class="modern-btn" style="padding: 10px">
-                    <i data-lucide="search" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </div>
+        <button onclick="toggleSidebar()" class="text-black">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <h1 id="view-title" class="text-lg font-bold">الرئيسية</h1>
+        <div></div>
     </header>
-
-    <!-- Search Modal -->
-    <div id="searchModal" class="search-modal">
-        <div class="search-container fade-in">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold">بحث متقدم</h2>
-                <button onclick="toggleSearch()" class="text-gray-400 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <div class="relative">
-                <input type="text" 
-                       placeholder="ابحث في الغرف، المستخدمين، المحتوى..." 
-                       class="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500">
-                <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
-            </div>
-            <div class="mt-4">
-                <h3 class="text-sm font-semibold text-slate-400 mb-2">البحث السريع</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 bg-slate-800 rounded-lg text-sm cursor-pointer hover:bg-slate-700">#عامة</span>
-                    <span class="px-3 py-1 bg-slate-800 rounded-lg text-sm cursor-pointer hover:bg-slate-700">#خاصة</span>
-                    <span class="px-3 py-1 bg-slate-800 rounded-lg text-sm cursor-pointer hover:bg-slate-700">#ذكاء اصطناعي</span>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Sidebar -->
     <div id="sidebar" class="sidebar">
-        <div class="p-6 text-center border-b border-slate-700">
-            <!-- Profile Section -->
-            <div class="relative mb-4">
-                <div class="profile-container mx-auto" style="width: 65px; height: 65px;">
-                    <img id="userAvatar" src="" class="avatar-img">
-                    <img id="activeFrame" src="" class="user-frame" style="display: none;">
-                    <!-- Edit Profile Button -->
-                    <button onclick="openEditProfile()" class="edit-profile-btn">
-                        <i data-lucide="edit-2" class="w-3 h-3"></i>
-                    </button>
-                </div>
+        <!-- Profile Section -->
+        <div class="p-5 text-center border-b border-gray-200">
+            <!-- Edit Profile Button -->
+            <button onclick="openEditProfile()" class="text-gray-600 hover:text-black mb-4">
+                <i data-lucide="edit-2" class="w-5 h-5"></i>
+            </button>
+            
+            <!-- Profile Image -->
+            <div class="profile-container mx-auto mb-3">
+                <img id="userAvatar" src="" class="avatar-img">
+                <img id="activeFrame" src="" class="user-frame" style="display: none;">
             </div>
-
+            
             <!-- User Info -->
-            <div class="mb-3">
-                <div id="userName" class="font-bold text-lg text-white mb-1">...</div>
-                <div class="flex items-center justify-center gap-2">
-                    <span id="userID" class="text-sky-300 font-mono text-sm">00000000</span>
-                    <button onclick="copyID()" class="text-sky-400 hover:text-sky-300">
-                        <i data-lucide="copy" class="w-3 h-3"></i>
-                    </button>
-                </div>
+            <div class="mb-4">
+                <div id="userName" class="font-bold text-base text-black mb-1">...</div>
+                <div class="text-sm text-gray-600" id="userID">00000000</div>
             </div>
-
-            <!-- Simple Level Display -->
-            <div class="level-display">
-                <div class="level-current" id="currentLevel">1</div>
-                <div class="level-label">المستوى</div>
-                <div class="level-progress">
-                    <div class="level-progress-bar" id="levelProgressBar" style="width: 20%"></div>
-                </div>
-                <div class="level-info">
-                    <span id="currentXP">0 XP</span>
-                    <span id="nextLevelXP">1000 XP</span>
-                </div>
+            
+            <!-- Level Icons -->
+            <div class="level-icons">
+                <div class="level-icon" id="levelIcon">1</div>
+                <div class="level-icon">🎮</div>
+                <div class="level-icon">⭐</div>
             </div>
         </div>
         
-        <!-- Badges Section -->
-        <div class="p-4 border-b border-slate-700">
-            <h4 class="text-sm font-semibold text-sky-300 mb-3 text-center">شاراتي</h4>
-            <div class="badges-grid" id="badgesGrid">
-                <!-- Badges will be injected here as images -->
-            </div>
+        <!-- Navigation Menu -->
+        <div class="flex-1 p-4">
+            <a href="#" onclick="switchView('home')" class="nav-item">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span>الرئيسية</span>
+            </a>
+            <a href="#" onclick="switchView('wallet')" class="nav-item">
+                <i data-lucide="wallet" class="w-5 h-5"></i>
+                <span>المحفظة</span>
+            </a>
+            <a href="#" onclick="switchView('store')" class="nav-item">
+                <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                <span>المتجر</span>
+            </a>
+            <a href="#" onclick="switchView('bag')" class="nav-item">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+                <span>حقيبتي</span>
+            </a>
+            <a href="#" onclick="switchView('settings')" class="nav-item">
+                <i data-lucide="settings" class="w-5 h-5"></i>
+                <span>الإعدادات</span>
+            </a>
         </div>
         
-        <!-- Navigation -->
-        <nav class="p-4 space-y-1 flex-1">
-            <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="home" class="w-5 h-5 text-sky-500"></i>
-                <span class="font-bold text-sm">الرئيسية</span>
-            </button>
-            <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="wallet" class="w-5 h-5 text-green-500"></i>
-                <span class="font-bold text-sm">المحفظة</span>
-            </button>
-            <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-500"></i>
-                <span class="font-bold text-sm">المتجر</span>
-            </button>
-            <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="briefcase" class="w-5 h-5 text-purple-500"></i>
-                <span class="font-bold text-sm">حقيبتي</span>
-            </button>
-        </nav>
-        
-        <!-- Logout Button -->
-        <div class="p-4 border-t border-slate-700">
-            <button onclick="logout()" class="w-full p-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-sm hover:from-red-700 hover:to-red-800 transition-all duration-200">
-                <i data-lucide="log-out" class="w-4 h-4 inline ml-2"></i>
+        <!-- Logout -->
+        <div class="p-4 border-t border-gray-200">
+            <button onclick="confirmLogout()" class="btn" style="background: #f5f5f5; color: #dc2626;">
+                <i data-lucide="log-out" class="w-4 h-4 ml-2"></i>
                 تسجيل خروج
             </button>
         </div>
@@ -854,53 +344,43 @@
 
     <!-- Views -->
     <div id="view-home" class="view-screen active">
-        <!-- Banner -->
-        <div id="bannerContainer" class="mx-4 mt-4 mb-6 rounded-2xl overflow-hidden shadow-xl h-[180px] bg-gradient-to-r from-sky-500/20 to-blue-500/20 border border-sky-500/30">
-            <!-- Banner will be loaded here -->
-        </div>
-        
-        <!-- Rooms Navigation -->
         <div class="tab-nav">
-            <button onclick="switchTab('public')" class="tab-btn active">🌐 غرف عامة</button>
-            <button onclick="switchTab('private')" class="tab-btn">🔒 خاص بي</button>
+            <button onclick="switchTab('public')" class="tab-btn active">🌐 عامة</button>
+            <button onclick="switchTab('private')" class="tab-btn">🔒 خاصة</button>
         </div>
         
-        <!-- Rooms Grid -->
         <div class="rooms-grid" id="roomsList">
-            <!-- Rooms will be loaded here -->
+            <!-- Rooms will load here -->
         </div>
     </div>
 
     <div id="view-wallet" class="view-screen">
-        <div class="wallet-balance slide-in">
-            <div class="text-sm text-slate-400 mb-2">الرصيد المتوفر</div>
-            <div class="text-5xl font-black mb-4">
-                <span id="wallet-balance-big">0</span> 
-                <span class="text-3xl">💰</span>
-            </div>
-            <div class="text-sm text-slate-400">أخر تحديث: اليوم</div>
+        <div class="p-5 text-center">
+            <div class="text-gray-600 mb-2">الرصيد المتوفر</div>
+            <div class="text-4xl font-black mb-1" id="wallet-balance-big">0</div>
+            <div class="text-sm text-gray-500">💰</div>
         </div>
         
-        <div class="px-5">
-            <h3 class="text-lg font-bold mb-4">شحن الرصيد</h3>
+        <div class="p-4">
+            <h3 class="font-bold mb-3">شحن الرصيد</h3>
             <div class="recharge-grid">
                 <div class="recharge-card" onclick="recharge(27000, 1)">
-                    <div class="text-2xl mb-2">💎</div>
-                    <div class="font-bold text-lg">27,000</div>
-                    <div class="text-sm text-slate-400 mb-2">باقة المبتدئين</div>
-                    <div class="modern-btn text-sm py-2">1.00$</div>
+                    <div class="text-xl mb-1">💎</div>
+                    <div class="font-bold">27,000</div>
+                    <div class="text-sm text-gray-600 mb-2">1.00$</div>
+                    <button class="btn btn-buy text-sm py-2">شراء</button>
                 </div>
                 <div class="recharge-card" onclick="recharge(55000, 1.99)">
-                    <div class="text-2xl mb-2">💎💎</div>
-                    <div class="font-bold text-lg">55,000</div>
-                    <div class="text-sm text-slate-400 mb-2">باقة المتوسط</div>
-                    <div class="modern-btn text-sm py-2">1.99$</div>
+                    <div class="text-xl mb-1">💎💎</div>
+                    <div class="font-bold">55,000</div>
+                    <div class="text-sm text-gray-600 mb-2">1.99$</div>
+                    <button class="btn btn-buy text-sm py-2">شراء</button>
                 </div>
                 <div class="recharge-card" onclick="recharge(120000, 3.99)">
-                    <div class="text-2xl mb-2">💎💎💎</div>
-                    <div class="font-bold text-lg">120,000</div>
-                    <div class="text-sm text-slate-400 mb-2">باقة المحترفين</div>
-                    <div class="modern-btn text-sm py-2">3.99$</div>
+                    <div class="text-xl mb-1">💎💎💎</div>
+                    <div class="font-bold">120,000</div>
+                    <div class="text-sm text-gray-600 mb-2">3.99$</div>
+                    <button class="btn btn-buy text-sm py-2">شراء</button>
                 </div>
             </div>
         </div>
@@ -908,8 +388,8 @@
 
     <div id="view-store" class="view-screen">
         <div class="tab-nav mx-4 mt-4">
-            <button onclick="filterStore('frames')" id="fBtn" class="tab-btn active">🖼️ إطارات</button>
-            <button onclick="filterStore('badges')" id="bBtn" class="tab-btn">🏷️ شارات</button>
+            <button onclick="filterStore('frames')" id="fBtn" class="tab-btn active">إطارات</button>
+            <button onclick="filterStore('badges')" id="bBtn" class="tab-btn">شارات</button>
         </div>
         <div id="storeItems" class="store-grid"></div>
     </div>
@@ -918,39 +398,67 @@
         <div id="bagItems" class="store-grid"></div>
     </div>
 
+    <div id="view-settings" class="view-screen">
+        <div class="p-5">
+            <h2 class="font-bold text-lg mb-4">الإعدادات</h2>
+            <div class="space-y-3">
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <div class="font-medium mb-1">حول التطبيق</div>
+                    <div class="text-sm text-gray-600">Afnan AI - النسخة المتطورة</div>
+                </div>
+                <div class="p-3 bg-gray-50 rounded-lg">
+                    <div class="font-medium mb-1">رقم الإصدار</div>
+                    <div class="text-sm text-gray-600">1.0.0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
 
     <!-- Edit Profile Modal -->
-    <div id="editProfileModal" class="edit-modal">
-        <div class="edit-content fade-in">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-xl font-bold text-white">تعديل الملف الشخصي</h2>
-                <button onclick="closeEditProfile()" class="text-slate-400 hover:text-white">
-                    <i data-lucide="x" class="w-6 h-6"></i>
+    <div id="editProfileModal" class="fixed inset-0 bg-black/50 z-5000 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl w-full max-w-sm p-6">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-lg font-bold">تعديل الملف</h2>
+                <button onclick="closeEditProfile()" class="text-gray-500">
+                    <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
             
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">الاسم المعروض</label>
-                    <input type="text" id="editDisplayName" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-sky-500">
+                    <label class="block text-sm text-gray-700 mb-2">الاسم</label>
+                    <input id="editDisplayName" type="text" class="w-full p-3 border border-gray-300 rounded-lg">
                 </div>
                 
                 <div>
-                    <label class="block text-sm font-medium text-slate-300 mb-2">رابط الصورة الجديدة</label>
-                    <input type="url" id="editPhotoURL" class="w-full p-3 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-sky-500" placeholder="https://example.com/photo.jpg">
+                    <label class="block text-sm text-gray-700 mb-2">رابط الصورة</label>
+                    <input id="editPhotoURL" type="url" class="w-full p-3 border border-gray-300 rounded-lg">
                 </div>
                 
-                <button onclick="saveProfile()" class="w-full modern-btn py-3 mt-4">
-                    <i data-lucide="save" class="w-5 h-5 ml-2"></i>
+                <button onclick="saveProfile()" class="btn btn-buy">
                     حفظ التغييرات
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
+    <!-- Logout Confirmation -->
+    <div id="logoutModal" class="fixed inset-0 bg-black/50 z-5000 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-xl w-full max-w-sm p-6">
+            <h2 class="text-lg font-bold mb-4">تسجيل الخروج</h2>
+            <p class="text-gray-600 mb-6">هل أنت متأكد من تسجيل الخروج؟</p>
+            <div class="flex gap-3">
+                <button onclick="closeLogoutModal()" class="btn flex-1" style="background: #f5f5f5;">
+                    إلغاء
+                </button>
+                <button onclick="logout()" class="btn flex-1" style="background: #dc2626; color: white;">
+                    تأكيد
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="module">
@@ -973,108 +481,9 @@
 
     let uData = null;
     let storeData = { frames: [], badges: [] };
-    let currentTheme = 'dark';
     
-    // Level Images Map (1-50)
-    const levelImages = {
-        1: 'https://i.postimg.cc/G4PtHLMS/ga.webp',
-        2: 'https://i.postimg.cc/8F15v23K/gb.webp',
-        3: 'https://i.postimg.cc/DW2ZG9DC/gc.webp',
-        4: 'https://i.postimg.cc/NygMX3VC/gd.webp',
-        5: 'https://i.postimg.cc/cKsH3pj5/ge.webp',
-        6: 'https://i.postimg.cc/NygMX3Vn/gf.webp',
-        7: 'https://i.postimg.cc/WD23ZBKH/gg.webp',
-        8: 'https://i.postimg.cc/068QST33/gh.webp',
-        9: 'https://i.postimg.cc/4KJdcDMq/gi.webp',
-        10: 'https://i.postimg.cc/Ff9RSMq2/gj.webp',
-        11: 'https://i.postimg.cc/yJVdRM5M/gk.webp',
-        12: 'https://i.postimg.cc/Js30GrTg/gl.webp',
-        13: 'https://i.postimg.cc/rd8m4B36/gm.webp',
-        14: 'https://i.postimg.cc/GBc2DWVw/gn.webp',
-        15: 'https://i.postimg.cc/xk0CmwhV/go.webp',
-        16: 'https://i.postimg.cc/t1XT6KwH/gp.webp',
-        17: 'https://i.postimg.cc/VSY6txp8/gq.webp',
-        18: 'https://i.postimg.cc/cKsH3p2W/gr.webp',
-        19: 'https://i.postimg.cc/d7q1Cbpw/gs.webp',
-        20: 'https://i.postimg.cc/R3MFtky9/gt.webp',
-        21: 'https://i.postimg.cc/3yKRGsVK/gu.webp',
-        22: 'https://i.postimg.cc/QBXt72wj/gv.webp',
-        23: 'https://i.postimg.cc/TKj1pdks/gw.webp',
-        24: 'https://i.postimg.cc/rd8m4B3F/gx.webp',
-        25: 'https://i.postimg.cc/SXys9B3x/gy.webp',
-        26: 'https://i.postimg.cc/DW2ZG9Hz/gz.webp',
-        27: 'https://i.postimg.cc/JyPh5TC4/h.webp',
-        28: 'https://i.postimg.cc/DW2ZG9HZ/h0.webp',
-        29: 'https://i.postimg.cc/6793Zkgq/h1.webp',
-        30: 'https://i.postimg.cc/xk0Cmwhq/h2.webp',
-        31: 'https://i.postimg.cc/t12gNrGj/h3.webp',
-        32: 'https://i.postimg.cc/3ynwFLQ7/h4.webp',
-        33: 'https://i.postimg.cc/t12gNrG9/h5.webp',
-        34: 'https://i.postimg.cc/wt0BQWYq/h6.webp',
-        35: 'https://i.postimg.cc/tsdJYqrw/h7.webp',
-        36: 'https://i.postimg.cc/7CmLnBrP/h8.webp',
-        37: 'https://i.postimg.cc/mc8rydWg/h9.webp',
-        38: 'https://i.postimg.cc/Y4bSzXB9/ha.webp',
-        39: 'https://i.postimg.cc/SXDKfZbR/hb.webp',
-        40: 'https://i.postimg.cc/XZQvk26X/hc.webp',
-        41: 'https://i.postimg.cc/GBqpxMnH/he.webp',
-        42: 'https://i.postimg.cc/3ynwFLQk/hf.webp',
-        43: 'https://i.postimg.cc/bG3v96fG/hg.webp',
-        44: 'https://i.postimg.cc/Js30GrTS/hh.webp',
-        45: 'https://i.postimg.cc/d740jWck/hi.webp',
-        46: 'https://i.postimg.cc/CZF183t7/hj.webp',
-        47: 'https://i.postimg.cc/PLtxDgcK/hk.webp',
-        48: 'https://i.postimg.cc/rd8m4BbQ/hl.webp',
-        49: 'https://i.postimg.cc/4KJdcDMW/hm.webp',
-        50: 'https://i.postimg.cc/4KJdcDMW/hm.webp'
-    };
-
-    // XP required for each level (1-50)
-    const xpRequirements = [];
-    for (let i = 1; i <= 50; i++) {
-        xpRequirements[i] = 1000 * Math.pow(1.2, i - 1);
-    }
-
-    // Theme Management
-    function toggleTheme() {
-        const body = document.body;
-        if (currentTheme === 'dark') {
-            body.classList.add('light-mode');
-            body.classList.remove('dark');
-            currentTheme = 'light';
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark');
-            currentTheme = 'dark';
-        }
-        localStorage.setItem('theme', currentTheme);
-    }
-
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        const body = document.body;
-        if (savedTheme === 'light') {
-            body.classList.add('light-mode');
-            body.classList.remove('dark');
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark');
-        }
-        currentTheme = savedTheme;
-    }
-
-    // Search Modal
-    function toggleSearch() {
-        const modal = document.getElementById('searchModal');
-        modal.classList.toggle('active');
-        if (modal.classList.contains('active')) {
-            modal.querySelector('input').focus();
-        }
-    }
-
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            loadTheme();
             onSnapshot(doc(db, "users", user.uid), (snap) => {
                 if (snap.exists()) {
                     uData = snap.data();
@@ -1086,7 +495,6 @@
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
             loadStore();
-            loadBanners();
             lucide.createIcons();
         } else {
             document.getElementById('loginPage').style.display = 'flex';
@@ -1113,22 +521,11 @@
 
     function updateUI() {
         document.getElementById('userName').innerText = uData.displayName || 'مستخدم';
-        document.getElementById('userAvatar').src = uData.photoURL || 'https://via.placeholder.com/50';
+        document.getElementById('userAvatar').src = uData.photoURL || 'https://via.placeholder.com/30';
         document.getElementById('userID').innerText = uData.customId || '00000000';
         document.getElementById('wallet-balance-big').innerText = (uData.balance || 0).toLocaleString();
+        document.getElementById('levelIcon').innerText = uData.level || '1';
         
-        // Update Level System - Simple Design
-        const level = uData.level || 1;
-        const xp = uData.xp || 0;
-        const nextLevelXP = xpRequirements[level] || 1000;
-        const progress = Math.min(100, (xp / nextLevelXP) * 100);
-        
-        document.getElementById('currentLevel').innerText = level;
-        document.getElementById('currentXP').innerText = `${xp.toLocaleString()} XP`;
-        document.getElementById('nextLevelXP').innerText = `${Math.round(nextLevelXP).toLocaleString()} XP`;
-        document.getElementById('levelProgressBar').style.width = `${progress}%`;
-        
-        // Active frame
         const frameImg = document.getElementById('activeFrame');
         if (uData.activeFrame) {
             const f = storeData.frames.find(x => x.id === uData.activeFrame);
@@ -1139,33 +536,6 @@
         } else {
             frameImg.style.display = 'none';
         }
-
-        // Update badges as images
-        const badgesGrid = document.getElementById('badgesGrid');
-        badgesGrid.innerHTML = '';
-        if (uData.purchasedBadges && uData.purchasedBadges.length > 0) {
-            uData.purchasedBadges.forEach(badge => {
-                const badgeData = storeData.badges.find(b => b.id === badge.id);
-                if (badgeData) {
-                    const isActive = uData.activeBadges && uData.activeBadges.includes(badge.id);
-                    const badgeImage = badgeData.image || badgeData.icon || 'https://via.placeholder.com/32';
-                    
-                    badgesGrid.innerHTML += `
-                        <div class="badge-item ${isActive ? 'active' : ''}" 
-                             title="${badgeData.name}"
-                             onclick="toggleBadge('${badge.id}')">
-                            ${badgeData.image ? 
-                                `<img src="${badgeData.image}" alt="${badgeData.name}">` : 
-                                `<span>${badgeData.icon || '🏅'}</span>`
-                            }
-                        </div>
-                    `;
-                }
-            });
-        } else {
-            badgesGrid.innerHTML = '<p class="text-slate-400 text-xs col-span-3 text-center">لا توجد شارات</p>';
-        }
-
         lucide.createIcons();
     }
 
@@ -1185,7 +555,6 @@
         const container = document.getElementById('storeItems');
         container.innerHTML = '';
         
-        // Update active tab
         document.querySelectorAll('#fBtn, #bBtn').forEach(btn => btn.classList.remove('active'));
         if (type === 'frames') {
             document.getElementById('fBtn').classList.add('active');
@@ -1195,33 +564,29 @@
 
         storeData[type].forEach(item => {
             container.innerHTML += `
-                <div class="store-card fade-in">
-                    <span class="item-label">${type === 'frames' ? 'إطار' : 'شارة'}</span>
-                    <div class="h-24 flex items-center justify-center mt-4">
+                <div class="store-card">
+                    <div class="h-24 flex items-center justify-center">
                         ${type === 'frames' 
-                            ? `<img src="${item.image}" class="w-20 h-20 object-contain">` 
-                            : `<img src="${item.image || 'https://via.placeholder.com/60'}" class="w-16 h-16 object-contain">`
+                            ? `<img src="${item.image}" class="w-16 h-16 object-contain">` 
+                            : `<img src="${item.image || 'https://via.placeholder.com/60'}" class="w-12 h-12 object-contain">`
                         }
                     </div>
-                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
-                    <div class="text-xs text-slate-400 mb-2">${item.description || ''}</div>
-                    <button onclick="buyItem('${type}', '${item.id}', ${item.price})" class="action-btn btn-buy">
-                        <i data-lucide="shopping-cart" class="w-3 h-3 inline ml-1"></i>
+                    <div class="text-sm font-bold mt-2">${item.name}</div>
+                    <button onclick="buyItem('${type}', '${item.id}', ${item.price})" class="btn btn-buy mt-3 text-sm">
                         شراء ${item.price.toLocaleString()}💰
                     </button>
                 </div>
             `;
         });
-        lucide.createIcons();
     };
 
     window.buyItem = async (type, id, price) => {
         if (uData.balance < price) {
-            showToast("رصيدك غير كافٍ", "error");
+            showToast("رصيدك غير كافٍ");
             return;
         }
         
-        const expiry = Date.now() + (24 * 60 * 60 * 1000); // 1 Day
+        const expiry = Date.now() + (24 * 60 * 60 * 1000);
         const userRef = doc(db, "users", auth.currentUser.uid);
         
         const listKey = type === 'frames' ? 'purchasedFrames' : 'purchasedBadges';
@@ -1235,47 +600,23 @@
                 balance: increment(-price),
                 [listKey]: newList
             });
-            showToast("تم الشراء لمدة يوم واحد", "success");
+            showToast("تم الشراء لمدة يوم");
         } catch (error) {
-            showToast("حدث خطأ أثناء الشراء", "error");
-        }
-    };
-
-    window.toggleBadge = async (badgeId) => {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const currentBadges = uData.activeBadges || [];
-        
-        let newBadges;
-        if (currentBadges.includes(badgeId)) {
-            newBadges = currentBadges.filter(id => id !== badgeId);
-            showToast("تم إزالة الشارة", "info");
-        } else {
-            newBadges = [...currentBadges, badgeId];
-            showToast("تم تفعيل الشارة", "success");
-        }
-        
-        try {
-            await updateDoc(userRef, {
-                activeBadges: newBadges
-            });
-        } catch (error) {
-            showToast("حدث خطأ", "error");
+            showToast("حدث خطأ أثناء الشراء");
         }
     };
 
     window.switchView = (v) => {
         document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
         const view = document.getElementById('view-' + v);
-        if (view) {
-            view.classList.add('active');
-            view.classList.add('fade-in');
-        }
+        if (view) view.classList.add('active');
         
         const titles = {
             'home': 'الرئيسية',
             'wallet': 'المحفظة',
             'store': 'المتجر',
-            'bag': 'حقيبتي'
+            'bag': 'حقيبتي',
+            'settings': 'الإعدادات'
         };
         document.getElementById('view-title').innerText = titles[v] || 'Afnan AI';
         if (v === 'bag') loadBag();
@@ -1287,13 +628,7 @@
         container.innerHTML = '';
         
         if (!uData.purchasedFrames || uData.purchasedFrames.length === 0) {
-            container.innerHTML = `
-                <div class="col-span-2 text-center py-8">
-                    <i data-lucide="package-open" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                    <p class="text-slate-400">الحقيبة فارغة</p>
-                </div>
-            `;
-            lucide.createIcons();
+            container.innerHTML = '<p class="text-gray-500 text-center col-span-2 py-8">الحقيبة فارغة</p>';
             return;
         }
 
@@ -1306,20 +641,17 @@
             const hoursLeft = Math.ceil(timeLeft / (1000 * 60 * 60));
             
             container.innerHTML += `
-                <div class="store-card fade-in">
-                    <span class="item-label">${hoursLeft} ساعة</span>
-                    <img src="${item.image}" class="w-16 h-16 object-contain mt-6">
-                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
-                    <div class="text-xs text-slate-400 mb-2">متبقي ${hoursLeft} ساعة</div>
+                <div class="store-card">
+                    <img src="${item.image}" class="w-16 h-16 object-contain mx-auto">
+                    <div class="text-sm font-bold mt-2 text-center">${item.name}</div>
+                    <div class="text-xs text-gray-500 text-center mb-2">${hoursLeft} ساعة</div>
                     <button onclick="${isEquipped ? `equip('null')` : `equip('${item.id}')`}" 
-                            class="action-btn ${isEquipped ? 'btn-unequip' : 'btn-equip'}">
-                        <i data-lucide="${isEquipped ? 'x' : 'check'}" class="w-3 h-3 inline ml-1"></i>
+                            class="btn ${isEquipped ? 'bg-gray-200 text-black' : 'btn-buy'} text-sm">
                         ${isEquipped ? 'خلع' : 'ارتداء'}
                     </button>
                 </div>
             `;
         });
-        lucide.createIcons();
     }
 
     window.equip = async (id) => {
@@ -1327,45 +659,23 @@
             await updateDoc(doc(db, "users", auth.currentUser.uid), { 
                 activeFrame: id === 'null' ? null : id 
             });
-            showToast(id === 'null' ? "تم خلع الإطار" : "تم ارتداء الإطار", "success");
+            showToast(id === 'null' ? "تم خلع الإطار" : "تم ارتداء الإطار");
             loadBag();
         } catch (error) {
-            showToast("حدث خطأ", "error");
+            showToast("حدث خطأ");
         }
     };
 
     window.recharge = async (amt, price) => {
         try {
             await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-                balance: increment(amt),
-                xp: increment(amt * 0.1) // Add XP when recharging
+                balance: increment(amt)
             });
-            showToast(`تم شحن ${amt.toLocaleString()} عملة بنجاح`, "success");
-            checkLevelUp();
+            showToast(`تم شحن ${amt.toLocaleString()} عملة`);
         } catch (error) {
-            showToast("حدث خطأ أثناء الشحن", "error");
+            showToast("حدث خطأ أثناء الشحن");
         }
     };
-
-    async function checkLevelUp() {
-        if (!uData) return;
-        
-        const level = uData.level || 1;
-        const xp = uData.xp || 0;
-        const nextLevelXP = xpRequirements[level] || 1000;
-        
-        if (xp >= nextLevelXP && level < 50) {
-            const newLevel = level + 1;
-            try {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    level: newLevel
-                });
-                showToast(`🎉 مبروك! لقد تقدمت للمستوى ${newLevel}!`, "success");
-            } catch (error) {
-                console.error('Error updating level:', error);
-            }
-        }
-    }
 
     window.toggleSidebar = (show) => {
         const side = document.getElementById('sidebar');
@@ -1379,45 +689,12 @@
         over.classList.toggle('active');
     };
 
-    async function loadBanners() {
-        try {
-            const snap = await getDocs(collection(db, "banners"));
-            const container = document.getElementById('bannerContainer');
-            if (snap.empty) {
-                container.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-sky-500/20 to-blue-500/20">
-                        <div class="text-center">
-                            <div class="text-3xl mb-2">🎉</div>
-                            <p class="font-bold">مرحباً في Afnan AI</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            const banner = snap.docs[0].data();
-            container.innerHTML = `
-                <img src="${banner.imageUrl}" class="w-full h-full object-cover">
-                <div class="absolute bottom-4 right-4 left-4 bg-black/50 backdrop-blur-sm rounded-lg p-3">
-                    <p class="text-white text-sm font-bold">${banner.title || 'عرض خاص'}</p>
-                    <p class="text-white/80 text-xs">${banner.description || ''}</p>
-                </div>
-            `;
-        } catch (error) {
-            console.error('Error loading banners:', error);
-        }
-    }
-
     async function loadRooms() {
         try {
             const snap = await getDocs(collection(db, "rooms"));
             const container = document.getElementById('roomsList');
             if (snap.empty) {
-                container.innerHTML = `
-                    <div class="col-span-2 text-center py-8">
-                        <i data-lucide="users" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                        <p class="text-slate-400">لا توجد غرف متاحة حالياً</p>
-                    </div>
-                `;
+                container.innerHTML = '<p class="text-gray-500 text-center col-span-2 py-8">لا توجد غرف متاحة</p>';
                 return;
             }
 
@@ -1425,24 +702,13 @@
             snap.docs.forEach(doc => {
                 const room = doc.data();
                 container.innerHTML += `
-                    <div class="room-card fade-in" onclick="enterRoom('${doc.id}')">
-                        <div class="room-header">
-                            <div class="room-icon">
-                                ${room.icon || '💬'}
-                            </div>
-                            <div class="flex-1">
-                                <h3 class="font-bold text-lg">${room.name}</h3>
-                                <p class="text-sm text-slate-400">${room.description || ''}</p>
-                            </div>
-                        </div>
-                        <div class="room-users">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                            <span>${room.users || 0} مستخدم</span>
-                        </div>
+                    <div class="room-card">
+                        <h3 class="font-bold text-lg mb-2">${room.name}</h3>
+                        <p class="text-sm text-gray-600 mb-3">${room.description || ''}</p>
+                        <div class="text-sm text-gray-500">👥 ${room.users || 0} مستخدم</div>
                     </div>
                 `;
             });
-            lucide.createIcons();
         } catch (error) {
             console.error('Error loading rooms:', error);
         }
@@ -1451,7 +717,7 @@
     window.switchTab = (tab) => {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         event.target.classList.add('active');
-        showToast(`تم التبديل إلى ${tab === 'public' ? 'الغرف العامة' : 'الخاصة'}`, "info");
+        showToast(`تم التبديل إلى ${tab === 'public' ? 'الغرف العامة' : 'الخاصة'}`);
     };
 
     window.loginWithGoogle = async () => {
@@ -1459,9 +725,9 @@
             const provider = new GoogleAuthProvider();
             const res = await signInWithPopup(auth, provider);
             await setupUserData(res.user);
-            showToast("مرحباً بك في Afnan AI", "success");
+            showToast("مرحباً بك");
         } catch (error) {
-            showToast("حدث خطأ أثناء التسجيل", "error");
+            showToast("حدث خطأ أثناء التسجيل");
         }
     };
 
@@ -1470,9 +736,9 @@
             const provider = new TwitterAuthProvider();
             const res = await signInWithPopup(auth, provider);
             await setupUserData(res.user);
-            showToast("مرحباً بك في Afnan AI", "success");
+            showToast("مرحباً بك");
         } catch (error) {
-            showToast("حدث خطأ أثناء التسجيل", "error");
+            showToast("حدث خطأ أثناء التسجيل");
         }
     };
 
@@ -1481,22 +747,17 @@
         const snap = await getDoc(userRef);
         
         if (!snap.exists()) {
-            const twitterUsername = user.displayName?.includes('@') ? user.displayName : `@${user.displayName?.split(' ').join('')}`;
-            
             await setDoc(userRef, {
                 displayName: user.displayName,
                 photoURL: user.photoURL,
                 email: user.email,
                 balance: 1000,
                 level: 1,
-                xp: 0,
                 customId: Math.floor(10000000 + Math.random() * 90000000).toString(),
                 purchasedFrames: [],
                 purchasedBadges: [],
                 activeFrame: null,
                 activeBadges: [],
-                provider: user.providerData[0]?.providerId,
-                twitterUsername: twitterUsername,
                 createdAt: new Date().toISOString(),
                 lastLogin: new Date().toISOString()
             });
@@ -1507,16 +768,15 @@
         }
     }
 
-    // Edit Profile Functions
     window.openEditProfile = () => {
         if (!uData) return;
         document.getElementById('editDisplayName').value = uData.displayName || '';
         document.getElementById('editPhotoURL').value = uData.photoURL || '';
-        document.getElementById('editProfileModal').classList.add('active');
+        document.getElementById('editProfileModal').style.display = 'flex';
     };
 
     window.closeEditProfile = () => {
-        document.getElementById('editProfileModal').classList.remove('active');
+        document.getElementById('editProfileModal').style.display = 'none';
     };
 
     window.saveProfile = async () => {
@@ -1524,7 +784,7 @@
         const newPhoto = document.getElementById('editPhotoURL').value.trim();
 
         if (!newName) {
-            showToast("الرجاء إدخال اسم", "error");
+            showToast("الرجاء إدخال اسم");
             return;
         }
 
@@ -1535,67 +795,53 @@
 
             if (Object.keys(updateData).length > 0) {
                 await updateDoc(doc(db, "users", auth.currentUser.uid), updateData);
-                showToast("تم تحديث الملف الشخصي", "success");
+                showToast("تم تحديث الملف");
                 closeEditProfile();
-            } else {
-                showToast("لم يتم إجراء تغييرات", "info");
             }
         } catch (error) {
-            console.error('Error updating profile:', error);
-            showToast("حدث خطأ أثناء الحفظ", "error");
+            showToast("حدث خطأ أثناء الحفظ");
         }
     };
 
-    function showToast(message, type = 'success') {
-        const container = document.getElementById('toastContainer');
+    function showToast(message) {
+        const container = document.getElementById('toastContainer') || (() => {
+            const div = document.createElement('div');
+            div.id = 'toastContainer';
+            document.body.appendChild(div);
+            return div;
+        })();
+        
         const toast = document.createElement('div');
-        
-        const colors = {
-            success: 'bg-gradient-to-r from-green-600 to-emerald-600',
-            error: 'bg-gradient-to-r from-red-600 to-rose-600',
-            info: 'bg-gradient-to-r from-sky-600 to-blue-600',
-            warning: 'bg-gradient-to-r from-orange-600 to-amber-600'
-        };
-        
-        const icons = {
-            success: 'check-circle',
-            error: 'alert-circle',
-            info: 'info',
-            warning: 'alert-triangle'
-        };
-        
-        toast.className = `toast ${colors[type]}`;
-        toast.innerHTML = `
-            <i data-lucide="${icons[type]}" class="w-5 h-5"></i>
-            <span>${message}</span>
-        `;
-        
+        toast.className = 'toast';
+        toast.textContent = message;
         container.appendChild(toast);
-        lucide.createIcons();
         
         setTimeout(() => {
-            toast.style.animation = 'slideUp 0.3s ease reverse';
-            setTimeout(() => {
-                if (toast.parentNode) {
-                    toast.parentNode.removeChild(toast);
-                }
-            }, 300);
+            toast.remove();
         }, 3000);
     }
 
     window.copyID = () => { 
         navigator.clipboard.writeText(uData.customId); 
-        showToast("تم نسخ المعرف", "success");
+        showToast("تم نسخ المعرف");
+    };
+    
+    window.confirmLogout = () => {
+        document.getElementById('logoutModal').style.display = 'flex';
+    };
+    
+    window.closeLogoutModal = () => {
+        document.getElementById('logoutModal').style.display = 'none';
     };
     
     window.logout = () => {
         signOut(auth);
-        showToast("تم تسجيل الخروج", "info");
+        showToast("تم تسجيل الخروج");
+        closeLogoutModal();
     };
     
     window.enterRoom = (roomId) => {
-        showToast("جاري الدخول إلى الغرفة...", "info");
-        // Implement room entry logic here
+        showToast("جاري الدخول إلى الغرفة...");
     };
 
     // Initialize icons
