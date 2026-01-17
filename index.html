@@ -140,6 +140,13 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
+        /* --- Badges Grid --- */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+        }
+
         /* --- General Animations --- */
         .fade-in { animation: fadeIn 0.5s ease-out forwards; }
         @keyframes fadeIn {
@@ -188,6 +195,21 @@
             color: #1f2937;
             border-radius: 20px 20px 20px 4px;
             border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .gift-message {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #fbbf24;
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            margin: 8px 0;
+        }
+
+        .gift-message-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 8px;
         }
     </style>
 </head>
@@ -286,7 +308,9 @@
                 <h3 class="font-bold text-lg mb-4 text-gray-800">إطاراتي</h3>
                 <div id="bagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي</h3>
-                <div id="badgesBagGrid" class="grid grid-cols-4 gap-3"></div>
+                <div id="badgesBagGrid" class="badges-grid mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي النشطة</h3>
+                <div id="activeBadgesGrid" class="badges-grid mb-8"></div>
             </div>
 
             <!-- VIEW: FRIENDS -->
@@ -302,6 +326,8 @@
                     <h3 class="font-bold text-lg text-gray-800">نتائج البحث</h3>
                     <div id="userResult" class="glass-card p-4 rounded-3xl"></div>
                 </div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">طلبات المتابعة</h3>
+                <div id="friendRequestsList" class="space-y-3 mb-6"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">أصدقائي</h3>
                 <div id="friendsList" class="space-y-3"></div>
             </div>
@@ -336,21 +362,20 @@
             </div>
             <div class="flex gap-3 mb-8">
                 <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-                    <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center overflow-hidden">
-                        <img id="magicLevelImg" src="" class="w-full h-full object-contain hidden">
-                        <i id="magicLevelIcon" data-lucide="wand-2" class="w-5 h-5 text-blue-400"></i>
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
+                        <img id="magicLevelImg" src="" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-[10px] text-gray-400 font-bold uppercase">السحر</span>
-                    <span id="magicLevelDisplay" class="font-black text-lg text-gray-800">-</span>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase mt-2">السحر</span>
                 </div>
                 <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-                    <div class="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center overflow-hidden">
-                        <img id="wealthLevelImg" src="" class="w-full h-full object-contain hidden">
-                        <i id="wealthLevelIcon" data-lucide="crown" class="w-5 h-5 text-yellow-400"></i>
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
+                        <img id="wealthLevelImg" src="" class="w-full h-full object-contain">
                     </div>
-                    <span class="text-[10px] text-gray-400 font-bold uppercase">الثروة</span>
-                    <span id="wealthLevelDisplay" class="font-black text-lg text-gray-800">-</span>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase mt-2">الثروة</span>
                 </div>
+            </div>
+            <div class="mb-6">
+                <div id="sidebarActiveBadges" class="badges-grid"></div>
             </div>
             <nav class="space-y-3">
                 <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
@@ -470,7 +495,7 @@
         const googleProvider = new GoogleAuthProvider();
 
         let userData = {};
-        let storeData = { frames: [], badges: [], gifts: [], magicLevels: {}, wealthLevels: {} };
+        let storeData = { frames: [], badges: [], gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {} };
         let currentChatFriend = null;
         let chatUnsubscribe = null;
 
@@ -482,6 +507,7 @@
                     if (docSnap.exists()) {
                         userData = docSnap.data();
                         await updateUI();
+                        await loadFriendRequests();
                         await loadFriends();
                     } else {
                         await createUserDoc(user);
@@ -503,6 +529,7 @@
                 email: user.email,
                 uid: user.uid,
                 balance: 1000,
+                jewels: 0, // جواهر جديدة
                 magicLevel: 1,
                 wealthLevel: 1,
                 customId: Math.floor(100000 + Math.random() * 900000).toString(),
@@ -511,25 +538,43 @@
                 activeFrame: null,
                 activeBadges: [],
                 friends: [],
+                friendRequests: [], // طلبات المتابعة الواردة
+                sentRequests: [], // طلبات المتابعة المرسلة
                 createdAt: new Date()
             });
         }
 
         async function loadGlobalData() {
+            // Load frames
             const fSnap = await getDocs(collection(db, "frames"));
             storeData.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            
+            // Load badges
             const bSnap = await getDocs(collection(db, "badges"));
             storeData.badges = bSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            
+            // Load gifts (wealth gifts)
             const gSnap = await getDocs(collection(db, "gifts"));
-            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'wealth'}));
+            
+            // Load luck gifts (magic gifts)
+            const lgSnap = await getDocs(collection(db, "luckGifts"));
+            storeData.luckGifts = lgSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'magic'}));
+            
+            // Load levels
             const mlSnap = await getDocs(collection(db, "magicLevels"));
             mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
+            
             const wlSnap = await getDocs(collection(db, "wealthLevels"));
             wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+            
             await updateUI();
         }
 
         async function updateUI() {
+            if (!auth.currentUser) return;
+            
+            // Basic user info
             document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
             document.getElementById('sideID').innerText = userData.customId || "000000";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
@@ -539,18 +584,16 @@
             // Levels
             const ml = userData.magicLevel || 1;
             const wl = userData.wealthLevel || 1;
-            document.getElementById('magicLevelDisplay').innerText = ml;
-            document.getElementById('wealthLevelDisplay').innerText = wl;
+            
+            const magicImg = document.getElementById('magicLevelImg');
+            const wealthImg = document.getElementById('wealthLevelImg');
             
             if (storeData.magicLevels[ml]) {
-                document.getElementById('magicLevelImg').src = storeData.magicLevels[ml].image;
-                document.getElementById('magicLevelImg').classList.remove('hidden');
-                document.getElementById('magicLevelIcon').classList.add('hidden');
+                magicImg.src = storeData.magicLevels[ml].image;
             }
+            
             if (storeData.wealthLevels[wl]) {
-                document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wl].image;
-                document.getElementById('wealthLevelImg').classList.remove('hidden');
-                document.getElementById('wealthLevelIcon').classList.add('hidden');
+                wealthImg.src = storeData.wealthLevels[wl].image;
             }
 
             // Frame
@@ -566,6 +609,22 @@
                 }
             } else {
                 frameEl.classList.add('hidden');
+            }
+
+            // Active badges in sidebar
+            const sidebarBadges = document.getElementById('sidebarActiveBadges');
+            sidebarBadges.innerHTML = '';
+            if (userData.activeBadges && userData.activeBadges.length > 0) {
+                userData.activeBadges.forEach(badgeId => {
+                    const badge = storeData.badges.find(b => b.id === badgeId);
+                    if (badge) {
+                        sidebarBadges.innerHTML += `
+                            <div class="flex items-center justify-center">
+                                <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
+                            </div>
+                        `;
+                    }
+                });
             }
         }
 
@@ -605,7 +664,10 @@
         window.loadBagItems = async () => {
             const fGrid = document.getElementById('bagGrid');
             const bGrid = document.getElementById('badgesBagGrid');
-            fGrid.innerHTML = ''; bGrid.innerHTML = '';
+            const aGrid = document.getElementById('activeBadgesGrid');
+            fGrid.innerHTML = ''; 
+            bGrid.innerHTML = '';
+            aGrid.innerHTML = '';
             
             // Frames
             const frames = userData.purchasedFrames || [];
@@ -616,13 +678,14 @@
                     fGrid.innerHTML += `
                         <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
                             <img src="${exists.image}" class="w-12 h-12 object-contain">
+                            ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                         </div>`;
                 } else {
                     await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedFrames: arrayRemove(f) });
                 }
             }
 
-            // Badges
+            // All badges
             const badges = userData.purchasedBadges || [];
             for (const b of badges) {
                 const exists = storeData.badges.find(sb => sb.id === b.id);
@@ -634,6 +697,18 @@
                         </div>`;
                 } else {
                     await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedBadges: arrayRemove(b) });
+                }
+            }
+
+            // Active badges only
+            const activeBadges = userData.activeBadges || [];
+            for (const badgeId of activeBadges) {
+                const badge = storeData.badges.find(b => b.id === badgeId);
+                if (badge) {
+                    aGrid.innerHTML += `
+                        <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white">
+                            <img src="${badge.image}" class="w-8 h-8 object-contain">
+                        </div>`;
                 }
             }
         };
@@ -650,6 +725,7 @@
                 activeBadges: isActive ? arrayRemove(id) : arrayUnion(id)
             });
             loadBagItems();
+            await updateUI();
         };
 
         window.searchUser = async () => {
@@ -665,6 +741,27 @@
             } else {
                 const user = snap.docs[0].data();
                 const isFollowing = userData.friends?.includes(user.uid);
+                const hasSentRequest = userData.sentRequests?.includes(user.uid);
+                const hasReceivedRequest = userData.friendRequests?.includes(user.uid);
+                
+                let buttonText = 'متابعة';
+                let buttonClass = 'bg-black text-white';
+                let buttonAction = `sendFriendRequest('${user.uid}')`;
+                
+                if (isFollowing) {
+                    buttonText = 'متابع';
+                    buttonClass = 'bg-gray-100 text-gray-500';
+                    buttonAction = `unfollowUser('${user.uid}')`;
+                } else if (hasSentRequest) {
+                    buttonText = 'تم الإرسال';
+                    buttonClass = 'bg-blue-100 text-blue-600';
+                    buttonAction = `cancelFriendRequest('${user.uid}')`;
+                } else if (hasReceivedRequest) {
+                    buttonText = 'قبول الطلب';
+                    buttonClass = 'bg-green-100 text-green-600';
+                    buttonAction = `acceptFriendRequest('${user.uid}')`;
+                }
+                
                 container.innerHTML = `
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
@@ -674,19 +771,112 @@
                                 <p class="text-xs text-gray-400">ID: ${user.customId}</p>
                             </div>
                         </div>
-                        <button onclick="toggleFollow('${user.uid}')" class="px-4 py-2 rounded-xl ${isFollowing ? 'bg-gray-100 text-gray-500' : 'bg-black text-white'} font-bold text-xs">
-                            ${isFollowing ? 'إلغاء المتابعة' : 'متابعة'}
+                        <button onclick="${buttonAction}" class="px-4 py-2 rounded-xl ${buttonClass} font-bold text-xs">
+                            ${buttonText}
                         </button>
                     </div>`;
             }
         };
 
-        window.toggleFollow = async (uid) => {
-            const isFollowing = userData.friends?.includes(uid);
+        window.sendFriendRequest = async (uid) => {
             await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                friends: isFollowing ? arrayRemove(uid) : arrayUnion(uid)
+                sentRequests: arrayUnion(uid)
             });
+            
+            await updateDoc(doc(db, "users", uid), {
+                friendRequests: arrayUnion(auth.currentUser.uid)
+            });
+            
             searchUser();
+            loadFriendRequests();
+        };
+
+        window.cancelFriendRequest = async (uid) => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                sentRequests: arrayRemove(uid)
+            });
+            
+            await updateDoc(doc(db, "users", uid), {
+                friendRequests: arrayRemove(auth.currentUser.uid)
+            });
+            
+            searchUser();
+            loadFriendRequests();
+        };
+
+        window.acceptFriendRequest = async (uid) => {
+            // Remove from requests
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friendRequests: arrayRemove(uid),
+                friends: arrayUnion(uid)
+            });
+            
+            // Add to other user's friends and remove from sent requests
+            await updateDoc(doc(db, "users", uid), {
+                sentRequests: arrayRemove(auth.currentUser.uid),
+                friends: arrayUnion(auth.currentUser.uid)
+            });
+            
+            searchUser();
+            loadFriendRequests();
+            loadFriends();
+        };
+
+        window.unfollowUser = async (uid) => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friends: arrayRemove(uid)
+            });
+            
+            await updateDoc(doc(db, "users", uid), {
+                friends: arrayRemove(auth.currentUser.uid)
+            });
+            
+            searchUser();
+            loadFriends();
+        };
+
+        async function loadFriendRequests() {
+            const list = document.getElementById('friendRequestsList');
+            list.innerHTML = '';
+            if (!userData.friendRequests || userData.friendRequests.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا توجد طلبات متابعة</p>';
+                return;
+            }
+            
+            for (const uid of userData.friendRequests) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const user = snap.data();
+                    list.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                    <div>
+                                        <h4 class="font-bold text-sm">${user.displayName}</h4>
+                                        <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="acceptFriendRequest('${user.uid}')" class="px-3 py-1 bg-green-100 text-green-600 rounded-lg text-xs font-bold">قبول</button>
+                                    <button onclick="rejectFriendRequest('${user.uid}')" class="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold">رفض</button>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            }
+        }
+
+        window.rejectFriendRequest = async (uid) => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friendRequests: arrayRemove(uid)
+            });
+            
+            await updateDoc(doc(db, "users", uid), {
+                sentRequests: arrayRemove(auth.currentUser.uid)
+            });
+            
+            loadFriendRequests();
         };
 
         async function loadFriends() {
@@ -725,19 +915,33 @@
             const chatId = [auth.currentUser.uid, uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
             if (chatUnsubscribe) chatUnsubscribe();
-            onValue(chatRef, (snapshot) => {
+            chatUnsubscribe = onValue(chatRef, (snapshot) => {
                 const messages = snapshot.val();
                 const container = document.getElementById('chatMessages');
                 container.innerHTML = '';
                 if (messages) {
                     Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
                         const isMe = msg.senderId === auth.currentUser.uid;
-                        container.innerHTML += `
-                            <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
-                                <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
-                                    ${msg.text}
-                                </div>
-                            </div>`;
+                        if (msg.type === 'gift') {
+                            // عرض الهدية كرسالة خاصة
+                            container.innerHTML += `
+                                <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                    <div class="gift-message max-w-[80%]">
+                                        <div class="gift-message-icon">
+                                            <img src="${msg.giftImage}" class="w-full h-full object-contain">
+                                        </div>
+                                        <p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p>
+                                        <p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p>
+                                    </div>
+                                </div>`;
+                        } else {
+                            container.innerHTML += `
+                                <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                    <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
+                                        ${msg.text}
+                                    </div>
+                                </div>`;
+                        }
                     });
                     container.scrollTop = container.scrollHeight;
                 }
@@ -754,6 +958,7 @@
                 senderId: auth.currentUser.uid,
                 receiverId: currentChatFriend.uid,
                 text: text,
+                type: 'text',
                 timestamp: Date.now()
             });
             input.value = '';
@@ -761,6 +966,10 @@
 
         window.closeChat = () => {
             document.getElementById('chatModal').classList.add('hidden');
+            if (chatUnsubscribe) {
+                chatUnsubscribe();
+                chatUnsubscribe = null;
+            }
             currentChatFriend = null;
         };
 
@@ -772,18 +981,19 @@
         window.switchGiftTab = (type) => {
             const grid = document.getElementById('giftGrid');
             grid.innerHTML = '';
-            const items = type === 'fixed' ? storeData.gifts : []; // Luck gifts logic can be added here
+            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
+            
             document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
             document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
             
-            if (type === 'luck') {
-                grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">قريباً...</p>';
+            if (items.length === 0) {
+                grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">لا توجد هدايا متاحة</p>';
                 return;
             }
 
             items.forEach(item => {
                 grid.innerHTML += `
-                    <div onclick="sendGift('${item.id}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
+                    <div onclick="sendGift('${item.id}', '${item.type}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
                         <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
                             <img src="${item.image}" class="w-full h-full object-contain">
                         </div>
@@ -793,15 +1003,85 @@
             });
         };
 
-        window.sendGift = async (giftId) => {
-            const gift = storeData.gifts.find(g => g.id === giftId);
-            if (userData.balance < (gift.price || 0)) return alert('رصيدك غير كافٍ!');
+        window.sendGift = async (giftId, giftType) => {
+            if (!currentChatFriend) {
+                alert('يجب فتح محادثة مع صديق أولاً');
+                toggleGiftBox(false);
+                return;
+            }
 
+            const giftList = giftType === 'magic' ? storeData.luckGifts : storeData.gifts;
+            const gift = giftList.find(g => g.id === giftId);
+            
+            if (userData.balance < (gift.price || 0)) {
+                alert('رصيدك غير كافٍ!');
+                return;
+            }
+
+            // خصم السعر من المرسل
             await updateDoc(doc(db, "users", auth.currentUser.uid), {
                 balance: increment(-(gift.price || 0))
             });
 
-            showGiftAnimation(gift, `لقد تم استلام هدية ${gift.name} بسعر ${gift.price || 0}`);
+            // إرسال الهدية في المحادثة
+            const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            await push(chatRef, {
+                senderId: auth.currentUser.uid,
+                receiverId: currentChatFriend.uid,
+                giftId: gift.id,
+                giftName: gift.name,
+                giftImage: gift.image,
+                giftType: gift.type,
+                type: 'gift',
+                timestamp: Date.now()
+            });
+
+            // تحديث مستوى المستلم بناءً على نوع الهدية
+            const receiverRef = doc(db, "users", currentChatFriend.uid);
+            const receiverSnap = await getDoc(receiverRef);
+            if (receiverSnap.exists()) {
+                const receiverData = receiverSnap.data();
+                
+                if (giftType === 'magic') {
+                    // زيادة جواهر السحر وتحويلها إلى عملات
+                    const newJewels = (receiverData.jewels || 0) + 10; // كل هدية سحر تضيف 10 جواهر
+                    let newCoins = receiverData.balance || 0;
+                    let newMagicLevel = receiverData.magicLevel || 1;
+                    
+                    // تحويل كل 10 جواهر إلى عملة واحدة
+                    if (newJewels >= 10) {
+                        const coinsToAdd = Math.floor(newJewels / 10);
+                        newCoins += coinsToAdd;
+                        newJewels = newJewels % 10;
+                        
+                        // زيادة مستوى السحر كل 100 عملة
+                        const magicPoints = newCoins;
+                        if (magicPoints >= 100 * newMagicLevel) {
+                            newMagicLevel += 1;
+                        }
+                    }
+                    
+                    await updateDoc(receiverRef, {
+                        jewels: newJewels,
+                        balance: newCoins,
+                        magicLevel: newMagicLevel
+                    });
+                } else if (giftType === 'wealth') {
+                    // زيادة مستوى الثروة مباشرة
+                    const wealthGiftValue = gift.reward || 1;
+                    const currentWealth = receiverData.wealthLevel || 1;
+                    const newWealthLevel = currentWealth + wealthGiftValue;
+                    
+                    await updateDoc(receiverRef, {
+                        wealthLevel: newWealthLevel,
+                        balance: increment(gift.reward || 0)
+                    });
+                }
+            }
+
+            // عرض رسالة تأكيد
+            showGiftAnimation(gift, `تم إرسال هدية ${gift.name} إلى ${currentChatFriend.displayName}`);
             toggleGiftBox(false);
         };
 
@@ -819,7 +1099,7 @@
 
         window.loginWithTwitter = () => signInWithPopup(auth, twitterProvider);
         window.loginWithGoogle = () => signInWithPopup(auth, googleProvider);
-        window.confirmLogout = () => confirm('خروج؟') && signOut(auth);
+        window.confirmLogout = () => confirm('هل تريد تسجيل الخروج؟') && signOut(auth);
         window.toggleSidebar = (show) => {
             const s = document.getElementById('sidebar');
             const o = document.getElementById('sidebarOverlay');
@@ -834,6 +1114,10 @@
             document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : v === 'bag' ? 'حقيبتي' : 'أصدقائي';
             if(v === 'bag') loadBagItems();
             if(v === 'store') loadStoreItems('frames');
+            if(v === 'friends') {
+                loadFriendRequests();
+                loadFriends();
+            }
             toggleSidebar(false);
         };
         window.recharge = (a) => updateDoc(doc(db, "users", auth.currentUser.uid), { balance: increment(a) }).then(() => alert('تم الشحن!'));
@@ -858,6 +1142,8 @@
             if (bDoc.exists()) {
                 const b = bDoc.data();
                 container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div><img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay"><div class="relative z-10 text-center p-6"><h3 class="font-black text-2xl text-gray-800 mb-1">${b.title}</h3><p class="text-sm text-gray-500 font-medium">${b.subtitle}</p></div>`;
+            } else {
+                container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-80"></div><div class="relative z-10 text-center p-6"><h3 class="font-black text-2xl text-gray-800 mb-1">مرحباً بك في Afnan AI</h3><p class="text-sm text-gray-500 font-medium">ابدأ تجربتك الآن</p></div>`;
             }
         }
 
@@ -876,6 +1162,7 @@
             document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
         };
 
+        // Initialize icons
         lucide.createIcons();
         setInterval(() => lucide.createIcons(), 1000);
     </script>
