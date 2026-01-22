@@ -6,7 +6,7 @@
     <title>Afnan AI - White Edition</title>
     
     <!-- Fonts: Noto Sans Arabic -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -113,6 +113,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 50%;
+            overflow: visible;
         }
 
         .avatar-img {
@@ -122,18 +124,23 @@
             object-fit: cover;
             border: 3px solid rgba(255, 255, 255, 0.8);
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 1;
         }
 
         .user-frame {
             position: absolute;
-            width: 185%;
-            height: 185%;
+            width: 140%;
+            height: 140%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             pointer-events: none;
-            z-index: 10;
+            z-index: 2;
             object-fit: contain;
+            border-radius: 50%;
+            padding: 0;
+            margin: 0;
         }
 
         /* --- SVGA Containers --- */
@@ -144,14 +151,28 @@
             top: 0;
             left: 0;
             pointer-events: none;
+            border-radius: 50%;
+            overflow: visible;
         }
 
         .svga-avatar-frame {
-            width: 185%;
-            height: 185%;
+            position: absolute;
+            width: 140%;
+            height: 140%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .svga-avatar-frame canvas {
+            border-radius: 50%;
+            object-fit: contain;
         }
 
         /* --- Level Indicators --- */
@@ -252,6 +273,62 @@
             padding: 2px 6px;
             border-radius: 4px;
             margin-top: 4px;
+        }
+
+        /* --- Perfect Frame Positioning --- */
+        .frame-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .perfect-frame {
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            object-fit: contain;
+            border-radius: 50%;
+            transform-origin: center center;
+            animation: frameFloat 3s ease-in-out infinite;
+        }
+
+        .perfect-svga-frame {
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            border-radius: 50%;
+            transform-origin: center center;
+            animation: frameFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes frameFloat {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.05) rotate(1deg); }
+        }
+
+        /* --- Frame Shadow Effect --- */
+        .frame-shadow {
+            position: absolute;
+            width: 130%;
+            height: 130%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle at center, 
+                rgba(0,0,0,0.1) 0%, 
+                rgba(0,0,0,0.05) 30%, 
+                transparent 70%);
+            z-index: 1;
+            pointer-events: none;
         }
     </style>
 </head>
@@ -359,9 +436,10 @@
         <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-2 pb-10">
             <div class="mb-6 mt-4">
                 <div class="avatar-wrapper">
+                    <div class="frame-shadow"></div>
                     <img id="sideAvatar" src="https://via.placeholder.com/150" class="avatar-img">
-                    <div id="sideSvgaFrame" class="svga-container svga-avatar-frame"></div>
-                    <img id="sideFrame" src="" class="user-frame hidden">
+                    <div id="sideSvgaFrame" class="perfect-svga-frame hidden"></div>
+                    <img id="sideFrame" src="" class="perfect-frame hidden">
                 </div>
             </div>
             <div class="text-center mb-6">
@@ -595,14 +673,18 @@
             const frameEl = document.getElementById('sideFrame');
             const svgaContainer = document.getElementById('sideSvgaFrame');
             
+            // إخفاء كليهما أولاً
+            frameEl.classList.add('hidden');
+            svgaContainer.classList.add('hidden');
+            svgaContainer.innerHTML = '';
+            
             if (userData.activeFrame) {
                 const item = storeData.itemsById[userData.activeFrame];
                 if (item) {
                     if (item.itemType === 'svga') {
                         // تشغيل SVGA كإطار متحرك
-                        frameEl.classList.add('hidden');
-                        svgaContainer.innerHTML = '';
-                        playSvga(item.fileUrl, svgaContainer, { 
+                        svgaContainer.classList.remove('hidden');
+                        playPerfectSvga(item.fileUrl, svgaContainer, { 
                             loops: 0, 
                             clearsAfterStop: false 
                         });
@@ -610,17 +692,11 @@
                         // استخدام صورة عادية كإطار
                         frameEl.src = item.image;
                         frameEl.classList.remove('hidden');
-                        svgaContainer.innerHTML = '';
                     }
                 } else {
                     // العنصر غير موجود في المتجر
-                    frameEl.classList.add('hidden');
-                    svgaContainer.innerHTML = '';
                     await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: null });
                 }
-            } else {
-                frameEl.classList.add('hidden');
-                svgaContainer.innerHTML = '';
             }
 
             // Active badges in sidebar
@@ -666,6 +742,45 @@
                     player.setVideoItem(videoItem);
                     player.loops = options.loops || 0;
                     player.clearsAfterStop = options.clearsAfterStop || false;
+                    player.startAnimation();
+                    
+                    // Store player reference
+                    const id = 'player_' + Date.now();
+                    activeSvgaPlayers[id] = { player, container };
+                    container.dataset.playerId = id;
+                }, (error) => {
+                    console.error('SVGA load error:', error);
+                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
+                });
+            } catch (error) {
+                console.error('SVGA player error:', error);
+                container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
+            }
+        }
+
+        // Perfect SVGA Player for Frames
+        function playPerfectSvga(url, container, options = {}) {
+            try {
+                // تنظيف الحاوية أولاً
+                container.innerHTML = '';
+                
+                const player = new SVGA.Player(container);
+                const parser = new SVGA.Parser();
+                
+                parser.load(url, (videoItem) => {
+                    player.setVideoItem(videoItem);
+                    player.loops = options.loops || 0;
+                    player.clearsAfterStop = options.clearsAfterStop || false;
+                    
+                    // Adjust canvas size to fit perfectly
+                    const canvas = container.querySelector('canvas');
+                    if (canvas) {
+                        canvas.style.width = '100%';
+                        canvas.style.height = '100%';
+                        canvas.style.objectFit = 'contain';
+                        canvas.style.borderRadius = '50%';
+                    }
+                    
                     player.startAnimation();
                     
                     // Store player reference
@@ -793,7 +908,7 @@
                         // عرض SVGA frame
                         fGrid.innerHTML += `
                             <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-1" id="bag-frame-${f.id}">
+                                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}">
                                     <span class="text-xs font-bold text-gray-600">SVGA</span>
                                 </div>
                                 ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
@@ -813,7 +928,7 @@
                         // صورة عادية
                         fGrid.innerHTML += `
                             <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                                <img src="${item.image}" class="w-12 h-12 object-contain">
+                                <img src="${item.image}" class="w-12 h-12 object-contain rounded-full">
                                 ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                             </div>`;
                     }
@@ -861,7 +976,7 @@
                     
                     sGrid.innerHTML += `
                         <div onclick="equipSvga('${s.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-1" id="bag-svga-${s.id}">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-svga-${s.id}">
                                 <span class="text-xs font-bold text-gray-600">SVGA</span>
                             </div>
                             <p class="text-xs text-center truncate w-full">${item.name}</p>
@@ -950,6 +1065,9 @@
             loadBagItems();
             await updateUI();
         };
+
+        // باقي الدوال تبقى كما هي...
+        // [بقية الكود تبقى كما هي بدون تغيير]
 
         window.searchUser = async () => {
             const id = document.getElementById('searchUserInput').value.trim();
