@@ -126,8 +126,8 @@
 
         .user-frame {
             position: absolute;
-            width: 165%;
-            height: 165%;
+            width: 185%;
+            height: 185%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -147,8 +147,8 @@
         }
 
         .svga-avatar-frame {
-            width: 165%;
-            height: 165%;
+            width: 185%;
+            height: 185%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -305,8 +305,8 @@
             <!-- VIEW: STORE -->
             <div id="view-store" class="view-section hidden fade-in">
                 <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2">
-                    <button onclick="loadStoreItems('frames')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
-                    <button onclick="loadStoreItems('badges')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
+                    <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
+                    <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
                     <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
                 </div>
                 <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
@@ -507,7 +507,14 @@
         const googleProvider = new GoogleAuthProvider();
 
         let userData = {};
-        let storeData = { frames: [], badges: [], svga: [], gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {} };
+        let storeData = { 
+            items: [], // جميع العناصر في متجر واحد
+            itemsById: {}, // للبحث السريع عن طريق الـ ID
+            gifts: [], 
+            luckGifts: [], 
+            magicLevels: {}, 
+            wealthLevels: {} 
+        };
         let currentChatFriend = null;
         let chatUnsubscribe = null;
         let activeSvgaPlayers = {};
@@ -531,17 +538,15 @@
         });
 
         async function loadGlobalData() {
-            // Load frames
-            const fSnap = await getDocs(collection(db, "frames"));
-            storeData.frames = fSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            // Load all store items from single collection
+            const storeSnap = await getDocs(collection(db, "storeItems"));
+            storeData.items = storeSnap.docs.map(d => ({id: d.id, ...d.data()}));
             
-            // Load badges
-            const bSnap = await getDocs(collection(db, "badges"));
-            storeData.badges = bSnap.docs.map(d => ({id: d.id, ...d.data()}));
-            
-            // Load SVGA items
-            const sSnap = await getDocs(collection(db, "svgaItems"));
-            storeData.svga = sSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'svga'}));
+            // Create lookup object for quick access
+            storeData.itemsById = {};
+            storeData.items.forEach(item => {
+                storeData.itemsById[item.id] = item;
+            });
             
             // Load gifts (wealth gifts)
             const gSnap = await getDocs(collection(db, "gifts"));
@@ -591,19 +596,24 @@
             const svgaContainer = document.getElementById('sideSvgaFrame');
             
             if (userData.activeFrame) {
-                // Check if it's a regular frame or SVGA
-                const frame = storeData.frames.find(f => f.id === userData.activeFrame);
-                const svgaItem = storeData.svga.find(s => s.id === userData.activeFrame);
-                
-                if (frame) {
-                    frameEl.src = frame.image;
-                    frameEl.classList.remove('hidden');
-                    svgaContainer.innerHTML = '';
-                } else if (svgaItem) {
-                    frameEl.classList.add('hidden');
-                    svgaContainer.innerHTML = '';
-                    playSvga(svgaItem.fileUrl, svgaContainer, { loops: 0, clearsAfterStop: false });
+                const item = storeData.itemsById[userData.activeFrame];
+                if (item) {
+                    if (item.itemType === 'svga') {
+                        // تشغيل SVGA كإطار متحرك
+                        frameEl.classList.add('hidden');
+                        svgaContainer.innerHTML = '';
+                        playSvga(item.fileUrl, svgaContainer, { 
+                            loops: 0, 
+                            clearsAfterStop: false 
+                        });
+                    } else {
+                        // استخدام صورة عادية كإطار
+                        frameEl.src = item.image;
+                        frameEl.classList.remove('hidden');
+                        svgaContainer.innerHTML = '';
+                    }
                 } else {
+                    // العنصر غير موجود في المتجر
                     frameEl.classList.add('hidden');
                     svgaContainer.innerHTML = '';
                     await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: null });
@@ -618,13 +628,26 @@
             sidebarBadges.innerHTML = '';
             if (userData.activeBadges && userData.activeBadges.length > 0) {
                 userData.activeBadges.forEach(badgeId => {
-                    const badge = storeData.badges.find(b => b.id === badgeId);
-                    if (badge) {
-                        sidebarBadges.innerHTML += `
-                            <div class="flex items-center justify-center">
-                                <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
-                            </div>
-                        `;
+                    const badge = storeData.itemsById[badgeId];
+                    if (badge && badge.type === 'badge') {
+                        if (badge.itemType === 'svga') {
+                            // إنشاء حاوية للشارة المتحركة
+                            const badgeContainer = document.createElement('div');
+                            badgeContainer.className = 'flex items-center justify-center w-8 h-8';
+                            badgeContainer.id = `badge-${badgeId}`;
+                            sidebarBadges.appendChild(badgeContainer);
+                            playSvga(badge.fileUrl, badgeContainer, { 
+                                loops: 1, 
+                                clearsAfterStop: false 
+                            });
+                        } else {
+                            // شارة عادية (صورة)
+                            sidebarBadges.innerHTML += `
+                                <div class="flex items-center justify-center">
+                                    <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
+                                </div>
+                            `;
+                        }
                     }
                 });
             }
@@ -633,6 +656,9 @@
         // SVGA Player Function
         function playSvga(url, container, options = {}) {
             try {
+                // تنظيف الحاوية أولاً
+                container.innerHTML = '';
+                
                 const player = new SVGA.Player(container);
                 const parser = new SVGA.Parser();
                 
@@ -648,10 +674,11 @@
                     container.dataset.playerId = id;
                 }, (error) => {
                     console.error('SVGA load error:', error);
-                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">خطأ في تحميل الرسوم المتحركة</div>';
+                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
                 });
             } catch (error) {
                 console.error('SVGA player error:', error);
+                container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
             }
         }
 
@@ -659,69 +686,88 @@
             const grid = document.getElementById('storeGrid');
             grid.innerHTML = '';
             
-            let items = [];
-            let field = '';
+            // تصفية العناصر حسب النوع
+            let items = storeData.items.filter(item => item.type === type);
             
-            if (type === 'frames') {
-                items = storeData.frames;
-                field = 'purchasedFrames';
-            } else if (type === 'badges') {
-                items = storeData.badges;
-                field = 'purchasedBadges';
-            } else if (type === 'svga') {
-                items = storeData.svga;
-                field = 'purchasedSvga';
-            }
-            
-            document.getElementById('store-tab-frames').className = type === 'frames' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
-            document.getElementById('store-tab-badges').className = type === 'badges' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            // تحديث أزرار التبويب
+            document.getElementById('store-tab-frames').className = type === 'frame' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-badges').className = type === 'badge' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
             document.getElementById('store-tab-svga').className = type === 'svga' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
 
             items.forEach(item => {
+                // تحديد الحقل المناسب حسب نوع العنصر
+                let field = '';
+                if (item.type === 'frame') field = 'purchasedFrames';
+                else if (item.type === 'badge') field = 'purchasedBadges';
+                else if (item.type === 'svga') field = 'purchasedSvga';
+                
                 const owned = userData[field]?.some(i => i.id === item.id);
                 
-                if (type === 'svga') {
-                    // عرض عناصر SVGA
-                    grid.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">
-                            <div class="svga-preview mb-2" id="preview-${item.id}"></div>
-                            <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
-                            <span class="svga-icon">SVGA</span>
-                            <button onclick="${owned ? '' : `buyItem('svga', '${item.id}', ${item.price})`}" 
-                                    class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl mt-2">
-                                ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
-                            </button>
-                        </div>`;
-                    
-                    // تشغيل معاينة SVGA
+                let previewHTML = '';
+                let extraTag = '';
+                
+                if (item.itemType === 'svga') {
+                    // معاينة SVGA
+                    previewHTML = `<div class="svga-preview mb-2" id="preview-${item.id}"></div>`;
+                    extraTag = '<span class="svga-icon">SVGA</span>';
+                } else {
+                    // صورة عادية
+                    previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
+                }
+                
+                grid.innerHTML += `
+                    <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">
+                        ${previewHTML}
+                        <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
+                        ${extraTag}
+                        <button onclick="${owned ? '' : `buyItem('${item.type}', '${item.id}', ${item.price})`}" 
+                                class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl mt-2">
+                            ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
+                        </button>
+                    </div>`;
+                
+                // تشغيل معاينة SVGA إذا كان من نوع SVGA
+                if (item.itemType === 'svga' && item.fileUrl) {
                     setTimeout(() => {
                         const previewContainer = document.getElementById(`preview-${item.id}`);
-                        if (previewContainer && item.fileUrl) {
-                            playSvga(item.fileUrl, previewContainer, { loops: 1, clearsAfterStop: true });
+                        if (previewContainer) {
+                            playSvga(item.fileUrl, previewContainer, { 
+                                loops: 1, 
+                                clearsAfterStop: true 
+                            });
                         }
                     }, 100);
-                } else {
-                    // عرض العناصر العادية
-                    grid.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[160px] relative">
-                            <img src="${item.image}" class="w-16 h-16 object-contain mb-2">
-                            <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
-                            <button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" 
-                                    class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl">
-                                ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
-                            </button>
-                        </div>`;
                 }
             });
+            
+            // إذا لم توجد عناصر
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center">
+                        <i data-lucide="package" class="w-12 h-12 text-gray-300 mb-4"></i>
+                        <p class="text-gray-400 text-sm">لا توجد عناصر في هذا القسم</p>
+                    </div>`;
+            }
         };
 
         window.buyItem = async (type, id, price) => {
             if (userData.balance < price) return alert('رصيدك غير كافٍ!');
-            const field = type === 'frames' ? 'purchasedFrames' : type === 'badges' ? 'purchasedBadges' : 'purchasedSvga';
+            
+            // تحديد الحقل المناسب حسب النوع
+            let field = '';
+            if (type === 'frame') field = 'purchasedFrames';
+            else if (type === 'badge') field = 'purchasedBadges';
+            else if (type === 'svga') field = 'purchasedSvga';
+            
             await updateDoc(doc(db, "users", auth.currentUser.uid), {
                 balance: increment(-price),
-                [field]: arrayUnion({ id: id, purchasedAt: new Date() })
+                [field]: arrayUnion({ 
+                    id: id, 
+                    purchasedAt: new Date(),
+                    itemType: storeData.itemsById[id]?.itemType || 'image'
+                })
             });
+            
             loadStoreItems(type);
         };
 
@@ -739,85 +785,168 @@
             // Frames
             const frames = userData.purchasedFrames || [];
             for (const f of frames) {
-                const exists = storeData.frames.find(sf => sf.id === f.id);
-                if (exists) {
+                const item = storeData.itemsById[f.id];
+                if (item && item.type === 'frame') {
                     const isEquipped = userData.activeFrame === f.id;
-                    fGrid.innerHTML += `
-                        <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                            <img src="${exists.image}" class="w-12 h-12 object-contain">
-                            ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
-                        </div>`;
-                } else {
-                    await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedFrames: arrayRemove(f) });
+                    
+                    if (item.itemType === 'svga') {
+                        // عرض SVGA frame
+                        fGrid.innerHTML += `
+                            <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                                <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-1" id="bag-frame-${f.id}">
+                                    <span class="text-xs font-bold text-gray-600">SVGA</span>
+                                </div>
+                                ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                            </div>`;
+                        
+                        // تشغيل SVGA
+                        setTimeout(() => {
+                            const container = document.getElementById(`bag-frame-${f.id}`);
+                            if (container) {
+                                playSvga(item.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: false 
+                                });
+                            }
+                        }, 100);
+                    } else {
+                        // صورة عادية
+                        fGrid.innerHTML += `
+                            <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                                <img src="${item.image}" class="w-12 h-12 object-contain">
+                                ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                            </div>`;
+                    }
                 }
             }
 
-            // All badges
+            // Badges
             const badges = userData.purchasedBadges || [];
             for (const b of badges) {
-                const exists = storeData.badges.find(sb => sb.id === b.id);
-                if (exists) {
+                const item = storeData.itemsById[b.id];
+                if (item && item.type === 'badge') {
                     const isActive = userData.activeBadges?.includes(b.id);
+                    
                     bGrid.innerHTML += `
                         <div onclick="toggleBadge('${b.id}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
-                            <img src="${exists.image}" class="w-8 h-8 object-contain">
+                            <div class="w-8 h-8 flex items-center justify-center" id="bag-badge-${b.id}">
+                                ${item.itemType === 'svga' ? 
+                                    '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : 
+                                    `<img src="${item.image}" class="w-full h-full object-contain">`
+                                }
+                            </div>
                         </div>`;
-                } else {
-                    await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedBadges: arrayRemove(b) });
+                    
+                    // تشغيل SVGA للشارات المتحركة
+                    if (item.itemType === 'svga' && item.fileUrl) {
+                        setTimeout(() => {
+                            const container = document.getElementById(`bag-badge-${b.id}`);
+                            if (container) {
+                                playSvga(item.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: false 
+                                });
+                            }
+                        }, 100);
+                    }
                 }
             }
 
-            // SVGA items
+            // SVGA items (متفرقة)
             const svgaItems = userData.purchasedSvga || [];
             for (const s of svgaItems) {
-                const exists = storeData.svga.find(ss => ss.id === s.id);
-                if (exists) {
+                const item = storeData.itemsById[s.id];
+                if (item && item.type === 'svga') {
                     const isEquipped = userData.activeFrame === s.id;
+                    
                     sGrid.innerHTML += `
                         <div onclick="equipSvga('${s.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-1">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-1" id="bag-svga-${s.id}">
                                 <span class="text-xs font-bold text-gray-600">SVGA</span>
                             </div>
-                            <p class="text-xs text-center truncate w-full">${exists.name}</p>
+                            <p class="text-xs text-center truncate w-full">${item.name}</p>
                             ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                         </div>`;
-                } else {
-                    await updateDoc(doc(db, "users", auth.currentUser.uid), { purchasedSvga: arrayRemove(s) });
+                    
+                    // تشغيل SVGA
+                    setTimeout(() => {
+                        const container = document.getElementById(`bag-svga-${s.id}`);
+                        if (container) {
+                            playSvga(item.fileUrl, container, { 
+                                loops: 1, 
+                                clearsAfterStop: false 
+                            });
+                        }
+                    }, 100);
                 }
             }
 
             // Active badges only
             const activeBadges = userData.activeBadges || [];
             for (const badgeId of activeBadges) {
-                const badge = storeData.badges.find(b => b.id === badgeId);
-                if (badge) {
+                const item = storeData.itemsById[badgeId];
+                if (item && item.type === 'badge') {
                     aGrid.innerHTML += `
                         <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white">
-                            <img src="${badge.image}" class="w-8 h-8 object-contain">
+                            <div class="w-8 h-8 flex items-center justify-center" id="active-badge-${badgeId}">
+                                ${item.itemType === 'svga' ? 
+                                    '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : 
+                                    `<img src="${item.image}" class="w-full h-full object-contain">`
+                                }
+                            </div>
                         </div>`;
+                    
+                    // تشغيل SVGA للشارات النشطة المتحركة
+                    if (item.itemType === 'svga' && item.fileUrl) {
+                        setTimeout(() => {
+                            const container = document.getElementById(`active-badge-${badgeId}`);
+                            if (container) {
+                                playSvga(item.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: false 
+                                });
+                            }
+                        }, 100);
+                    }
                 }
             }
         };
 
         window.equipFrame = async (id) => {
+            const item = storeData.itemsById[id];
+            if (!item) return;
+            
             const newFrame = userData.activeFrame === id ? null : id;
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: newFrame });
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeFrame: newFrame 
+            });
+            
             loadBagItems();
             setTimeout(() => updateUI(), 100);
         };
 
         window.equipSvga = async (id) => {
+            const item = storeData.itemsById[id];
+            if (!item || item.type !== 'svga') return;
+            
             const newFrame = userData.activeFrame === id ? null : id;
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: newFrame });
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeFrame: newFrame 
+            });
+            
             loadBagItems();
             setTimeout(() => updateUI(), 100);
         };
 
         window.toggleBadge = async (id) => {
+            const item = storeData.itemsById[id];
+            if (!item || item.type !== 'badge') return;
+            
             const isActive = userData.activeBadges?.includes(id);
             await updateDoc(doc(db, "users", auth.currentUser.uid), {
                 activeBadges: isActive ? arrayRemove(id) : arrayUnion(id)
             });
+            
             loadBagItems();
             await updateUI();
         };
@@ -825,11 +954,14 @@
         window.searchUser = async () => {
             const id = document.getElementById('searchUserInput').value.trim();
             if (!id) return;
+            
             const q = query(collection(db, "users"), where("customId", "==", id));
             const snap = await getDocs(q);
             const results = document.getElementById('searchResults');
             const container = document.getElementById('userResult');
+            
             results.classList.remove('hidden');
+            
             if (snap.empty) {
                 container.innerHTML = '<p class="text-center text-gray-400 text-sm">لم يتم العثور على مستخدم</p>';
             } else {
@@ -932,6 +1064,7 @@
         async function loadFriendRequests() {
             const list = document.getElementById('friendRequestsList');
             list.innerHTML = '';
+            
             if (!userData.friendRequests || userData.friendRequests.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا توجد طلبات متابعة</p>';
                 return;
@@ -976,10 +1109,12 @@
         async function loadFriends() {
             const list = document.getElementById('friendsList');
             list.innerHTML = '';
+            
             if (!userData.friends || userData.friends.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا يوجد أصدقاء بعد</p>';
                 return;
             }
+            
             for (const uid of userData.friends) {
                 const snap = await getDoc(doc(db, "users", uid));
                 if (snap.exists()) {
@@ -1003,40 +1138,47 @@
         window.openChat = async (uid) => {
             const snap = await getDoc(doc(db, "users", uid));
             currentChatFriend = snap.data();
+            
             document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
             document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
             document.getElementById('chatModal').classList.remove('hidden');
+            
             const chatId = [auth.currentUser.uid, uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
             if (chatUnsubscribe) chatUnsubscribe();
+            
             chatUnsubscribe = onValue(chatRef, (snapshot) => {
                 const messages = snapshot.val();
                 const container = document.getElementById('chatMessages');
                 container.innerHTML = '';
+                
                 if (messages) {
-                    Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
-                        const isMe = msg.senderId === auth.currentUser.uid;
-                        if (msg.type === 'gift') {
-                            // عرض الهدية كرسالة خاصة
-                            container.innerHTML += `
-                                <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
-                                    <div class="gift-message max-w-[80%]">
-                                        <div class="gift-message-icon">
-                                            <img src="${msg.giftImage}" class="w-full h-full object-contain">
+                    Object.values(messages)
+                        .sort((a, b) => a.timestamp - b.timestamp)
+                        .forEach(msg => {
+                            const isMe = msg.senderId === auth.currentUser.uid;
+                            if (msg.type === 'gift') {
+                                // عرض الهدية كرسالة خاصة
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="gift-message max-w-[80%]">
+                                            <div class="gift-message-icon">
+                                                <img src="${msg.giftImage}" class="w-full h-full object-contain">
+                                            </div>
+                                            <p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p>
+                                            <p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p>
                                         </div>
-                                        <p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p>
-                                        <p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p>
-                                    </div>
-                                </div>`;
-                        } else {
-                            container.innerHTML += `
-                                <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
-                                    <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
-                                        ${msg.text}
-                                    </div>
-                                </div>`;
-                        }
-                    });
+                                    </div>`;
+                            } else {
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
+                                            ${msg.text}
+                                        </div>
+                                    </div>`;
+                            }
+                        });
                     container.scrollTop = container.scrollHeight;
                 }
             });
@@ -1045,9 +1187,12 @@
         window.sendMessage = async () => {
             const input = document.getElementById('chatInput');
             const text = input.value.trim();
+            
             if (!text || !currentChatFriend) return;
+            
             const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
             await push(chatRef, {
                 senderId: auth.currentUser.uid,
                 receiverId: currentChatFriend.uid,
@@ -1055,6 +1200,7 @@
                 type: 'text',
                 timestamp: Date.now()
             });
+            
             input.value = '';
         };
 
@@ -1071,6 +1217,7 @@
             const giftBox = document.getElementById('giftBox');
             const isHidden = giftBox.classList.contains('hidden');
             giftBox.classList.toggle('hidden');
+            
             if (isHidden) {
                 switchGiftTab('fixed');
             }
@@ -1079,6 +1226,7 @@
         window.switchGiftTab = (type) => {
             const grid = document.getElementById('giftGrid');
             grid.innerHTML = '';
+            
             const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
             
             document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
@@ -1124,6 +1272,7 @@
             // إرسال الهدية في المحادثة
             const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
             await push(chatRef, {
                 senderId: auth.currentUser.uid,
                 receiverId: currentChatFriend.uid,
@@ -1138,6 +1287,7 @@
             // تحديث مستوى المستلم بناءً على نوع الهدية
             const receiverRef = doc(db, "users", currentChatFriend.uid);
             const receiverSnap = await getDoc(receiverRef);
+            
             if (receiverSnap.exists()) {
                 const receiverData = receiverSnap.data();
                 
@@ -1151,7 +1301,6 @@
                     if (newJewels >= 10) {
                         const coinsToAdd = Math.floor(newJewels / 10);
                         newCoins += coinsToAdd;
-                        // newJewels = newJewels % 10; // This should be updated in the variable
                         
                         // زيادة مستوى السحر كل 100 عملة
                         const magicPoints = newCoins;
@@ -1213,6 +1362,7 @@
             const o = document.getElementById('sidebarOverlay');
             s.classList.toggle('open', show);
             o.classList.toggle('hidden', !show);
+            
             if(show) setTimeout(() => o.classList.add('visible'), 10);
             else o.classList.remove('visible');
         };
@@ -1220,13 +1370,20 @@
         window.switchView = (v) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
             document.getElementById('view-' + v).classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : v === 'bag' ? 'حقيبتي' : 'أصدقائي';
+            
+            document.getElementById('pageTitle').innerText = 
+                v === 'home' ? 'الرئيسية' : 
+                v === 'wallet' ? 'المحفظة' : 
+                v === 'store' ? 'المتجر' : 
+                v === 'bag' ? 'حقيبتي' : 'أصدقائي';
+            
             if(v === 'bag') loadBagItems();
-            if(v === 'store') loadStoreItems('frames');
+            if(v === 'store') loadStoreItems('frame');
             if(v === 'friends') {
                 loadFriendRequests();
                 loadFriends();
             }
+            
             toggleSidebar(false);
         };
         
@@ -1249,12 +1406,17 @@
         async function loadBanner() {
             const bDoc = await getDoc(doc(db, "appData", "banner"));
             const container = document.getElementById('homeBanner');
+            
             if (bDoc.exists()) {
                 const b = bDoc.data();
-                // إزالة العنوان من البنر كما طلبت
-                container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div><img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">`;
+                container.innerHTML = `
+                    <div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div>
+                    <img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
+                `;
             } else {
-                container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-80"></div>`;
+                container.innerHTML = `
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-80"></div>
+                `;
             }
         }
 
@@ -1262,9 +1424,18 @@
             const rSnap = await getDocs(collection(db, "rooms"));
             const grid = document.getElementById('roomsGrid');
             grid.innerHTML = '';
+            
             rSnap.docs.forEach(d => {
                 const r = d.data();
-                grid.innerHTML += `<div class="glass-card p-4 rounded-3xl flex items-center gap-4"><div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div><div class="flex-1"><h4 class="font-bold text-gray-900">${r.name}</h4><p class="text-xs text-gray-500">${r.description}</p></div><i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i></div>`;
+                grid.innerHTML += `
+                    <div class="glass-card p-4 rounded-3xl flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">${r.name}</h4>
+                            <p class="text-xs text-gray-500">${r.description}</p>
+                        </div>
+                        <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
+                    </div>`;
             });
         }
 
