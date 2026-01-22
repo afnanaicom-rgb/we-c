@@ -1,0 +1,234 @@
+/* style.css - مطابق تماماً للتصميم المطلوب */
+body { 
+    margin: 0; 
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background-color: #f8f9fa; 
+}
+
+.sidebar {
+    height: 100vh; 
+    width: 280px; 
+    position: fixed; 
+    right: 0; 
+    top: 0;
+    background: white; 
+    box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    padding-top: 40px;
+}
+
+/* حاوية الصورة والإطار (مهمة جداً للقياسات) */
+.profile-container { 
+    position: relative; 
+    width: 100px; 
+    height: 100px; 
+    margin-bottom: 10px; 
+}
+
+.user-avatar { 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    position: absolute; 
+    top: 10px; 
+    left: 10px; 
+    object-fit: cover; 
+    z-index: 1;
+    border: 2px solid #f1f3f5;
+}
+
+.frame-img {
+    /* الإطار أكبر بـ 20px من الصورة (80+20=100) */
+    width: 100px; 
+    height: 100px; 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    z-index: 2; 
+    pointer-events: none;
+}
+
+.user-name { 
+    font-size: 20px; 
+    font-weight: bold; 
+    color: #1a1c2e; 
+    margin: 5px 0; 
+}
+
+.user-id { 
+    font-size: 12px; 
+    color: #a0a0a0; 
+    background: #f1f3f5; 
+    padding: 4px 10px; 
+    border-radius: 5px; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.user-id:hover {
+    background: #e9ecef;
+}
+
+.stats-row { 
+    display: flex; 
+    gap: 15px; 
+    margin: 25px 0; 
+    width: 85%; 
+}
+
+.stat-box { 
+    flex: 1; 
+    background: white; 
+    border: 1px solid #f1f3f5; 
+    padding: 15px; 
+    border-radius: 15px; 
+    text-align: center; 
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: transform 0.3s;
+}
+
+.stat-box:hover {
+    transform: translateY(-2px);
+}
+
+.stat-box img { 
+    width: 35px; 
+    margin-bottom: 5px; 
+}
+
+.stat-label { 
+    font-size: 12px; 
+    color: #888; 
+    display: block; 
+}
+
+.stat-val { 
+    font-weight: bold; 
+    font-size: 14px; 
+    color: #2c3e50;
+}
+
+.nav-menu { 
+    width: 85%; 
+}
+
+.nav-item {
+    width: 100%; 
+    padding: 12px 15px; 
+    margin-bottom: 8px; 
+    border: none;
+    background: #fff; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center;
+    justify-content: space-between; 
+    cursor: pointer; 
+    transition: all 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.nav-item:hover { 
+    background: #f8f9fa; 
+    transform: translateX(-5px);
+}
+
+.nav-item i { 
+    color: #555; 
+    font-size: 18px; 
+}
+
+.nav-item span { 
+    flex-grow: 1; 
+    text-align: right; 
+    margin-right: 15px; 
+    font-weight: 500;
+}
+
+.logout-btn { 
+    color: #e74c3c; 
+    margin-top: auto; 
+    margin-bottom: 30px; 
+    font-weight: bold; 
+    text-decoration: none; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.logout-btn:hover {
+    background: #ffeaea;
+}
+
+.badges-list { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 5px; 
+    justify-content: center; 
+    width: 80%; 
+    margin-top: 10px; 
+}
+
+.badge-icon { 
+    width: 35px; 
+    height: 35px; 
+    object-fit: contain;
+    border-radius: 50%;
+    border: 2px solid #e91e63;
+    padding: 2px;
+}
+
+/* نافذة التأكيد المخصصة */
+.confirm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.confirm-content {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.confirm-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.confirm-btn.yes {
+    background: #e74c3c;
+    color: white;
+}
+
+.confirm-btn.no {
+    background: #3498db;
+    color: white;
+}
