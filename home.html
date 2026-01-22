@@ -6,7 +6,7 @@
     <title>Afnan AI - White Edition</title>
     
     <!-- Fonts: Noto Sans Arabic -->
-    <link href="https://https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -130,8 +130,8 @@
 
         .user-frame {
             position: absolute;
-            width: 140%;
-            height: 140%;
+            width: 165%;
+            height: 165%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -155,10 +155,11 @@
             overflow: visible;
         }
 
+        /* إطار SVGA متحرك - تم التصحيح */
         .svga-avatar-frame {
             position: absolute;
-            width: 140%;
-            height: 140%;
+            width: 165%;
+            height: 165%;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -168,11 +169,38 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: frameFloat 3s ease-in-out infinite;
         }
 
         .svga-avatar-frame canvas {
             border-radius: 50%;
             object-fit: contain;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* إطار الصورة العادية */
+        .perfect-frame {
+            position: absolute;
+            width: 165%;
+            height: 165%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            object-fit: contain;
+            border-radius: 50%;
+            animation: frameFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes frameFloat {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1); 
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.05); 
+            }
         }
 
         /* --- Level Indicators --- */
@@ -273,62 +301,6 @@
             padding: 2px 6px;
             border-radius: 4px;
             margin-top: 4px;
-        }
-
-        /* --- Perfect Frame Positioning --- */
-        .frame-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-            pointer-events: none;
-            border-radius: 50%;
-        }
-
-        .perfect-frame {
-            position: absolute;
-            width: 120%;
-            height: 120%;
-            object-fit: contain;
-            border-radius: 50%;
-            transform-origin: center center;
-            animation: frameFloat 3s ease-in-out infinite;
-        }
-
-        .perfect-svga-frame {
-            position: absolute;
-            width: 120%;
-            height: 120%;
-            border-radius: 50%;
-            transform-origin: center center;
-            animation: frameFloat 3s ease-in-out infinite;
-        }
-
-        @keyframes frameFloat {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.05) rotate(1deg); }
-        }
-
-        /* --- Frame Shadow Effect --- */
-        .frame-shadow {
-            position: absolute;
-            width: 130%;
-            height: 130%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            background: radial-gradient(circle at center, 
-                rgba(0,0,0,0.1) 0%, 
-                rgba(0,0,0,0.05) 30%, 
-                transparent 70%);
-            z-index: 1;
-            pointer-events: none;
         }
     </style>
 </head>
@@ -436,9 +408,8 @@
         <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-2 pb-10">
             <div class="mb-6 mt-4">
                 <div class="avatar-wrapper">
-                    <div class="frame-shadow"></div>
                     <img id="sideAvatar" src="https://via.placeholder.com/150" class="avatar-img">
-                    <div id="sideSvgaFrame" class="perfect-svga-frame hidden"></div>
+                    <div id="sideSvgaFrame" class="svga-avatar-frame"></div>
                     <img id="sideFrame" src="" class="perfect-frame hidden">
                 </div>
             </div>
@@ -758,7 +729,7 @@
             }
         }
 
-        // Perfect SVGA Player for Frames
+        // Perfect SVGA Player for Frames - تم التصحيح
         function playPerfectSvga(url, container, options = {}) {
             try {
                 // تنظيف الحاوية أولاً
@@ -772,14 +743,20 @@
                     player.loops = options.loops || 0;
                     player.clearsAfterStop = options.clearsAfterStop || false;
                     
-                    // Adjust canvas size to fit perfectly
-                    const canvas = container.querySelector('canvas');
-                    if (canvas) {
-                        canvas.style.width = '100%';
-                        canvas.style.height = '100%';
-                        canvas.style.objectFit = 'contain';
-                        canvas.style.borderRadius = '50%';
-                    }
+                    // ضبط حجم canvas ليتناسب تماماً مع الحاوية
+                    setTimeout(() => {
+                        const canvas = container.querySelector('canvas');
+                        if (canvas) {
+                            canvas.style.width = '100%';
+                            canvas.style.height = '100%';
+                            canvas.style.objectFit = 'contain';
+                            canvas.style.borderRadius = '50%';
+                            canvas.style.position = 'absolute';
+                            canvas.style.top = '50%';
+                            canvas.style.left = '50%';
+                            canvas.style.transform = 'translate(-50%, -50%)';
+                        }
+                    }, 100);
                     
                     player.startAnimation();
                     
@@ -1065,9 +1042,6 @@
             loadBagItems();
             await updateUI();
         };
-
-        // باقي الدوال تبقى كما هي...
-        // [بقية الكود تبقى كما هي بدون تغيير]
 
         window.searchUser = async () => {
             const id = document.getElementById('searchUserInput').value.trim();
