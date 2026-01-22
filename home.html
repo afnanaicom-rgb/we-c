@@ -534,910 +534,1101 @@
         </div>
     </div>
 
-// ================= الجزء المحسن من الـ script =================
+    <!-- ================= SCRIPTS ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { 
-        getAuth, 
-        TwitterAuthProvider, 
-        GoogleAuthProvider, 
-        signInWithPopup, 
-        signOut, 
-        onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { 
-        getFirestore, 
-        doc, 
-        getDoc, 
-        setDoc, 
-        updateDoc, 
-        onSnapshot, 
-        collection, 
-        getDocs, 
-        increment, 
-        query, 
-        where, 
-        arrayUnion, 
-        arrayRemove,
-        writeBatch
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { 
-        getDatabase, 
-        ref, 
-        push, 
-        onValue, 
-        set 
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-        authDomain: "rtx3090-28439.firebaseapp.com",
-        projectId: "rtx3090-28439",
-        storageBucket: "rtx3090-28439.firebasestorage.app",
-        messagingSenderId: "178612030690",
-        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
-        databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const rtdb = getDatabase(app);
-
-    let userData = {};
-    let storeData = { 
-        frames: [], badges: [], svga: [], gifts: [], luckGifts: [], 
-        magicLevels: {}, wealthLevels: {}, bubbles: [], levelRequirements: {} 
-    };
-    let currentChatFriend = null;
-    let chatUnsubscribe = null;
-    let activeSvgaPlayers = {};
-    let selectedGift = null;
-    
-    // ================= نظام التحقق الذكي =================
-    
-    // 1. تتبع حالة إنشاء المستخدم
-    const USER_CREATION_FLAG = 'afnan_ai_user_created';
-    
-    // 2. توقيع فريد لكل جهاز
-    const getDeviceSignature = () => {
-        const keys = [
-            'userAgent',
-            'language',
-            'platform',
-            'hardwareConcurrency',
-            'deviceMemory'
-        ];
-        
-        let signature = '';
-        keys.forEach(key => {
-            if (navigator[key]) {
-                signature += navigator[key].toString().substring(0, 3);
-            }
-        });
-        
-        return btoa(signature).substring(0, 10);
-    };
-    
-    // 3. علامة مائية للبيانات
-    const createDataWatermark = (uid) => {
-        return {
-            _protected: true,
-            _uid: uid,
-            _created: new Date().toISOString(),
-            _device: getDeviceSignature(),
-            _version: '2.0'
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
+            authDomain: "rtx3090-28439.firebaseapp.com",
+            projectId: "rtx3090-28439",
+            storageBucket: "rtx3090-28439.firebasestorage.app",
+            messagingSenderId: "178612030690",
+            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
         };
-    };
-    
-    // 4. تحقق من صحة علامة مائية
-    const validateDataWatermark = (data, uid) => {
-        if (!data || typeof data !== 'object') return false;
-        if (!data._protected) return false;
-        if (data._uid !== uid) return false;
-        return true;
-    };
-    
-    // 5. تحقق شامل من المستخدم
-    const validateUserDocument = async (user) => {
-        const userDocRef = doc(db, "users", user.uid);
-        
-        try {
-            const docSnap = await getDoc(userDocRef);
-            
-            if (docSnap.exists()) {
-                const data = docSnap.data();
-                
-                // التحقق من العلامة المائية
-                if (!validateDataWatermark(data, user.uid)) {
-                    console.warn('Watermark mismatch, possible data corruption');
-                    return { isValid: false, data: null, isCorrupted: true };
-                }
-                
-                return { isValid: true, data: data, isNew: false };
-            }
-            
-            // المستند غير موجود - نحتاج لمعرفة السبب
-            return { isValid: false, data: null, isNew: true };
-            
-        } catch (error) {
-            console.error('Validation error:', error);
-            return { isValid: false, data: null, error: error.message };
-        }
-    };
-    
-    // 6. إنشاء مستخدم جديد بشكل آمن
-    const createNewUserSafe = async (user) => {
-        const userDocRef = doc(db, "users", user.uid);
-        
-        // التحقق المزدوج من أن المستخدم جديد حقًا
-        const isReallyNew = await isUserReallyNew(user);
-        if (!isReallyNew) {
-            throw new Error('User is not new - cannot create document');
-        }
-        
-        // إنشاء بيانات المستخدم مع العلامة المائية
-        const watermark = createDataWatermark(user.uid);
-        const customId = generateCustomId();
-        
-        const newUserData = {
-            ...watermark,
-            uid: user.uid,
-            displayName: user.displayName || "مستخدم جديد",
-            photoURL: user.photoURL || 'https://via.placeholder.com/150',
-            email: user.email || '',
-            customId: customId,
-            balance: 1000, // رصيد ابتدائي
-            magicLevel: 1,
-            wealthLevel: 1,
-            magicXP: 0,
-            wealthXP: 0,
-            purchasedFrames: [],
-            purchasedBadges: [],
-            purchasedSvga: [],
-            purchasedBubbles: [],
-            activeFrame: null,
-            activeBadges: [],
-            friends: [],
-            friendRequests: [],
-            sentRequests: [],
-            jewels: 0,
-            stats: {
-                totalGiftsSent: 0,
-                totalGiftsReceived: 0,
-                totalMessages: 0,
-                loginCount: 0
-            },
-            timestamps: {
-                createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                lastActive: new Date().toISOString()
-            },
-            security: {
-                backupCodes: generateBackupCodes(),
-                lastDeviceSignature: getDeviceSignature(),
-                recoveryEmail: user.email || ''
-            }
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+        const twitterProvider = new TwitterAuthProvider();
+        const googleProvider = new GoogleAuthProvider();
+
+        let userData = {};
+        let storeData = { 
+            frames: [], 
+            badges: [], 
+            svga: [], 
+            gifts: [], 
+            luckGifts: [], 
+            magicLevels: {}, 
+            wealthLevels: {},
+            bubbles: [],
+            levelRequirements: {}  // لتخزين متطلبات الترقية
         };
-        
-        try {
-            // استخدام Batch للكتابة الآمنة
-            const batch = writeBatch(db);
-            batch.set(userDocRef, newUserData);
-            
-            // إنشاء سجل للنشاط
-            const activityRef = doc(collection(db, "userActivities"));
-            batch.set(activityRef, {
-                userId: user.uid,
-                type: 'account_created',
-                timestamp: new Date().toISOString(),
-                device: getDeviceSignature(),
-                ipLocation: 'unknown' // يمكن إضافة API للتعرف على الموقع
-            });
-            
-            await batch.commit();
-            
-            // حفظ علامة في localStorage
-            localStorage.setItem(USER_CREATION_FLAG, 'true');
-            localStorage.setItem(`user_${user.uid}_created`, new Date().toISOString());
-            
-            return newUserData;
-            
-        } catch (error) {
-            console.error('Failed to create user:', error);
-            
-            // محاولة الإنشاء بدون batch
-            try {
-                await setDoc(userDocRef, newUserData, { merge: true });
-                localStorage.setItem(USER_CREATION_FLAG, 'true');
-                return newUserData;
-            } catch (secondError) {
-                throw secondError;
-            }
-        }
-    };
-    
-    // 7. تحقق عميق من أن المستخدم جديد
-    const isUserReallyNew = async (user) => {
-        // الطبقة 1: تحقق من metadata
-        const metadata = user.metadata;
-        if (!metadata) return true;
-        
-        // إذا كان الوقت بين الإنشاء وآخر تسجيل دخول كبيرًا
-        const created = new Date(metadata.creationTime);
-        const lastSignIn = new Date(metadata.lastSignInTime);
-        const diffHours = Math.abs(lastSignIn - created) / (1000 * 60 * 60);
-        
-        if (diffHours > 1) {
-            return false; // المستخدم ليس جديدًا
-        }
-        
-        // الطبقة 2: تحقق من localStorage
-        if (localStorage.getItem(`user_${user.uid}_created`)) {
-            return false;
-        }
-        
-        // الطبقة 3: تحقق من Firestore (سجل النشاط)
-        try {
-            const activitiesQuery = query(
-                collection(db, "userActivities"),
-                where("userId", "==", user.uid),
-                where("type", "==", "account_created")
-            );
-            
-            const activitiesSnap = await getDocs(activitiesQuery);
-            if (!activitiesSnap.empty) {
-                return false;
-            }
-        } catch (error) {
-            console.warn('Could not check activities:', error);
-        }
-        
-        return true;
-    };
-    
-    // 8. استعادة البيانات المحمية
-    const restoreUserData = async (user) => {
-        const userDocRef = doc(db, "users", user.uid);
-        
-        try {
-            const docSnap = await getDoc(userDocRef);
-            
-            if (docSnap.exists()) {
-                const data = docSnap.data();
+        let currentChatFriend = null;
+        let chatUnsubscribe = null;
+        let activeSvgaPlayers = {};
+        let selectedGift = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDocRef = doc(db, "users", user.uid);
                 
-                // إذا كانت البيانات تالفة أو بدون علامة مائية
-                if (!validateDataWatermark(data, user.uid)) {
-                    console.warn('Attempting to restore corrupted data');
+                // التحقق مما إذا كان المستخدم موجوداً في Firestore
+                const userDoc = await getDoc(userDocRef);
+                
+                if (!userDoc.exists()) {
+                    // إنشاء مستخدم جديد إذا لم يكن موجوداً
+                    const customId = generateCustomId();
+                    const newUserData = {
+                        uid: user.uid,
+                        displayName: user.displayName || "مستخدم جديد",
+                        photoURL: user.photoURL || 'https://via.placeholder.com/150',
+                        email: user.email || '',
+                        customId: customId,
+                        balance: 0,
+                        magicLevel: 1,
+                        wealthLevel: 1,
+                        magicXP: 0,
+                        wealthXP: 0,
+                        purchasedFrames: [],
+                        purchasedBadges: [],
+                        purchasedSvga: [],
+                        purchasedBubbles: [],
+                        activeFrame: null,
+                        activeBadges: [],
+                        friends: [],
+                        friendRequests: [],
+                        sentRequests: [],
+                        jewels: 0,
+                        createdAt: new Date().toISOString(),
+                        lastLogin: new Date().toISOString()
+                    };
                     
-                    // استعادة من النسخ الاحتياطي
-                    const backupData = await getUserBackup(user.uid);
-                    if (backupData && validateDataWatermark(backupData, user.uid)) {
-                        await setDoc(userDocRef, backupData, { merge: true });
-                        return backupData;
-                    }
-                    
-                    // إذا لم يوجد نسخ احتياطي، نحتاج لإعادة بناء البيانات
-                    return await rebuildUserData(user, data);
-                }
-                
-                return data;
-            }
-            
-            throw new Error('User document not found');
-            
-        } catch (error) {
-            console.error('Restoration failed:', error);
-            throw error;
-        }
-    };
-    
-    // 9. إنشاء نسخ احتياطية
-    const createUserBackup = async (userId, data) => {
-        try {
-            // حفظ محلي
-            localStorage.setItem(`backup_${userId}`, JSON.stringify({
-                data: data,
-                timestamp: new Date().toISOString(),
-                signature: getDeviceSignature()
-            }));
-            
-            // حفظ في Firestore (منفصل)
-            const backupRef = doc(db, "userBackups", userId);
-            await setDoc(backupRef, {
-                userId: userId,
-                data: data,
-                backupTimestamp: new Date().toISOString(),
-                deviceSignature: getDeviceSignature()
-            }, { merge: true });
-            
-        } catch (error) {
-            console.warn('Backup failed:', error);
-        }
-    };
-    
-    // 10. استرجاع النسخ الاحتياطي
-    const getUserBackup = async (userId) => {
-        try {
-            // المحاولة من Firestore أولاً
-            const backupRef = doc(db, "userBackups", userId);
-            const backupSnap = await getDoc(backupRef);
-            
-            if (backupSnap.exists()) {
-                const backup = backupSnap.data();
-                
-                // التحقق من توقيع الجهاز
-                if (backup.deviceSignature === getDeviceSignature()) {
-                    return backup.data;
-                }
-            }
-            
-            // المحاولة من localStorage
-            const localBackup = localStorage.getItem(`backup_${userId}`);
-            if (localBackup) {
-                return JSON.parse(localBackup).data;
-            }
-            
-        } catch (error) {
-            console.warn('Backup retrieval failed:', error);
-        }
-        
-        return null;
-    };
-    
-    // 11. إعادة بناء البيانات التالفة
-    const rebuildUserData = async (user, corruptedData) => {
-        console.log('Rebuilding user data for:', user.uid);
-        
-        const watermark = createDataWatermark(user.uid);
-        const customId = generateCustomId();
-        
-        // المحافظة على أي بيانات يمكن إنقاذها
-        const rebuiltData = {
-            ...watermark,
-            uid: user.uid,
-            displayName: corruptedData.displayName || user.displayName || "مستخدم",
-            photoURL: corruptedData.photoURL || user.photoURL || 'https://via.placeholder.com/150',
-            email: user.email || '',
-            customId: corruptedData.customId || customId,
-            balance: corruptedData.balance || 1000,
-            magicLevel: corruptedData.magicLevel || 1,
-            wealthLevel: corruptedData.wealthLevel || 1,
-            magicXP: corruptedData.magicXP || 0,
-            wealthXP: corruptedData.wealthXP || 0,
-            purchasedFrames: corruptedData.purchasedFrames || [],
-            purchasedBadges: corruptedData.purchasedBadges || [],
-            purchasedSvga: corruptedData.purchasedSvga || [],
-            purchasedBubbles: corruptedData.purchasedBubbles || [],
-            activeFrame: corruptedData.activeFrame || null,
-            activeBadges: corruptedData.activeBadges || [],
-            friends: corruptedData.friends || [],
-            friendRequests: corruptedData.friendRequests || [],
-            sentRequests: corruptedData.sentRequests || [],
-            jewels: corruptedData.jewels || 0,
-            stats: {
-                totalGiftsSent: corruptedData.stats?.totalGiftsSent || 0,
-                totalGiftsReceived: corruptedData.stats?.totalGiftsReceived || 0,
-                totalMessages: corruptedData.stats?.totalMessages || 0,
-                loginCount: (corruptedData.stats?.loginCount || 0) + 1
-            },
-            timestamps: {
-                createdAt: corruptedData.timestamps?.createdAt || new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                lastActive: new Date().toISOString()
-            }
-        };
-        
-        try {
-            const userDocRef = doc(db, "users", user.uid);
-            await setDoc(userDocRef, rebuiltData, { merge: true });
-            
-            // إنشاء نسخة احتياطية فورًا
-            await createUserBackup(user.uid, rebuiltData);
-            
-            return rebuiltData;
-            
-        } catch (error) {
-            console.error('Rebuild failed:', error);
-            throw error;
-        }
-    };
-    
-    // 12. معالج تسجيل الدخول المحسن
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                console.log('User logged in:', user.uid);
-                
-                // الخطوة 1: التحقق من وجود المستند وصحته
-                const validation = await validateUserDocument(user);
-                
-                if (validation.isValid) {
-                    // ✅ المستند موجود وصالح
-                    userData = validation.data;
-                    
+                    await setDoc(userDocRef, newUserData);
+                    userData = newUserData;
+                } else {
                     // تحديث آخر تسجيل دخول
-                    await updateDoc(doc(db, "users", user.uid), {
-                        'timestamps.lastLogin': new Date().toISOString(),
-                        'timestamps.lastActive': new Date().toISOString(),
-                        'stats.loginCount': increment(1)
+                    await updateDoc(userDocRef, {
+                        lastLogin: new Date().toISOString()
                     });
                     
-                    // إنشاء نسخة احتياطية
-                    await createUserBackup(user.uid, userData);
-                    
-                } else if (validation.isNew) {
-                    // 📝 مستخدم جديد حقيقي
-                    try {
-                        userData = await createNewUserSafe(user);
-                        console.log('New user created:', userData.customId);
-                    } catch (createError) {
-                        console.error('Failed to create new user:', createError);
-                        
-                        // محاولة الاستعادة
-                        try {
-                            userData = await restoreUserData(user);
-                            console.log('User data restored from backup');
-                        } catch (restoreError) {
-                            console.error('Restoration failed:', restoreError);
-                            
-                            // الإنشاء الطارئ
-                            userData = await emergencyUserCreation(user);
-                        }
-                    }
-                    
-                } else if (validation.isCorrupted) {
-                    // ⚠️ البيانات تالفة
-                    console.warn('Data corruption detected, attempting restore...');
-                    userData = await restoreUserData(user);
-                    
-                } else {
-                    // ❌ حالة غير معروفة
-                    throw new Error('Unknown user state');
+                    userData = userDoc.data();
                 }
-                
-                // ✅ جميع الحالات - المتابعة
                 
                 // إعداد الاشتراك في تحديثات المستخدم
-                setupUserSnapshot(user.uid);
+                onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        userData = docSnap.data();
+                        updateUI();
+                        loadFriendRequests();
+                        loadFriends();
+                    }
+                });
                 
-                // تحميل البيانات العامة
-                await Promise.all([
-                    loadBanner(),
-                    loadGlobalData(),
-                    loadRooms()
-                ]);
-                
-                // تحديث الواجهة
+                await loadBanner();
+                await loadGlobalData();
+                await loadRooms();
                 await updateUI();
+            } else {
+                window.location.href = "index.html";
+            }
+        });
+
+        function generateCustomId() {
+            return 'AFN' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        }
+
+        async function loadGlobalData() {
+            try {
+                // تحميل البيانات من Firestore مع معالجة الأخطاء
+                const collections = [
+                    'frames', 'badges', 'svgaItems', 'gifts', 'luckGifts', 
+                    'magicLevels', 'wealthLevels', 'bubbles', 'levelRequirements'
+                ];
                 
-                // تحميل قوائم الأصدقاء
-                await Promise.all([
-                    loadFriendRequests(),
-                    loadFriends()
-                ]);
+                for (const col of collections) {
+                    const snap = await getDocs(collection(db, col));
+                    if (col === 'magicLevels' || col === 'wealthLevels') {
+                        storeData[col] = {};
+                        snap.docs.forEach(d => storeData[col][d.id] = d.data());
+                    } else {
+                        storeData[col] = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                    }
+                }
                 
-                // تحديث نشط دوري
-                startActivityTracker(user.uid);
+                // تحميل متطلبات الترقية
+                const reqSnap = await getDocs(collection(db, "levelRequirements"));
+                reqSnap.docs.forEach(d => {
+                    storeData.levelRequirements[d.id] = d.data();
+                });
                 
             } catch (error) {
-                console.error('Critical auth error:', error);
-                
-                // حالة الطوارئ - عرض واجهة محدودة
-                showEmergencyInterface(user);
-                
-                // محاولة إعادة الاتصال
-                setTimeout(() => {
-                    location.reload();
-                }, 5000);
+                console.error('Error loading global data:', error);
             }
-            
-        } else {
-            // تسجيل الخروج
-            cleanup();
-            window.location.href = "index.html";
         }
-    });
-    
-    // 13. الإنشاء الطارئ
-    const emergencyUserCreation = async (user) => {
-        const watermark = createDataWatermark(user.uid);
-        const customId = generateCustomId();
-        
-        const emergencyData = {
-            ...watermark,
-            uid: user.uid,
-            displayName: user.displayName || "مستخدم",
-            photoURL: user.photoURL || 'https://via.placeholder.com/150',
-            email: user.email || '',
-            customId: customId,
-            balance: 1000,
-            magicLevel: 1,
-            wealthLevel: 1,
-            magicXP: 0,
-            wealthXP: 0,
-            purchasedFrames: [],
-            purchasedBadges: [],
-            purchasedSvga: [],
-            purchasedBubbles: [],
-            activeFrame: null,
-            activeBadges: [],
-            friends: [],
-            friendRequests: [],
-            sentRequests: [],
-            jewels: 0,
-            stats: {
-                totalGiftsSent: 0,
-                totalGiftsReceived: 0,
-                totalMessages: 0,
-                loginCount: 1
-            },
-            timestamps: {
-                createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
-                lastActive: new Date().toISOString()
-            },
-            emergencyCreated: true
-        };
-        
-        try {
-            const userDocRef = doc(db, "users", user.uid);
-            await setDoc(userDocRef, emergencyData, { merge: true });
+
+        async function updateUI() {
+            if (!auth.currentUser) return;
             
-            // حفظ محلي كإجراء طارئ
-            localStorage.setItem(`emergency_${user.uid}`, JSON.stringify(emergencyData));
-            
-            return emergencyData;
-        } catch (error) {
-            console.error('Emergency creation failed:', error);
-            
-            // استخدام البيانات المحلية فقط
-            emergencyData.localOnly = true;
-            return emergencyData;
-        }
-    };
-    
-    // 14. إعداد تتبع النشاط
-    const startActivityTracker = (userId) => {
-        // تحديث النشاط كل دقيقة
-        setInterval(async () => {
-            if (auth.currentUser) {
-                try {
-                    await updateDoc(doc(db, "users", userId), {
-                        'timestamps.lastActive': new Date().toISOString()
-                    });
-                } catch (error) {
-                    console.warn('Activity update failed:', error);
-                }
-            }
-        }, 60000);
-        
-        // تحديث عند إغلاق الصفحة
-        window.addEventListener('beforeunload', async () => {
-            if (auth.currentUser) {
-                try {
-                    await updateDoc(doc(db, "users", userId), {
-                        'timestamps.lastActive': new Date().toISOString()
-                    });
-                } catch (error) {
-                    // محاولة الحفظ محليًا
-                    localStorage.setItem(`lastActive_${userId}`, new Date().toISOString());
-                }
-            }
-        });
-    };
-    
-    // 15. وظائف مساعدة
-    function generateCustomId() {
-        const prefix = 'AFN';
-        const timestamp = Date.now().toString(36).slice(-4).toUpperCase();
-        const random = Math.random().toString(36).slice(2, 6).toUpperCase();
-        return `${prefix}${timestamp}${random}`;
-    }
-    
-    function generateBackupCodes() {
-        const codes = [];
-        for (let i = 0; i < 5; i++) {
-            codes.push(Math.random().toString(36).slice(2, 10).toUpperCase());
-        }
-        return codes;
-    }
-    
-    function cleanup() {
-        // تنظيف جميع المشغلات النشطة
-        Object.keys(activeSvgaPlayers).forEach(id => {
             try {
-                activeSvgaPlayers[id].player.clear();
-            } catch (e) {}
-        });
-        activeSvgaPlayers = {};
-        
-        // إلغاء اشتراكات Firestore
-        if (userUnsubscribe) {
-            userUnsubscribe();
-            userUnsubscribe = null;
-        }
-        
-        if (chatUnsubscribe) {
-            chatUnsubscribe();
-            chatUnsubscribe = null;
-        }
-    }
-    
-    // 16. واجهة الطوارئ
-    function showEmergencyInterface(user) {
-        document.body.innerHTML = `
-            <div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-                <div class="glass-deep rounded-3xl p-8 max-w-md text-center">
-                    <div class="text-red-500 mb-4">
-                        <i data-lucide="alert-triangle" class="w-16 h-16 mx-auto"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold mb-4">مشكلة في تحميل البيانات</h2>
-                    <p class="text-gray-600 mb-6">
-                        حدث خطأ في تحميل بيانات حسابك. جاري محاولة الإصلاح تلقائيًا...
-                    </p>
-                    <div class="loader mx-auto mb-6"></div>
-                    <p class="text-sm text-gray-500">
-                        المستخدم: ${user.email || user.uid.substring(0, 8)}<br>
-                        إذا استمرت المشكلة، راسل الدعم مع الـ ID: ${user.uid}
-                    </p>
-                </div>
-            </div>
-        `;
-        lucide.createIcons();
-    }
-    
-    // 17. إعداد اشتراك آمن
-    let userUnsubscribe = null;
-    
-    function setupUserSnapshot(uid) {
-        if (userUnsubscribe) {
-            userUnsubscribe();
-        }
-        
-        const userDocRef = doc(db, "users", uid);
-        userUnsubscribe = onSnapshot(userDocRef, (docSnap) => {
-            if (docSnap.exists()) {
-                const data = docSnap.data();
+                // معلومات المستخدم الأساسية
+                document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
+                document.getElementById('sideID').innerText = userData.customId || "000000";
+                document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
+                document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
+                document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
                 
-                // التحقق من العلامة المائية قبل التحديث
-                if (validateDataWatermark(data, uid)) {
-                    userData = data;
-                    updateUI();
+                // المستويات ومتطلبات الترقية
+                const ml = userData.magicLevel || 1;
+                const wl = userData.wealthLevel || 1;
+                const magicXP = userData.magicXP || 0;
+                const wealthXP = userData.wealthXP || 0;
+                
+                const magicImg = document.getElementById('magicLevelImg');
+                const wealthImg = document.getElementById('wealthLevelImg');
+                
+                if (storeData.magicLevels[ml]) {
+                    magicImg.src = storeData.magicLevels[ml].image;
+                    const nextLevelReq = storeData.levelRequirements[`magic_${ml + 1}`];
+                    document.getElementById('magicLevelReq').innerHTML = nextLevelReq ? 
+                        `مطلوب: ${nextLevelReq.requiredXP - magicXP} XP` : 'الحد الأقصى';
+                }
+                
+                if (storeData.wealthLevels[wl]) {
+                    wealthImg.src = storeData.wealthLevels[wl].image;
+                    const nextLevelReq = storeData.levelRequirements[`wealth_${wl + 1}`];
+                    document.getElementById('wealthLevelReq').innerHTML = nextLevelReq ? 
+                        `مطلوب: ${nextLevelReq.requiredXP - wealthXP} XP` : 'الحد الأقصى';
+                }
+
+                // الإطار أو SVGA النشط
+                const frameEl = document.getElementById('sideFrame');
+                const svgaContainer = document.getElementById('sideSvgaFrame');
+                
+                if (userData.activeFrame) {
+                    const frame = storeData.frames.find(f => f.id === userData.activeFrame);
+                    const svgaItem = storeData.svga.find(s => s.id === userData.activeFrame);
                     
-                    // تحديث النسخ الاحتياطي
-                    createUserBackup(uid, data).catch(() => {});
-                } else {
-                    console.warn('Received invalid data from snapshot');
-                }
-            }
-        }, (error) => {
-            console.error('Snapshot error:', error);
-            
-            // استخدام البيانات المحلية كنسخة احتياطية
-            const localBackup = localStorage.getItem(`backup_${uid}`);
-            if (localBackup) {
-                try {
-                    const backup = JSON.parse(localBackup);
-                    if (validateDataWatermark(backup.data, uid)) {
-                        userData = backup.data;
-                        updateUI();
+                    if (frame) {
+                        frameEl.src = frame.image;
+                        frameEl.classList.remove('hidden');
+                        svgaContainer.innerHTML = '';
+                    } else if (svgaItem) {
+                        frameEl.classList.add('hidden');
+                        svgaContainer.innerHTML = '';
+                        playSvga(svgaItem.fileUrl, svgaContainer, { loops: 0, clearsAfterStop: false });
                     }
-                } catch (e) {}
-            }
-        });
-    }
-    
-    // 18. نظام المراقبة الذاتية
-    const selfMonitor = {
-        lastBalance: null,
-        lastLevels: null,
-        
-        checkAnomalies: (newData) => {
-            const anomalies = [];
-            
-            if (selfMonitor.lastBalance !== null) {
-                const balanceDiff = newData.balance - selfMonitor.lastBalance;
-                
-                // تغيير غير طبيعي في الرصيد
-                if (Math.abs(balanceDiff) > 100000 && balanceDiff < 0) {
-                    anomalies.push(`Large balance decrease: ${balanceDiff}`);
+                } else {
+                    frameEl.classList.add('hidden');
+                    svgaContainer.innerHTML = '';
                 }
-                
-                // رصيد سالب
-                if (newData.balance < 0) {
-                    anomalies.push('Negative balance detected');
-                }
-            }
-            
-            if (selfMonitor.lastLevels) {
-                const magicDiff = newData.magicLevel - selfMonitor.lastLevels.magic;
-                const wealthDiff = newData.wealthLevel - selfMonitor.lastLevels.wealth;
-                
-                // ترقية غير طبيعية
-                if (magicDiff > 5 || wealthDiff > 5) {
-                    anomalies.push(`Abnormal level increase: Magic +${magicDiff}, Wealth +${wealthDiff}`);
-                }
-                
-                // انخفاض المستوى (غير مسموح)
-                if (magicDiff < 0 || wealthDiff < 0) {
-                    anomalies.push('Level decrease detected - possible corruption');
-                }
-            }
-            
-            // حفظ القيم الحالية
-            selfMonitor.lastBalance = newData.balance;
-            selfMonitor.lastLevels = {
-                magic: newData.magicLevel,
-                wealth: newData.wealthLevel
-            };
-            
-            // تسجيل المخالفات
-            if (anomalies.length > 0) {
-                console.warn('Anomalies detected:', anomalies);
-                
-                // حفظ في Firestore للتدقيق
-                try {
-                    const auditRef = doc(collection(db, "securityAudits"));
-                    setDoc(auditRef, {
-                        userId: auth.currentUser?.uid,
-                        anomalies: anomalies,
-                        timestamp: new Date().toISOString(),
-                        dataSnapshot: newData
+
+                // الشارات النشطة في الشريط الجانبي
+                const sidebarBadges = document.getElementById('sidebarActiveBadges');
+                sidebarBadges.innerHTML = '';
+                if (userData.activeBadges && userData.activeBadges.length > 0) {
+                    userData.activeBadges.forEach(badgeId => {
+                        const badge = storeData.badges.find(b => b.id === badgeId);
+                        if (badge) {
+                            sidebarBadges.innerHTML += `
+                                <div class="flex items-center justify-center">
+                                    <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
+                                </div>
+                            `;
+                        }
                     });
-                } catch (e) {}
+                }
+            } catch (error) {
+                console.error('Error updating UI:', error);
+            }
+        }
+
+        function playSvga(url, container, options = {}) {
+            try {
+                // تنظيف أي مشغل سابق
+                if (container.dataset.playerId && activeSvgaPlayers[container.dataset.playerId]) {
+                    activeSvgaPlayers[container.dataset.playerId].player.clear();
+                    delete activeSvgaPlayers[container.dataset.playerId];
+                }
+                
+                const player = new SVGA.Player(container);
+                const parser = new SVGA.Parser();
+                
+                parser.load(url, (videoItem) => {
+                    player.setVideoItem(videoItem);
+                    player.loops = options.loops || 0;
+                    player.clearsAfterStop = options.clearsAfterStop !== undefined ? options.clearsAfterStop : true;
+                    player.startAnimation();
+                    
+                    const id = 'player_' + Date.now() + Math.random();
+                    activeSvgaPlayers[id] = { player, container };
+                    container.dataset.playerId = id;
+                    
+                    // إضافة معالجة الأخطاء
+                    player.onError = (error) => {
+                        console.error('SVGA player error:', error);
+                    };
+                }, (error) => {
+                    console.error('SVGA load error:', error);
+                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">⚠️ خطأ في الرسوم المتحركة</div>';
+                });
+            } catch (error) {
+                console.error('SVGA initialization error:', error);
+            }
+        }
+
+        window.loadStoreItems = async (type) => {
+            const grid = document.getElementById('storeGrid');
+            grid.innerHTML = '';
+            
+            // تنظيف مشغلات SVGA السابقة
+            document.querySelectorAll('.svga-preview').forEach(container => {
+                if (container.dataset.playerId && activeSvgaPlayers[container.dataset.playerId]) {
+                    activeSvgaPlayers[container.dataset.playerId].player.clear();
+                    delete activeSvgaPlayers[container.dataset.playerId];
+                }
+            });
+            
+            let items = [];
+            let field = '';
+            
+            if (type === 'frames') {
+                items = storeData.frames;
+                field = 'purchasedFrames';
+            } else if (type === 'badges') {
+                items = storeData.badges;
+                field = 'purchasedBadges';
+            } else if (type === 'svga') {
+                items = storeData.svga;
+                field = 'purchasedSvga';
+            } else if (type === 'bubbles') {
+                items = storeData.bubbles;
+                field = 'purchasedBubbles';
             }
             
-            return anomalies;
-        }
-    };
-    
-    // 19. تعديل دالة updateUI لإضافة المراقبة
-    async function updateUI() {
-        if (!auth.currentUser || !userData) return;
-        
-        try {
-            // التحقق من الشذوذات
-            const anomalies = selfMonitor.checkAnomalies(userData);
-            if (anomalies.length > 0) {
-                console.warn('UI update blocked due to anomalies');
+            // تحديث أزرار التبويب
+            document.querySelectorAll('#view-store button').forEach(btn => {
+                btn.className = 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            });
+            document.getElementById(`store-tab-${type}`).className = 
+                'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition';
+
+            if (items.length === 0) {
+                grid.innerHTML = '<div class="col-span-2 text-center py-10 text-gray-400">لا توجد عناصر في هذا القسم</div>';
+                return;
+            }
+
+            items.forEach(item => {
+                const owned = userData[field]?.some(i => i.id === item.id);
+                
+                if (type === 'svga') {
+                    grid.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px]">
+                            <div class="svga-preview mb-2" id="preview-${item.id}"></div>
+                            <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
+                            <span class="svga-icon">SVGA</span>
+                            <button onclick="${owned ? '' : `buyItem('svga', '${item.id}', ${item.price})`}" 
+                                    class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white hover:bg-gray-800'} text-xs font-bold rounded-xl mt-2 transition">
+                                ${owned ? '✓ مملوك' : `${item.price} 💰 شراء`}
+                            </button>
+                        </div>`;
+                    
+                    setTimeout(() => {
+                        const previewContainer = document.getElementById(`preview-${item.id}`);
+                        if (previewContainer && item.fileUrl) {
+                            playSvga(item.fileUrl, previewContainer, { loops: 1, clearsAfterStop: true });
+                        }
+                    }, 100);
+                } else if (type === 'bubbles') {
+                    grid.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px]">
+                            <div class="bubble-preview mb-2" style="background: ${item.bgColor || '#f3f4f6'}">
+                                <div class="bubble-text" style="background: ${item.bubbleColor || '#1f2937'}; color: ${item.textColor || 'white'}">
+                                    ${item.sampleText || 'نص تجريبي'}
+                                </div>
+                            </div>
+                            <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
+                            <button onclick="${owned ? '' : `buyItem('bubbles', '${item.id}', ${item.price})`}" 
+                                    class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white hover:bg-gray-800'} text-xs font-bold rounded-xl transition">
+                                ${owned ? '✓ مملوك' : `${item.price} 💰 شراء`}
+                            </button>
+                        </div>`;
+                } else {
+                    grid.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[160px]">
+                            <img src="${item.image}" class="w-16 h-16 object-contain mb-2">
+                            <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
+                            <button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" 
+                                    class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white hover:bg-gray-800'} text-xs font-bold rounded-xl transition">
+                                ${owned ? '✓ مملوك' : `${item.price} 💰 شراء`}
+                            </button>
+                        </div>`;
+                }
+            });
+        };
+
+        window.buyItem = async (type, id, price) => {
+            if (userData.balance < price) {
+                alert('رصيدك غير كافٍ!');
                 return;
             }
             
-            // ... (بقية كود updateUI كما هو) ...
+            const fieldMap = {
+                'frames': 'purchasedFrames',
+                'badges': 'purchasedBadges',
+                'svga': 'purchasedSvga',
+                'bubbles': 'purchasedBubbles'
+            };
             
-        } catch (error) {
-            console.error('UI update error:', error);
+            const field = fieldMap[type];
+            
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    balance: increment(-price),
+                    [field]: arrayUnion({ 
+                        id: id, 
+                        purchasedAt: new Date().toISOString(),
+                        itemType: type 
+                    })
+                });
+                
+                loadStoreItems(type);
+            } catch (error) {
+                console.error('Error buying item:', error);
+                alert('حدث خطأ أثناء الشراء');
+            }
+        };
+
+        window.loadBagItems = async () => {
+            const fGrid = document.getElementById('bagGrid');
+            const bGrid = document.getElementById('badgesBagGrid');
+            const sGrid = document.getElementById('svgaBagGrid');
+            const aGrid = document.getElementById('activeBadgesGrid');
+            const buGrid = document.getElementById('bubblesBagGrid');
+            
+            fGrid.innerHTML = ''; 
+            bGrid.innerHTML = '';
+            sGrid.innerHTML = '';
+            aGrid.innerHTML = '';
+            buGrid.innerHTML = '';
+            
+            // الإطارات
+            const frames = userData.purchasedFrames || [];
+            for (const f of frames) {
+                const exists = storeData.frames.find(sf => sf.id === f.id);
+                if (exists) {
+                    const isEquipped = userData.activeFrame === f.id;
+                    fGrid.innerHTML += `
+                        <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                            <img src="${exists.image}" class="w-12 h-12 object-contain">
+                            ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                        </div>`;
+                }
+            }
+
+            // جميع الشارات
+            const badges = userData.purchasedBadges || [];
+            for (const b of badges) {
+                const exists = storeData.badges.find(sb => sb.id === b.id);
+                if (exists) {
+                    const isActive = userData.activeBadges?.includes(b.id);
+                    bGrid.innerHTML += `
+                        <div onclick="toggleBadge('${b.id}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
+                            <img src="${exists.image}" class="w-8 h-8 object-contain">
+                        </div>`;
+                }
+            }
+
+            // عناصر SVGA
+            const svgaItems = userData.purchasedSvga || [];
+            for (const s of svgaItems) {
+                const exists = storeData.svga.find(ss => ss.id === s.id);
+                if (exists) {
+                    const isEquipped = userData.activeFrame === s.id;
+                    sGrid.innerHTML += `
+                        <div onclick="equipSvga('${s.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mb-1">
+                                <span class="text-xs font-bold text-gray-600">SVGA</span>
+                            </div>
+                            <p class="text-xs text-center truncate w-full">${exists.name}</p>
+                            ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                        </div>`;
+                }
+            }
+
+            // الشارات النشطة فقط
+            const activeBadges = userData.activeBadges || [];
+            for (const badgeId of activeBadges) {
+                const badge = storeData.badges.find(b => b.id === badgeId);
+                if (badge) {
+                    aGrid.innerHTML += `
+                        <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white">
+                            <img src="${badge.image}" class="w-8 h-8 object-contain">
+                        </div>`;
+                }
+            }
+
+            // فقاعات الكتابة
+            const bubbles = userData.purchasedBubbles || [];
+            for (const bubble of bubbles) {
+                const exists = storeData.bubbles.find(b => b.id === bubble.id);
+                if (exists) {
+                    buGrid.innerHTML += `
+                        <div onclick="equipBubble('${bubble.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer">
+                            <div class="bubble-preview mb-1" style="background: ${exists.bgColor || '#f3f4f6'}">
+                                <div class="bubble-text" style="background: ${exists.bubbleColor || '#1f2937'}; color: ${exists.textColor || 'white'}">
+                                    ${exists.sampleText || 'نص'}
+                                </div>
+                            </div>
+                            <p class="text-xs text-center truncate w-full">${exists.name}</p>
+                        </div>`;
+                }
+            }
+        };
+
+        window.equipFrame = async (id) => {
+            const newFrame = userData.activeFrame === id ? null : id;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeFrame: newFrame 
+            });
+            loadBagItems();
+            updateUI();
+        };
+
+        window.equipSvga = async (id) => {
+            const newFrame = userData.activeFrame === id ? null : id;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeFrame: newFrame 
+            });
+            loadBagItems();
+            updateUI();
+        };
+
+        window.equipBubble = async (id) => {
+            // حفظ فقاعة الكتابة النشطة
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeBubble: id 
+            });
+            alert('تم تفعيل فقاعة الكتابة');
+        };
+
+        window.toggleBadge = async (id) => {
+            const isActive = userData.activeBadges?.includes(id);
+            const newBadges = isActive 
+                ? userData.activeBadges.filter(b => b !== id)
+                : [...(userData.activeBadges || []), id];
+            
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                activeBadges: newBadges
+            });
+            loadBagItems();
+            updateUI();
+        };
+
+        window.searchUser = async () => {
+            const id = document.getElementById('searchUserInput').value.trim();
+            if (!id) return;
+            
+            try {
+                const q = query(collection(db, "users"), where("customId", "==", id));
+                const snap = await getDocs(q);
+                const results = document.getElementById('searchResults');
+                const container = document.getElementById('userResult');
+                results.classList.remove('hidden');
+                
+                if (snap.empty) {
+                    container.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لم يتم العثور على مستخدم</p>';
+                } else {
+                    const user = snap.docs[0].data();
+                    const isFollowing = userData.friends?.includes(user.uid);
+                    const hasSentRequest = userData.sentRequests?.includes(user.uid);
+                    const hasReceivedRequest = userData.friendRequests?.includes(user.uid);
+                    
+                    let buttonText = 'متابعة';
+                    let buttonClass = 'bg-black text-white';
+                    let buttonAction = `sendFriendRequest('${user.uid}')`;
+                    
+                    if (isFollowing) {
+                        buttonText = 'متابع';
+                        buttonClass = 'bg-gray-100 text-gray-500';
+                        buttonAction = `unfollowUser('${user.uid}')`;
+                    } else if (hasSentRequest) {
+                        buttonText = 'تم الإرسال';
+                        buttonClass = 'bg-blue-100 text-blue-600';
+                        buttonAction = `cancelFriendRequest('${user.uid}')`;
+                    } else if (hasReceivedRequest) {
+                        buttonText = 'قبول الطلب';
+                        buttonClass = 'bg-green-100 text-green-600';
+                        buttonAction = `acceptFriendRequest('${user.uid}')`;
+                    }
+                    
+                    container.innerHTML = `
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm">${user.displayName}</h4>
+                                    <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                                </div>
+                            </div>
+                            <button onclick="${buttonAction}" class="px-4 py-2 rounded-xl ${buttonClass} font-bold text-xs hover:opacity-90 transition">
+                                ${buttonText}
+                            </button>
+                        </div>`;
+                }
+            } catch (error) {
+                console.error('Error searching user:', error);
+            }
+        };
+
+        window.sendFriendRequest = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    sentRequests: arrayUnion(uid)
+                });
+                
+                await updateDoc(doc(db, "users", uid), {
+                    friendRequests: arrayUnion(auth.currentUser.uid)
+                });
+                
+                searchUser();
+                loadFriendRequests();
+            } catch (error) {
+                console.error('Error sending friend request:', error);
+            }
+        };
+
+        window.cancelFriendRequest = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    sentRequests: arrayRemove(uid)
+                });
+                
+                await updateDoc(doc(db, "users", uid), {
+                    friendRequests: arrayRemove(auth.currentUser.uid)
+                });
+                
+                searchUser();
+                loadFriendRequests();
+            } catch (error) {
+                console.error('Error canceling friend request:', error);
+            }
+        };
+
+        window.acceptFriendRequest = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    friendRequests: arrayRemove(uid),
+                    friends: arrayUnion(uid)
+                });
+                
+                await updateDoc(doc(db, "users", uid), {
+                    sentRequests: arrayRemove(auth.currentUser.uid),
+                    friends: arrayUnion(auth.currentUser.uid)
+                });
+                
+                searchUser();
+                loadFriendRequests();
+                loadFriends();
+            } catch (error) {
+                console.error('Error accepting friend request:', error);
+            }
+        };
+
+        window.unfollowUser = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    friends: arrayRemove(uid)
+                });
+                
+                await updateDoc(doc(db, "users", uid), {
+                    friends: arrayRemove(auth.currentUser.uid)
+                });
+                
+                searchUser();
+                loadFriends();
+            } catch (error) {
+                console.error('Error unfollowing user:', error);
+            }
+        };
+
+        async function loadFriendRequests() {
+            const list = document.getElementById('friendRequestsList');
+            list.innerHTML = '';
+            
+            if (!userData.friendRequests || userData.friendRequests.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا توجد طلبات متابعة</p>';
+                return;
+            }
+            
+            for (const uid of userData.friendRequests) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const user = snap.data();
+                    list.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                    <div>
+                                        <h4 class="font-bold text-sm">${user.displayName}</h4>
+                                        <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="acceptFriendRequest('${user.uid}')" class="px-3 py-1 bg-green-100 text-green-600 rounded-lg text-xs font-bold hover:bg-green-200 transition">قبول</button>
+                                    <button onclick="rejectFriendRequest('${user.uid}')" class="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold hover:bg-red-200 transition">رفض</button>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            }
         }
-    }
-    
-    // 20. تعديل جميع دوال الكتابة لإضافة الحماية
-    window.buyItem = async (type, id, price) => {
-        if (!auth.currentUser) return;
-        
-        // التحقق من الرصيد
-        if (userData.balance < price) {
-            alert('رصيدك غير كافٍ!');
-            return;
+
+        window.rejectFriendRequest = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    friendRequests: arrayRemove(uid)
+                });
+                
+                await updateDoc(doc(db, "users", uid), {
+                    sentRequests: arrayRemove(auth.currentUser.uid)
+                });
+                
+                loadFriendRequests();
+            } catch (error) {
+                console.error('Error rejecting friend request:', error);
+            }
+        };
+
+        async function loadFriends() {
+            const list = document.getElementById('friendsList');
+            list.innerHTML = '';
+            
+            if (!userData.friends || userData.friends.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا يوجد أصدقاء بعد</p>';
+                return;
+            }
+            
+            for (const uid of userData.friends) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const friend = snap.data();
+                    list.innerHTML += `
+                        <div onclick="openChat('${friend.uid}')" class="glass-card p-4 rounded-3xl flex items-center justify-between cursor-pointer hover:bg-white transition">
+                            <div class="flex items-center gap-3">
+                                <img src="${friend.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm">${friend.displayName}</h4>
+                                    <p class="text-xs text-gray-400">ID: ${friend.customId}</p>
+                                </div>
+                            </div>
+                            <i data-lucide="message-circle" class="w-5 h-5 text-gray-300"></i>
+                        </div>`;
+                }
+            }
+            lucide.createIcons();
         }
-        
-        // منع الشراء المزدوج
-        const fieldMap = {
-            'frames': 'purchasedFrames',
-            'badges': 'purchasedBadges',
-            'svga': 'purchasedSvga',
-            'bubbles': 'purchasedBubbles'
+
+        window.openChat = async (uid) => {
+            try {
+                const snap = await getDoc(doc(db, "users", uid));
+                currentChatFriend = snap.data();
+                document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
+                document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
+                document.getElementById('chatModal').classList.remove('hidden');
+                
+                const chatId = [auth.currentUser.uid, uid].sort().join('_');
+                const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+                
+                if (chatUnsubscribe) chatUnsubscribe();
+                
+                chatUnsubscribe = onValue(chatRef, (snapshot) => {
+                    const messages = snapshot.val();
+                    const container = document.getElementById('chatMessages');
+                    container.innerHTML = '';
+                    
+                    if (messages) {
+                        Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
+                            const isMe = msg.senderId === auth.currentUser.uid;
+                            if (msg.type === 'gift') {
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="gift-message max-w-[80%]">
+                                            <div class="gift-message-icon">
+                                                <img src="${msg.giftImage}" class="w-full h-full object-contain">
+                                            </div>
+                                            <p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p>
+                                            <p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p>
+                                        </div>
+                                    </div>`;
+                            } else {
+                                // تطبيق فقاعة الكتابة إذا كانت موجودة
+                                let bubbleStyle = '';
+                                if (isMe && userData.activeBubble) {
+                                    const bubble = storeData.bubbles.find(b => b.id === userData.activeBubble);
+                                    if (bubble) {
+                                        bubbleStyle = `style="background: ${bubble.bubbleColor}; color: ${bubble.textColor}"`;
+                                    }
+                                }
+                                
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium" ${bubbleStyle}>
+                                            ${msg.text}
+                                        </div>
+                                    </div>`;
+                            }
+                        });
+                        container.scrollTop = container.scrollHeight;
+                    }
+                });
+            } catch (error) {
+                console.error('Error opening chat:', error);
+            }
+        };
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentChatFriend) return;
+            
+            try {
+                const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+                const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+                
+                await push(chatRef, {
+                    senderId: auth.currentUser.uid,
+                    receiverId: currentChatFriend.uid,
+                    text: text,
+                    type: 'text',
+                    timestamp: Date.now()
+                });
+                input.value = '';
+            } catch (error) {
+                console.error('Error sending message:', error);
+            }
+        };
+
+        window.closeChat = () => {
+            document.getElementById('chatModal').classList.add('hidden');
+            if (chatUnsubscribe) {
+                chatUnsubscribe();
+                chatUnsubscribe = null;
+            }
+            currentChatFriend = null;
+        };
+
+        window.toggleGiftBox = () => {
+            const giftBox = document.getElementById('giftBox');
+            const isHidden = giftBox.classList.contains('hidden');
+            giftBox.classList.toggle('hidden');
+            selectedGift = null;
+            document.getElementById('sendGiftBtn').disabled = true;
+            if (isHidden) {
+                switchGiftTab('fixed');
+            }
+        };
+
+        window.switchGiftTab = (type) => {
+            const grid = document.getElementById('giftGrid');
+            grid.innerHTML = '';
+            selectedGift = null;
+            document.getElementById('sendGiftBtn').disabled = true;
+            
+            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
+            
+            document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            
+            if (items.length === 0) {
+                grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">لا توجد هدايا متاحة</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                grid.innerHTML += `
+                    <div onclick="selectGift('${item.id}', '${item.type || 'wealth'}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
+                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2 hover:bg-gray-100 transition">
+                            <img src="${item.image}" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span>
+                        <span class="text-[8px] text-yellow-600 font-black">${item.price || 0} 💰</span>
+                    </div>`;
+            });
+        };
+
+        window.selectGift = (giftId, giftType) => {
+            const giftList = giftType === 'magic' ? storeData.luckGifts : storeData.gifts;
+            const gift = giftList.find(g => g.id === giftId);
+            
+            if (gift) {
+                selectedGift = { ...gift, giftType };
+                document.getElementById('sendGiftBtn').disabled = false;
+                
+                // إضافة تأثير التحديد
+                document.querySelectorAll('#giftGrid > div').forEach(div => {
+                    div.classList.remove('border-2', 'border-black');
+                });
+                event.currentTarget.classList.add('border-2', 'border-black');
+            }
+        };
+
+        window.sendSelectedGift = async () => {
+            if (!selectedGift || !currentChatFriend) {
+                alert('يجب اختيار هدية أولاً وفتح محادثة مع صديق!');
+                return;
+            }
+
+            if (userData.balance < (selectedGift.price || 0)) {
+                alert('رصيدك غير كافٍ!');
+                return;
+            }
+
+            try {
+                // خصم السعر من المرسل
+                await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                    balance: increment(-(selectedGift.price || 0))
+                });
+
+                // إرسال الهدية في المحادثة
+                const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+                const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+                
+                await push(chatRef, {
+                    senderId: auth.currentUser.uid,
+                    receiverId: currentChatFriend.uid,
+                    giftId: selectedGift.id,
+                    giftName: selectedGift.name,
+                    giftImage: selectedGift.image,
+                    giftType: selectedGift.giftType,
+                    type: 'gift',
+                    timestamp: Date.now()
+                });
+
+                // تحديث مستويات المتلقي بناءً على نوع الهدية
+                const receiverRef = doc(db, "users", currentChatFriend.uid);
+                const receiverSnap = await getDoc(receiverRef);
+                
+                if (receiverSnap.exists()) {
+                    const receiverData = receiverSnap.data();
+                    
+                    if (selectedGift.giftType === 'magic') {
+                        // زيادة XP السحر
+                        const newMagicXP = (receiverData.magicXP || 0) + (selectedGift.xpValue || 10);
+                        
+                        // التحقق من الترقية
+                        let newMagicLevel = receiverData.magicLevel || 1;
+                        const nextLevelReq = storeData.levelRequirements[`magic_${newMagicLevel + 1}`];
+                        
+                        if (nextLevelReq && newMagicXP >= nextLevelReq.requiredXP) {
+                            newMagicLevel += 1;
+                        }
+                        
+                        await updateDoc(receiverRef, {
+                            magicXP: newMagicXP,
+                            magicLevel: newMagicLevel,
+                            balance: increment(selectedGift.coinReward || 10)
+                        });
+                        
+                    } else if (selectedGift.giftType === 'wealth') {
+                        // زيادة XP الثروة
+                        const newWealthXP = (receiverData.wealthXP || 0) + (selectedGift.xpValue || 10);
+                        
+                        // التحقق من الترقية
+                        let newWealthLevel = receiverData.wealthLevel || 1;
+                        const nextLevelReq = storeData.levelRequirements[`wealth_${newWealthLevel + 1}`];
+                        
+                        if (nextLevelReq && newWealthXP >= nextLevelReq.requiredXP) {
+                            newWealthLevel += 1;
+                        }
+                        
+                        await updateDoc(receiverRef, {
+                            wealthXP: newWealthXP,
+                            wealthLevel: newWealthLevel,
+                            balance: increment(selectedGift.coinReward || 10)
+                        });
+                    }
+                }
+
+                // عرض رسالة تأكيد مع تأثير الحركة
+                showGiftAnimation(selectedGift, `تم إرسال هدية ${selectedGift.name} إلى ${currentChatFriend.displayName}`);
+                
+                // إضافة تأثير حركة الإرسال
+                const giftBtn = document.getElementById('sendGiftBtn');
+                giftBtn.classList.add('gift-send-animation');
+                setTimeout(() => {
+                    giftBtn.classList.remove('gift-send-animation');
+                }, 1000);
+                
+                setTimeout(() => {
+                    toggleGiftBox();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error sending gift:', error);
+                alert('حدث خطأ أثناء إرسال الهدية');
+            }
+        };
+
+        function showGiftAnimation(gift, text) {
+            const anim = document.createElement('div');
+            anim.className = 'gift-animation flex flex-col items-center gap-4';
+            anim.innerHTML = `
+                <img src="${gift.image}" class="w-32 h-32 object-contain drop-shadow-2xl animate-bounce">
+                <div class="glass px-6 py-3 rounded-2xl shadow-xl border-2 border-white animate-pulse">
+                    <p class="font-black text-gray-900 text-center">${text}</p>
+                </div>`;
+            document.body.appendChild(anim);
+            setTimeout(() => anim.remove(), 3000);
+        }
+
+        window.confirmLogout = () => {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                // تنظيف مشغلات SVGA النشطة
+                Object.keys(activeSvgaPlayers).forEach(id => {
+                    try {
+                        activeSvgaPlayers[id].player.clear();
+                    } catch (e) {}
+                });
+                activeSvgaPlayers = {};
+                signOut(auth);
+            }
         };
         
-        const field = fieldMap[type];
-        if (userData[field]?.some(item => item.id === id)) {
-            alert('هذا العنصر مملوك مسبقًا!');
-            return;
-        }
+        window.toggleSidebar = (show) => {
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('sidebarOverlay');
+            s.classList.toggle('open', show);
+            o.classList.toggle('hidden', !show);
+            if(show) setTimeout(() => o.classList.add('visible'), 10);
+            else o.classList.remove('visible');
+        };
         
-        try {
-            // استخدام Batch للكتابة الآمنة
-            const batch = writeBatch(db);
-            const userRef = doc(db, "users", auth.currentUser.uid);
+        window.switchView = (v) => {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('view-' + v).classList.remove('hidden');
+            document.getElementById('pageTitle').innerText = 
+                v === 'home' ? 'الرئيسية' : 
+                v === 'wallet' ? 'المحفظة' : 
+                v === 'store' ? 'المتجر' : 
+                v === 'bag' ? 'حقيبتي' : 'أصدقائي';
             
-            // 1. تحديث الرصيد
-            batch.update(userRef, {
-                balance: increment(-price)
-            });
-            
-            // 2. إضافة العنصر
-            batch.update(userRef, {
-                [field]: arrayUnion({
-                    id: id,
-                    purchasedAt: new Date().toISOString(),
-                    price: price,
-                    transactionId: `TXN_${Date.now()}_${Math.random().toString(36).slice(2)}`
-                })
-            });
-            
-            // 3. تسجيل المعاملة
-            const transactionRef = doc(collection(db, "transactions"));
-            batch.set(transactionRef, {
-                userId: auth.currentUser.uid,
-                type: 'purchase',
-                itemType: type,
-                itemId: id,
-                amount: -price,
-                balanceAfter: userData.balance - price,
-                timestamp: new Date().toISOString(),
-                device: getDeviceSignature()
-            });
-            
-            await batch.commit();
-            
-            // إعادة تحميل المتجر
-            loadStoreItems(type);
-            
-            // تحديث النسخ الاحتياطي
-            createUserBackup(auth.currentUser.uid, {
-                ...userData,
-                balance: userData.balance - price,
-                [field]: [...(userData[field] || []), {
-                    id: id,
-                    purchasedAt: new Date().toISOString()
-                }]
-            });
-            
-        } catch (error) {
-            console.error('Purchase failed:', error);
-            alert('حدث خطأ أثناء الشراء، لم يتم خصم الرصيد');
-        }
-    };
-    
-    // ... (بقية الدوال مع نفس النمط من الحماية) ...
-
-    // ================= تهيئة التطبيق =================
-    
-    // تحميل البيانات العامة
-    async function loadGlobalData() {
-        try {
-            const collections = [
-                'frames', 'badges', 'svgaItems', 'gifts', 'luckGifts', 
-                'magicLevels', 'wealthLevels', 'bubbles', 'levelRequirements'
-            ];
-            
-            const promises = collections.map(async (col) => {
-                const snap = await getDocs(collection(db, col));
-                if (col.includes('Levels')) {
-                    storeData[col] = {};
-                    snap.docs.forEach(d => storeData[col][d.id] = d.data());
-                } else {
-                    storeData[col] = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                }
-            });
-            
-            await Promise.all(promises);
-            
-        } catch (error) {
-            console.error('Error loading global data:', error);
-        }
-    }
-    
-    // تحميل البنر
-    async function loadBanner() {
-        try {
-            const bDoc = await getDoc(doc(db, "appData", "banner"));
-            const container = document.getElementById('homeBanner');
-            if (bDoc.exists()) {
-                const b = bDoc.data();
-                container.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div>
-                    <img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
-                `;
+            if(v === 'bag') loadBagItems();
+            if(v === 'store') loadStoreItems('frames');
+            if(v === 'friends') {
+                loadFriendRequests();
+                loadFriends();
             }
-        } catch (error) {
-            console.error('Error loading banner:', error);
-        }
-    }
-    
-    // ... (بقية الدوال كما هي مع تعديلات طفيفة للتوافق) ...
+            toggleSidebar(false);
+        };
+        
+        window.recharge = async (a) => {
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                    balance: increment(a) 
+                });
+                alert('تم شحن الرصيد بنجاح!');
+            } catch (error) {
+                console.error('Error recharging:', error);
+                alert('حدث خطأ أثناء الشحن');
+            }
+        };
+        
+        window.copyID = () => {
+            navigator.clipboard.writeText(userData.customId).then(() => {
+                alert('تم نسخ الـ ID إلى الحافظة');
+            });
+        };
+        
+        window.openEditProfile = () => {
+            document.getElementById('editNameInp').value = userData.displayName;
+            document.getElementById('editPhotoInp').value = userData.photoURL;
+            document.getElementById('editModal').classList.remove('hidden');
+            toggleSidebar(false);
+        };
+        
+        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        
+        window.saveProfileChanges = async () => {
+            const n = document.getElementById('editNameInp').value.trim();
+            const p = document.getElementById('editPhotoInp').value.trim();
+            
+            if (!n) {
+                alert('الاسم مطلوب!');
+                return;
+            }
+            
+            try {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                    displayName: n, 
+                    photoURL: p || userData.photoURL 
+                });
+                closeEditModal();
+            } catch (error) {
+                console.error('Error updating profile:', error);
+                alert('حدث خطأ أثناء حفظ التغييرات');
+            }
+        };
 
-</script>
+        async function loadBanner() {
+            try {
+                const bDoc = await getDoc(doc(db, "appData", "banner"));
+                const container = document.getElementById('homeBanner');
+                if (bDoc.exists()) {
+                    const b = bDoc.data();
+                    container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div><img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">`;
+                } else {
+                    container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-80"></div>`;
+                }
+            } catch (error) {
+                console.error('Error loading banner:', error);
+            }
+        }
+
+        async function loadRooms() {
+            try {
+                const rSnap = await getDocs(collection(db, "rooms"));
+                const grid = document.getElementById('roomsGrid');
+                grid.innerHTML = '';
+                
+                rSnap.docs.forEach(d => {
+                    const r = d.data();
+                    grid.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl flex items-center gap-4 hover:bg-white transition cursor-pointer">
+                            <div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">
+                                ${r.icon}
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-gray-900">${r.name}</h4>
+                                <p class="text-xs text-gray-500">${r.description}</p>
+                            </div>
+                            <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
+                        </div>`;
+                });
+            } catch (error) {
+                console.error('Error loading rooms:', error);
+            }
+        }
+
+        window.filterRooms = (t) => {
+            document.getElementById('btn-public').className = t === 'public' ? 
+                'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 
+                'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+            document.getElementById('btn-private').className = t === 'private' ? 
+                'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 
+                'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+        };
+
+        // تهيئة الأيقونات
+        lucide.createIcons();
+        setInterval(() => lucide.createIcons(), 2000);
+    </script>
 </body>
 </html>
