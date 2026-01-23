@@ -158,10 +158,10 @@
         /* إطار SVGA متحرك - تم التعديل للرفع للأعلى والتحريك لليسار */
         .svga-avatar-frame {
             position: absolute;
-            width: 165%;
-            height: 165%;
-            top: 40%;  /* كان 50% - رفع 10% للأعلى */
-            left: 57%;  /* كان 50% - تحريك 7% لليسار */
+            width: 170%;  /* أكبر قليلاً من الصورة */
+            height: 170%; /* أكبر قليلاً من الصورة */
+            top: calc(50% - 20px);  /* رفع 20px للأعلى */
+            left: calc(50% + 10px);  /* تحريك 10px لليسار */
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 2;
@@ -170,6 +170,7 @@
             align-items: center;
             justify-content: center;
             animation: frameFloat 3s ease-in-out infinite;
+            overflow: visible;
         }
 
         .svga-avatar-frame canvas {
@@ -177,15 +178,23 @@
             object-fit: contain;
             width: 100% !important;
             height: 100% !important;
+            position: absolute !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            max-width: 100% !important;
+            max-height: 100% !important;
+            min-width: 100% !important;
+            min-height: 100% !important;
         }
 
         /* إطار الصورة العادية - تم التعديل كذلك */
         .perfect-frame {
             position: absolute;
-            width: 165%;
-            height: 165%;
-            top: 40%;  /* كان 50% - رفع 10% للأعلى */
-            left: 57%;  /* كان 50% - تحريك 7% لليسار */
+            width: 170%;  /* أكبر قليلاً من الصورة */
+            height: 170%; /* أكبر قليلاً من الصورة */
+            top: calc(50% - 20px);  /* رفع 20px للأعلى */
+            left: calc(50% + 10px);  /* تحريك 10px لليسار */
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 2;
@@ -743,7 +752,9 @@
                     player.loops = options.loops || 0;
                     player.clearsAfterStop = options.clearsAfterStop || false;
                     
-                    // ضبط حجم canvas ليتناسب تماماً مع الحاوية
+                    player.startAnimation();
+                    
+                    // ضبط canvas مباشرة بعد التشغيل
                     setTimeout(() => {
                         const canvas = container.querySelector('canvas');
                         if (canvas) {
@@ -755,10 +766,13 @@
                             canvas.style.top = '50%';
                             canvas.style.left = '50%';
                             canvas.style.transform = 'translate(-50%, -50%)';
+                            canvas.style.maxWidth = '100%';
+                            canvas.style.maxHeight = '100%';
+                            canvas.style.minWidth = '100%';
+                            canvas.style.minHeight = '100%';
+                            canvas.style.display = 'block';
                         }
-                    }, 100);
-                    
-                    player.startAnimation();
+                    }, 50);
                     
                     // Store player reference
                     const id = 'player_' + Date.now();
