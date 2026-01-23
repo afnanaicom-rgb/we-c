@@ -3,2126 +3,1542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - النسخة المتطورة</title>
+    <title>Afnan AI - White Edition</title>
+    
+    <!-- Fonts: Noto Sans Arabic -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- SVGA Library -->
+    <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+
     <style>
-        * { 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-            font-family: 'Noto Sans Arabic', sans-serif; 
+        /* --- Base Settings --- */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Noto Sans Arabic', sans-serif;
+            touch-action: manipulation;
         }
-        body, html { 
-            height: 100%; 
-            margin: 0; 
-            color: #1a1a1a; 
-            overflow-x: hidden; 
-            transition: background-color 0.3s ease;
-        }
-        
-        /* Theme Variables */
-        :root {
-            --bg-primary: #0f172a;
-            --bg-secondary: #1e293b;
-            --bg-card: #334155;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --accent: #f59e0b;
-            --accent-secondary: #1da1f2;
-            --border-color: #475569;
-        }
-        
-        .light-mode {
-            --bg-primary: #f8fafc;
-            --bg-secondary: #ffffff;
-            --bg-card: #ffffff;
-            --text-primary: #0f172a;
-            --text-secondary: #475569;
-            --border-color: #e2e8f0;
-        }
-        
+
         body {
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
+            background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%);
+            color: #1f2937;
+            overflow-x: hidden;
+            min-height: 100vh;
         }
-        
-        .view-screen { 
-            position: absolute; 
-            inset: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: var(--bg-primary); 
-            display: none; 
-            flex-direction: column; 
-            z-index: 10; 
-            padding-top: 80px; 
-            overflow-y: auto; 
-            padding-bottom: 100px; 
-            transition: background-color 0.3s ease;
+
+        /* --- iOS Glassmorphism --- */
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.04),
+                0 2px 4px -1px rgba(0, 0, 0, 0.02),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
         }
-        .view-screen.active { display: flex; }
-        
-        /* Enhanced Header */
-        .app-header { 
-            position: fixed; 
-            top: 0; 
-            right: 0; 
-            left: 0; 
-            height: 80px; 
-            background: rgba(15, 23, 42, 0.95); 
-            backdrop-filter: blur(20px); 
-            border-bottom: 1px solid var(--border-color); 
-            display: flex; 
-            align-items: center; 
-            justify-content: space-between; 
-            padding: 0 1.5rem; 
-            z-index: 1000; 
-            transition: all 0.3s ease;
+
+        .glass-deep {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-right: 1px solid rgba(255, 255, 255, 0.8);
         }
-        
-        .light-mode .app-header {
-            background: rgba(248, 250, 252, 0.95);
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 
+                0 2px 8px -2px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
         }
-        
-        .header-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
+
+        .glass-card:active {
+            transform: scale(0.97);
+            box-shadow: 
+                0 1px 3px -1px rgba(0, 0, 0, 0.02),
+                inset 0 2px 0 0 rgba(255, 255, 255, 0.3);
         }
-        
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .theme-toggle {
-            width: 44px;
-            height: 24px;
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            position: relative;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-        }
-        
-        .theme-toggle::after {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background: var(--accent);
-            border-radius: 50%;
-            top: 1px;
-            right: 2px;
-            transition: transform 0.3s ease;
-        }
-        
-        .light-mode .theme-toggle::after {
-            transform: translateX(-20px);
-        }
-        
-        /* Enhanced Search Modal */
-        .search-modal {
+
+        /* --- Sidebar Animation --- */
+        .sidebar-container {
             position: fixed;
             top: 0;
             right: 0;
-            left: 0;
-            bottom: 0;
-            background: rgba(15, 23, 42, 0.95);
-            z-index: 2000;
-            display: none;
-            align-items: flex-start;
-            justify-content: center;
-            padding-top: 100px;
-            backdrop-filter: blur(20px);
-        }
-        
-        .search-modal.active {
-            display: flex;
-        }
-        
-        .search-container {
-            width: 90%;
-            max-width: 600px;
-            background: var(--bg-secondary);
-            border-radius: 24px;
-            padding: 2rem;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: slideDown 0.3s ease;
-        }
-        
-        @keyframes slideDown {
-            from { transform: translateY(-30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .search-input-group {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-        
-        .search-input {
-            width: 100%;
-            padding: 1.25rem 1.25rem 1.25rem 3.5rem;
-            background: var(--bg-primary);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            color: var(--text-primary);
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-        
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
-        }
-        
-        .search-icon {
-            position: absolute;
-            right: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-        
-        .search-close {
-            position: absolute;
-            left: 1.25rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: transparent;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .search-close:hover {
-            background: rgba(245, 158, 11, 0.1);
-            color: var(--accent);
-        }
-        
-        /* Profile Styles - تم التعديل هنا */
-        .profile-container { 
-            position: relative; 
-            width: 80px; 
-            height: 80px; 
-            margin: 0 auto; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-        .avatar-img { 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            z-index: 1; 
-            border: 3px solid var(--accent); 
-            box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); 
-        }
-        .user-frame { 
-            position: absolute; 
-            width: 100px; 
-            height: 100px; 
-            top: 43%;  /* رفع 7% للأعلى (كان 50%) */
-            left: 45%; /* تحريك 5% لليسار (كان 50%) */
-            transform: translate(-50%, -50%); 
-            z-index: 2; 
-            pointer-events: none; 
-            object-fit: contain; 
-            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.3));
-        }
-        
-        /* Enhanced Level System */
-        .level-display {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 1.5rem 0;
-            padding: 1.5rem;
-            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
-            border-radius: 24px;
-            border: 2px solid var(--border-color);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .level-display::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #f59e0b, #3b82f6, #8b5cf6);
-        }
-        
-        .level-current {
-            font-size: 56px;
-            font-weight: 900;
-            background: linear-gradient(135deg, #f59e0b, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-            text-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
-        }
-        
-        .level-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 0.5rem;
-        }
-        
-        .level-progress-container {
-            width: 100%;
-            margin: 1rem 0;
-        }
-        
-        .level-progress {
-            width: 100%;
-            height: 10px;
-            background: var(--bg-primary);
-            border-radius: 5px;
-            overflow: hidden;
-            position: relative;
-        }
-        
-        .level-progress-bar {
+            width: 85%;
+            max-width: 320px;
             height: 100%;
-            background: linear-gradient(90deg, #f59e0b, #3b82f6);
-            border-radius: 5px;
-            transition: width 0.5s ease;
-            position: relative;
-            overflow: hidden;
+            z-index: 50;
+            transform: translateX(110%);
+            transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1);
         }
-        
-        .level-progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            animation: shimmer 2s infinite;
+
+        .sidebar-container.open {
+            transform: translateX(0);
         }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .level-info {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 0.5rem;
-        }
-        
-        /* Level Image Container */
-        .level-image-container {
-            width: 120px;
-            height: 120px;
-            margin: 1rem auto;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .level-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 20px rgba(245, 158, 11, 0.3));
-        }
-        
-        /* Badges Grid */
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0.75rem;
-            margin-top: 0.5rem;
-        }
-        
-        .badge-item {
-            width: 50px;
-            height: 50px;
-            border-radius: 12px;
-            background: var(--bg-card);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            border: 2px solid var(--border-color);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .badge-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            padding: 8px;
-        }
-        
-        .badge-item.active {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
-            transform: scale(1.1);
-        }
-        
-        .badge-item:hover::after {
-            content: attr(title);
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.9);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            white-space: nowrap;
-            margin-bottom: 8px;
-            z-index: 10;
-        }
-        
-        /* Enhanced Store & Items */
-        .store-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 16px; 
-            padding: 20px; 
-        }
-        .store-card { 
-            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
-            border-radius: 24px; 
-            padding: 20px; 
-            text-align: center; 
-            border: 2px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            position: relative; 
-            height: 240px; 
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-        
-        .store-card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            bottom: -2px;
-            left: -2px;
-            background: linear-gradient(45deg, #f59e0b, #3b82f6, #8b5cf6);
-            border-radius: 25px;
-            z-index: -1;
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 40;
             opacity: 0;
+            pointer-events: none;
             transition: opacity 0.3s ease;
         }
-        
-        .store-card:hover::before {
-            opacity: 0.3;
+
+        .sidebar-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
-        
-        .store-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            border-color: var(--accent);
-        }
-        
-        .item-label { 
-            position: absolute; 
-            top: 12px; 
-            right: 12px; 
-            font-size: 10px; 
-            font-weight: 800; 
-            color: var(--text-secondary); 
-            text-transform: uppercase; 
-            background: rgba(0,0,0,0.5);
-            padding: 4px 12px;
-            border-radius: 12px;
-            letter-spacing: 1px;
-        }
-        
-        .item-image-container {
+
+        /* --- Avatar & Frame Logic --- */
+        .avatar-wrapper {
+            position: relative;
             width: 100px;
             height: 100px;
+            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 1rem 0;
+            border-radius: 50%;
+            overflow: visible;
         }
-        
-        .item-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-        
-        .action-btn { 
-            width: 100%; 
-            padding: 12px 0; 
-            border-radius: 16px; 
-            font-size: 14px; 
-            font-weight: bold; 
-            margin-top: auto; 
-            cursor: pointer; 
-            transition: all 0.3s; 
-            border: none;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .btn-buy { 
-            background: linear-gradient(135deg, #f59e0b, #d97706); 
-            color: white; 
-        }
-        .btn-buy:hover {
-            background: linear-gradient(135deg, #d97706, #f59e0b);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
-        }
-        .btn-equip { 
-            background: linear-gradient(135deg, #10b981, #059669); 
-            color: white; 
-        }
-        .btn-equip:hover {
-            background: linear-gradient(135deg, #059669, #10b981);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
-        }
-        .btn-unequip { 
-            background: linear-gradient(135deg, #ef4444, #dc2626); 
-            color: white; 
-        }
-        .btn-unequip:hover {
-            background: linear-gradient(135deg, #dc2626, #ef4444);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
-        }
-        
-        /* Sidebar */
-        .sidebar { 
-            position: fixed; 
-            top: 0; 
-            right: -320px; 
-            width: 320px; 
-            height: 100%; 
-            background: var(--bg-secondary); 
-            z-index: 4000; 
-            transition: 0.3s ease; 
-            border-left: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
-        }
-        .sidebar.open { right: 0; }
-        
-        .overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.7); 
-            z-index: 2500; 
-            display: none; 
-            backdrop-filter: blur(10px); 
-        }
-        .overlay.active { display: block; }
-        
-        /* Enhanced Rooms Grid */
-        .rooms-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-            padding: 1.5rem;
-        }
-        
-        .room-card {
-            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
-            border-radius: 24px;
-            padding: 1.5rem;
-            border: 2px solid var(--border-color);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .room-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #f59e0b, #3b82f6);
-        }
-        
-        .room-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent);
-            box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15);
-        }
-        
-        .room-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .room-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            flex-shrink: 0;
-        }
-        
-        .room-users {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-top: 1rem;
-        }
-        
-        .room-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        
-        .room-action-btn {
-            flex: 1;
-            padding: 8px 16px;
-            border-radius: 12px;
-            background: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .room-action-btn:hover {
-            background: var(--accent);
-            color: white;
-        }
-        
-        /* Enhanced Recharge Cards */
-        .recharge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            gap: 1.5rem;
-            padding: 2rem;
-        }
-        
-        .recharge-card {
-            background: linear-gradient(145deg, var(--bg-card), var(--bg-secondary));
-            border-radius: 20px;
-            padding: 2rem 1.5rem;
-            text-align: center;
-            border: 2px solid transparent;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .recharge-card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            right: -2px;
-            bottom: -2px;
-            left: -2px;
-            background: linear-gradient(45deg, #f59e0b, #3b82f6, #8b5cf6);
-            border-radius: 22px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .recharge-card:hover::before {
-            opacity: 0.3;
-        }
-        
-        .recharge-card:hover {
-            transform: translateY(-5px) scale(1.03);
-            border-color: var(--accent);
-            box-shadow: 0 15px 35px rgba(245, 158, 11, 0.2);
-        }
-        
-        .recharge-icon {
-            font-size: 48px;
-            margin-bottom: 1rem;
-            display: inline-block;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        /* Modern Button */
-        .modern-btn {
-            background: linear-gradient(135deg, var(--accent), #d97706);
-            color: white;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .modern-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+
+        .avatar-img {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-        
-        .modern-btn:hover::before {
-            left: 100%;
-        }
-        
-        .modern-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(245, 158, 11, 0.3);
-        }
-        
-        .twitter-btn {
-            background: linear-gradient(135deg, #1da1f2, #0c85d0);
-        }
-        
-        .twitter-btn:hover {
-            background: linear-gradient(135deg, #0c85d0, #1da1f2);
-            box-shadow: 0 12px 25px rgba(29, 161, 242, 0.3);
-        }
-        
-        /* Login Page */
-        .login-container {
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             position: relative;
-            overflow: hidden;
+            z-index: 1;
         }
-        
-        .login-container::before {
-            content: '';
+
+        .user-frame {
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(245, 158, 11, 0.1) 0%, transparent 70%);
-            animation: pulse 4s ease-in-out infinite;
+            width: 165%;
+            height: 165%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            object-fit: contain;
+            border-radius: 50%;
+            padding: 0;
+            margin: 0;
         }
-        
-        .login-logo {
-            position: relative;
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.5; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-        }
-        
-        /* Enhanced Wallet Balance */
-        .wallet-balance {
-            background: linear-gradient(145deg, #0f172a, #1e293b);
-            border-radius: 28px;
-            padding: 3rem;
-            margin: 2rem;
-            border: 2px solid var(--border-color);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .wallet-balance::before {
-            content: '';
+
+        /* --- SVGA Containers --- */
+        .svga-container {
+            width: 100%;
+            height: 100%;
             position: absolute;
-            top: -2px;
-            right: -2px;
-            bottom: -2px;
-            left: -2px;
-            background: linear-gradient(45deg, #f59e0b, #3b82f6, #8b5cf6);
-            border-radius: 30px;
-            z-index: -1;
-            opacity: 0.1;
-        }
-        
-        .light-mode .wallet-balance {
-            background: linear-gradient(145deg, #f1f5f9, #e2e8f0);
-        }
-        
-        /* Tab Navigation */
-        .tab-nav {
-            display: flex;
-            background: var(--bg-secondary);
-            border-radius: 16px;
-            padding: 6px;
-            margin: 1rem;
-            border: 2px solid var(--border-color);
-            gap: 6px;
-        }
-        
-        .tab-btn {
-            flex: 1;
-            padding: 14px;
-            text-align: center;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            font-family: inherit;
-        }
-        
-        .tab-btn.active {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: white;
-            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
-        }
-        
-        /* Animation Classes */
-        .fade-in {
-            animation: fadeIn 0.4s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .slide-in {
-            animation: slideIn 0.4s ease;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        /* Level Badge */
-        .level-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(245, 158, 11, 0.1);
-            padding: 8px 16px;
-            border-radius: 24px;
-            border: 2px solid rgba(245, 158, 11, 0.3);
-            backdrop-filter: blur(10px);
-        }
-        
-        .level-badge-number {
-            font-weight: 900;
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 18px;
-        }
-        
-        /* Create Room Modal */
-        .modal {
-            position: fixed;
             top: 0;
-            right: 0;
             left: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 5000;
-            display: none;
+            pointer-events: none;
+            border-radius: 50%;
+            overflow: visible;
+        }
+
+        /* إطار SVGA متحرك - تم التعديل للرفع للأعلى والتحريك لليسار */
+        .svga-avatar-frame {
+            position: absolute;
+            width: 165%;
+            height: 165%;
+            top: 40%;  /* كان 50% - رفع 10% للأعلى */
+            left: 57%;  /* كان 50% - تحريك 7% لليسار */
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
-            backdrop-filter: blur(20px);
+            animation: frameFloat 3s ease-in-out infinite;
         }
-        
-        .modal.active {
-            display: flex;
+
+        .svga-avatar-frame canvas {
+            border-radius: 50%;
+            object-fit: contain;
+            width: 100% !important;
+            height: 100% !important;
         }
-        
-        .modal-content {
-            width: 100%;
-            max-width: 500px;
-            background: var(--bg-secondary);
-            border-radius: 24px;
-            padding: 2rem;
-            border: 2px solid var(--border-color);
-            animation: modalSlide 0.3s ease;
+
+        /* إطار الصورة العادية - تم التعديل كذلك */
+        .perfect-frame {
+            position: absolute;
+            width: 165%;
+            height: 165%;
+            top: 40%;  /* كان 50% - رفع 10% للأعلى */
+            left: 57%;  /* كان 50% - تحريك 7% لليسار */
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            object-fit: contain;
+            border-radius: 50%;
+            animation: frameFloat 3s ease-in-out infinite;
         }
-        
-        @keyframes modalSlide {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+
+        @keyframes frameFloat {
+            0%, 100% { 
+                transform: translate(-50%, -50%) scale(1); 
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.05); 
+            }
         }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
+
+        /* --- Level Indicators --- */
+        .level-badge {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
+            border: 1px solid rgba(255,255,255,0.8);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: var(--text-secondary);
-            font-weight: 600;
+
+        /* --- Badges Grid --- */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
         }
-        
-        .form-input {
-            width: 100%;
-            padding: 1rem;
-            background: var(--bg-primary);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-family: inherit;
-            transition: all 0.3s ease;
+
+        /* --- General Animations --- */
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+
+        .loader {
+            border: 3px solid rgba(0,0,0,0.1);
+            border-left-color: #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
         }
-        
-        /* Admin Panel Link */
-        .admin-link {
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* --- Gift Animation --- */
+        @keyframes giftFly {
+            0% { transform: translate(-50%, 100%) scale(0.5); opacity: 0; }
+            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(150%, -150%) scale(0.5); opacity: 0; }
+        }
+        .gift-animation {
             position: fixed;
-            bottom: 20px;
-            left: 20px;
-            z-index: 100;
-        }
-        
-        .admin-btn {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .admin-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
-        }
-        
-        /* Toast Container */
-        .toast-container {
-            position: fixed;
-            bottom: 30px;
             left: 50%;
-            transform: translateX(-50%);
-            z-index: 11000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 90%;
-            max-width: 400px;
+            top: 50%;
+            z-index: 100;
+            pointer-events: none;
+            animation: giftFly 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
-        
-        .toast {
-            padding: 16px 20px;
-            border-radius: 16px;
+
+        /* --- Hide Scrollbar --- */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- Chat Styles --- */
+        .chat-bubble-me {
+            background: #1f2937;
             color: white;
-            font-weight: 600;
+            border-radius: 20px 20px 4px 20px;
+        }
+        .chat-bubble-them {
+            background: white;
+            color: #1f2937;
+            border-radius: 20px 20px 20px 4px;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .gift-message {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #fbbf24;
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            margin: 8px 0;
+        }
+
+        .gift-message-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 8px;
+        }
+
+        /* --- SVGA Preview in Store --- */
+        .svga-preview {
+            width: 100%;
+            height: 80px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            animation: toastIn 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: center;
+            overflow: hidden;
         }
-        
-        .toast.success {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-        
-        .toast.error {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-        
-        .toast.info {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-        }
-        
-        .toast.warning {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-        
-        @keyframes toastIn {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        @keyframes toastOut {
-            from { transform: translateY(0); opacity: 1; }
-            to { transform: translateY(100px); opacity: 0; }
+
+        .svga-icon {
+            font-size: 10px;
+            background: #3b82f6;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 4px;
         }
     </style>
 </head>
-<body class="dark">
+<body class="antialiased selection:bg-blue-100 selection:text-blue-900">
 
-<!-- Login Page -->
-<div id="loginPage" class="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 z-[10000] flex flex-col items-center justify-center p-8 login-container">
-    <div class="login-logo mb-8">
-        <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663174655187/mcieZCLEOIrmCjBq.png" class="w-40 relative z-10">
-    </div>
-    <h1 class="text-5xl font-black bg-gradient-to-r from-orange-400 via-yellow-400 to-orange-400 bg-clip-text text-transparent mb-2">Afnan AI</h1>
-    <p class="text-slate-400 mb-10 text-center text-lg">النسخة المتطورة - مستقبل الذكاء الاصطناعي</p>
-    
-    <div class="w-full max-w-sm space-y-4">
-        <button onclick="loginWithGoogle()" class="modern-btn w-full">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
-            تسجيل الدخول عبر جوجل
-        </button>
+    <!-- ================= MAIN APP ================= -->
+    <div id="main-app" class="min-h-screen pb-24">
         
-        <button onclick="loginWithTwitter()" class="modern-btn twitter-btn w-full">
-            <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24">
-                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.213c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-            </svg>
-            تسجيل الدخول عبر X (تويتر)
-        </button>
-    </div>
-</div>
-
-<!-- Main App -->
-<div id="main-app" style="display: none;">
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-content">
-            <div class="header-left">
-                <button onclick="toggleSidebar()" class="modern-btn" style="padding: 10px 14px">
-                    <i data-lucide="menu" class="w-5 h-5"></i>
-                </button>
-                <h1 id="view-title" class="text-xl font-bold">الرئيسية</h1>
-            </div>
-            <div class="header-right">
-                <div class="theme-toggle" onclick="toggleTheme()"></div>
-                <button onclick="toggleSearch()" class="modern-btn" style="padding: 10px 14px">
-                    <i data-lucide="search" class="w-5 h-5"></i>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Search Modal -->
-    <div id="searchModal" class="search-modal">
-        <div class="search-container">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold">بحث متقدم</h2>
-                <button onclick="toggleSearch()" class="search-close">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            <div class="search-input-group">
-                <input type="text" 
-                       id="searchInput"
-                       placeholder="ابحث في الغرف، المستخدمين، المحتوى..." 
-                       class="search-input">
-                <i data-lucide="search" class="search-icon w-5 h-5"></i>
-            </div>
-            <div class="mt-4">
-                <h3 class="text-sm font-semibold text-slate-400 mb-3">البحث السريع</h3>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-4 py-2 bg-slate-800 rounded-xl text-sm cursor-pointer hover:bg-slate-700 transition-colors duration-200" onclick="quickSearch('#عامة')">#عامة</span>
-                    <span class="px-4 py-2 bg-slate-800 rounded-xl text-sm cursor-pointer hover:bg-slate-700 transition-colors duration-200" onclick="quickSearch('#خاصة')">#خاصة</span>
-                    <span class="px-4 py-2 bg-slate-800 rounded-xl text-sm cursor-pointer hover:bg-slate-700 transition-colors duration-200" onclick="quickSearch('#ذكاء اصطناعي')">#ذكاء اصطناعي</span>
-                    <span class="px-4 py-2 bg-slate-800 rounded-xl text-sm cursor-pointer hover:bg-slate-700 transition-colors duration-200" onclick="quickSearch('#تطوير')">#تطوير</span>
-                </div>
-            </div>
-            <div class="mt-6">
-                <h3 class="text-sm font-semibold text-slate-400 mb-3">نتائج البحث</h3>
-                <div id="searchResults" class="space-y-2">
-                    <p class="text-center text-slate-500 py-4">اكتب للبدء في البحث...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Create Room Modal -->
-    <div id="createRoomModal" class="modal">
-        <div class="modal-content">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold">إنشاء غرفة جديدة</h2>
-                <button onclick="toggleCreateRoomModal()" class="text-gray-400 hover:text-orange-500">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">اسم الغرفة</label>
-                <input type="text" id="roomName" class="form-input" placeholder="أدخل اسم الغرفة">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">وصف الغرفة</label>
-                <textarea id="roomDescription" class="form-input" rows="3" placeholder="أدخل وصف الغرفة"></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">نوع الغرفة</label>
-                <select id="roomType" class="form-input">
-                    <option value="public">عامة</option>
-                    <option value="private">خاصة</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">أيقونة الغرفة</label>
-                <select id="roomIcon" class="form-input">
-                    <option value="💬">💬 دردشة</option>
-                    <option value="🎮">🎮 ألعاب</option>
-                    <option value="🤖">🤖 ذكاء اصطناعي</option>
-                    <option value="🎨">🎨 إبداع</option>
-                    <option value="📚">📚 تعلم</option>
-                </select>
-            </div>
-            
-            <button onclick="createRoom()" class="modern-btn w-full mt-4">
-                <i data-lucide="plus" class="w-5 h-5"></i>
-                إنشاء الغرفة
+        <!-- HEADER -->
+        <header class="fixed top-0 left-0 right-0 h-20 z-30 px-6 flex items-center justify-between glass">
+            <h2 id="pageTitle" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">الرئيسية</h2>
+            <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition">
+                <i data-lucide="menu" class="text-black w-6 h-6"></i>
             </button>
-        </div>
-    </div>
+        </header>
 
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar">
-        <div class="p-6 text-center border-b border-slate-700">
-            <div class="profile-container mb-4">
-                <img id="userAvatar" src="" class="avatar-img">
-                <img id="activeFrame" src="" class="user-frame" style="display: none;">
-            </div>
-            <div class="flex items-center justify-center gap-2 mb-3">
-                <div id="userName" class="font-bold text-lg">...</div>
-                <button onclick="openEditProfile()" class="text-gray-400 hover:text-orange-500">
-                    <i data-lucide="edit-3" class="w-4 h-4"></i>
-                </button>
-            </div>
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 rounded-lg text-sm mb-4">
-                <span class="glowing-id" id="userID">00000000</span>
-                <button onclick="copyID()" class="hover:text-orange-500">
-                    <i data-lucide="copy" class="w-3 h-3"></i>
-                </button>
+        <!-- VIEW CONTAINER -->
+        <main class="pt-24 px-5">
+
+            <!-- VIEW: HOME -->
+            <div id="view-home" class="view-section fade-in">
+                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
+                <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
+                    <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
+                    <button id="btn-private" onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
+                </div>
+                <div id="roomsGrid" class="space-y-3"></div>
             </div>
 
-            <!-- Level Display -->
-            <div class="level-display">
-                <div class="level-label">مستواك الحالي</div>
-                <div class="level-current" id="currentLevel">1</div>
-                
-                <div class="level-progress-container">
-                    <div class="level-progress">
-                        <div class="level-progress-bar" id="levelProgressBar" style="width: 20%"></div>
+            <!-- VIEW: WALLET -->
+            <div id="view-wallet" class="view-section hidden fade-in">
+                <div class="glass-card rounded-[40px] p-8 text-center mb-8 relative overflow-hidden">
+                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl"></div>
+                    <div class="relative z-10">
+                        <p class="text-gray-500 text-sm font-semibold mb-2">الرصيد الكلي</p>
+                        <h2 class="text-6xl font-black text-gray-900 tracking-tight mb-2" id="walletAmount">0</h2>
+                        <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold">
+                            <i data-lucide="coins" class="w-3 h-3"></i> عملة ذهبية
+                        </span>
                     </div>
                 </div>
-                
-                <div class="level-info">
-                    <span id="currentXP">0 XP</span>
-                    <span id="nextLevelXP">1000 XP</span>
-                </div>
-                
-                <div class="level-image-container">
-                    <img id="levelImage" src="https://i.postimg.cc/G4PtHLMS/ga.webp" class="level-image">
-                </div>
-            </div>
-
-            <!-- Badges Section -->
-            <div class="mt-4">
-                <h4 class="text-sm font-semibold text-slate-400 mb-2">شاراتي</h4>
-                <div class="badges-grid" id="badgesGrid">
-                    <!-- Badges will be injected here -->
-                </div>
-            </div>
-        </div>
-        
-        <nav class="p-4 space-y-2 flex-1">
-            <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="home" class="w-5 h-5 text-orange-500"></i>
-                <span class="font-bold text-sm">الرئيسية</span>
-            </button>
-            <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="wallet" class="w-5 h-5 text-green-500"></i>
-                <span class="font-bold text-sm">المحفظة</span>
-            </button>
-            <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="shopping-bag" class="w-5 h-5 text-blue-500"></i>
-                <span class="font-bold text-sm">المتجر</span>
-            </button>
-            <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-3 hover:bg-slate-800 rounded-xl transition-all duration-200">
-                <i data-lucide="briefcase" class="w-5 h-5 text-purple-500"></i>
-                <span class="font-bold text-sm">حقيبتي</span>
-            </button>
-        </nav>
-        
-        <div class="p-4 border-t border-slate-700">
-            <button onclick="logout()" class="w-full p-3 bg-gradient-to-r from-red-600 to-red-700 text-white rounded-xl font-bold text-sm hover:from-red-700 hover:to-red-800 transition-all duration-200 flex items-center justify-center gap-2">
-                <i data-lucide="log-out" class="w-4 h-4"></i>
-                تسجيل خروج
-            </button>
-        </div>
-    </div>
-
-    <!-- Views -->
-    <div id="view-home" class="view-screen active">
-        <!-- Banner -->
-        <div id="bannerContainer" class="mx-4 mt-4 mb-6 rounded-2xl overflow-hidden shadow-xl h-[200px] bg-gradient-to-r from-orange-500/20 to-blue-500/20 border border-orange-500/30 relative">
-            <!-- Banner will be loaded here -->
-        </div>
-        
-        <!-- Rooms Navigation -->
-        <div class="tab-nav">
-            <button onclick="switchTab('public')" class="tab-btn active">🌐 غرف عامة</button>
-            <button onclick="switchTab('private')" class="tab-btn">🔒 خاص بي</button>
-            <button onclick="toggleCreateRoomModal()" class="tab-btn">➕ إنشاء غرفة</button>
-        </div>
-        
-        <!-- Rooms Grid -->
-        <div class="rooms-grid" id="roomsList">
-            <!-- Rooms will be loaded here -->
-        </div>
-    </div>
-
-    <div id="view-wallet" class="view-screen">
-        <div class="wallet-balance slide-in">
-            <div class="text-sm text-slate-400 mb-2">الرصيد المتوفر</div>
-            <div class="text-6xl font-black mb-4">
-                <span id="wallet-balance-big">0</span> 
-                <span class="text-4xl">💰</span>
-            </div>
-            <div class="text-sm text-slate-400">أخر تحديث: اليوم</div>
-        </div>
-        
-        <div class="px-5">
-            <h3 class="text-xl font-bold mb-6 text-center">شحن الرصيد</h3>
-            <div class="recharge-grid">
-                <div class="recharge-card" onclick="recharge(27000, 1)">
-                    <div class="recharge-icon">💎</div>
-                    <div class="font-bold text-2xl mb-2">27,000</div>
-                    <div class="text-sm text-slate-400 mb-4">باقة المبتدئين</div>
-                    <div class="modern-btn text-sm py-2 px-4">1.00$</div>
-                </div>
-                <div class="recharge-card" onclick="recharge(55000, 1.99)">
-                    <div class="recharge-icon">💎💎</div>
-                    <div class="font-bold text-2xl mb-2">55,000</div>
-                    <div class="text-sm text-slate-400 mb-4">باقة المتوسط</div>
-                    <div class="modern-btn text-sm py-2 px-4">1.99$</div>
-                </div>
-                <div class="recharge-card" onclick="recharge(120000, 3.99)">
-                    <div class="recharge-icon">💎💎💎</div>
-                    <div class="font-bold text-2xl mb-2">120,000</div>
-                    <div class="text-sm text-slate-400 mb-4">باقة المحترفين</div>
-                    <div class="modern-btn text-sm py-2 px-4">3.99$</div>
-                </div>
-                <div class="recharge-card" onclick="recharge(250000, 7.99)">
-                    <div class="recharge-icon">💎💎💎💎</div>
-                    <div class="font-bold text-2xl mb-2">250,000</div>
-                    <div class="text-sm text-slate-400 mb-4">باقة المميزة</div>
-                    <div class="modern-btn text-sm py-2 px-4">7.99$</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="view-store" class="view-screen">
-        <div class="tab-nav mx-4 mt-4">
-            <button onclick="filterStore('frames')" id="fBtn" class="tab-btn active">🖼️ إطارات</button>
-            <button onclick="filterStore('badges')" id="bBtn" class="tab-btn">🏷️ شارات</button>
-            <button onclick="filterStore('magic')" id="mBtn" class="tab-btn">✨ سحر</button>
-        </div>
-        <div id="storeItems" class="store-grid"></div>
-    </div>
-
-    <div id="view-bag" class="view-screen">
-        <div id="bagItems" class="store-grid"></div>
-    </div>
-
-    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
-
-    <!-- Admin Panel Link -->
-    <div class="admin-link">
-        <a href="admin.html" target="_blank" class="admin-btn">
-            <i data-lucide="settings" class="w-4 h-4"></i>
-            لوحة التحكم
-        </a>
-    </div>
-
-    <!-- Toast Container -->
-    <div id="toastContainer" class="toast-container"></div>
-</div>
-
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut, signInWithPopup, GoogleAuthProvider, TwitterAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs, onSnapshot, increment, serverTimestamp, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-        authDomain: "rtx3090-28439.firebaseapp.com",
-        projectId: "rtx3090-28439",
-        storageBucket: "rtx3090-28439.firebasestorage.app",
-        messagingSenderId: "178612030690",
-        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let uData = null;
-    let storeData = { frames: [], badges: [], magic: [] };
-    let currentTheme = 'dark';
-    let currentTab = 'public';
-    
-    // Level Images Map (1-50)
-    const levelImages = {
-        1: 'https://i.postimg.cc/G4PtHLMS/ga.webp',
-        2: 'https://i.postimg.cc/8F15v23K/gb.webp',
-        3: 'https://i.postimg.cc/DW2ZG9DC/gc.webp',
-        4: 'https://i.postimg.cc/NygMX3VC/gd.webp',
-        5: 'https://i.postimg.cc/cKsH3pj5/ge.webp',
-        6: 'https://i.postimg.cc/NygMX3Vn/gf.webp',
-        7: 'https://i.postimg.cc/WD23ZBKH/gg.webp',
-        8: 'https://i.postimg.cc/068QST33/gh.webp',
-        9: 'https://i.postimg.cc/4KJdcDMq/gi.webp',
-        10: 'https://i.postimg.cc/Ff9RSMq2/gj.webp',
-        11: 'https://i.postimg.cc/yJVdRM5M/gk.webp',
-        12: 'https://i.postimg.cc/Js30GrTg/gl.webp',
-        13: 'https://i.postimg.cc/rd8m4B36/gm.webp',
-        14: 'https://i.postimg.cc/GBc2DWVw/gn.webp',
-        15: 'https://i.postimg.cc/xk0CmwhV/go.webp',
-        16: 'https://i.postimg.cc/t1XT6KwH/gp.webp',
-        17: 'https://i.postimg.cc/VSY6txp8/gq.webp',
-        18: 'https://i.postimg.cc/cKsH3p2W/gr.webp',
-        19: 'https://i.postimg.cc/d7q1Cbpw/gs.webp',
-        20: 'https://i.postimg.cc/R3MFtky9/gt.webp',
-        21: 'https://i.postimg.cc/3yKRGsVK/gu.webp',
-        22: 'https://i.postimg.cc/QBXt72wj/gv.webp',
-        23: 'https://i.postimg.cc/TKj1pdks/gw.webp',
-        24: 'https://i.postimg.cc/rd8m4B3F/gx.webp',
-        25: 'https://i.postimg.cc/SXys9B3x/gy.webp',
-        26: 'https://i.postimg.cc/DW2ZG9Hz/gz.webp',
-        27: 'https://i.postimg.cc/JyPh5TC4/h.webp',
-        28: 'https://i.postimg.cc/DW2ZG9HZ/h0.webp',
-        29: 'https://i.postimg.cc/6793Zkgq/h1.webp',
-        30: 'https://i.postimg.cc/xk0Cmwhq/h2.webp',
-        31: 'https://i.postimg.cc/t12gNrGj/h3.webp',
-        32: 'https://i.postimg.cc/3ynwFLQ7/h4.webp',
-        33: 'https://i.postimg.cc/t12gNrG9/h5.webp',
-        34: 'https://i.postimg.cc/wt0BQWYq/h6.webp',
-        35: 'https://i.postimg.cc/tsdJYqrw/h7.webp',
-        36: 'https://i.postimg.cc/7CmLnBrP/h8.webp',
-        37: 'https://i.postimg.cc/mc8rydWg/h9.webp',
-        38: 'https://i.postimg.cc/Y4bSzXB9/ha.webp',
-        39: 'https://i.postimg.cc/SXDKfZbR/hb.webp',
-        40: 'https://i.postimg.cc/XZQvk26X/hc.webp',
-        41: 'https://i.postimg.cc/GBqpxMnH/he.webp',
-        42: 'https://i.postimg.cc/3ynwFLQk/hf.webp',
-        43: 'https://i.postimg.cc/bG3v96fG/hg.webp',
-        44: 'https://i.postimg.cc/Js30GrTS/hh.webp',
-        45: 'https://i.postimg.cc/d740jWck/hi.webp',
-        46: 'https://i.postimg.cc/CZF183t7/hj.webp',
-        47: 'https://i.postimg.cc/PLtxDgcK/hk.webp',
-        48: 'https://i.postimg.cc/rd8m4BbQ/hl.webp',
-        49: 'https://i.postimg.cc/4KJdcDMW/hm.webp',
-        50: 'https://i.postimg.cc/4KJdcDMW/hm.webp'
-    };
-
-    // XP required for each level (1-50)
-    const xpRequirements = [];
-    for (let i = 1; i <= 50; i++) {
-        xpRequirements[i] = 1000 * Math.pow(1.2, i - 1);
-    }
-
-    // Theme Management
-    function toggleTheme() {
-        const body = document.body;
-        if (currentTheme === 'dark') {
-            body.classList.add('light-mode');
-            body.classList.remove('dark');
-            currentTheme = 'light';
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark');
-            currentTheme = 'dark';
-        }
-        localStorage.setItem('theme', currentTheme);
-    }
-
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'dark';
-        const body = document.body;
-        if (savedTheme === 'light') {
-            body.classList.add('light-mode');
-            body.classList.remove('dark');
-        } else {
-            body.classList.remove('light-mode');
-            body.classList.add('dark');
-        }
-        currentTheme = savedTheme;
-    }
-
-    // Search Modal
-    function toggleSearch() {
-        const modal = document.getElementById('searchModal');
-        modal.classList.toggle('active');
-        if (modal.classList.contains('active')) {
-            document.getElementById('searchInput').focus();
-        }
-    }
-
-    function quickSearch(query) {
-        document.getElementById('searchInput').value = query;
-        performSearch(query);
-    }
-
-    function performSearch(query) {
-        const resultsContainer = document.getElementById('searchResults');
-        if (!query.trim()) {
-            resultsContainer.innerHTML = '<p class="text-center text-slate-500 py-4">اكتب للبدء في البحث...</p>';
-            return;
-        }
-
-        // في الواقع الحقيقي، هنا ستقوم بالبحث في Firestore
-        resultsContainer.innerHTML = `
-            <div class="animate-pulse">
-                <div class="h-4 bg-slate-800 rounded mb-2"></div>
-                <div class="h-4 bg-slate-800 rounded mb-2"></div>
-                <div class="h-4 bg-slate-800 rounded w-2/3"></div>
-            </div>
-        `;
-
-        // محاكاة البحث
-        setTimeout(() => {
-            resultsContainer.innerHTML = `
-                <div class="bg-slate-800/50 rounded-xl p-4">
-                    <div class="flex items-center gap-3 mb-2">
-                        <div class="w-10 h-10 bg-slate-700 rounded-lg flex items-center justify-center">
-                            💬
-                        </div>
-                        <div>
-                            <h4 class="font-bold">غرفة: ${query}</h4>
-                            <p class="text-sm text-slate-400">5 مستخدمين متصلين</p>
-                        </div>
+                <h3 class="font-bold text-xl mb-4 mr-2">شحن الرصيد</h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div onclick="recharge(85000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition">
+                        <span class="text-2xl font-black text-gray-900">85,000</span>
+                        <span class="text-gray-400 text-xs">$1</span>
                     </div>
-                    <button class="w-full mt-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition-colors duration-200">
-                        الانضمام للغرفة
+                </div>
+            </div>
+
+            <!-- VIEW: STORE -->
+            <div id="view-store" class="view-section hidden fade-in">
+                <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2">
+                    <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
+                    <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
+                    <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
+                </div>
+                <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
+            </div>
+
+            <!-- VIEW: BAG -->
+            <div id="view-bag" class="view-section hidden fade-in">
+                <h3 class="font-bold text-lg mb-4 text-gray-800">إطاراتي</h3>
+                <div id="bagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي</h3>
+                <div id="badgesBagGrid" class="badges-grid mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">رسوم متحركة</h3>
+                <div id="svgaBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي النشطة</h3>
+                <div id="activeBadgesGrid" class="badges-grid mb-8"></div>
+            </div>
+
+            <!-- VIEW: FRIENDS -->
+            <div id="view-friends" class="view-section hidden fade-in">
+                <div class="relative mb-6">
+                    <input type="text" id="searchUserInput" placeholder="ابحث عن مستخدم بواسطة الـ ID..." 
+                           class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm">
+                    <button onclick="searchUser()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <i data-lucide="search" class="w-5 h-5"></i>
                     </button>
                 </div>
-            `;
-        }, 500);
-    }
-
-    // Create Room Modal
-    function toggleCreateRoomModal() {
-        const modal = document.getElementById('createRoomModal');
-        modal.classList.toggle('active');
-    }
-
-    async function createRoom() {
-        const name = document.getElementById('roomName').value;
-        const description = document.getElementById('roomDescription').value;
-        const type = document.getElementById('roomType').value;
-        const icon = document.getElementById('roomIcon').value;
-
-        if (!name.trim()) {
-            showToast('يرجى إدخال اسم الغرفة', 'error');
-            return;
-        }
-
-        try {
-            const roomRef = await addDoc(collection(db, "rooms"), {
-                name: name,
-                description: description,
-                type: type,
-                icon: icon,
-                createdBy: auth.currentUser.uid,
-                createdAt: serverTimestamp(),
-                users: 1,
-                maxUsers: 50
-            });
-
-            showToast('تم إنشاء الغرفة بنجاح', 'success');
-            toggleCreateRoomModal();
-            loadRooms();
-        } catch (error) {
-            console.error('Error creating room:', error);
-            showToast('حدث خطأ أثناء إنشاء الغرفة', 'error');
-        }
-    }
-
-    // Firebase Auth State Listener
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            loadTheme();
-            
-            // Check if user document exists
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
-            
-            if (!userSnap.exists()) {
-                // Create new user document
-                await setupUserData(user);
-            }
-            
-            // Listen for user data updates
-            onSnapshot(userRef, (snap) => {
-                if (snap.exists()) {
-                    uData = snap.data();
-                    checkExpiredItems();
-                    updateUI();
-                    loadRooms();
-                }
-            });
-            
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
-            loadStore();
-            loadBanners();
-            lucide.createIcons();
-            
-            // Add event listener for search input
-            document.getElementById('searchInput').addEventListener('input', (e) => {
-                performSearch(e.target.value);
-            });
-        } else {
-            document.getElementById('loginPage').style.display = 'flex';
-            document.getElementById('main-app').style.display = 'none';
-        }
-    });
-
-    async function checkExpiredItems() {
-        if (!uData?.purchasedFrames) return;
-        const now = Date.now();
-        let changed = false;
-        const newFrames = uData.purchasedFrames.filter(item => {
-            if (now > item.expiry) { changed = true; return false; }
-            return true;
-        });
-        if (changed) {
-            const update = { purchasedFrames: newFrames };
-            if (uData.activeFrame && !newFrames.find(f => f.id === uData.activeFrame)) {
-                update.activeFrame = null;
-            }
-            await updateDoc(doc(db, "users", auth.currentUser.uid), update);
-        }
-    }
-
-    function updateUI() {
-        if (!uData) return;
-        
-        document.getElementById('userName').innerText = uData.displayName || 'مستخدم';
-        document.getElementById('userAvatar').src = uData.photoURL || 'https://via.placeholder.com/60';
-        document.getElementById('userID').innerText = uData.customId || '00000000';
-        document.getElementById('wallet-balance-big').innerText = (uData.balance || 0).toLocaleString();
-        
-        // Update Level System
-        const level = uData.level || 1;
-        const xp = uData.xp || 0;
-        const nextLevelXP = xpRequirements[level] || 1000;
-        const progress = Math.min(100, (xp / nextLevelXP) * 100);
-        
-        document.getElementById('currentLevel').innerText = level;
-        document.getElementById('currentXP').innerText = `${xp.toLocaleString()} XP`;
-        document.getElementById('nextLevelXP').innerText = `${Math.round(nextLevelXP).toLocaleString()} XP`;
-        document.getElementById('levelProgressBar').style.width = `${progress}%`;
-        
-        // Update Level Image
-        const levelImg = document.getElementById('levelImage');
-        if (levelImages[level]) {
-            levelImg.src = levelImages[level];
-        } else if (level >= 50) {
-            levelImg.src = levelImages[50];
-        } else {
-            levelImg.src = levelImages[1];
-        }
-        
-        // Active frame
-        const frameImg = document.getElementById('activeFrame');
-        if (uData.activeFrame) {
-            const f = storeData.frames.find(x => x.id === uData.activeFrame);
-            if (f) { 
-                frameImg.src = f.image; 
-                frameImg.style.display = 'block'; 
-            }
-        } else {
-            frameImg.style.display = 'none';
-        }
-
-        // Update badges
-        const badgesGrid = document.getElementById('badgesGrid');
-        badgesGrid.innerHTML = '';
-        if (uData.purchasedBadges && uData.purchasedBadges.length > 0) {
-            uData.purchasedBadges.forEach(badge => {
-                const badgeData = storeData.badges.find(b => b.id === badge.id);
-                if (badgeData) {
-                    const isActive = uData.activeBadges && uData.activeBadges.includes(badge.id);
-                    badgesGrid.innerHTML += `
-                        <div class="badge-item ${isActive ? 'active' : ''}" 
-                             title="${badgeData.name}"
-                             onclick="toggleBadge('${badge.id}')">
-                            ${badgeData.image ? `<img src="${badgeData.image}" alt="${badgeData.name}">` : (badgeData.icon || '🏅')}
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        lucide.createIcons();
-    }
-
-    async function loadStore() {
-        try {
-            // Load frames
-            const f = await getDocs(collection(db, "frames"));
-            storeData.frames = f.docs.map(d => ({id: d.id, ...d.data()}));
-            
-            // Load badges
-            const b = await getDocs(collection(db, "badges"));
-            storeData.badges = b.docs.map(d => ({id: d.id, ...d.data()}));
-            
-            // Load magic items
-            const m = await getDocs(collection(db, "magic"));
-            storeData.magic = m.docs.map(d => ({id: d.id, ...d.data()}));
-            
-            filterStore('frames');
-        } catch (error) {
-            console.error('Error loading store:', error);
-        }
-    }
-
-    window.filterStore = (type) => {
-        const container = document.getElementById('storeItems');
-        container.innerHTML = '';
-        
-        // Update active tab
-        document.querySelectorAll('#fBtn, #bBtn, #mBtn').forEach(btn => btn.classList.remove('active'));
-        if (type === 'frames') {
-            document.getElementById('fBtn').classList.add('active');
-        } else if (type === 'badges') {
-            document.getElementById('bBtn').classList.add('active');
-        } else {
-            document.getElementById('mBtn').classList.add('active');
-        }
-
-        storeData[type].forEach(item => {
-            const isPurchased = uData?.[`purchased${type.charAt(0).toUpperCase() + type.slice(1)}`]?.some(x => x.id === item.id);
-            const isEquipped = type === 'frames' ? uData?.activeFrame === item.id : 
-                             type === 'badges' ? uData?.activeBadges?.includes(item.id) : false;
-            
-            container.innerHTML += `
-                <div class="store-card fade-in">
-                    <span class="item-label">${type === 'frames' ? 'إطار' : type === 'badges' ? 'شارة' : 'سحر'}</span>
-                    <div class="item-image-container">
-                        ${type === 'frames' || type === 'badges' || type === 'magic' 
-                            ? `<img src="${item.image}" class="item-image" alt="${item.name}">` 
-                            : `<span class="text-5xl">${item.icon || '🏅'}</span>`
-                        }
-                    </div>
-                    <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
-                    <div class="text-xs text-slate-400 mb-2">${item.description || ''}</div>
-                    
-                    ${isPurchased 
-                        ? `<button onclick="${type === 'frames' ? `equip('${item.id}')` : type === 'badges' ? `toggleBadge('${item.id}')` : 'useMagic()'}" 
-                                  class="action-btn ${isEquipped ? 'btn-unequip' : 'btn-equip'}">
-                            <i data-lucide="${isEquipped ? 'x' : 'check'}" class="w-3 h-3"></i>
-                            ${isEquipped ? 'إلغاء التفعيل' : 'تفعيل'}
-                          </button>`
-                        : `<button onclick="buyItem('${type}', '${item.id}', ${item.price || 0})" 
-                                  class="action-btn btn-buy">
-                            <i data-lucide="shopping-cart" class="w-3 h-3"></i>
-                            شراء ${(item.price || 0).toLocaleString()}💰
-                          </button>`
-                    }
+                <div id="searchResults" class="space-y-3 mb-8 hidden">
+                    <h3 class="font-bold text-lg text-gray-800">نتائج البحث</h3>
+                    <div id="userResult" class="glass-card p-4 rounded-3xl"></div>
                 </div>
-            `;
-        });
-        lucide.createIcons();
-    };
+                <h3 class="font-bold text-lg mb-4 text-gray-800">طلبات المتابعة</h3>
+                <div id="friendRequestsList" class="space-y-3 mb-6"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">أصدقائي</h3>
+                <div id="friendsList" class="space-y-3"></div>
+            </div>
+        </main>
+    </div>
 
-    window.buyItem = async (type, id, price) => {
-        if (!uData) return;
-        
-        if (uData.balance < price) {
-            showToast("رصيدك غير كافٍ", "error");
-            return;
-        }
-        
-        const expiry = Date.now() + (24 * 60 * 60 * 1000); // 1 Day
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        
-        const listKey = type === 'frames' ? 'purchasedFrames' : 
-                       type === 'badges' ? 'purchasedBadges' : 
-                       'purchasedMagic';
-        
-        const currentList = uData[listKey] || [];
-        
-        const newList = [...currentList, { id, expiry }];
+    <!-- ================= SIDEBAR ================= -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+    <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
+        <div class="pt-12 px-6 flex justify-between items-start">
+             <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/50 hover:bg-gray-200/50 transition">
+                <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+            </button>
+            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white transition shadow-sm group">
+                <i data-lucide="edit-3" class="w-5 h-5 text-gray-600 group-hover:text-black"></i>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-2 pb-10">
+            <div class="mb-6 mt-4">
+                <div class="avatar-wrapper">
+                    <img id="sideAvatar" src="https://via.placeholder.com/150" class="avatar-img">
+                    <div id="sideSvgaFrame" class="svga-avatar-frame"></div>
+                    <img id="sideFrame" src="" class="perfect-frame hidden">
+                </div>
+            </div>
+            <div class="text-center mb-6">
+                <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
+                <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
+                    <span class="text-xs font-bold text-gray-400">ID:</span>
+                    <span id="sideID" class="text-sm font-mono font-medium text-gray-600">...</span>
+                    <button onclick="copyID()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                </div>
+            </div>
+            <div class="flex gap-3 mb-8">
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
+                        <img id="magicLevelImg" src="" class="w-full h-full object-contain">
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase mt-2">السحر</span>
+                </div>
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
+                        <img id="wealthLevelImg" src="" class="w-full h-full object-contain">
+                    </div>
+                    <span class="text-[10px] text-gray-400 font-bold uppercase mt-2">الثروة</span>
+                </div>
+            </div>
+            <div class="mb-6">
+                <div id="sidebarActiveBadges" class="badges-grid"></div>
+            </div>
+            <nav class="space-y-3">
+                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
+                    الرئيسية
+                </button>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
+                    المحفظة
+                </button>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
+                    المتجر
+                </button>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>
+                    حقيبتي
+                </button>
+                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
+                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>
+                    أصدقائي
+                </button>
+            </nav>
+            <div class="mt-8">
+                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    تسجيل خروج
+                </button>
+            </div>
+        </div>
+    </aside>
 
-        try {
-            await updateDoc(userRef, {
-                balance: increment(-price),
-                [listKey]: newList
-            });
-            showToast("تم الشراء بنجاح", "success");
-        } catch (error) {
-            console.error('Error buying item:', error);
-            showToast("حدث خطأ أثناء الشراء", "error");
-        }
-    };
+    <!-- ================= CHAT MODAL ================= -->
+    <div id="chatModal" class="fixed inset-0 z-[60] hidden flex flex-col bg-gray-50">
+        <header class="h-20 glass flex items-center px-6 justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="closeChat()" class="p-2 rounded-full hover:bg-gray-100"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                <div class="flex items-center gap-2">
+                    <img id="chatUserAvatar" src="" class="w-10 h-10 rounded-full object-cover">
+                    <div>
+                        <h4 id="chatUserName" class="font-bold text-sm">...</h4>
+                        <p class="text-[10px] text-green-500 font-bold">متصل الآن</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
+        </header>
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar"></div>
+        <div class="p-4 glass flex gap-2 items-center">
+            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." class="flex-1 p-4 rounded-2xl bg-white border-0 focus:ring-0 text-sm">
+            <button onclick="sendMessage()" class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg"><i data-lucide="send" class="w-5 h-5"></i></button>
+        </div>
+    </div>
 
-    window.toggleBadge = async (badgeId) => {
-        const userRef = doc(db, "users", auth.currentUser.uid);
-        const currentBadges = uData.activeBadges || [];
-        
-        let newBadges;
-        if (currentBadges.includes(badgeId)) {
-            newBadges = currentBadges.filter(id => id !== badgeId);
-            showToast("تم إزالة الشارة", "info");
-        } else {
-            newBadges = [...currentBadges, badgeId];
-            showToast("تم تفعيل الشارة", "success");
-        }
-        
-        try {
-            await updateDoc(userRef, {
-                activeBadges: newBadges
-            });
-        } catch (error) {
-            console.error('Error toggling badge:', error);
-            showToast("حدث خطأ", "error");
-        }
-    };
+    <!-- ================= GIFT BOX ================= -->
+    <div id="giftBox" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="toggleGiftBox()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[40px] h-[45vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-6 flex justify-between items-center border-b border-gray-100">
+                <div class="flex gap-4">
+                    <button onclick="switchGiftTab('fixed')" id="tab-fixed" class="font-bold text-black border-b-2 border-black pb-1">هدايا ثابتة</button>
+                    <button onclick="switchGiftTab('luck')" id="tab-luck" class="font-bold text-gray-400 pb-1">هدايا الحظ</button>
+                </div>
+                <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                    <i data-lucide="coins" class="w-3 h-3 text-yellow-600"></i>
+                    <span id="giftWalletBalance" class="text-xs font-bold text-yellow-700">0</span>
+                </div>
+            </div>
+            <div id="giftGrid" class="flex-1 overflow-y-auto p-6 grid grid-cols-4 gap-4 no-scrollbar"></div>
+        </div>
+    </div>
 
-    window.switchView = (v) => {
-        document.querySelectorAll('.view-screen').forEach(s => s.classList.remove('active'));
-        const view = document.getElementById('view-' + v);
-        if (view) {
-            view.classList.add('active');
-        }
-        
-        const titles = {
-            'home': 'الرئيسية',
-            'wallet': 'المحفظة',
-            'store': 'المتجر',
-            'bag': 'حقيبتي'
+    <!-- ================= EDIT MODAL ================= -->
+    <div id="editModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeEditModal()"></div>
+        <div class="relative w-full max-w-sm glass-deep rounded-[40px] p-6 shadow-2xl fade-in">
+            <h3 class="text-center font-bold text-xl mb-6">تعديل الملف</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">الاسم الظاهر</label>
+                    <input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 mr-2">رابط الصورة</label>
+                    <input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500">
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeEditModal()" class="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200">إلغاء</button>
+                <button onclick="saveProfileChanges()" class="flex-1 py-3 rounded-2xl bg-black text-white font-bold hover:shadow-lg hover:-translate-y-1 transition">حفظ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
+            authDomain: "rtx3090-28439.firebaseapp.com",
+            projectId: "rtx3090-28439",
+            storageBucket: "rtx3090-28439.firebasestorage.app",
+            messagingSenderId: "178612030690",
+            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
         };
-        document.getElementById('view-title').innerText = titles[v] || 'Afnan AI';
-        if (v === 'bag') loadBag();
-        toggleSidebar(false);
-    };
 
-    function loadBag() {
-        const container = document.getElementById('bagItems');
-        container.innerHTML = '';
-        
-        if ((!uData.purchasedFrames || uData.purchasedFrames.length === 0) &&
-            (!uData.purchasedBadges || uData.purchasedBadges.length === 0)) {
-            container.innerHTML = `
-                <div class="col-span-2 text-center py-8">
-                    <i data-lucide="package-open" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                    <p class="text-slate-400">الحقيبة فارغة</p>
-                </div>
-            `;
-            lucide.createIcons();
-            return;
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+        const twitterProvider = new TwitterAuthProvider();
+        const googleProvider = new GoogleAuthProvider();
 
-        // Display frames
-        if (uData.purchasedFrames && uData.purchasedFrames.length > 0) {
-            uData.purchasedFrames.forEach(itemRef => {
-                const item = storeData.frames.find(x => x.id === itemRef.id);
-                if (!item) return;
-                
-                const isEquipped = uData.activeFrame === item.id;
-                const timeLeft = Math.max(0, itemRef.expiry - Date.now());
-                const hoursLeft = Math.ceil(timeLeft / (1000 * 60 * 60));
-                
-                container.innerHTML += `
-                    <div class="store-card fade-in">
-                        <span class="item-label">${hoursLeft} ساعة</span>
-                        <div class="item-image-container">
-                            <img src="${item.image}" class="item-image">
-                        </div>
-                        <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
-                        <div class="text-xs text-slate-400 mb-2">متبقي ${hoursLeft} ساعة</div>
-                        <button onclick="${isEquipped ? `equip('null')` : `equip('${item.id}')`}" 
-                                class="action-btn ${isEquipped ? 'btn-unequip' : 'btn-equip'}">
-                            <i data-lucide="${isEquipped ? 'x' : 'check'}" class="w-3 h-3"></i>
-                            ${isEquipped ? 'خلع' : 'ارتداء'}
-                        </button>
-                    </div>
-                `;
-            });
-        }
+        let userData = {};
+        let storeData = { 
+            items: [], // جميع العناصر في متجر واحد
+            itemsById: {}, // للبحث السريع عن طريق الـ ID
+            gifts: [], 
+            luckGifts: [], 
+            magicLevels: {}, 
+            wealthLevels: {} 
+        };
+        let currentChatFriend = null;
+        let chatUnsubscribe = null;
+        let activeSvgaPlayers = {};
 
-        // Display badges
-        if (uData.purchasedBadges && uData.purchasedBadges.length > 0) {
-            uData.purchasedBadges.forEach(itemRef => {
-                const item = storeData.badges.find(x => x.id === itemRef.id);
-                if (!item) return;
-                
-                const isEquipped = uData.activeBadges?.includes(item.id);
-                const timeLeft = Math.max(0, itemRef.expiry - Date.now());
-                const hoursLeft = Math.ceil(timeLeft / (1000 * 60 * 60));
-                
-                container.innerHTML += `
-                    <div class="store-card fade-in">
-                        <span class="item-label">${hoursLeft} ساعة</span>
-                        <div class="item-image-container">
-                            ${item.image ? `<img src="${item.image}" class="item-image">` : `<span class="text-4xl">${item.icon || '🏅'}</span>`}
-                        </div>
-                        <div class="text-sm font-bold mt-2 px-2">${item.name}</div>
-                        <div class="text-xs text-slate-400 mb-2">متبقي ${hoursLeft} ساعة</div>
-                        <button onclick="toggleBadge('${item.id}')" 
-                                class="action-btn ${isEquipped ? 'btn-unequip' : 'btn-equip'}">
-                            <i data-lucide="${isEquipped ? 'x' : 'check'}" class="w-3 h-3"></i>
-                            ${isEquipped ? 'إلغاء' : 'تفعيل'}
-                        </button>
-                    </div>
-                `;
-            });
-        }
-
-        lucide.createIcons();
-    }
-
-    window.equip = async (id) => {
-        try {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-                activeFrame: id === 'null' ? null : id 
-            });
-            showToast(id === 'null' ? "تم خلع الإطار" : "تم ارتداء الإطار", "success");
-            loadBag();
-        } catch (error) {
-            console.error('Error equipping frame:', error);
-            showToast("حدث خطأ", "error");
-        }
-    };
-
-    window.recharge = async (amt, price) => {
-        try {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
-                balance: increment(amt),
-                xp: increment(amt * 0.1) // Add XP when recharging
-            });
-            showToast(`تم شحن ${amt.toLocaleString()} عملة بنجاح`, "success");
-            checkLevelUp();
-        } catch (error) {
-            console.error('Error recharging:', error);
-            showToast("حدث خطأ أثناء الشحن", "error");
-        }
-    };
-
-    async function checkLevelUp() {
-        if (!uData) return;
-        
-        const level = uData.level || 1;
-        const xp = uData.xp || 0;
-        const nextLevelXP = xpRequirements[level] || 1000;
-        
-        if (xp >= nextLevelXP && level < 50) {
-            const newLevel = level + 1;
-            try {
-                await updateDoc(doc(db, "users", auth.currentUser.uid), {
-                    level: newLevel,
-                    xp: xp - nextLevelXP
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
+                    if (docSnap.exists()) {
+                        userData = docSnap.data();
+                        await updateUI();
+                        await loadFriendRequests();
+                        await loadFriends();
+                    }
                 });
-                showToast(`🎉 مبروك! لقد تقدمت للمستوى ${newLevel}!`, "success");
-            } catch (error) {
-                console.error('Error updating level:', error);
+                await loadBanner();
+                await loadGlobalData();
+                await loadRooms();
+            } else {
+                window.location.href = "index.html";
             }
-        }
-    }
+        });
 
-    window.toggleSidebar = (show) => {
-        const side = document.getElementById('sidebar');
-        const over = document.getElementById('overlay');
-        if (show === false) { 
-            side.classList.remove('open'); 
-            over.classList.remove('active'); 
-            return; 
-        }
-        side.classList.toggle('open');
-        over.classList.toggle('active');
-    };
-
-    async function loadBanners() {
-        try {
-            const snap = await getDocs(collection(db, "banners"));
-            const container = document.getElementById('bannerContainer');
-            if (snap.empty) {
-                container.innerHTML = `
-                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-r from-orange-500/20 to-blue-500/20">
-                        <div class="text-center p-8">
-                            <div class="text-4xl mb-4">🎉</div>
-                            <p class="font-bold text-xl mb-2">مرحباً في Afnan AI</p>
-                            <p class="text-slate-400">النسخة المتطورة</p>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            const banner = snap.docs[0].data();
-            container.innerHTML = `
-                <img src="${banner.imageUrl}" class="w-full h-full object-cover">
-                <div class="absolute bottom-0 right-0 left-0 bg-gradient-to-t from-black/80 to-transparent p-6 pt-12">
-                    <h3 class="text-white text-xl font-bold mb-2">${banner.title || 'عرض خاص'}</h3>
-                    <p class="text-white/80 text-sm">${banner.description || ''}</p>
-                </div>
-            `;
-        } catch (error) {
-            console.error('Error loading banners:', error);
-        }
-    }
-
-    async function loadRooms() {
-        try {
-            const snap = await getDocs(collection(db, "rooms"));
-            const container = document.getElementById('roomsList');
-            if (snap.empty) {
-                container.innerHTML = `
-                    <div class="col-span-2 text-center py-8">
-                        <i data-lucide="users" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                        <p class="text-slate-400">لا توجد غرف متاحة حالياً</p>
-                        <button onclick="toggleCreateRoomModal()" class="modern-btn mt-4">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
-                            إنشاء أول غرفة
-                        </button>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = '';
-            snap.docs.forEach(doc => {
-                const room = doc.data();
-                const isPrivate = room.type === 'private';
-                const isMine = room.createdBy === auth.currentUser.uid;
-                
-                // Filter rooms based on current tab
-                if (currentTab === 'private' && !isMine) return;
-                if (currentTab === 'public' && isPrivate) return;
-                
-                container.innerHTML += `
-                    <div class="room-card fade-in" onclick="enterRoom('${doc.id}')">
-                        <div class="room-header">
-                            <div class="room-icon">
-                                ${room.icon || '💬'}
-                            </div>
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <h3 class="font-bold text-lg">${room.name}</h3>
-                                    ${isPrivate ? '<span class="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded-lg">خاص</span>' : ''}
-                                    ${isMine ? '<span class="text-xs bg-green-500/20 text-green-300 px-2 py-1 rounded-lg">خاص بي</span>' : ''}
-                                </div>
-                                <p class="text-sm text-slate-400">${room.description || 'لا يوجد وصف'}</p>
-                            </div>
-                        </div>
-                        <div class="room-users">
-                            <i data-lucide="users" class="w-4 h-4"></i>
-                            <span>${room.users || 0} / ${room.maxUsers || 50} مستخدم</span>
-                        </div>
-                        <div class="room-actions">
-                            <button onclick="event.stopPropagation(); enterRoom('${doc.id}')" class="room-action-btn">
-                                <i data-lucide="log-in" class="w-3 h-3 inline ml-1"></i>
-                                دخول
-                            </button>
-                            ${isMine ? `
-                                <button onclick="event.stopPropagation(); deleteRoom('${doc.id}')" class="room-action-btn">
-                                    <i data-lucide="trash-2" class="w-3 h-3 inline ml-1"></i>
-                                    حذف
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `;
+        async function loadGlobalData() {
+            // Load all store items from single collection
+            const storeSnap = await getDocs(collection(db, "storeItems"));
+            storeData.items = storeSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            
+            // Create lookup object for quick access
+            storeData.itemsById = {};
+            storeData.items.forEach(item => {
+                storeData.itemsById[item.id] = item;
             });
             
-            // If no rooms after filtering
-            if (!container.innerHTML.trim()) {
-                container.innerHTML = `
-                    <div class="col-span-2 text-center py-8">
-                        <i data-lucide="${currentTab === 'private' ? 'lock' : 'users'}" class="w-16 h-16 mx-auto text-slate-400 mb-4"></i>
-                        <p class="text-slate-400">${currentTab === 'private' ? 'لا توجد غرف خاصة بك' : 'لا توجد غرف عامة حالياً'}</p>
-                        <button onclick="toggleCreateRoomModal()" class="modern-btn mt-4">
-                            <i data-lucide="plus" class="w-4 h-4"></i>
-                            إنشاء غرفة جديدة
-                        </button>
-                    </div>
-                `;
+            // Load gifts (wealth gifts)
+            const gSnap = await getDocs(collection(db, "gifts"));
+            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'wealth'}));
+            
+            // Load luck gifts (magic gifts)
+            const lgSnap = await getDocs(collection(db, "luckGifts"));
+            storeData.luckGifts = lgSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'magic'}));
+            
+            // Load levels
+            const mlSnap = await getDocs(collection(db, "magicLevels"));
+            mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
+            
+            const wlSnap = await getDocs(collection(db, "wealthLevels"));
+            wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+            
+            await updateUI();
+        }
+
+        async function updateUI() {
+            if (!auth.currentUser) return;
+            
+            // Basic user info
+            document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
+            document.getElementById('sideID').innerText = userData.customId || "000000";
+            document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
+            document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
+            document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
+            
+            // Levels
+            const ml = userData.magicLevel || 1;
+            const wl = userData.wealthLevel || 1;
+            
+            const magicImg = document.getElementById('magicLevelImg');
+            const wealthImg = document.getElementById('wealthLevelImg');
+            
+            if (storeData.magicLevels[ml]) {
+                magicImg.src = storeData.magicLevels[ml].image;
             }
             
+            if (storeData.wealthLevels[wl]) {
+                wealthImg.src = storeData.wealthLevels[wl].image;
+            }
+
+            // Frame or SVGA
+            const frameEl = document.getElementById('sideFrame');
+            const svgaContainer = document.getElementById('sideSvgaFrame');
+            
+            // إخفاء كليهما أولاً
+            frameEl.classList.add('hidden');
+            svgaContainer.classList.add('hidden');
+            svgaContainer.innerHTML = '';
+            
+            if (userData.activeFrame) {
+                const item = storeData.itemsById[userData.activeFrame];
+                if (item) {
+                    if (item.itemType === 'svga') {
+                        // تشغيل SVGA كإطار متحرك
+                        svgaContainer.classList.remove('hidden');
+                        playPerfectSvga(item.fileUrl, svgaContainer, { 
+                            loops: 0, 
+                            clearsAfterStop: false 
+                        });
+                    } else {
+                        // استخدام صورة عادية كإطار
+                        frameEl.src = item.image;
+                        frameEl.classList.remove('hidden');
+                    }
+                } else {
+                    // العنصر غير موجود في المتجر
+                    await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: null });
+                }
+            }
+
+            // Active badges in sidebar
+            const sidebarBadges = document.getElementById('sidebarActiveBadges');
+            sidebarBadges.innerHTML = '';
+            if (userData.activeBadges && userData.activeBadges.length > 0) {
+                userData.activeBadges.forEach(badgeId => {
+                    const badge = storeData.itemsById[badgeId];
+                    if (badge && badge.type === 'badge') {
+                        if (badge.itemType === 'svga') {
+                            // إنشاء حاوية للشارة المتحركة
+                            const badgeContainer = document.createElement('div');
+                            badgeContainer.className = 'flex items-center justify-center w-8 h-8';
+                            badgeContainer.id = `badge-${badgeId}`;
+                            sidebarBadges.appendChild(badgeContainer);
+                            playSvga(badge.fileUrl, badgeContainer, { 
+                                loops: 1, 
+                                clearsAfterStop: false 
+                            });
+                        } else {
+                            // شارة عادية (صورة)
+                            sidebarBadges.innerHTML += `
+                                <div class="flex items-center justify-center">
+                                    <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
+                                </div>
+                            `;
+                        }
+                    }
+                });
+            }
+        }
+
+        // SVGA Player Function
+        function playSvga(url, container, options = {}) {
+            try {
+                // تنظيف الحاوية أولاً
+                container.innerHTML = '';
+                
+                const player = new SVGA.Player(container);
+                const parser = new SVGA.Parser();
+                
+                parser.load(url, (videoItem) => {
+                    player.setVideoItem(videoItem);
+                    player.loops = options.loops || 0;
+                    player.clearsAfterStop = options.clearsAfterStop || false;
+                    player.startAnimation();
+                    
+                    // Store player reference
+                    const id = 'player_' + Date.now();
+                    activeSvgaPlayers[id] = { player, container };
+                    container.dataset.playerId = id;
+                }, (error) => {
+                    console.error('SVGA load error:', error);
+                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
+                });
+            } catch (error) {
+                console.error('SVGA player error:', error);
+                container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
+            }
+        }
+
+        // Perfect SVGA Player for Frames - تم التصحيح
+        function playPerfectSvga(url, container, options = {}) {
+            try {
+                // تنظيف الحاوية أولاً
+                container.innerHTML = '';
+                
+                const player = new SVGA.Player(container);
+                const parser = new SVGA.Parser();
+                
+                parser.load(url, (videoItem) => {
+                    player.setVideoItem(videoItem);
+                    player.loops = options.loops || 0;
+                    player.clearsAfterStop = options.clearsAfterStop || false;
+                    
+                    // ضبط حجم canvas ليتناسب تماماً مع الحاوية
+                    setTimeout(() => {
+                        const canvas = container.querySelector('canvas');
+                        if (canvas) {
+                            canvas.style.width = '100%';
+                            canvas.style.height = '100%';
+                            canvas.style.objectFit = 'contain';
+                            canvas.style.borderRadius = '50%';
+                            canvas.style.position = 'absolute';
+                            canvas.style.top = '50%';
+                            canvas.style.left = '50%';
+                            canvas.style.transform = 'translate(-50%, -50%)';
+                        }
+                    }, 100);
+                    
+                    player.startAnimation();
+                    
+                    // Store player reference
+                    const id = 'player_' + Date.now();
+                    activeSvgaPlayers[id] = { player, container };
+                    container.dataset.playerId = id;
+                }, (error) => {
+                    console.error('SVGA load error:', error);
+                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
+                });
+            } catch (error) {
+                console.error('SVGA player error:', error);
+                container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
+            }
+        }
+
+        window.loadStoreItems = (type) => {
+            const grid = document.getElementById('storeGrid');
+            grid.innerHTML = '';
+            
+            // تصفية العناصر حسب النوع
+            let items = storeData.items.filter(item => item.type === type);
+            
+            // تحديث أزرار التبويب
+            document.getElementById('store-tab-frames').className = type === 'frame' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-badges').className = type === 'badge' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-svga').className = type === 'svga' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+
+            items.forEach(item => {
+                // تحديد الحقل المناسب حسب نوع العنصر
+                let field = '';
+                if (item.type === 'frame') field = 'purchasedFrames';
+                else if (item.type === 'badge') field = 'purchasedBadges';
+                else if (item.type === 'svga') field = 'purchasedSvga';
+                
+                const owned = userData[field]?.some(i => i.id === item.id);
+                
+                let previewHTML = '';
+                let extraTag = '';
+                
+                if (item.itemType === 'svga') {
+                    // معاينة SVGA
+                    previewHTML = `<div class="svga-preview mb-2" id="preview-${item.id}"></div>`;
+                    extraTag = '<span class="svga-icon">SVGA</span>';
+                } else {
+                    // صورة عادية
+                    previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
+                }
+                
+                grid.innerHTML += `
+                    <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">
+                        ${previewHTML}
+                        <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
+                        ${extraTag}
+                        <button onclick="${owned ? '' : `buyItem('${item.type}', '${item.id}', ${item.price})`}" 
+                                class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl mt-2">
+                            ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
+                        </button>
+                    </div>`;
+                
+                // تشغيل معاينة SVGA إذا كان من نوع SVGA
+                if (item.itemType === 'svga' && item.fileUrl) {
+                    setTimeout(() => {
+                        const previewContainer = document.getElementById(`preview-${item.id}`);
+                        if (previewContainer) {
+                            playSvga(item.fileUrl, previewContainer, { 
+                                loops: 1, 
+                                clearsAfterStop: true 
+                            });
+                        }
+                    }, 100);
+                }
+            });
+            
+            // إذا لم توجد عناصر
+            if (items.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-2 glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center">
+                        <i data-lucide="package" class="w-12 h-12 text-gray-300 mb-4"></i>
+                        <p class="text-gray-400 text-sm">لا توجد عناصر في هذا القسم</p>
+                    </div>`;
+            }
+        };
+
+        window.buyItem = async (type, id, price) => {
+            if (userData.balance < price) return alert('رصيدك غير كافٍ!');
+            
+            // تحديد الحقل المناسب حسب النوع
+            let field = '';
+            if (type === 'frame') field = 'purchasedFrames';
+            else if (type === 'badge') field = 'purchasedBadges';
+            else if (type === 'svga') field = 'purchasedSvga';
+            
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                balance: increment(-price),
+                [field]: arrayUnion({ 
+                    id: id, 
+                    purchasedAt: new Date(),
+                    itemType: storeData.itemsById[id]?.itemType || 'image'
+                })
+            });
+            
+            loadStoreItems(type);
+        };
+
+        window.loadBagItems = async () => {
+            const fGrid = document.getElementById('bagGrid');
+            const bGrid = document.getElementById('badgesBagGrid');
+            const sGrid = document.getElementById('svgaBagGrid');
+            const aGrid = document.getElementById('activeBadgesGrid');
+            
+            fGrid.innerHTML = ''; 
+            bGrid.innerHTML = '';
+            sGrid.innerHTML = '';
+            aGrid.innerHTML = '';
+            
+            // Frames
+            const frames = userData.purchasedFrames || [];
+            for (const f of frames) {
+                const item = storeData.itemsById[f.id];
+                if (item && item.type === 'frame') {
+                    const isEquipped = userData.activeFrame === f.id;
+                    
+                    if (item.itemType === 'svga') {
+                        // عرض SVGA frame
+                        fGrid.innerHTML += `
+                            <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}">
+                                    <span class="text-xs font-bold text-gray-600">SVGA</span>
+                                </div>
+                                ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                            </div>`;
+                        
+                        // تشغيل SVGA
+                        setTimeout(() => {
+                            const container = document.getElementById(`bag-frame-${f.id}`);
+                            if (container) {
+                                playSvga(item.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: false 
+                                });
+                            }
+                        }, 100);
+                    } else {
+                        // صورة عادية
+                        fGrid.innerHTML += `
+                            <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                                <img src="${item.image}" class="w-12 h-12 object-contain rounded-full">
+                                ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                            </div>`;
+                    }
+                }
+            }
+
+            // Badges
+            const badges = userData.purchasedBadges || [];
+            for (const b of badges) {
+                const item = storeData.itemsById[b.id];
+                if (item && item.type === 'badge') {
+                    const isActive = userData.activeBadges?.includes(b.id);
+                    
+                    bGrid.innerHTML += `
+                        <div onclick="toggleBadge('${b.id}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
+                            <div class="w-8 h-8 flex items-center justify-center" id="bag-badge-${b.id}">
+                                ${item.itemType === 'svga' ? 
+                                    '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : 
+                                    `<img src="${item.image}" class="w-full h-full object-contain">`
+                                }
+                            </div>
+                        </div>`;
+                    
+                    // تشغيل SVGA للشارات المتحركة
+                    if (item.itemType === 'svga' && item.fileUrl) {
+                        setTimeout(() => {
+                            const container = document.getElementById(`bag-badge-${b.id}`);
+                            if (container) {
+                                playSvga(item.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: false 
+                                });
+                            }
+                        }, 100);
+                    }
+                }
+            }
+
+            // SVGA items (متفرقة)
+            const svgaItems = userData.purchasedSvga || [];
+            for (const s of svgaItems) {
+                const item = storeData.itemsById[s.id];
+                if (item && item.type === 'svga') {
+                    const isEquipped = userData.activeFrame === s.id;
+                    
+                    sGrid.innerHTML += `
+                        <div onclick="equipSvga('${s.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-svga-${s.id}">
+                                <span class="text-xs font-bold text-gray-600">SVGA</span>
+                            </div>
+                            <p class="text-xs text-center truncate w-full">${item.name}</p>
+                            ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                        </div>`;
+                    
+                    // تشغيل SVGA
+                    setTimeout(() => {
+                        const container = document.getElementById(`bag-svga-${s.id}`);
+                        if (container) {
+                            playSvga(item.fileUrl, container, { 
+                                loops: 1, 
+                                clearsAfterStop: false 
+                            });
+                        }
+                    }, 100);
+                }
+            }
+
+            // Active badges only
+            const activeBadges = userData.activeBadges || [];
+            for (const badgeId of activeBadges) {
+                const item = storeData.itemsById[badgeId];
+                if (item && item.type === 'badge') {
+                    aGrid.innerHTML += `
+                        <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white">
+                            <div class="w-8 h-8 flex items-center justify-center" id="active-badge-${badgeId}">
+                                ${item.itemType === 'svga' ? 
+                                    '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : 
+                                    `<img src="${item.image}" class="w-full h-full object-contain">`
+                                }
+                            </div>
+                        </div>`;
+                    
+                    // تشغيل SVGA للشارات النشطة المتحركة
+                    if (item.itemType === 'svga' && item.fileUrl) {
+                        setTimeout(() => {
+                            const container = document.getElementById(`active-badge-${badgeId}`);
+                            if (container) {
+                                playSvga(item.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: false 
+                                });
+                            }
+                        }, 100);
+                    }
+                }
+            }
+        };
+
+        window.equipFrame = async (id) => {
+            const item = storeData.itemsById[id];
+            if (!item) return;
+            
+            const newFrame = userData.activeFrame === id ? null : id;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeFrame: newFrame 
+            });
+            
+            loadBagItems();
+            setTimeout(() => updateUI(), 100);
+        };
+
+        window.equipSvga = async (id) => {
+            const item = storeData.itemsById[id];
+            if (!item || item.type !== 'svga') return;
+            
+            const newFrame = userData.activeFrame === id ? null : id;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+                activeFrame: newFrame 
+            });
+            
+            loadBagItems();
+            setTimeout(() => updateUI(), 100);
+        };
+
+        window.toggleBadge = async (id) => {
+            const item = storeData.itemsById[id];
+            if (!item || item.type !== 'badge') return;
+            
+            const isActive = userData.activeBadges?.includes(id);
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                activeBadges: isActive ? arrayRemove(id) : arrayUnion(id)
+            });
+            
+            loadBagItems();
+            await updateUI();
+        };
+
+        window.searchUser = async () => {
+            const id = document.getElementById('searchUserInput').value.trim();
+            if (!id) return;
+            
+            const q = query(collection(db, "users"), where("customId", "==", id));
+            const snap = await getDocs(q);
+            const results = document.getElementById('searchResults');
+            const container = document.getElementById('userResult');
+            
+            results.classList.remove('hidden');
+            
+            if (snap.empty) {
+                container.innerHTML = '<p class="text-center text-gray-400 text-sm">لم يتم العثور على مستخدم</p>';
+            } else {
+                const user = snap.docs[0].data();
+                const isFollowing = userData.friends?.includes(user.uid);
+                const hasSentRequest = userData.sentRequests?.includes(user.uid);
+                const hasReceivedRequest = userData.friendRequests?.includes(user.uid);
+                
+                let buttonText = 'متابعة';
+                let buttonClass = 'bg-black text-white';
+                let buttonAction = `sendFriendRequest('${user.uid}')`;
+                
+                if (isFollowing) {
+                    buttonText = 'متابع';
+                    buttonClass = 'bg-gray-100 text-gray-500';
+                    buttonAction = `unfollowUser('${user.uid}')`;
+                } else if (hasSentRequest) {
+                    buttonText = 'تم الإرسال';
+                    buttonClass = 'bg-blue-100 text-blue-600';
+                    buttonAction = `cancelFriendRequest('${user.uid}')`;
+                } else if (hasReceivedRequest) {
+                    buttonText = 'قبول الطلب';
+                    buttonClass = 'bg-green-100 text-green-600';
+                    buttonAction = `acceptFriendRequest('${user.uid}')`;
+                }
+                
+                container.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <h4 class="font-bold text-sm">${user.displayName}</h4>
+                                <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                            </div>
+                        </div>
+                        <button onclick="${buttonAction}" class="px-4 py-2 rounded-xl ${buttonClass} font-bold text-xs">
+                            ${buttonText}
+                        </button>
+                    </div>`;
+            }
+        };
+
+        window.sendFriendRequest = async (uid) => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                sentRequests: arrayUnion(uid)
+            });
+            
+            await updateDoc(doc(db, "users", uid), {
+                friendRequests: arrayUnion(auth.currentUser.uid)
+            });
+            
+            searchUser();
+            loadFriendRequests();
+        };
+
+        window.cancelFriendRequest = async (uid) => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                sentRequests: arrayRemove(uid)
+            });
+            
+            await updateDoc(doc(db, "users", uid), {
+                friendRequests: arrayRemove(auth.currentUser.uid)
+            });
+            
+            searchUser();
+            loadFriendRequests();
+        };
+
+        window.acceptFriendRequest = async (uid) => {
+            // Remove from requests
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friendRequests: arrayRemove(uid),
+                friends: arrayUnion(uid)
+            });
+            
+            // Add to other user's friends and remove from sent requests
+            await updateDoc(doc(db, "users", uid), {
+                sentRequests: arrayRemove(auth.currentUser.uid),
+                friends: arrayUnion(auth.currentUser.uid)
+            });
+            
+            searchUser();
+            loadFriendRequests();
+            loadFriends();
+        };
+
+        window.unfollowUser = async (uid) => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friends: arrayRemove(uid)
+            });
+            
+            await updateDoc(doc(db, "users", uid), {
+                friends: arrayRemove(auth.currentUser.uid)
+            });
+            
+            searchUser();
+            loadFriends();
+        };
+
+        async function loadFriendRequests() {
+            const list = document.getElementById('friendRequestsList');
+            list.innerHTML = '';
+            
+            if (!userData.friendRequests || userData.friendRequests.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا توجد طلبات متابعة</p>';
+                return;
+            }
+            
+            for (const uid of userData.friendRequests) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const user = snap.data();
+                    list.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                    <div>
+                                        <h4 class="font-bold text-sm">${user.displayName}</h4>
+                                        <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button onclick="acceptFriendRequest('${user.uid}')" class="px-3 py-1 bg-green-100 text-green-600 rounded-lg text-xs font-bold">قبول</button>
+                                    <button onclick="rejectFriendRequest('${user.uid}')" class="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold">رفض</button>
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            }
+        }
+
+        window.rejectFriendRequest = async (uid) => {
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                friendRequests: arrayRemove(uid)
+            });
+            
+            await updateDoc(doc(db, "users", uid), {
+                sentRequests: arrayRemove(auth.currentUser.uid)
+            });
+            
+            loadFriendRequests();
+        };
+
+        async function loadFriends() {
+            const list = document.getElementById('friendsList');
+            list.innerHTML = '';
+            
+            if (!userData.friends || userData.friends.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا يوجد أصدقاء بعد</p>';
+                return;
+            }
+            
+            for (const uid of userData.friends) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const friend = snap.data();
+                    list.innerHTML += `
+                        <div onclick="openChat('${friend.uid}')" class="glass-card p-4 rounded-3xl flex items-center justify-between cursor-pointer hover:bg-white transition">
+                            <div class="flex items-center gap-3">
+                                <img src="${friend.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm">${friend.displayName}</h4>
+                                    <p class="text-xs text-gray-400">ID: ${friend.customId}</p>
+                                </div>
+                            </div>
+                            <i data-lucide="message-circle" class="w-5 h-5 text-gray-300"></i>
+                        </div>`;
+                }
+            }
             lucide.createIcons();
-        } catch (error) {
-            console.error('Error loading rooms:', error);
         }
-    }
 
-    window.switchTab = (tab) => {
-        currentTab = tab;
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        loadRooms();
-    };
+        window.openChat = async (uid) => {
+            const snap = await getDoc(doc(db, "users", uid));
+            currentChatFriend = snap.data();
+            
+            document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
+            document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
+            document.getElementById('chatModal').classList.remove('hidden');
+            
+            const chatId = [auth.currentUser.uid, uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
+            if (chatUnsubscribe) chatUnsubscribe();
+            
+            chatUnsubscribe = onValue(chatRef, (snapshot) => {
+                const messages = snapshot.val();
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = '';
+                
+                if (messages) {
+                    Object.values(messages)
+                        .sort((a, b) => a.timestamp - b.timestamp)
+                        .forEach(msg => {
+                            const isMe = msg.senderId === auth.currentUser.uid;
+                            if (msg.type === 'gift') {
+                                // عرض الهدية كرسالة خاصة
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="gift-message max-w-[80%]">
+                                            <div class="gift-message-icon">
+                                                <img src="${msg.giftImage}" class="w-full h-full object-contain">
+                                            </div>
+                                            <p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p>
+                                            <p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p>
+                                        </div>
+                                    </div>`;
+                            } else {
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
+                                            ${msg.text}
+                                        </div>
+                                    </div>`;
+                            }
+                        });
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
+        };
 
-    window.loginWithGoogle = async () => {
-        try {
-            const provider = new GoogleAuthProvider();
-            const res = await signInWithPopup(auth, provider);
-            showToast("مرحباً بك في Afnan AI", "success");
-        } catch (error) {
-            console.error('Error signing in with Google:', error);
-            showToast("حدث خطأ أثناء التسجيل", "error");
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            
+            if (!text || !currentChatFriend) return;
+            
+            const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
+            await push(chatRef, {
+                senderId: auth.currentUser.uid,
+                receiverId: currentChatFriend.uid,
+                text: text,
+                type: 'text',
+                timestamp: Date.now()
+            });
+            
+            input.value = '';
+        };
+
+        window.closeChat = () => {
+            document.getElementById('chatModal').classList.add('hidden');
+            if (chatUnsubscribe) {
+                chatUnsubscribe();
+                chatUnsubscribe = null;
+            }
+            currentChatFriend = null;
+        };
+
+        window.toggleGiftBox = () => {
+            const giftBox = document.getElementById('giftBox');
+            const isHidden = giftBox.classList.contains('hidden');
+            giftBox.classList.toggle('hidden');
+            
+            if (isHidden) {
+                switchGiftTab('fixed');
+            }
+        };
+
+        window.switchGiftTab = (type) => {
+            const grid = document.getElementById('giftGrid');
+            grid.innerHTML = '';
+            
+            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
+            
+            document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            
+            if (items.length === 0) {
+                grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">لا توجد هدايا متاحة</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                grid.innerHTML += `
+                    <div onclick="sendGift('${item.id}', '${item.type}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
+                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
+                            <img src="${item.image}" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span>
+                        <span class="text-[8px] text-yellow-600 font-black">${item.price || 0} 💰</span>
+                    </div>`;
+            });
+        };
+
+        window.sendGift = async (giftId, giftType) => {
+            if (!currentChatFriend) {
+                alert('يجب فتح محادثة مع صديق أولاً');
+                toggleGiftBox();
+                return;
+            }
+
+            const giftList = giftType === 'magic' ? storeData.luckGifts : storeData.gifts;
+            const gift = giftList.find(g => g.id === giftId);
+            
+            if (userData.balance < (gift.price || 0)) {
+                alert('رصيدك غير كافٍ!');
+                return;
+            }
+
+            // خصم السعر من المرسل
+            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+                balance: increment(-(gift.price || 0))
+            });
+
+            // إرسال الهدية في المحادثة
+            const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
+            await push(chatRef, {
+                senderId: auth.currentUser.uid,
+                receiverId: currentChatFriend.uid,
+                giftId: gift.id,
+                giftName: gift.name,
+                giftImage: gift.image,
+                giftType: gift.type,
+                type: 'gift',
+                timestamp: Date.now()
+            });
+
+            // تحديث مستوى المستلم بناءً على نوع الهدية
+            const receiverRef = doc(db, "users", currentChatFriend.uid);
+            const receiverSnap = await getDoc(receiverRef);
+            
+            if (receiverSnap.exists()) {
+                const receiverData = receiverSnap.data();
+                
+                if (giftType === 'magic') {
+                    // زيادة جواهر السحر وتحويلها إلى عملات
+                    const newJewels = (receiverData.jewels || 0) + 10;
+                    let newCoins = receiverData.balance || 0;
+                    let newMagicLevel = receiverData.magicLevel || 1;
+                    
+                    // تحويل كل 10 جواهر إلى عملة واحدة
+                    if (newJewels >= 10) {
+                        const coinsToAdd = Math.floor(newJewels / 10);
+                        newCoins += coinsToAdd;
+                        
+                        // زيادة مستوى السحر كل 100 عملة
+                        const magicPoints = newCoins;
+                        if (magicPoints >= 100 * newMagicLevel) {
+                            newMagicLevel += 1;
+                        }
+                    }
+                    
+                    await updateDoc(receiverRef, {
+                        jewels: newJewels % 10,
+                        balance: newCoins,
+                        magicLevel: newMagicLevel
+                    });
+                } else if (giftType === 'wealth') {
+                    // زيادة مستوى الثروة مباشرة
+                    const wealthGiftValue = gift.reward || 1;
+                    const currentWealth = receiverData.wealthLevel || 1;
+                    const newWealthLevel = currentWealth + wealthGiftValue;
+                    
+                    await updateDoc(receiverRef, {
+                        wealthLevel: newWealthLevel,
+                        balance: increment(gift.reward || 0)
+                    });
+                }
+            }
+
+            // عرض رسالة تأكيد
+            showGiftAnimation(gift, `تم إرسال هدية ${gift.name} إلى ${currentChatFriend.displayName}`);
+            toggleGiftBox();
+        };
+
+        function showGiftAnimation(gift, text) {
+            const anim = document.createElement('div');
+            anim.className = 'gift-animation flex flex-col items-center gap-4';
+            anim.innerHTML = `
+                <img src="${gift.image}" class="w-32 h-32 object-contain drop-shadow-2xl">
+                <div class="glass px-6 py-3 rounded-2xl shadow-xl border-2 border-white">
+                    <p class="font-black text-gray-900 text-center">${text}</p>
+                </div>`;
+            document.body.appendChild(anim);
+            setTimeout(() => anim.remove(), 3000);
         }
-    };
 
-    window.loginWithTwitter = async () => {
-        try {
-            const provider = new TwitterAuthProvider();
-            const res = await signInWithPopup(auth, provider);
-            showToast("مرحباً بك في Afnan AI", "success");
-        } catch (error) {
-            console.error('Error signing in with Twitter:', error);
-            showToast("حدث خطأ أثناء التسجيل", "error");
+        window.confirmLogout = () => {
+            if (confirm('هل تريد تسجيل الخروج؟')) {
+                // تنظيف مشغلات SVGA النشطة
+                Object.keys(activeSvgaPlayers).forEach(id => {
+                    try {
+                        activeSvgaPlayers[id].player.clear();
+                    } catch (e) {}
+                });
+                activeSvgaPlayers = {};
+                signOut(auth);
+            }
+        };
+        
+        window.toggleSidebar = (show) => {
+            const s = document.getElementById('sidebar');
+            const o = document.getElementById('sidebarOverlay');
+            s.classList.toggle('open', show);
+            o.classList.toggle('hidden', !show);
+            
+            if(show) setTimeout(() => o.classList.add('visible'), 10);
+            else o.classList.remove('visible');
+        };
+        
+        window.switchView = (v) => {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('view-' + v).classList.remove('hidden');
+            
+            document.getElementById('pageTitle').innerText = 
+                v === 'home' ? 'الرئيسية' : 
+                v === 'wallet' ? 'المحفظة' : 
+                v === 'store' ? 'المتجر' : 
+                v === 'bag' ? 'حقيبتي' : 'أصدقائي';
+            
+            if(v === 'bag') loadBagItems();
+            if(v === 'store') loadStoreItems('frame');
+            if(v === 'friends') {
+                loadFriendRequests();
+                loadFriends();
+            }
+            
+            toggleSidebar(false);
+        };
+        
+        window.recharge = (a) => updateDoc(doc(db, "users", auth.currentUser.uid), { balance: increment(a) }).then(() => alert('تم الشحن!'));
+        window.copyID = () => navigator.clipboard.writeText(userData.customId).then(() => alert('تم النسخ'));
+        window.openEditProfile = () => {
+            document.getElementById('editNameInp').value = userData.displayName;
+            document.getElementById('editPhotoInp').value = userData.photoURL;
+            document.getElementById('editModal').classList.remove('hidden');
+            toggleSidebar(false);
+        };
+        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        window.saveProfileChanges = async () => {
+            const n = document.getElementById('editNameInp').value;
+            const p = document.getElementById('editPhotoInp').value;
+            await updateDoc(doc(db, "users", auth.currentUser.uid), { displayName: n, photoURL: p });
+            closeEditModal();
+        };
+
+        async function loadBanner() {
+            const bDoc = await getDoc(doc(db, "appData", "banner"));
+            const container = document.getElementById('homeBanner');
+            
+            if (bDoc.exists()) {
+                const b = bDoc.data();
+                container.innerHTML = `
+                    <div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div>
+                    <img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-80"></div>
+                `;
+            }
         }
-    };
 
-    async function setupUserData(user) {
-        const userRef = doc(db, "users", user.uid);
-        
-        const twitterUsername = user.displayName?.includes('@') ? user.displayName : `@${user.displayName?.split(' ').join('')}`;
-        
-        await setDoc(userRef, {
-            displayName: user.displayName || 'مستخدم',
-            photoURL: user.photoURL || 'https://via.placeholder.com/60',
-            email: user.email || '',
-            balance: 1000,
-            level: 1,
-            xp: 0,
-            customId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-            purchasedFrames: [],
-            purchasedBadges: [],
-            purchasedMagic: [],
-            activeFrame: null,
-            activeBadges: [],
-            provider: user.providerData[0]?.providerId,
-            twitterUsername: twitterUsername,
-            createdAt: serverTimestamp(),
-            lastLogin: serverTimestamp()
-        });
-    }
+        async function loadRooms() {
+            const rSnap = await getDocs(collection(db, "rooms"));
+            const grid = document.getElementById('roomsGrid');
+            grid.innerHTML = '';
+            
+            rSnap.docs.forEach(d => {
+                const r = d.data();
+                grid.innerHTML += `
+                    <div class="glass-card p-4 rounded-3xl flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-gray-900">${r.name}</h4>
+                            <p class="text-xs text-gray-500">${r.description}</p>
+                        </div>
+                        <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
+                    </div>`;
+            });
+        }
 
-    function showToast(message, type = 'success') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        
-        toast.className = `toast ${type}`;
-        toast.innerHTML = `
-            <i data-lucide="${type === 'success' ? 'check-circle' : type === 'error' ? 'alert-circle' : type === 'warning' ? 'alert-triangle' : 'info'}" class="w-5 h-5"></i>
-            <span>${message}</span>
-        `;
-        
-        container.appendChild(toast);
+        window.filterRooms = (t) => {
+            document.getElementById('btn-public').className = t === 'public' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+            document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+        };
+
+        // Initialize icons
         lucide.createIcons();
-        
-        setTimeout(() => {
-            toast.style.animation = 'toastOut 0.3s ease forwards';
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    window.copyID = () => { 
-        if (!uData) return;
-        navigator.clipboard.writeText(uData.customId); 
-        showToast("تم نسخ المعرف", "success");
-    };
-    
-    window.logout = () => {
-        signOut(auth);
-        showToast("تم تسجيل الخروج", "info");
-    };
-    
-    window.enterRoom = (roomId) => {
-        showToast("جاري الدخول إلى الغرفة...", "info");
-        // TODO: Implement room entry logic
-        setTimeout(() => {
-            showToast("تم الدخول إلى الغرفة", "success");
-        }, 1000);
-    };
-    
-    window.openEditProfile = () => {
-        showToast("ميزة تعديل الملف الشخصي قريباً", "info");
-    };
-
-    window.deleteRoom = async (roomId) => {
-        if (!confirm('هل أنت متأكد من حذف هذه الغرفة؟')) return;
-        
-        try {
-            await deleteDoc(doc(db, "rooms", roomId));
-            showToast("تم حذف الغرفة", "success");
-            loadRooms();
-        } catch (error) {
-            console.error('Error deleting room:', error);
-            showToast("حدث خطأ أثناء الحذف", "error");
-        }
-    };
-
-    // Initialize icons
-    lucide.createIcons();
-</script>
+        setInterval(() => lucide.createIcons(), 1000);
+    </script>
 </body>
 </html>
