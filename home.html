@@ -104,11 +104,11 @@
             pointer-events: auto;
         }
 
-        /* --- Avatar & Frame Logic --- */
+        /* --- Avatar & Frame Logic - MODIFIED --- */
         .avatar-wrapper {
             position: relative;
-            width: 100px;
-            height: 100px;
+            width: 80px; /* تقليل من 100px إلى 80px */
+            height: 80px; /* تقليل من 100px إلى 80px */
             margin: 0 auto;
             display: flex;
             align-items: center;
@@ -128,40 +128,13 @@
             z-index: 1;
         }
 
-        .user-frame {
-            position: absolute;
-            width: 165%;
-            height: 165%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 2;
-            object-fit: contain;
-            border-radius: 50%;
-            padding: 0;
-            margin: 0;
-        }
-
-        /* --- SVGA Containers --- */
-        .svga-container {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            border-radius: 50%;
-            overflow: visible;
-        }
-
-        /* إطار SVGA متحرك - تم التعديل للرفع للأعلى والتحريك لليسار */
+        /* إطار SVGA متحرك - تم التعديل للرفع للأعلى 10px وتصغير الحجم */
         .svga-avatar-frame {
             position: absolute;
-            width: 170%;  /* أكبر قليلاً من الصورة */
-            height: 170%; /* أكبر قليلاً من الصورة */
-            top: calc(50% - 20px);  /* رفع 20px للأعلى */
-            left: calc(50% + 10px);  /* تحريك 10px لليسار */
+            width: 108%; /* تصغير من 170% إلى 108% (أكبر من الصورة بمقدار 4% فقط من كل جانب) */
+            height: 108%; /* تصغير من 170% إلى 108% */
+            top: calc(50% - 10px); /* رفع 10px للأعلى بدلاً من 20px */
+            left: calc(50% + 10px); /* تحريك 10px لليسار */
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 2;
@@ -191,16 +164,49 @@
         /* إطار الصورة العادية - تم التعديل كذلك */
         .perfect-frame {
             position: absolute;
-            width: 170%;  /* أكبر قليلاً من الصورة */
-            height: 170%; /* أكبر قليلاً من الصورة */
-            top: calc(50% - 20px);  /* رفع 20px للأعلى */
-            left: calc(50% + 10px);  /* تحريك 10px لليسار */
+            width: 108%; /* تصغير من 170% إلى 108% */
+            height: 108%; /* تصغير من 170% إلى 108% */
+            top: calc(50% - 10px); /* رفع 10px للأعلى بدلاً من 20px */
+            left: calc(50% + 10px); /* تحريك 10px لليسار */
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 2;
             object-fit: contain;
             border-radius: 50%;
             animation: frameFloat 3s ease-in-out infinite;
+        }
+
+        /* حاوية SVGA للأفاتار في السايدبار - لإضافة نفس التعديلات */
+        #sidebar .avatar-wrapper {
+            width: 80px;
+            height: 80px;
+        }
+
+        #sidebar .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            position: relative;
+            z-index: 1;
+        }
+
+        #sidebar .svga-avatar-frame {
+            width: 108%;
+            height: 108%;
+            top: calc(50% - 10px);
+            left: calc(50% + 10px);
+            transform: translate(-50%, -50%);
+        }
+
+        #sidebar .perfect-frame {
+            width: 108%;
+            height: 108%;
+            top: calc(50% - 10px);
+            left: calc(50% + 10px);
+            transform: translate(-50%, -50%);
         }
 
         @keyframes frameFloat {
@@ -385,7 +391,7 @@
             <!-- VIEW: FRIENDS -->
             <div id="view-friends" class="view-section hidden fade-in">
                 <div class="relative mb-6">
-                    <input type="text" id="searchUserInput" placeholder="ابحث عن مستخدم بواسطة الـ ID..." 
+                    <input type="text" id="searchUserInput" placeholder="ابحث عن مستخدم بواسطة البريد الإلكتروني..." 
                            class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm">
                     <button onclick="searchUser()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
                         <i data-lucide="search" class="w-5 h-5"></i>
@@ -425,9 +431,9 @@
             <div class="text-center mb-6">
                 <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
                 <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
-                    <span class="text-xs font-bold text-gray-400">ID:</span>
-                    <span id="sideID" class="text-sm font-mono font-medium text-gray-600">...</span>
-                    <button onclick="copyID()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                    <span class="text-xs font-bold text-gray-400">البريد:</span>
+                    <span id="sideEmail" class="text-sm font-medium text-gray-600 truncate max-w-[150px]">...</span>
+                    <button onclick="copyEmail()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
                 </div>
             </div>
             <div class="flex gap-3 mb-8">
@@ -543,8 +549,8 @@
     <!-- ================= SCRIPTS ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
@@ -561,13 +567,11 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
-        const twitterProvider = new TwitterAuthProvider();
-        const googleProvider = new GoogleAuthProvider();
 
         let userData = {};
         let storeData = { 
-            items: [], // جميع العناصر في متجر واحد
-            itemsById: {}, // للبحث السريع عن طريق الـ ID
+            items: [],
+            itemsById: {},
             gifts: [], 
             luckGifts: [], 
             magicLevels: {}, 
@@ -579,14 +583,95 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
-                    if (docSnap.exists()) {
-                        userData = docSnap.data();
-                        await updateUI();
-                        await loadFriendRequests();
-                        await loadFriends();
-                    }
-                });
+                // البحث عن المستخدم في Firestore باستخدام email
+                const q = query(collection(db, "users"), where("email", "==", user.email));
+                const querySnapshot = await getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    // المستخدم موجود في Firestore
+                    const userDoc = querySnapshot.docs[0];
+                    userData = { uid: userDoc.id, ...userDoc.data() };
+                    
+                    // الاستماع للتحديثات
+                    onSnapshot(doc(db, "users", userDoc.id), async (docSnap) => {
+                        if (docSnap.exists()) {
+                            userData = { uid: docSnap.id, ...docSnap.data() };
+                            await updateUI();
+                            await loadFriendRequests();
+                            await loadFriends();
+                        }
+                    });
+                } else {
+                    // المستخدم غير موجود في Firestore، التحقق من Realtime Database
+                    const rtdbRef = ref(rtdb, `users/${user.uid}`);
+                    
+                    onValue(rtdbRef, async (snapshot) => {
+                        if (snapshot.exists()) {
+                            // يوجد بيانات قديمة في Realtime Database
+                            const oldData = snapshot.val();
+                            
+                            // إنشاء مستند جديد في Firestore مع البيانات القديمة
+                            const newUserRef = doc(collection(db, "users"));
+                            await setDoc(newUserRef, {
+                                uid: user.uid,
+                                email: user.email,
+                                displayName: user.displayName || oldData.displayName || "مستخدم",
+                                photoURL: user.photoURL || oldData.photoURL || 'https://via.placeholder.com/150',
+                                balance: oldData.balance || 0,
+                                magicLevel: oldData.magicLevel || 1,
+                                wealthLevel: oldData.wealthLevel || 1,
+                                purchasedFrames: oldData.purchasedFrames || [],
+                                purchasedBadges: oldData.purchasedBadges || [],
+                                purchasedSvga: oldData.purchasedSvga || [],
+                                activeFrame: oldData.activeFrame || null,
+                                activeBadges: oldData.activeBadges || [],
+                                friends: oldData.friends || [],
+                                friendRequests: oldData.friendRequests || [],
+                                sentRequests: oldData.sentRequests || [],
+                                createdAt: serverTimestamp()
+                            });
+                            
+                            // حذف البيانات القديمة من Realtime Database
+                            await set(rtdbRef, null);
+                            
+                            userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
+                        } else {
+                            // لا توجد بيانات قديمة، إنشاء مستخدم جديد
+                            const newUserRef = doc(collection(db, "users"));
+                            await setDoc(newUserRef, {
+                                uid: user.uid,
+                                email: user.email,
+                                displayName: user.displayName || "مستخدم",
+                                photoURL: user.photoURL || 'https://via.placeholder.com/150',
+                                balance: 0,
+                                magicLevel: 1,
+                                wealthLevel: 1,
+                                purchasedFrames: [],
+                                purchasedBadges: [],
+                                purchasedSvga: [],
+                                activeFrame: null,
+                                activeBadges: [],
+                                friends: [],
+                                friendRequests: [],
+                                sentRequests: [],
+                                createdAt: serverTimestamp()
+                            });
+                            
+                            userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
+                        }
+                        
+                        // الآن الاستماع للتحديثات
+                        onSnapshot(doc(db, "users", userData.uid), async (docSnap) => {
+                            if (docSnap.exists()) {
+                                userData = { uid: docSnap.id, ...docSnap.data() };
+                                await updateUI();
+                                await loadFriendRequests();
+                                await loadFriends();
+                            }
+                        });
+                    }, { onlyOnce: true });
+                }
+                
                 await loadBanner();
                 await loadGlobalData();
                 await loadRooms();
@@ -596,25 +681,20 @@
         });
 
         async function loadGlobalData() {
-            // Load all store items from single collection
             const storeSnap = await getDocs(collection(db, "storeItems"));
             storeData.items = storeSnap.docs.map(d => ({id: d.id, ...d.data()}));
             
-            // Create lookup object for quick access
             storeData.itemsById = {};
             storeData.items.forEach(item => {
                 storeData.itemsById[item.id] = item;
             });
             
-            // Load gifts (wealth gifts)
             const gSnap = await getDocs(collection(db, "gifts"));
             storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'wealth'}));
             
-            // Load luck gifts (magic gifts)
             const lgSnap = await getDocs(collection(db, "luckGifts"));
             storeData.luckGifts = lgSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'magic'}));
             
-            // Load levels
             const mlSnap = await getDocs(collection(db, "magicLevels"));
             mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
             
@@ -625,16 +705,14 @@
         }
 
         async function updateUI() {
-            if (!auth.currentUser) return;
+            if (!auth.currentUser || !userData.uid) return;
             
-            // Basic user info
             document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
-            document.getElementById('sideID').innerText = userData.customId || "000000";
+            document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
             document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
             
-            // Levels
             const ml = userData.magicLevel || 1;
             const wl = userData.wealthLevel || 1;
             
@@ -649,11 +727,9 @@
                 wealthImg.src = storeData.wealthLevels[wl].image;
             }
 
-            // Frame or SVGA
             const frameEl = document.getElementById('sideFrame');
             const svgaContainer = document.getElementById('sideSvgaFrame');
             
-            // إخفاء كليهما أولاً
             frameEl.classList.add('hidden');
             svgaContainer.classList.add('hidden');
             svgaContainer.innerHTML = '';
@@ -662,24 +738,20 @@
                 const item = storeData.itemsById[userData.activeFrame];
                 if (item) {
                     if (item.itemType === 'svga') {
-                        // تشغيل SVGA كإطار متحرك
                         svgaContainer.classList.remove('hidden');
                         playPerfectSvga(item.fileUrl, svgaContainer, { 
                             loops: 0, 
                             clearsAfterStop: false 
                         });
                     } else {
-                        // استخدام صورة عادية كإطار
                         frameEl.src = item.image;
                         frameEl.classList.remove('hidden');
                     }
                 } else {
-                    // العنصر غير موجود في المتجر
-                    await updateDoc(doc(db, "users", auth.currentUser.uid), { activeFrame: null });
+                    await updateDoc(doc(db, "users", userData.uid), { activeFrame: null });
                 }
             }
 
-            // Active badges in sidebar
             const sidebarBadges = document.getElementById('sidebarActiveBadges');
             sidebarBadges.innerHTML = '';
             if (userData.activeBadges && userData.activeBadges.length > 0) {
@@ -687,7 +759,6 @@
                     const badge = storeData.itemsById[badgeId];
                     if (badge && badge.type === 'badge') {
                         if (badge.itemType === 'svga') {
-                            // إنشاء حاوية للشارة المتحركة
                             const badgeContainer = document.createElement('div');
                             badgeContainer.className = 'flex items-center justify-center w-8 h-8';
                             badgeContainer.id = `badge-${badgeId}`;
@@ -697,7 +768,6 @@
                                 clearsAfterStop: false 
                             });
                         } else {
-                            // شارة عادية (صورة)
                             sidebarBadges.innerHTML += `
                                 <div class="flex items-center justify-center">
                                     <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
@@ -709,10 +779,8 @@
             }
         }
 
-        // SVGA Player Function
         function playSvga(url, container, options = {}) {
             try {
-                // تنظيف الحاوية أولاً
                 container.innerHTML = '';
                 
                 const player = new SVGA.Player(container);
@@ -724,7 +792,6 @@
                     player.clearsAfterStop = options.clearsAfterStop || false;
                     player.startAnimation();
                     
-                    // Store player reference
                     const id = 'player_' + Date.now();
                     activeSvgaPlayers[id] = { player, container };
                     container.dataset.playerId = id;
@@ -738,10 +805,8 @@
             }
         }
 
-        // Perfect SVGA Player for Frames - تم التصحيح
         function playPerfectSvga(url, container, options = {}) {
             try {
-                // تنظيف الحاوية أولاً
                 container.innerHTML = '';
                 
                 const player = new SVGA.Player(container);
@@ -754,7 +819,6 @@
                     
                     player.startAnimation();
                     
-                    // ضبط canvas مباشرة بعد التشغيل
                     setTimeout(() => {
                         const canvas = container.querySelector('canvas');
                         if (canvas) {
@@ -774,7 +838,6 @@
                         }
                     }, 50);
                     
-                    // Store player reference
                     const id = 'player_' + Date.now();
                     activeSvgaPlayers[id] = { player, container };
                     container.dataset.playerId = id;
@@ -792,16 +855,13 @@
             const grid = document.getElementById('storeGrid');
             grid.innerHTML = '';
             
-            // تصفية العناصر حسب النوع
             let items = storeData.items.filter(item => item.type === type);
             
-            // تحديث أزرار التبويب
             document.getElementById('store-tab-frames').className = type === 'frame' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
             document.getElementById('store-tab-badges').className = type === 'badge' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
             document.getElementById('store-tab-svga').className = type === 'svga' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
 
             items.forEach(item => {
-                // تحديد الحقل المناسب حسب نوع العنصر
                 let field = '';
                 if (item.type === 'frame') field = 'purchasedFrames';
                 else if (item.type === 'badge') field = 'purchasedBadges';
@@ -813,11 +873,9 @@
                 let extraTag = '';
                 
                 if (item.itemType === 'svga') {
-                    // معاينة SVGA
                     previewHTML = `<div class="svga-preview mb-2" id="preview-${item.id}"></div>`;
                     extraTag = '<span class="svga-icon">SVGA</span>';
                 } else {
-                    // صورة عادية
                     previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
                 }
                 
@@ -832,7 +890,6 @@
                         </button>
                     </div>`;
                 
-                // تشغيل معاينة SVGA إذا كان من نوع SVGA
                 if (item.itemType === 'svga' && item.fileUrl) {
                     setTimeout(() => {
                         const previewContainer = document.getElementById(`preview-${item.id}`);
@@ -846,7 +903,6 @@
                 }
             });
             
-            // إذا لم توجد عناصر
             if (items.length === 0) {
                 grid.innerHTML = `
                     <div class="col-span-2 glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center">
@@ -859,13 +915,12 @@
         window.buyItem = async (type, id, price) => {
             if (userData.balance < price) return alert('رصيدك غير كافٍ!');
             
-            // تحديد الحقل المناسب حسب النوع
             let field = '';
             if (type === 'frame') field = 'purchasedFrames';
             else if (type === 'badge') field = 'purchasedBadges';
             else if (type === 'svga') field = 'purchasedSvga';
             
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 balance: increment(-price),
                 [field]: arrayUnion({ 
                     id: id, 
@@ -888,7 +943,6 @@
             sGrid.innerHTML = '';
             aGrid.innerHTML = '';
             
-            // Frames
             const frames = userData.purchasedFrames || [];
             for (const f of frames) {
                 const item = storeData.itemsById[f.id];
@@ -896,7 +950,6 @@
                     const isEquipped = userData.activeFrame === f.id;
                     
                     if (item.itemType === 'svga') {
-                        // عرض SVGA frame
                         fGrid.innerHTML += `
                             <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
                                 <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}">
@@ -905,7 +958,6 @@
                                 ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                             </div>`;
                         
-                        // تشغيل SVGA
                         setTimeout(() => {
                             const container = document.getElementById(`bag-frame-${f.id}`);
                             if (container) {
@@ -916,7 +968,6 @@
                             }
                         }, 100);
                     } else {
-                        // صورة عادية
                         fGrid.innerHTML += `
                             <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
                                 <img src="${item.image}" class="w-12 h-12 object-contain rounded-full">
@@ -926,7 +977,6 @@
                 }
             }
 
-            // Badges
             const badges = userData.purchasedBadges || [];
             for (const b of badges) {
                 const item = storeData.itemsById[b.id];
@@ -943,7 +993,6 @@
                             </div>
                         </div>`;
                     
-                    // تشغيل SVGA للشارات المتحركة
                     if (item.itemType === 'svga' && item.fileUrl) {
                         setTimeout(() => {
                             const container = document.getElementById(`bag-badge-${b.id}`);
@@ -958,7 +1007,6 @@
                 }
             }
 
-            // SVGA items (متفرقة)
             const svgaItems = userData.purchasedSvga || [];
             for (const s of svgaItems) {
                 const item = storeData.itemsById[s.id];
@@ -974,7 +1022,6 @@
                             ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                         </div>`;
                     
-                    // تشغيل SVGA
                     setTimeout(() => {
                         const container = document.getElementById(`bag-svga-${s.id}`);
                         if (container) {
@@ -987,7 +1034,6 @@
                 }
             }
 
-            // Active badges only
             const activeBadges = userData.activeBadges || [];
             for (const badgeId of activeBadges) {
                 const item = storeData.itemsById[badgeId];
@@ -1002,7 +1048,6 @@
                             </div>
                         </div>`;
                     
-                    // تشغيل SVGA للشارات النشطة المتحركة
                     if (item.itemType === 'svga' && item.fileUrl) {
                         setTimeout(() => {
                             const container = document.getElementById(`active-badge-${badgeId}`);
@@ -1023,7 +1068,7 @@
             if (!item) return;
             
             const newFrame = userData.activeFrame === id ? null : id;
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+            await updateDoc(doc(db, "users", userData.uid), { 
                 activeFrame: newFrame 
             });
             
@@ -1036,7 +1081,7 @@
             if (!item || item.type !== 'svga') return;
             
             const newFrame = userData.activeFrame === id ? null : id;
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { 
+            await updateDoc(doc(db, "users", userData.uid), { 
                 activeFrame: newFrame 
             });
             
@@ -1049,7 +1094,7 @@
             if (!item || item.type !== 'badge') return;
             
             const isActive = userData.activeBadges?.includes(id);
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 activeBadges: isActive ? arrayRemove(id) : arrayUnion(id)
             });
             
@@ -1058,10 +1103,10 @@
         };
 
         window.searchUser = async () => {
-            const id = document.getElementById('searchUserInput').value.trim();
-            if (!id) return;
+            const email = document.getElementById('searchUserInput').value.trim();
+            if (!email) return;
             
-            const q = query(collection(db, "users"), where("customId", "==", id));
+            const q = query(collection(db, "users"), where("email", "==", email));
             const snap = await getDocs(q);
             const results = document.getElementById('searchResults');
             const container = document.getElementById('userResult');
@@ -1072,26 +1117,27 @@
                 container.innerHTML = '<p class="text-center text-gray-400 text-sm">لم يتم العثور على مستخدم</p>';
             } else {
                 const user = snap.docs[0].data();
-                const isFollowing = userData.friends?.includes(user.uid);
-                const hasSentRequest = userData.sentRequests?.includes(user.uid);
-                const hasReceivedRequest = userData.friendRequests?.includes(user.uid);
+                const userUid = snap.docs[0].id;
+                const isFollowing = userData.friends?.includes(userUid);
+                const hasSentRequest = userData.sentRequests?.includes(userUid);
+                const hasReceivedRequest = userData.friendRequests?.includes(userUid);
                 
                 let buttonText = 'متابعة';
                 let buttonClass = 'bg-black text-white';
-                let buttonAction = `sendFriendRequest('${user.uid}')`;
+                let buttonAction = `sendFriendRequest('${userUid}')`;
                 
                 if (isFollowing) {
                     buttonText = 'متابع';
                     buttonClass = 'bg-gray-100 text-gray-500';
-                    buttonAction = `unfollowUser('${user.uid}')`;
+                    buttonAction = `unfollowUser('${userUid}')`;
                 } else if (hasSentRequest) {
                     buttonText = 'تم الإرسال';
                     buttonClass = 'bg-blue-100 text-blue-600';
-                    buttonAction = `cancelFriendRequest('${user.uid}')`;
+                    buttonAction = `cancelFriendRequest('${userUid}')`;
                 } else if (hasReceivedRequest) {
                     buttonText = 'قبول الطلب';
                     buttonClass = 'bg-green-100 text-green-600';
-                    buttonAction = `acceptFriendRequest('${user.uid}')`;
+                    buttonAction = `acceptFriendRequest('${userUid}')`;
                 }
                 
                 container.innerHTML = `
@@ -1100,7 +1146,7 @@
                             <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
                             <div>
                                 <h4 class="font-bold text-sm">${user.displayName}</h4>
-                                <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                                <p class="text-xs text-gray-400">${user.email}</p>
                             </div>
                         </div>
                         <button onclick="${buttonAction}" class="px-4 py-2 rounded-xl ${buttonClass} font-bold text-xs">
@@ -1111,12 +1157,12 @@
         };
 
         window.sendFriendRequest = async (uid) => {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 sentRequests: arrayUnion(uid)
             });
             
             await updateDoc(doc(db, "users", uid), {
-                friendRequests: arrayUnion(auth.currentUser.uid)
+                friendRequests: arrayUnion(userData.uid)
             });
             
             searchUser();
@@ -1124,12 +1170,12 @@
         };
 
         window.cancelFriendRequest = async (uid) => {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 sentRequests: arrayRemove(uid)
             });
             
             await updateDoc(doc(db, "users", uid), {
-                friendRequests: arrayRemove(auth.currentUser.uid)
+                friendRequests: arrayRemove(userData.uid)
             });
             
             searchUser();
@@ -1137,16 +1183,14 @@
         };
 
         window.acceptFriendRequest = async (uid) => {
-            // Remove from requests
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 friendRequests: arrayRemove(uid),
                 friends: arrayUnion(uid)
             });
             
-            // Add to other user's friends and remove from sent requests
             await updateDoc(doc(db, "users", uid), {
-                sentRequests: arrayRemove(auth.currentUser.uid),
-                friends: arrayUnion(auth.currentUser.uid)
+                sentRequests: arrayRemove(userData.uid),
+                friends: arrayUnion(userData.uid)
             });
             
             searchUser();
@@ -1155,12 +1199,12 @@
         };
 
         window.unfollowUser = async (uid) => {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 friends: arrayRemove(uid)
             });
             
             await updateDoc(doc(db, "users", uid), {
-                friends: arrayRemove(auth.currentUser.uid)
+                friends: arrayRemove(userData.uid)
             });
             
             searchUser();
@@ -1187,12 +1231,12 @@
                                     <img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover">
                                     <div>
                                         <h4 class="font-bold text-sm">${user.displayName}</h4>
-                                        <p class="text-xs text-gray-400">ID: ${user.customId}</p>
+                                        <p class="text-xs text-gray-400">${user.email}</p>
                                     </div>
                                 </div>
                                 <div class="flex gap-2">
-                                    <button onclick="acceptFriendRequest('${user.uid}')" class="px-3 py-1 bg-green-100 text-green-600 rounded-lg text-xs font-bold">قبول</button>
-                                    <button onclick="rejectFriendRequest('${user.uid}')" class="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold">رفض</button>
+                                    <button onclick="acceptFriendRequest('${uid}')" class="px-3 py-1 bg-green-100 text-green-600 rounded-lg text-xs font-bold">قبول</button>
+                                    <button onclick="rejectFriendRequest('${uid}')" class="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold">رفض</button>
                                 </div>
                             </div>
                         </div>`;
@@ -1201,12 +1245,12 @@
         }
 
         window.rejectFriendRequest = async (uid) => {
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 friendRequests: arrayRemove(uid)
             });
             
             await updateDoc(doc(db, "users", uid), {
-                sentRequests: arrayRemove(auth.currentUser.uid)
+                sentRequests: arrayRemove(userData.uid)
             });
             
             loadFriendRequests();
@@ -1226,12 +1270,12 @@
                 if (snap.exists()) {
                     const friend = snap.data();
                     list.innerHTML += `
-                        <div onclick="openChat('${friend.uid}')" class="glass-card p-4 rounded-3xl flex items-center justify-between cursor-pointer hover:bg-white transition">
+                        <div onclick="openChat('${uid}')" class="glass-card p-4 rounded-3xl flex items-center justify-between cursor-pointer hover:bg-white transition">
                             <div class="flex items-center gap-3">
                                 <img src="${friend.photoURL}" class="w-12 h-12 rounded-full object-cover">
                                 <div>
                                     <h4 class="font-bold text-sm">${friend.displayName}</h4>
-                                    <p class="text-xs text-gray-400">ID: ${friend.customId}</p>
+                                    <p class="text-xs text-gray-400">${friend.email}</p>
                                 </div>
                             </div>
                             <i data-lucide="message-circle" class="w-5 h-5 text-gray-300"></i>
@@ -1243,13 +1287,13 @@
 
         window.openChat = async (uid) => {
             const snap = await getDoc(doc(db, "users", uid));
-            currentChatFriend = snap.data();
+            currentChatFriend = { uid, ...snap.data() };
             
             document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
             document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
             document.getElementById('chatModal').classList.remove('hidden');
             
-            const chatId = [auth.currentUser.uid, uid].sort().join('_');
+            const chatId = [userData.uid, uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
             
             if (chatUnsubscribe) chatUnsubscribe();
@@ -1263,9 +1307,8 @@
                     Object.values(messages)
                         .sort((a, b) => a.timestamp - b.timestamp)
                         .forEach(msg => {
-                            const isMe = msg.senderId === auth.currentUser.uid;
+                            const isMe = msg.senderId === userData.uid;
                             if (msg.type === 'gift') {
-                                // عرض الهدية كرسالة خاصة
                                 container.innerHTML += `
                                     <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
                                         <div class="gift-message max-w-[80%]">
@@ -1296,11 +1339,11 @@
             
             if (!text || !currentChatFriend) return;
             
-            const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+            const chatId = [userData.uid, currentChatFriend.uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
             
             await push(chatRef, {
-                senderId: auth.currentUser.uid,
+                senderId: userData.uid,
                 receiverId: currentChatFriend.uid,
                 text: text,
                 type: 'text',
@@ -1370,17 +1413,15 @@
                 return;
             }
 
-            // خصم السعر من المرسل
-            await updateDoc(doc(db, "users", auth.currentUser.uid), {
+            await updateDoc(doc(db, "users", userData.uid), {
                 balance: increment(-(gift.price || 0))
             });
 
-            // إرسال الهدية في المحادثة
-            const chatId = [auth.currentUser.uid, currentChatFriend.uid].sort().join('_');
+            const chatId = [userData.uid, currentChatFriend.uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
             
             await push(chatRef, {
-                senderId: auth.currentUser.uid,
+                senderId: userData.uid,
                 receiverId: currentChatFriend.uid,
                 giftId: gift.id,
                 giftName: gift.name,
@@ -1390,7 +1431,6 @@
                 timestamp: Date.now()
             });
 
-            // تحديث مستوى المستلم بناءً على نوع الهدية
             const receiverRef = doc(db, "users", currentChatFriend.uid);
             const receiverSnap = await getDoc(receiverRef);
             
@@ -1398,17 +1438,14 @@
                 const receiverData = receiverSnap.data();
                 
                 if (giftType === 'magic') {
-                    // زيادة جواهر السحر وتحويلها إلى عملات
                     const newJewels = (receiverData.jewels || 0) + 10;
                     let newCoins = receiverData.balance || 0;
                     let newMagicLevel = receiverData.magicLevel || 1;
                     
-                    // تحويل كل 10 جواهر إلى عملة واحدة
                     if (newJewels >= 10) {
                         const coinsToAdd = Math.floor(newJewels / 10);
                         newCoins += coinsToAdd;
                         
-                        // زيادة مستوى السحر كل 100 عملة
                         const magicPoints = newCoins;
                         if (magicPoints >= 100 * newMagicLevel) {
                             newMagicLevel += 1;
@@ -1421,7 +1458,6 @@
                         magicLevel: newMagicLevel
                     });
                 } else if (giftType === 'wealth') {
-                    // زيادة مستوى الثروة مباشرة
                     const wealthGiftValue = gift.reward || 1;
                     const currentWealth = receiverData.wealthLevel || 1;
                     const newWealthLevel = currentWealth + wealthGiftValue;
@@ -1433,7 +1469,6 @@
                 }
             }
 
-            // عرض رسالة تأكيد
             showGiftAnimation(gift, `تم إرسال هدية ${gift.name} إلى ${currentChatFriend.displayName}`);
             toggleGiftBox();
         };
@@ -1452,7 +1487,6 @@
 
         window.confirmLogout = () => {
             if (confirm('هل تريد تسجيل الخروج؟')) {
-                // تنظيف مشغلات SVGA النشطة
                 Object.keys(activeSvgaPlayers).forEach(id => {
                     try {
                         activeSvgaPlayers[id].player.clear();
@@ -1493,8 +1527,8 @@
             toggleSidebar(false);
         };
         
-        window.recharge = (a) => updateDoc(doc(db, "users", auth.currentUser.uid), { balance: increment(a) }).then(() => alert('تم الشحن!'));
-        window.copyID = () => navigator.clipboard.writeText(userData.customId).then(() => alert('تم النسخ'));
+        window.recharge = (a) => updateDoc(doc(db, "users", userData.uid), { balance: increment(a) }).then(() => alert('تم الشحن!'));
+        window.copyEmail = () => navigator.clipboard.writeText(userData.email).then(() => alert('تم نسخ البريد'));
         window.openEditProfile = () => {
             document.getElementById('editNameInp').value = userData.displayName;
             document.getElementById('editPhotoInp').value = userData.photoURL;
@@ -1505,7 +1539,7 @@
         window.saveProfileChanges = async () => {
             const n = document.getElementById('editNameInp').value;
             const p = document.getElementById('editPhotoInp').value;
-            await updateDoc(doc(db, "users", auth.currentUser.uid), { displayName: n, photoURL: p });
+            await updateDoc(doc(db, "users", userData.uid), { displayName: n, photoURL: p });
             closeEditModal();
         };
 
@@ -1550,7 +1584,6 @@
             document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
         };
 
-        // Initialize icons
         lucide.createIcons();
         setInterval(() => lucide.createIcons(), 1000);
     </script>
