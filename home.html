@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - White Edition</title>
+    <title>Afnan AI - الرئيسية</title>
     
     <!-- Fonts: Noto Sans Arabic -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -18,59 +18,43 @@
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
 
     <style>
-        /* --- Base Settings --- */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             font-family: 'Noto Sans Arabic', sans-serif;
             touch-action: manipulation;
         }
-
         body {
             background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%);
             color: #1f2937;
             overflow-x: hidden;
             min-height: 100vh;
         }
-
-        /* --- iOS Glassmorphism --- */
         .glass {
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 
-                0 4px 6px -1px rgba(0, 0, 0, 0.04),
-                0 2px 4px -1px rgba(0, 0, 0, 0.02),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
         }
-
         .glass-deep {
             background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(25px) saturate(200%);
             -webkit-backdrop-filter: blur(25px) saturate(200%);
             border-right: 1px solid rgba(255, 255, 255, 0.8);
         }
-
         .glass-card {
             background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(12px) saturate(180%);
             -webkit-backdrop-filter: blur(12px) saturate(180%);
             border: 1px solid rgba(255, 255, 255, 0.4);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 
-                0 2px 8px -2px rgba(0, 0, 0, 0.03),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
+            box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.5);
         }
-
         .glass-card:active {
             transform: scale(0.97);
-            box-shadow: 
-                0 1px 3px -1px rgba(0, 0, 0, 0.02),
-                inset 0 2px 0 0 rgba(255, 255, 255, 0.3);
+            box-shadow: 0 1px 3px -1px rgba(0, 0, 0, 0.02), inset 0 2px 0 0 rgba(255, 255, 255, 0.3);
         }
-
-        /* --- Sidebar Animation --- */
         .sidebar-container {
             position: fixed;
             top: 0;
@@ -82,11 +66,9 @@
             transform: translateX(110%);
             transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1);
         }
-
         .sidebar-container.open {
             transform: translateX(0);
         }
-
         .sidebar-overlay {
             position: fixed;
             inset: 0;
@@ -98,13 +80,10 @@
             pointer-events: none;
             transition: opacity 0.3s ease;
         }
-
         .sidebar-overlay.visible {
             opacity: 1;
             pointer-events: auto;
         }
-
-        /* --- Avatar & Frame Logic - MODIFIED --- */
         .avatar-wrapper {
             position: relative;
             width: 80px;
@@ -116,7 +95,6 @@
             border-radius: 50%;
             overflow: visible;
         }
-
         .avatar-img {
             width: 100%;
             height: 100%;
@@ -127,8 +105,6 @@
             position: relative;
             z-index: 1;
         }
-
-        /* إطار SVGA متحرك - تم التعديل: تكبير 4px، تحريك 3px شمال، نزول 4px */
         .svga-avatar-frame {
             position: absolute;
             width: calc(100% + 8px);
@@ -145,7 +121,6 @@
             animation: frameFloat 3s ease-in-out infinite;
             overflow: visible;
         }
-
         .svga-avatar-frame canvas {
             border-radius: 50%;
             object-fit: contain;
@@ -160,8 +135,6 @@
             min-width: 100% !important;
             min-height: 100% !important;
         }
-
-        /* إطار الصورة العادية - تم التعديل كذلك */
         .perfect-frame {
             position: absolute;
             width: calc(100% + 8px);
@@ -175,157 +148,56 @@
             border-radius: 50%;
             animation: frameFloat 3s ease-in-out infinite;
         }
-
         @keyframes frameFloat {
-            0%, 100% { 
-                transform: translate(-50%, -50%) scale(1); 
-            }
-            50% { 
-                transform: translate(-50%, -50%) scale(1.05); 
-            }
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.05); }
         }
-
-        /* --- Chat Bubble Styles --- */
-        .chat-bubble-me {
-            position: relative;
-            background: #1f2937;
-            color: white;
-            border-radius: 20px 4px 20px 20px;
-            margin-left: 50px;
-            min-height: 60px;
-            padding: 12px 16px 40px 16px;
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
         }
-
-        .chat-bubble-them {
-            position: relative;
-            background: white;
-            color: #1f2937;
-            border-radius: 4px 20px 20px 20px;
-            border: 1px solid rgba(0,0,0,0.05);
-            margin-right: 50px;
-            min-height: 60px;
-            padding: 12px 16px 40px 16px;
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .chat-sender-info {
-            position: absolute;
-            top: -45px;
-            right: 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            z-index: 5;
-        }
-
-        .chat-sender-info.me {
-            left: 0;
-            right: auto;
-        }
-
-        .sender-avatar-wrapper {
-            position: relative;
-            width: 32px;
-            height: 32px;
-        }
-
-        .sender-avatar {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .sender-badges {
-            display: flex;
-            gap: 2px;
-            margin-right: 8px;
-        }
-
-        .sender-badge {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .sender-name {
-            font-size: 11px;
-            font-weight: bold;
-            color: #374151;
-        }
-
-        .chat-timestamp {
-            position: absolute;
-            bottom: 8px;
-            left: 16px;
-            font-size: 10px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .chat-timestamp.them {
-            color: #6b7280;
-            right: 16px;
-            left: auto;
-        }
-
-        /* --- Gift Animation --- */
-        @keyframes giftFly {
-            0% { transform: translate(-50%, 100%) scale(0.5); opacity: 0; }
-            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(150%, -150%) scale(0.5); opacity: 0; }
-        }
-        .gift-animation {
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            z-index: 100;
-            pointer-events: none;
-            animation: giftFly 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        /* --- Hide Scrollbar --- */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* --- Banner Styles --- */
-        .banner-container {
-            height: 120px;
-            margin-top: 20px;
-        }
-
-        /* --- Header Icons --- */
-        .header-icon {
-            width: 32px;
-            height: 32px;
+        .svga-preview {
+            width: 100%;
+            height: 80px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.8);
+            overflow: hidden;
+        }
+        .svga-icon {
+            font-size: 10px;
+            background: #3b82f6;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 4px;
+        }
+        .small-icon {
+            width: 24px;
+            height: 24px;
+        }
+        .small-banner {
+            height: 120px !important;
         }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-100 selection:text-blue-900">
-
-    <!-- ================= MAIN APP ================= -->
     <div id="main-app" class="min-h-screen pb-24">
-        
         <!-- HEADER -->
         <header class="fixed top-0 left-0 right-0 h-20 z-30 px-6 flex items-center justify-between glass">
-            <div class="flex items-center gap-2">
-                <div class="header-icon">
-                    <i data-lucide="home" class="w-4 h-4 text-gray-700" id="homeIcon"></i>
-                </div>
-                <div class="header-icon hidden" id="friendsIcon">
-                    <i data-lucide="users" class="w-4 h-4 text-gray-700"></i>
-                </div>
-                <h2 id="pageTitle" class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">الرئيسية</h2>
+            <div class="flex items-center gap-3">
+                <img src="https://cdn-icons-png.flaticon.com/128/5968/5968764.png" class="w-8 h-8">
+                <h2 id="pageTitle" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">الرئيسية</h2>
             </div>
             <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition">
                 <i data-lucide="menu" class="text-black w-6 h-6"></i>
@@ -334,13 +206,18 @@
 
         <!-- VIEW CONTAINER -->
         <main class="pt-24 px-5">
-
             <!-- VIEW: HOME -->
             <div id="view-home" class="view-section fade-in">
-                <div id="homeBanner" class="w-full banner-container rounded-[28px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
+                <div id="homeBanner" class="w-full small-banner rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
                 <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
-                    <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
-                    <button id="btn-private" onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
+                    <button onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all flex items-center justify-center gap-2">
+                        <img src="https://cdn-icons-png.flaticon.com/128/1828/1828743.png" class="w-4 h-4">
+                        عامة
+                    </button>
+                    <button onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all flex items-center justify-center gap-2">
+                        <img src="https://cdn-icons-png.flaticon.com/128/1828/1828748.png" class="w-4 h-4">
+                        خاصة
+                    </button>
                 </div>
                 <div id="roomsGrid" class="space-y-3"></div>
             </div>
@@ -372,7 +249,7 @@
                     <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
                     <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
                     <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
-                    <button onclick="loadStoreItems('chatbubble')" id="store-tab-chatbubble" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">فقاعات</button>
+                    <button onclick="loadStoreItems('chatBubble')" id="store-tab-bubbles" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">فقاعات</button>
                 </div>
                 <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
             </div>
@@ -385,10 +262,10 @@
                 <div id="badgesBagGrid" class="badges-grid mb-8"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">رسوم متحركة</h3>
                 <div id="svgaBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">فقاعاتي</h3>
+                <div id="bubblesBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي النشطة</h3>
                 <div id="activeBadgesGrid" class="badges-grid mb-8"></div>
-                <h3 class="font-bold text-lg mb-4 text-gray-800">فقاعاتي</h3>
-                <div id="chatbubblesBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
             </div>
 
             <!-- VIEW: FRIENDS -->
@@ -412,7 +289,7 @@
         </main>
     </div>
 
-    <!-- ================= SIDEBAR ================= -->
+    <!-- SIDEBAR -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
     <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
         <div class="pt-12 px-6 flex justify-between items-start">
@@ -487,62 +364,7 @@
         </div>
     </aside>
 
-    <!-- ================= CHAT MODAL ================= -->
-    <div id="chatModal" class="fixed inset-0 z-[60] hidden flex flex-col bg-gray-50">
-        <header class="h-20 glass flex items-center px-6 justify-between">
-            <div class="flex items-center gap-3">
-                <button onclick="closeChat()" class="p-2 rounded-full hover:bg-gray-100"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
-                <div class="flex items-center gap-2">
-                    <div class="avatar-wrapper" style="width: 40px; height: 40px;">
-                        <img id="chatUserAvatar" src="" class="avatar-img">
-                        <div id="chatUserSvgaFrame" class="svga-avatar-frame" style="width: calc(100% + 8px); height: calc(100% + 8px);"></div>
-                        <img id="chatUserFrame" src="" class="perfect-frame hidden" style="width: calc(100% + 8px); height: calc(100% + 8px);">
-                    </div>
-                    <div>
-                        <h4 id="chatUserName" class="font-bold text-sm">...</h4>
-                        <div class="flex items-center gap-1">
-                            <div class="w-4 h-4 flex items-center justify-center">
-                                <img id="chatUserMagicLevel" src="" class="w-3 h-3 object-contain">
-                            </div>
-                            <div class="w-4 h-4 flex items-center justify-center">
-                                <img id="chatUserWealthLevel" src="" class="w-3 h-3 object-contain">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="flex gap-2">
-                <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
-                <button onclick="unfollowInChat()" id="unfollowBtn" class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 hidden"><i data-lucide="user-x" class="w-5 h-5"></i></button>
-                <button onclick="blockUserInChat()" id="blockBtn" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i data-lucide="shield-off" class="w-5 h-5"></i></button>
-            </div>
-        </header>
-        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar"></div>
-        <div class="p-4 glass flex gap-2 items-center">
-            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." class="flex-1 p-4 rounded-2xl bg-white border-0 focus:ring-0 text-sm">
-            <button onclick="sendMessage()" class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg"><i data-lucide="send" class="w-5 h-5"></i></button>
-        </div>
-    </div>
-
-    <!-- ================= GIFT BOX ================= -->
-    <div id="giftBox" class="fixed inset-0 z-[70] hidden">
-        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="toggleGiftBox()"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[40px] h-[45vh] flex flex-col overflow-hidden shadow-2xl">
-            <div class="p-6 flex justify-between items-center border-b border-gray-100">
-                <div class="flex gap-4">
-                    <button onclick="switchGiftTab('fixed')" id="tab-fixed" class="font-bold text-black border-b-2 border-black pb-1">هدايا ثابتة</button>
-                    <button onclick="switchGiftTab('luck')" id="tab-luck" class="font-bold text-gray-400 pb-1">هدايا الحظ</button>
-                </div>
-                <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
-                    <i data-lucide="coins" class="w-3 h-3 text-yellow-600"></i>
-                    <span id="giftWalletBalance" class="text-xs font-bold text-yellow-700">0</span>
-                </div>
-            </div>
-            <div id="giftGrid" class="flex-1 overflow-y-auto p-6 grid grid-cols-4 gap-4 no-scrollbar"></div>
-        </div>
-    </div>
-
-    <!-- ================= EDIT MODAL ================= -->
+    <!-- EDIT MODAL -->
     <div id="editModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
         <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeEditModal()"></div>
         <div class="relative w-full max-w-sm glass-deep rounded-[40px] p-6 shadow-2xl fade-in">
@@ -564,12 +386,10 @@
         </div>
     </div>
 
-    <!-- ================= SCRIPTS ================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
@@ -584,7 +404,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const rtdb = getDatabase(app);
 
         let userData = {};
         let storeData = { 
@@ -593,102 +412,55 @@
             gifts: [], 
             luckGifts: [], 
             magicLevels: {}, 
-            wealthLevels: {},
-            chatBubbles: []
+            wealthLevels: {} 
         };
-        let currentChatFriend = null;
-        let chatUnsubscribe = null;
         let activeSvgaPlayers = {};
-        let activeChatBubble = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // البحث عن المستخدم في Firestore باستخدام email
                 const q = query(collection(db, "users"), where("email", "==", user.email));
                 const querySnapshot = await getDocs(q);
                 
-                if (!querySnapshot.empty) {
+                if (querySnapshot.empty) {
+                    const newUserRef = doc(collection(db, "users"));
+                    await setDoc(newUserRef, {
+                        uid: user.uid,
+                        email: user.email,
+                        displayName: user.displayName || "مستخدم",
+                        photoURL: user.photoURL || 'https://via.placeholder.com/150',
+                        balance: 0,
+                        magicLevel: 1,
+                        wealthLevel: 1,
+                        purchasedFrames: [],
+                        purchasedBadges: [],
+                        purchasedSvga: [],
+                        purchasedChatBubbles: [],
+                        activeFrame: null,
+                        activeChatBubble: null,
+                        activeBadges: [],
+                        friends: [],
+                        friendRequests: [],
+                        sentRequests: [],
+                        activeFrameExpiry: null,
+                        activeBadgesExpiry: {},
+                        activeBubbleExpiry: null,
+                        createdAt: new Date()
+                    });
+                    userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
+                } else {
                     const userDoc = querySnapshot.docs[0];
                     userData = { uid: userDoc.id, ...userDoc.data() };
-                    
-                    onSnapshot(doc(db, "users", userDoc.id), async (docSnap) => {
-                        if (docSnap.exists()) {
-                            userData = { uid: docSnap.id, ...docSnap.data() };
-                            await updateUI();
-                            await loadFriendRequests();
-                            await loadFriends();
-                        }
-                    });
-                } else {
-                    const rtdbRef = ref(rtdb, `users/${user.uid}`);
-                    
-                    onValue(rtdbRef, async (snapshot) => {
-                        if (snapshot.exists()) {
-                            const oldData = snapshot.val();
-                            
-                            const newUserRef = doc(collection(db, "users"));
-                            await setDoc(newUserRef, {
-                                uid: user.uid,
-                                email: user.email,
-                                displayName: user.displayName || oldData.displayName || "مستخدم",
-                                photoURL: user.photoURL || oldData.photoURL || 'https://via.placeholder.com/150',
-                                balance: oldData.balance || 0,
-                                magicLevel: oldData.magicLevel || 1,
-                                wealthLevel: oldData.wealthLevel || 1,
-                                purchasedFrames: oldData.purchasedFrames || [],
-                                purchasedBadges: oldData.purchasedBadges || [],
-                                purchasedSvga: oldData.purchasedSvga || [],
-                                purchasedChatBubbles: oldData.purchasedChatBubbles || [],
-                                activeFrame: oldData.activeFrame || null,
-                                activeBadges: oldData.activeBadges || [],
-                                activeChatBubble: oldData.activeChatBubble || null,
-                                friends: oldData.friends || [],
-                                friendRequests: oldData.friendRequests || [],
-                                sentRequests: oldData.sentRequests || [],
-                                blockedUsers: oldData.blockedUsers || [],
-                                createdAt: serverTimestamp()
-                            });
-                            
-                            await set(rtdbRef, null);
-                            
-                            userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
-                        } else {
-                            const newUserRef = doc(collection(db, "users"));
-                            await setDoc(newUserRef, {
-                                uid: user.uid,
-                                email: user.email,
-                                displayName: user.displayName || "مستخدم",
-                                photoURL: user.photoURL || 'https://via.placeholder.com/150',
-                                balance: 0,
-                                magicLevel: 1,
-                                wealthLevel: 1,
-                                purchasedFrames: [],
-                                purchasedBadges: [],
-                                purchasedSvga: [],
-                                purchasedChatBubbles: [],
-                                activeFrame: null,
-                                activeBadges: [],
-                                activeChatBubble: null,
-                                friends: [],
-                                friendRequests: [],
-                                sentRequests: [],
-                                blockedUsers: [],
-                                createdAt: serverTimestamp()
-                            });
-                            
-                            userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
-                        }
-                        
-                        onSnapshot(doc(db, "users", userData.uid), async (docSnap) => {
-                            if (docSnap.exists()) {
-                                userData = { uid: docSnap.id, ...docSnap.data() };
-                                await updateUI();
-                                await loadFriendRequests();
-                                await loadFriends();
-                            }
-                        });
-                    }, { onlyOnce: true });
                 }
+                
+                onSnapshot(doc(db, "users", userData.uid), async (docSnap) => {
+                    if (docSnap.exists()) {
+                        userData = { uid: docSnap.id, ...docSnap.data() };
+                        checkExpiredItems();
+                        await updateUI();
+                        await loadFriendRequests();
+                        await loadFriends();
+                    }
+                });
                 
                 await loadBanner();
                 await loadGlobalData();
@@ -697,6 +469,45 @@
                 window.location.href = "index.html";
             }
         });
+
+        async function checkExpiredItems() {
+            const now = new Date();
+            const updates = {};
+            
+            // Check frame expiry
+            if (userData.activeFrameExpiry && new Date(userData.activeFrameExpiry) < now) {
+                updates.activeFrame = null;
+                updates.activeFrameExpiry = null;
+            }
+            
+            // Check bubble expiry
+            if (userData.activeBubbleExpiry && new Date(userData.activeBubbleExpiry) < now) {
+                updates.activeChatBubble = null;
+                updates.activeBubbleExpiry = null;
+            }
+            
+            // Check badges expiry
+            const activeBadgesExpiry = userData.activeBadgesExpiry || {};
+            const activeBadges = userData.activeBadges || [];
+            const newActiveBadges = [];
+            const newExpiry = {};
+            
+            for (const badgeId of activeBadges) {
+                if (activeBadgesExpiry[badgeId] && new Date(activeBadgesExpiry[badgeId]) >= now) {
+                    newActiveBadges.push(badgeId);
+                    newExpiry[badgeId] = activeBadgesExpiry[badgeId];
+                }
+            }
+            
+            if (newActiveBadges.length !== activeBadges.length) {
+                updates.activeBadges = newActiveBadges;
+                updates.activeBadgesExpiry = newExpiry;
+            }
+            
+            if (Object.keys(updates).length > 0) {
+                await updateDoc(doc(db, "users", userData.uid), updates);
+            }
+        }
 
         async function loadGlobalData() {
             const storeSnap = await getDocs(collection(db, "storeItems"));
@@ -719,9 +530,6 @@
             const wlSnap = await getDocs(collection(db, "wealthLevels"));
             wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
             
-            const cbSnap = await getDocs(collection(db, "chatBubbles"));
-            storeData.chatBubbles = cbSnap.docs.map(d => ({id: d.id, ...d.data()}));
-            
             await updateUI();
         }
 
@@ -732,7 +540,6 @@
             document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
-            document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
             
             const ml = userData.magicLevel || 1;
             const wl = userData.wealthLevel || 1;
@@ -768,8 +575,6 @@
                         frameEl.src = item.image;
                         frameEl.classList.remove('hidden');
                     }
-                } else {
-                    await updateDoc(doc(db, "users", userData.uid), { activeFrame: null });
                 }
             }
 
@@ -779,21 +584,19 @@
                 userData.activeBadges.forEach(badgeId => {
                     const badge = storeData.itemsById[badgeId];
                     if (badge && badge.type === 'badge') {
-                        if (badge.itemType === 'svga') {
-                            const badgeContainer = document.createElement('div');
-                            badgeContainer.className = 'flex items-center justify-center w-8 h-8';
-                            badgeContainer.id = `badge-${badgeId}`;
-                            sidebarBadges.appendChild(badgeContainer);
-                            playSvga(badge.fileUrl, badgeContainer, { 
-                                loops: 1, 
-                                clearsAfterStop: false 
-                            });
-                        } else {
-                            sidebarBadges.innerHTML += `
-                                <div class="flex items-center justify-center">
-                                    <img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">
-                                </div>
-                            `;
+                        sidebarBadges.innerHTML += `
+                            <div class="flex items-center justify-center">
+                                ${badge.itemType === 'svga' ? 
+                                    `<div id="badge-${badgeId}" class="w-8 h-8"></div>` :
+                                    `<img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}">`
+                                }
+                            </div>`;
+                        
+                        if (badge.itemType === 'svga' && badge.fileUrl) {
+                            setTimeout(() => {
+                                const container = document.getElementById(`badge-${badgeId}`);
+                                if (container) playSvga(badge.fileUrl, container, { loops: 1 });
+                            }, 100);
                         }
                     }
                 });
@@ -803,25 +606,16 @@
         function playSvga(url, container, options = {}) {
             try {
                 container.innerHTML = '';
-                
                 const player = new SVGA.Player(container);
                 const parser = new SVGA.Parser();
-                
                 parser.load(url, (videoItem) => {
                     player.setVideoItem(videoItem);
                     player.loops = options.loops || 0;
                     player.clearsAfterStop = options.clearsAfterStop || false;
                     player.startAnimation();
-                    
-                    const id = 'player_' + Date.now();
-                    activeSvgaPlayers[id] = { player, container };
-                    container.dataset.playerId = id;
-                }, (error) => {
-                    console.error('SVGA load error:', error);
-                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
                 });
             } catch (error) {
-                console.error('SVGA player error:', error);
+                console.error('SVGA error:', error);
                 container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
             }
         }
@@ -829,45 +623,16 @@
         function playPerfectSvga(url, container, options = {}) {
             try {
                 container.innerHTML = '';
-                
                 const player = new SVGA.Player(container);
                 const parser = new SVGA.Parser();
-                
                 parser.load(url, (videoItem) => {
                     player.setVideoItem(videoItem);
                     player.loops = options.loops || 0;
                     player.clearsAfterStop = options.clearsAfterStop || false;
-                    
                     player.startAnimation();
-                    
-                    setTimeout(() => {
-                        const canvas = container.querySelector('canvas');
-                        if (canvas) {
-                            canvas.style.width = '100%';
-                            canvas.style.height = '100%';
-                            canvas.style.objectFit = 'contain';
-                            canvas.style.borderRadius = '50%';
-                            canvas.style.position = 'absolute';
-                            canvas.style.top = '50%';
-                            canvas.style.left = '50%';
-                            canvas.style.transform = 'translate(-50%, -50%)';
-                            canvas.style.maxWidth = '100%';
-                            canvas.style.maxHeight = '100%';
-                            canvas.style.minWidth = '100%';
-                            canvas.style.minHeight = '100%';
-                            canvas.style.display = 'block';
-                        }
-                    }, 50);
-                    
-                    const id = 'player_' + Date.now();
-                    activeSvgaPlayers[id] = { player, container };
-                    container.dataset.playerId = id;
-                }, (error) => {
-                    console.error('SVGA load error:', error);
-                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
                 });
             } catch (error) {
-                console.error('SVGA player error:', error);
+                console.error('SVGA error:', error);
                 container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
             }
         }
@@ -876,39 +641,30 @@
             const grid = document.getElementById('storeGrid');
             grid.innerHTML = '';
             
-            let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
+            let items = storeData.items.filter(item => item.type === type);
             
-            document.getElementById('store-tab-frames').className = type === 'frame' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
-            document.getElementById('store-tab-badges').className = type === 'badge' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
-            document.getElementById('store-tab-svga').className = type === 'svga' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
-            document.getElementById('store-tab-chatbubble').className = type === 'chatbubble' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            ['frames','badges','svga','bubbles'].forEach(tab => {
+                const btn = document.getElementById(`store-tab-${tab}`);
+                if (btn) btn.className = type === tab ? 
+                    'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 
+                    'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            });
 
             items.forEach(item => {
                 let field = '';
-                if (type === 'frame') field = 'purchasedFrames';
-                else if (type === 'badge') field = 'purchasedBadges';
-                else if (type === 'svga') field = 'purchasedSvga';
-                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
+                if (item.type === 'frame') field = 'purchasedFrames';
+                else if (item.type === 'badge') field = 'purchasedBadges';
+                else if (item.type === 'svga') field = 'purchasedSvga';
+                else if (item.type === 'chatBubble') field = 'purchasedChatBubbles';
                 
                 const owned = userData[field]?.some(i => i.id === item.id);
+                const isActive = (item.type === 'frame' && userData.activeFrame === item.id) || 
+                                (item.type === 'chatBubble' && userData.activeChatBubble === item.id);
                 
                 let previewHTML = '';
                 let extraTag = '';
                 
-                if (type === 'chatbubble') {
-                    previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
-                    if (item.fileUrl) {
-                        setTimeout(() => {
-                            const container = document.getElementById(`preview-cb-${item.id}`);
-                            if (container) {
-                                playSvga(item.fileUrl, container, { 
-                                    loops: 1, 
-                                    clearsAfterStop: true 
-                                });
-                            }
-                        }, 100);
-                    }
-                } else if (item.itemType === 'svga') {
+                if (item.itemType === 'svga') {
                     previewHTML = `<div class="svga-preview mb-2" id="preview-${item.id}"></div>`;
                     extraTag = '<span class="svga-icon">SVGA</span>';
                 } else {
@@ -920,21 +676,17 @@
                         ${previewHTML}
                         <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
                         ${extraTag}
-                        <button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" 
-                                class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl mt-2">
-                            ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
+                        ${item.duration ? `<span class="text-[10px] text-gray-500">${item.duration} ساعة</span>` : ''}
+                        <button onclick="${owned ? (isActive ? '' : `equipItem('${item.type}', '${item.id}')`) : `buyItem('${item.type}', '${item.id}', ${item.price})`}" 
+                                class="w-full py-2 ${owned ? (isActive ? 'bg-green-100 text-green-700' : 'bg-black text-white') : 'bg-black text-white'} text-xs font-bold rounded-xl mt-2">
+                            ${isActive ? 'مفعل ✓' : owned ? 'تفعيل' : `${item.price} 💰 شراء`}
                         </button>
                     </div>`;
                 
-                if (item.itemType === 'svga' && item.fileUrl && type !== 'chatbubble') {
+                if (item.itemType === 'svga' && item.fileUrl) {
                     setTimeout(() => {
                         const previewContainer = document.getElementById(`preview-${item.id}`);
-                        if (previewContainer) {
-                            playSvga(item.fileUrl, previewContainer, { 
-                                loops: 1, 
-                                clearsAfterStop: true 
-                            });
-                        }
+                        if (previewContainer) playSvga(item.fileUrl, previewContainer, { loops: 1 });
                     }, 100);
                 }
             });
@@ -955,74 +707,94 @@
             if (type === 'frame') field = 'purchasedFrames';
             else if (type === 'badge') field = 'purchasedBadges';
             else if (type === 'svga') field = 'purchasedSvga';
-            else if (type === 'chatbubble') field = 'purchasedChatBubbles';
+            else if (type === 'chatBubble') field = 'purchasedChatBubbles';
             
             await updateDoc(doc(db, "users", userData.uid), {
                 balance: increment(-price),
                 [field]: arrayUnion({ 
                     id: id, 
                     purchasedAt: new Date(),
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 ساعة
+                    itemType: storeData.itemsById[id]?.itemType || 'image'
                 })
             });
             
             loadStoreItems(type);
         };
 
-        window.loadBagItems = async () => {
-            const fGrid = document.getElementById('bagGrid');
-            const bGrid = document.getElementById('badgesBagGrid');
-            const sGrid = document.getElementById('svgaBagGrid');
-            const aGrid = document.getElementById('activeBadgesGrid');
-            const cbGrid = document.getElementById('chatbubblesBagGrid');
+        window.equipItem = async (type, id) => {
+            const item = storeData.itemsById[id];
+            if (!item) return;
             
-            fGrid.innerHTML = ''; 
-            bGrid.innerHTML = '';
-            sGrid.innerHTML = '';
-            aGrid.innerHTML = '';
-            cbGrid.innerHTML = '';
+            const updates = {};
+            const now = new Date();
+            const expiry = new Date(now.getTime() + (item.duration || 24) * 60 * 60 * 1000);
+            
+            if (type === 'frame') {
+                updates.activeFrame = id;
+                updates.activeFrameExpiry = expiry;
+            } else if (type === 'chatBubble') {
+                updates.activeChatBubble = id;
+                updates.activeBubbleExpiry = expiry;
+            } else if (type === 'badge') {
+                const activeBadges = [...(userData.activeBadges || [])];
+                if (!activeBadges.includes(id)) {
+                    activeBadges.push(id);
+                    updates.activeBadges = activeBadges;
+                    updates.activeBadgesExpiry = {
+                        ...(userData.activeBadgesExpiry || {}),
+                        [id]: expiry
+                    };
+                }
+            }
+            
+            await updateDoc(doc(db, "users", userData.uid), updates);
+            loadStoreItems(type);
+            if (type === 'frame' || type === 'badge') {
+                loadBagItems();
+                setTimeout(() => updateUI(), 100);
+            }
+        };
+
+        window.loadBagItems = async () => {
+            ['bagGrid','badgesBagGrid','svgaBagGrid','bubblesBagGrid','activeBadgesGrid'].forEach(id => {
+                document.getElementById(id).innerHTML = '';
+            });
             
             const frames = userData.purchasedFrames || [];
-            for (const f of frames) {
+            frames.forEach(f => {
                 const item = storeData.itemsById[f.id];
                 if (item && item.type === 'frame') {
                     const isEquipped = userData.activeFrame === f.id;
+                    const expiry = userData.activeFrameExpiry;
+                    const timeLeft = expiry ? Math.max(0, Math.ceil((new Date(expiry) - new Date()) / (1000 * 60 * 60))) : 0;
                     
-                    if (item.itemType === 'svga') {
-                        fGrid.innerHTML += `
-                            <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                                <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}">
-                                    <span class="text-xs font-bold text-gray-600">SVGA</span>
-                                </div>
-                                ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
-                            </div>`;
-                        
+                    document.getElementById('bagGrid').innerHTML += `
+                        <div onclick="equipItem('frame', '${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                            ${item.itemType === 'svga' ? 
+                                `<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}"></div>` :
+                                `<img src="${item.image}" class="w-12 h-12 object-contain rounded-full">`
+                            }
+                            ${isEquipped ? `<p class="text-xs mt-1 text-green-600 font-bold">✓ ${timeLeft}س</p>` : ''}
+                        </div>`;
+                    
+                    if (item.itemType === 'svga' && item.fileUrl) {
                         setTimeout(() => {
                             const container = document.getElementById(`bag-frame-${f.id}`);
-                            if (container) {
-                                playSvga(item.fileUrl, container, { 
-                                    loops: 1, 
-                                    clearsAfterStop: false 
-                                });
-                            }
+                            if (container) playSvga(item.fileUrl, container, { loops: 1 });
                         }, 100);
-                    } else {
-                        fGrid.innerHTML += `
-                            <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                                <img src="${item.image}" class="w-12 h-12 object-contain rounded-full">
-                                ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
-                            </div>`;
                     }
                 }
-            }
+            });
 
             const badges = userData.purchasedBadges || [];
-            for (const b of badges) {
+            badges.forEach(b => {
                 const item = storeData.itemsById[b.id];
                 if (item && item.type === 'badge') {
                     const isActive = userData.activeBadges?.includes(b.id);
+                    const expiry = userData.activeBadgesExpiry?.[b.id];
+                    const timeLeft = expiry ? Math.max(0, Math.ceil((new Date(expiry) - new Date()) / (1000 * 60 * 60))) : 0;
                     
-                    bGrid.innerHTML += `
+                    document.getElementById('badgesBagGrid').innerHTML += `
                         <div onclick="toggleBadge('${b.id}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
                             <div class="w-8 h-8 flex items-center justify-center" id="bag-badge-${b.id}">
                                 ${item.itemType === 'svga' ? 
@@ -1030,141 +802,87 @@
                                     `<img src="${item.image}" class="w-full h-full object-contain">`
                                 }
                             </div>
+                            ${isActive ? `<span class="text-[6px] absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-3 h-3 flex items-center justify-center">${timeLeft}</span>` : ''}
                         </div>`;
                     
                     if (item.itemType === 'svga' && item.fileUrl) {
                         setTimeout(() => {
                             const container = document.getElementById(`bag-badge-${b.id}`);
-                            if (container) {
-                                playSvga(item.fileUrl, container, { 
-                                    loops: 1, 
-                                    clearsAfterStop: false 
-                                });
-                            }
+                            if (container) playSvga(item.fileUrl, container, { loops: 1 });
                         }, 100);
                     }
                 }
-            }
+            });
 
             const svgaItems = userData.purchasedSvga || [];
-            for (const s of svgaItems) {
+            svgaItems.forEach(s => {
                 const item = storeData.itemsById[s.id];
                 if (item && item.type === 'svga') {
-                    const isEquipped = userData.activeFrame === s.id;
-                    
-                    sGrid.innerHTML += `
-                        <div onclick="equipSvga('${s.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
-                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-svga-${s.id}">
-                                <span class="text-xs font-bold text-gray-600">SVGA</span>
-                            </div>
+                    document.getElementById('svgaBagGrid').innerHTML += `
+                        <div class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-svga-${s.id}"></div>
                             <p class="text-xs text-center truncate w-full">${item.name}</p>
-                            ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                         </div>`;
                     
                     setTimeout(() => {
                         const container = document.getElementById(`bag-svga-${s.id}`);
-                        if (container) {
-                            playSvga(item.fileUrl, container, { 
-                                loops: 1, 
-                                clearsAfterStop: false 
-                            });
-                        }
+                        if (container) playSvga(item.fileUrl, container, { loops: 1 });
                     }, 100);
                 }
-            }
+            });
+
+            const bubbles = userData.purchasedChatBubbles || [];
+            bubbles.forEach(b => {
+                const item = storeData.itemsById[b.id];
+                if (item && item.type === 'chatBubble') {
+                    const isEquipped = userData.activeChatBubble === b.id;
+                    const expiry = userData.activeBubbleExpiry;
+                    const timeLeft = expiry ? Math.max(0, Math.ceil((new Date(expiry) - new Date()) / (1000 * 60 * 60))) : 0;
+                    
+                    document.getElementById('bubblesBagGrid').innerHTML += `
+                        <div onclick="equipItem('chatBubble', '${b.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
+                            ${item.itemType === 'svga' ? 
+                                `<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-bubble-${b.id}"></div>` :
+                                `<img src="${item.image}" class="w-12 h-12 object-contain rounded-full">`
+                            }
+                            ${isEquipped ? `<p class="text-xs mt-1 text-green-600 font-bold">✓ ${timeLeft}س</p>` : ''}
+                        </div>`;
+                    
+                    if (item.itemType === 'svga' && item.fileUrl) {
+                        setTimeout(() => {
+                            const container = document.getElementById(`bag-bubble-${b.id}`);
+                            if (container) playSvga(item.fileUrl, container, { loops: 1 });
+                        }, 100);
+                    }
+                }
+            });
 
             const activeBadges = userData.activeBadges || [];
-            for (const badgeId of activeBadges) {
+            activeBadges.forEach(badgeId => {
                 const item = storeData.itemsById[badgeId];
                 if (item && item.type === 'badge') {
-                    aGrid.innerHTML += `
-                        <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white">
+                    const expiry = userData.activeBadgesExpiry?.[badgeId];
+                    const timeLeft = expiry ? Math.max(0, Math.ceil((new Date(expiry) - new Date()) / (1000 * 60 * 60))) : 0;
+                    
+                    document.getElementById('activeBadgesGrid').innerHTML += `
+                        <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white relative">
                             <div class="w-8 h-8 flex items-center justify-center" id="active-badge-${badgeId}">
                                 ${item.itemType === 'svga' ? 
                                     '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : 
                                     `<img src="${item.image}" class="w-full h-full object-contain">`
                                 }
                             </div>
+                            <span class="text-[6px] absolute -top-1 -right-1 bg-green-500 text-white rounded-full w-3 h-3 flex items-center justify-center">${timeLeft}</span>
                         </div>`;
                     
                     if (item.itemType === 'svga' && item.fileUrl) {
                         setTimeout(() => {
                             const container = document.getElementById(`active-badge-${badgeId}`);
-                            if (container) {
-                                playSvga(item.fileUrl, container, { 
-                                    loops: 1, 
-                                    clearsAfterStop: false 
-                                });
-                            }
+                            if (container) playSvga(item.fileUrl, container, { loops: 1 });
                         }, 100);
                     }
                 }
-            }
-
-            const chatBubbles = userData.purchasedChatBubbles || [];
-            for (const cb of chatBubbles) {
-                const bubble = storeData.chatBubbles.find(b => b.id === cb.id);
-                if (bubble) {
-                    const isActive = userData.activeChatBubble === cb.id;
-                    
-                    cbGrid.innerHTML += `
-                        <div onclick="equipChatBubble('${cb.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
-                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-cb-${cb.id}">
-                                <span class="text-xs font-bold text-gray-600">فقاعة</span>
-                            </div>
-                            <p class="text-xs text-center truncate w-full">${bubble.name}</p>
-                            ${isActive ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
-                        </div>`;
-                    
-                    if (bubble.fileUrl) {
-                        setTimeout(() => {
-                            const container = document.getElementById(`bag-cb-${cb.id}`);
-                            if (container) {
-                                playSvga(bubble.fileUrl, container, { 
-                                    loops: 1, 
-                                    clearsAfterStop: false 
-                                });
-                            }
-                        }, 100);
-                    }
-                }
-            }
-        };
-
-        window.equipFrame = async (id) => {
-            const item = storeData.itemsById[id];
-            if (!item) return;
-            
-            const newFrame = userData.activeFrame === id ? null : id;
-            await updateDoc(doc(db, "users", userData.uid), { 
-                activeFrame: newFrame 
             });
-            
-            loadBagItems();
-            setTimeout(() => updateUI(), 100);
-        };
-
-        window.equipSvga = async (id) => {
-            const item = storeData.itemsById[id];
-            if (!item || item.type !== 'svga') return;
-            
-            const newFrame = userData.activeFrame === id ? null : id;
-            await updateDoc(doc(db, "users", userData.uid), { 
-                activeFrame: newFrame 
-            });
-            
-            loadBagItems();
-            setTimeout(() => updateUI(), 100);
-        };
-
-        window.equipChatBubble = async (id) => {
-            const newBubble = userData.activeChatBubble === id ? null : id;
-            await updateDoc(doc(db, "users", userData.uid), { 
-                activeChatBubble: newBubble 
-            });
-            
-            activeChatBubble = newBubble ? storeData.chatBubbles.find(b => b.id === id) : null;
-            loadBagItems();
         };
 
         window.toggleBadge = async (id) => {
@@ -1172,12 +890,26 @@
             if (!item || item.type !== 'badge') return;
             
             const isActive = userData.activeBadges?.includes(id);
-            await updateDoc(doc(db, "users", userData.uid), {
-                activeBadges: isActive ? arrayRemove(id) : arrayUnion(id)
-            });
+            const updates = {};
+            const now = new Date();
+            const expiry = new Date(now.getTime() + (item.duration || 24) * 60 * 60 * 1000);
             
+            if (isActive) {
+                updates.activeBadges = arrayRemove(id);
+                const expiryObj = { ...(userData.activeBadgesExpiry || {}) };
+                delete expiryObj[id];
+                updates.activeBadgesExpiry = expiryObj;
+            } else {
+                updates.activeBadges = arrayUnion(id);
+                updates.activeBadgesExpiry = {
+                    ...(userData.activeBadgesExpiry || {}),
+                    [id]: expiry
+                };
+            }
+            
+            await updateDoc(doc(db, "users", userData.uid), updates);
             loadBagItems();
-            await updateUI();
+            setTimeout(() => updateUI(), 100);
         };
 
         window.searchUser = async () => {
@@ -1185,15 +917,8 @@
             if (!email) return;
             
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('يرجى إدخال بريد إلكتروني صحيح');
-                return;
-            }
-            
-            if (email === userData.email?.toLowerCase()) {
-                alert('لا يمكنك البحث عن نفسك');
-                return;
-            }
+            if (!emailRegex.test(email)) return alert('يرجى إدخال بريد إلكتروني صحيح');
+            if (email === userData.email?.toLowerCase()) return alert('لا يمكنك البحث عن نفسك');
             
             const q = query(collection(db, "users"), where("email", "==", email));
             const snap = await getDocs(q);
@@ -1206,8 +931,7 @@
                 container.innerHTML = `
                     <div class="text-center p-6">
                         <i data-lucide="user-x" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
-                        <p class="text-gray-400 text-sm mb-2">لم يتم العثور على مستخدم بهذا البريد</p>
-                        <p class="text-xs text-gray-300">تأكد من كتابة البريد الإلكتروني بشكل صحيح</p>
+                        <p class="text-gray-400 text-sm mb-2">لم يتم العثور على مستخدم</p>
                     </div>`;
                 lucide.createIcons();
             } else {
@@ -1286,7 +1010,7 @@
                         </div>
                         
                         <button onclick="${buttonAction}" 
-                                class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl ${buttonClass} font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl ${buttonClass} font-bold text-sm transition-all">
                             <i data-lucide="${buttonIcon}" class="w-4 h-4"></i>
                             ${buttonText}
                         </button>
@@ -1299,10 +1023,7 @@
                         const frameItem = storeData.itemsById[user.activeFrame];
                         const frameContainer = document.getElementById(`search-frame-${userUid}`);
                         if (frameContainer && frameItem?.fileUrl) {
-                            playPerfectSvga(frameItem.fileUrl, frameContainer, { 
-                                loops: 0, 
-                                clearsAfterStop: false 
-                            });
+                            playPerfectSvga(frameItem.fileUrl, frameContainer, { loops: 0 });
                         }
                     }, 100);
                 }
@@ -1313,11 +1034,9 @@
             await updateDoc(doc(db, "users", userData.uid), {
                 sentRequests: arrayUnion(uid)
             });
-            
             await updateDoc(doc(db, "users", uid), {
                 friendRequests: arrayUnion(userData.uid)
             });
-            
             searchUser();
             loadFriendRequests();
         };
@@ -1326,11 +1045,9 @@
             await updateDoc(doc(db, "users", userData.uid), {
                 sentRequests: arrayRemove(uid)
             });
-            
             await updateDoc(doc(db, "users", uid), {
                 friendRequests: arrayRemove(userData.uid)
             });
-            
             searchUser();
             loadFriendRequests();
         };
@@ -1340,12 +1057,10 @@
                 friendRequests: arrayRemove(uid),
                 friends: arrayUnion(uid)
             });
-            
             await updateDoc(doc(db, "users", uid), {
                 sentRequests: arrayRemove(userData.uid),
                 friends: arrayUnion(userData.uid)
             });
-            
             searchUser();
             loadFriendRequests();
             loadFriends();
@@ -1355,11 +1070,9 @@
             await updateDoc(doc(db, "users", userData.uid), {
                 friends: arrayRemove(uid)
             });
-            
             await updateDoc(doc(db, "users", uid), {
                 friends: arrayRemove(userData.uid)
             });
-            
             searchUser();
             loadFriends();
         };
@@ -1401,11 +1114,9 @@
             await updateDoc(doc(db, "users", userData.uid), {
                 friendRequests: arrayRemove(uid)
             });
-            
             await updateDoc(doc(db, "users", uid), {
                 sentRequests: arrayRemove(userData.uid)
             });
-            
             loadFriendRequests();
         };
 
@@ -1438,325 +1149,9 @@
             lucide.createIcons();
         }
 
-        window.openChat = async (uid) => {
-            const snap = await getDoc(doc(db, "users", uid));
-            currentChatFriend = { uid, ...snap.data() };
-            
-            document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
-            document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
-            
-            const magicLevel = currentChatFriend.magicLevel || 1;
-            const wealthLevel = currentChatFriend.wealthLevel || 1;
-            const magicLevelImg = document.getElementById('chatUserMagicLevel');
-            const wealthLevelImg = document.getElementById('chatUserWealthLevel');
-            
-            if (storeData.magicLevels[magicLevel]) {
-                magicLevelImg.src = storeData.magicLevels[magicLevel].image;
-            }
-            if (storeData.wealthLevels[wealthLevel]) {
-                wealthLevelImg.src = storeData.wealthLevels[wealthLevel].image;
-            }
-            
-            const frameEl = document.getElementById('chatUserFrame');
-            const svgaContainer = document.getElementById('chatUserSvgaFrame');
-            
-            frameEl.classList.add('hidden');
-            svgaContainer.classList.add('hidden');
-            svgaContainer.innerHTML = '';
-            
-            if (currentChatFriend.activeFrame) {
-                const item = storeData.itemsById[currentChatFriend.activeFrame];
-                if (item) {
-                    if (item.itemType === 'svga') {
-                        svgaContainer.classList.remove('hidden');
-                        playPerfectSvga(item.fileUrl, svgaContainer, { 
-                            loops: 0, 
-                            clearsAfterStop: false 
-                        });
-                    } else {
-                        frameEl.src = item.image;
-                        frameEl.classList.remove('hidden');
-                    }
-                }
-            }
-            
-            const isFollowing = userData.friends?.includes(uid);
-            const unfollowBtn = document.getElementById('unfollowBtn');
-            if (isFollowing) {
-                unfollowBtn.classList.remove('hidden');
-            } else {
-                unfollowBtn.classList.add('hidden');
-            }
-            
-            document.getElementById('chatModal').classList.remove('hidden');
-            document.getElementById('homeIcon').classList.add('hidden');
-            document.getElementById('friendsIcon').classList.remove('hidden');
-            
-            const chatId = [userData.uid, uid].sort().join('_');
-            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
-            
-            if (chatUnsubscribe) chatUnsubscribe();
-            
-            chatUnsubscribe = onValue(chatRef, (snapshot) => {
-                const messages = snapshot.val();
-                const container = document.getElementById('chatMessages');
-                container.innerHTML = '';
-                
-                if (messages) {
-                    Object.values(messages)
-                        .sort((a, b) => a.timestamp - b.timestamp)
-                        .forEach(msg => {
-                            const isMe = msg.senderId === userData.uid;
-                            const senderId = isMe ? userData.uid : currentChatFriend.uid;
-                            const senderData = isMe ? userData : currentChatFriend;
-                            
-                            if (msg.type === 'gift') {
-                                container.innerHTML += `
-                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
-                                        <div class="gift-message max-w-[80%]">
-                                            <div class="gift-message-icon">
-                                                <img src="${msg.giftImage}" class="w-full h-full object-contain">
-                                            </div>
-                                            <p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p>
-                                            <p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p>
-                                        </div>
-                                    </div>`;
-                            } else {
-                                const senderBadges = isMe ? (userData.activeBadges || []) : (currentChatFriend.activeBadges || []);
-                                let badgesHTML = '';
-                                
-                                if (senderBadges.length > 0) {
-                                    badgesHTML = `
-                                        <div class="sender-badges">
-                                            ${senderBadges.slice(0, 3).map(badgeId => {
-                                                const badge = storeData.itemsById[badgeId];
-                                                if (badge) {
-                                                    if (badge.itemType === 'svga') {
-                                                        return `<div class="sender-badge" id="chat-badge-${badgeId}-${senderId}"></div>`;
-                                                    } else {
-                                                        return `<img src="${badge.image}" class="sender-badge object-contain" title="${badge.name}">`;
-                                                    }
-                                                }
-                                                return '';
-                                            }).join('')}
-                                        </div>`;
-                                }
-                                
-                                const bubbleClass = isMe ? 'chat-bubble-me' : 'chat-bubble-them';
-                                const timestampClass = isMe ? '' : 'them';
-                                
-                                container.innerHTML += `
-                                    <div class="relative">
-                                        <div class="chat-sender-info ${isMe ? 'me' : ''}">
-                                            ${badgesHTML}
-                                            <span class="sender-name">${senderData.displayName}</span>
-                                            <div class="sender-avatar-wrapper">
-                                                <img src="${senderData.photoURL}" class="sender-avatar">
-                                            </div>
-                                        </div>
-                                        <div class="${bubbleClass}">
-                                            ${msg.text}
-                                            <div class="chat-timestamp ${timestampClass}">${new Date(msg.timestamp).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</div>
-                                        </div>
-                                    </div>`;
-                                
-                                if (senderBadges.length > 0) {
-                                    setTimeout(() => {
-                                        senderBadges.slice(0, 3).forEach(badgeId => {
-                                            const badge = storeData.itemsById[badgeId];
-                                            if (badge && badge.itemType === 'svga' && badge.fileUrl) {
-                                                const container = document.getElementById(`chat-badge-${badgeId}-${senderId}`);
-                                                if (container) {
-                                                    playSvga(badge.fileUrl, container, { 
-                                                        loops: 1, 
-                                                        clearsAfterStop: false 
-                                                    });
-                                                }
-                                            }
-                                        });
-                                    }, 100);
-                                }
-                            }
-                        });
-                    container.scrollTop = container.scrollHeight;
-                }
-            });
+        window.openChat = (uid) => {
+            window.open(`chat.html?uid=${uid}`, '_blank');
         };
-
-        window.sendMessage = async () => {
-            const input = document.getElementById('chatInput');
-            const text = input.value.trim();
-            
-            if (!text || !currentChatFriend) return;
-            
-            const chatId = [userData.uid, currentChatFriend.uid].sort().join('_');
-            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
-            
-            await push(chatRef, {
-                senderId: userData.uid,
-                receiverId: currentChatFriend.uid,
-                text: text,
-                type: 'text',
-                timestamp: Date.now()
-            });
-            
-            input.value = '';
-        };
-
-        window.closeChat = () => {
-            document.getElementById('chatModal').classList.add('hidden');
-            if (chatUnsubscribe) {
-                chatUnsubscribe();
-                chatUnsubscribe = null;
-            }
-            currentChatFriend = null;
-            document.getElementById('homeIcon').classList.remove('hidden');
-            document.getElementById('friendsIcon').classList.add('hidden');
-        };
-
-        window.unfollowInChat = async () => {
-            if (!currentChatFriend) return;
-            
-            if (confirm('هل تريد إلغاء متابعة هذا المستخدم؟')) {
-                await unfollowUser(currentChatFriend.uid);
-                document.getElementById('unfollowBtn').classList.add('hidden');
-            }
-        };
-
-        window.blockUserInChat = async () => {
-            if (!currentChatFriend) return;
-            
-            if (confirm('هل تريد حظر هذا المستخدم؟')) {
-                await updateDoc(doc(db, "users", userData.uid), {
-                    blockedUsers: arrayUnion(currentChatFriend.uid)
-                });
-                closeChat();
-                alert('تم حظر المستخدم');
-            }
-        };
-
-        window.toggleGiftBox = () => {
-            const giftBox = document.getElementById('giftBox');
-            const isHidden = giftBox.classList.contains('hidden');
-            giftBox.classList.toggle('hidden');
-            
-            if (isHidden) {
-                switchGiftTab('fixed');
-            }
-        };
-
-        window.switchGiftTab = (type) => {
-            const grid = document.getElementById('giftGrid');
-            grid.innerHTML = '';
-            
-            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
-            
-            document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
-            document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
-            
-            if (items.length === 0) {
-                grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">لا توجد هدايا متاحة</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                grid.innerHTML += `
-                    <div onclick="sendGift('${item.id}', '${item.type}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
-                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
-                            <img src="${item.image}" class="w-full h-full object-contain">
-                        </div>
-                        <span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span>
-                        <span class="text-[8px] text-yellow-600 font-black">${item.price || 0} 💰</span>
-                    </div>`;
-            });
-        };
-
-        window.sendGift = async (giftId, giftType) => {
-            if (!currentChatFriend) {
-                alert('يجب فتح محادثة مع صديق أولاً');
-                toggleGiftBox();
-                return;
-            }
-
-            const giftList = giftType === 'magic' ? storeData.luckGifts : storeData.gifts;
-            const gift = giftList.find(g => g.id === giftId);
-            
-            if (userData.balance < (gift.price || 0)) {
-                alert('رصيدك غير كافٍ!');
-                return;
-            }
-
-            await updateDoc(doc(db, "users", userData.uid), {
-                balance: increment(-(gift.price || 0))
-            });
-
-            const chatId = [userData.uid, currentChatFriend.uid].sort().join('_');
-            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
-            
-            await push(chatRef, {
-                senderId: userData.uid,
-                receiverId: currentChatFriend.uid,
-                giftId: gift.id,
-                giftName: gift.name,
-                giftImage: gift.image,
-                giftType: gift.type,
-                type: 'gift',
-                timestamp: Date.now()
-            });
-
-            const receiverRef = doc(db, "users", currentChatFriend.uid);
-            const receiverSnap = await getDoc(receiverRef);
-            
-            if (receiverSnap.exists()) {
-                const receiverData = receiverSnap.data();
-                
-                if (giftType === 'magic') {
-                    const newJewels = (receiverData.jewels || 0) + 10;
-                    let newCoins = receiverData.balance || 0;
-                    let newMagicLevel = receiverData.magicLevel || 1;
-                    
-                    if (newJewels >= 10) {
-                        const coinsToAdd = Math.floor(newJewels / 10);
-                        newCoins += coinsToAdd;
-                        
-                        const magicPoints = newCoins;
-                        if (magicPoints >= 100 * newMagicLevel) {
-                            newMagicLevel += 1;
-                        }
-                    }
-                    
-                    await updateDoc(receiverRef, {
-                        jewels: newJewels % 10,
-                        balance: newCoins,
-                        magicLevel: newMagicLevel
-                    });
-                } else if (giftType === 'wealth') {
-                    const wealthGiftValue = gift.reward || 1;
-                    const currentWealth = receiverData.wealthLevel || 1;
-                    const newWealthLevel = currentWealth + wealthGiftValue;
-                    
-                    await updateDoc(receiverRef, {
-                        wealthLevel: newWealthLevel,
-                        balance: increment(gift.reward || 0)
-                    });
-                }
-            }
-
-            showGiftAnimation(gift, `تم إرسال هدية ${gift.name} إلى ${currentChatFriend.displayName}`);
-            toggleGiftBox();
-        };
-
-        function showGiftAnimation(gift, text) {
-            const anim = document.createElement('div');
-            anim.className = 'gift-animation flex flex-col items-center gap-4';
-            anim.innerHTML = `
-                <img src="${gift.image}" class="w-32 h-32 object-contain drop-shadow-2xl">
-                <div class="glass px-6 py-3 rounded-2xl shadow-xl border-2 border-white">
-                    <p class="font-black text-gray-900 text-center">${text}</p>
-                </div>`;
-            document.body.appendChild(anim);
-            setTimeout(() => anim.remove(), 3000);
-        }
 
         window.copyText = (text) => {
             navigator.clipboard.writeText(text).then(() => {
@@ -1773,9 +1168,7 @@
         window.confirmLogout = () => {
             if (confirm('هل تريد تسجيل الخروج؟')) {
                 Object.keys(activeSvgaPlayers).forEach(id => {
-                    try {
-                        activeSvgaPlayers[id].player.clear();
-                    } catch (e) {}
+                    try { activeSvgaPlayers[id].player.clear(); } catch (e) {}
                 });
                 activeSvgaPlayers = {};
                 signOut(auth);
@@ -1834,11 +1227,11 @@
             if (bDoc.exists()) {
                 const b = bDoc.data();
                 container.innerHTML = `
-                    <img src="${b.image}" class="absolute inset-0 w-full h-full object-cover rounded-[28px]">
+                    <img src="${b.image}" class="absolute inset-0 w-full h-full object-cover">
                 `;
             } else {
                 container.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 rounded-[28px]"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100"></div>
                 `;
             }
         }
@@ -1851,7 +1244,7 @@
             rSnap.docs.forEach(d => {
                 const r = d.data();
                 grid.innerHTML += `
-                    <div onclick="window.location.href='room.html?id=${d.id}'" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition">
+                    <div onclick="openRoom('${d.id}')" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition">
                         <div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div>
                         <div class="flex-1">
                             <h4 class="font-bold text-gray-900">${r.name}</h4>
@@ -1862,47 +1255,14 @@
             });
         }
 
-        window.filterRooms = (t) => {
-            document.getElementById('btn-public').className = t === 'public' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
-            document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
+        window.openRoom = (roomId) => {
+            window.open(`room.html?id=${roomId}`, '_blank');
         };
 
-        async function checkExpiredItems() {
-            const now = new Date();
-            const updates = {};
-            
-            if (userData.purchasedFrames) {
-                const expiredFrames = userData.purchasedFrames.filter(f => f.expiresAt && new Date(f.expiresAt) < now);
-                if (expiredFrames.length > 0) {
-                    updates.purchasedFrames = userData.purchasedFrames.filter(f => !expiredFrames.includes(f));
-                    if (userData.activeFrame && expiredFrames.some(f => f.id === userData.activeFrame)) {
-                        updates.activeFrame = null;
-                    }
-                }
-            }
-            
-            if (userData.purchasedBadges) {
-                const expiredBadges = userData.purchasedBadges.filter(b => b.expiresAt && new Date(b.expiresAt) < now);
-                if (expiredBadges.length > 0) {
-                    updates.purchasedBadges = userData.purchasedBadges.filter(b => !expiredBadges.includes(b));
-                    updates.activeBadges = (userData.activeBadges || []).filter(b => !expiredBadges.some(eb => eb.id === b));
-                }
-            }
-            
-            if (userData.purchasedChatBubbles) {
-                const expiredBubbles = userData.purchasedChatBubbles.filter(cb => cb.expiresAt && new Date(cb.expiresAt) < now);
-                if (expiredBubbles.length > 0) {
-                    updates.purchasedChatBubbles = userData.purchasedChatBubbles.filter(cb => !expiredBubbles.includes(cb));
-                    if (userData.activeChatBubble && expiredBubbles.some(cb => cb.id === userData.activeChatBubble)) {
-                        updates.activeChatBubble = null;
-                    }
-                }
-            }
-            
-            if (Object.keys(updates).length > 0) {
-                await updateDoc(doc(db, "users", userData.uid), updates);
-            }
-        }
+        window.filterRooms = (t) => {
+            document.getElementById('btn-public').className = t === 'public' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all flex items-center justify-center gap-2' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all flex items-center justify-center gap-2';
+            document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all flex items-center justify-center gap-2' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all flex items-center justify-center gap-2';
+        };
 
         lucide.createIcons();
         setInterval(() => lucide.createIcons(), 1000);
