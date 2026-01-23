@@ -131,10 +131,10 @@
         /* إطار SVGA متحرك - تم التعديل: تكبير 4px، تحريك 3px شمال، نزول 4px */
         .svga-avatar-frame {
             position: absolute;
-            width: calc(100% + 8px); /* تكبير 4px من كل جانب (4px * 2 = 8px) */
-            height: calc(100% + 8px); /* تكبير 4px من كل جانب */
-            top: calc(50% + 4px); /* نزول 4px للأسفل */
-            left: calc(50% - 3px); /* تحريك 3px لليسار (شمال) */
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
+            top: calc(50% + 4px);
+            left: calc(50% - 3px);
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 2;
@@ -164,49 +164,16 @@
         /* إطار الصورة العادية - تم التعديل كذلك */
         .perfect-frame {
             position: absolute;
-            width: calc(100% + 8px); /* تكبير 4px من كل جانب */
-            height: calc(100% + 8px); /* تكبير 4px من كل جانب */
-            top: calc(50% + 4px); /* نزول 4px للأسفل */
-            left: calc(50% - 3px); /* تحريك 3px لليسار (شمال) */
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
+            top: calc(50% + 4px);
+            left: calc(50% - 3px);
             transform: translate(-50%, -50%);
             pointer-events: none;
             z-index: 2;
             object-fit: contain;
             border-radius: 50%;
             animation: frameFloat 3s ease-in-out infinite;
-        }
-
-        /* حاوية SVGA للأفاتار في السايدبار */
-        #sidebar .avatar-wrapper {
-            width: 80px;
-            height: 80px;
-        }
-
-        #sidebar .avatar-img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            position: relative;
-            z-index: 1;
-        }
-
-        #sidebar .svga-avatar-frame {
-            width: calc(100% + 8px);
-            height: calc(100% + 8px);
-            top: calc(50% + 4px);
-            left: calc(50% - 3px);
-            transform: translate(-50%, -50%);
-        }
-
-        #sidebar .perfect-frame {
-            width: calc(100% + 8px);
-            height: calc(100% + 8px);
-            top: calc(50% + 4px);
-            left: calc(50% - 3px);
-            transform: translate(-50%, -50%);
         }
 
         @keyframes frameFloat {
@@ -218,36 +185,90 @@
             }
         }
 
-        /* --- Level Indicators --- */
-        .level-badge {
-            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%);
-            border: 1px solid rgba(255,255,255,0.8);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        /* --- Chat Bubble Styles --- */
+        .chat-bubble-me {
+            position: relative;
+            background: #1f2937;
+            color: white;
+            border-radius: 20px 4px 20px 20px;
+            margin-left: 50px;
+            min-height: 60px;
+            padding: 12px 16px 40px 16px;
         }
 
-        /* --- Badges Grid --- */
-        .badges-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 0.5rem;
+        .chat-bubble-them {
+            position: relative;
+            background: white;
+            color: #1f2937;
+            border-radius: 4px 20px 20px 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+            margin-right: 50px;
+            min-height: 60px;
+            padding: 12px 16px 40px 16px;
         }
 
-        /* --- General Animations --- */
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
+        .chat-sender-info {
+            position: absolute;
+            top: -45px;
+            right: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 5;
         }
 
-        .loader {
-            border: 3px solid rgba(0,0,0,0.1);
-            border-left-color: #3b82f6;
+        .chat-sender-info.me {
+            left: 0;
+            right: auto;
+        }
+
+        .sender-avatar-wrapper {
+            position: relative;
+            width: 32px;
+            height: 32px;
+        }
+
+        .sender-avatar {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .sender-badges {
+            display: flex;
+            gap: 2px;
+            margin-right: 8px;
+        }
+
+        .sender-badge {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .sender-name {
+            font-size: 11px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .chat-timestamp {
+            position: absolute;
+            bottom: 8px;
+            left: 16px;
+            font-size: 10px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .chat-timestamp.them {
+            color: #6b7280;
+            right: 16px;
+            left: auto;
+        }
 
         /* --- Gift Animation --- */
         @keyframes giftFly {
@@ -269,53 +290,24 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-        /* --- Chat Styles --- */
-        .chat-bubble-me {
-            background: #1f2937;
-            color: white;
-            border-radius: 20px 20px 4px 20px;
-        }
-        .chat-bubble-them {
-            background: white;
-            color: #1f2937;
-            border-radius: 20px 20px 20px 4px;
-            border: 1px solid rgba(0,0,0,0.05);
+        /* --- Banner Styles --- */
+        .banner-container {
+            height: 120px;
+            margin-top: 20px;
         }
 
-        .gift-message {
-            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-            border: 2px solid #fbbf24;
-            border-radius: 20px;
-            padding: 12px;
-            text-align: center;
-            margin: 8px 0;
-        }
-
-        .gift-message-icon {
-            width: 48px;
-            height: 48px;
-            margin: 0 auto 8px;
-        }
-
-        /* --- SVGA Preview in Store --- */
-        .svga-preview {
-            width: 100%;
-            height: 80px;
-            background: rgba(0,0,0,0.05);
-            border-radius: 12px;
+        /* --- Header Icons --- */
+        .header-icon {
+            width: 32px;
+            height: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
-        }
-
-        .svga-icon {
-            font-size: 10px;
-            background: #3b82f6;
-            color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-top: 4px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.8);
         }
     </style>
 </head>
@@ -326,7 +318,15 @@
         
         <!-- HEADER -->
         <header class="fixed top-0 left-0 right-0 h-20 z-30 px-6 flex items-center justify-between glass">
-            <h2 id="pageTitle" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">الرئيسية</h2>
+            <div class="flex items-center gap-2">
+                <div class="header-icon">
+                    <i data-lucide="home" class="w-4 h-4 text-gray-700" id="homeIcon"></i>
+                </div>
+                <div class="header-icon hidden" id="friendsIcon">
+                    <i data-lucide="users" class="w-4 h-4 text-gray-700"></i>
+                </div>
+                <h2 id="pageTitle" class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">الرئيسية</h2>
+            </div>
             <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition">
                 <i data-lucide="menu" class="text-black w-6 h-6"></i>
             </button>
@@ -337,7 +337,7 @@
 
             <!-- VIEW: HOME -->
             <div id="view-home" class="view-section fade-in">
-                <div id="homeBanner" class="w-full h-48 rounded-[32px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
+                <div id="homeBanner" class="w-full banner-container rounded-[28px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
                 <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
                     <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
                     <button id="btn-private" onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
@@ -372,6 +372,7 @@
                     <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
                     <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
                     <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
+                    <button onclick="loadStoreItems('chatbubble')" id="store-tab-chatbubble" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">فقاعات</button>
                 </div>
                 <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
             </div>
@@ -386,6 +387,8 @@
                 <div id="svgaBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي النشطة</h3>
                 <div id="activeBadgesGrid" class="badges-grid mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">فقاعاتي</h3>
+                <div id="chatbubblesBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
             </div>
 
             <!-- VIEW: FRIENDS -->
@@ -490,16 +493,31 @@
             <div class="flex items-center gap-3">
                 <button onclick="closeChat()" class="p-2 rounded-full hover:bg-gray-100"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
                 <div class="flex items-center gap-2">
-                    <img id="chatUserAvatar" src="" class="w-10 h-10 rounded-full object-cover">
+                    <div class="avatar-wrapper" style="width: 40px; height: 40px;">
+                        <img id="chatUserAvatar" src="" class="avatar-img">
+                        <div id="chatUserSvgaFrame" class="svga-avatar-frame" style="width: calc(100% + 8px); height: calc(100% + 8px);"></div>
+                        <img id="chatUserFrame" src="" class="perfect-frame hidden" style="width: calc(100% + 8px); height: calc(100% + 8px);">
+                    </div>
                     <div>
                         <h4 id="chatUserName" class="font-bold text-sm">...</h4>
-                        <p class="text-[10px] text-green-500 font-bold">متصل الآن</p>
+                        <div class="flex items-center gap-1">
+                            <div class="w-4 h-4 flex items-center justify-center">
+                                <img id="chatUserMagicLevel" src="" class="w-3 h-3 object-contain">
+                            </div>
+                            <div class="w-4 h-4 flex items-center justify-center">
+                                <img id="chatUserWealthLevel" src="" class="w-3 h-3 object-contain">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
+            <div class="flex gap-2">
+                <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
+                <button onclick="unfollowInChat()" id="unfollowBtn" class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 hidden"><i data-lucide="user-x" class="w-5 h-5"></i></button>
+                <button onclick="blockUserInChat()" id="blockBtn" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i data-lucide="shield-off" class="w-5 h-5"></i></button>
+            </div>
         </header>
-        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-4 no-scrollbar"></div>
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar"></div>
         <div class="p-4 glass flex gap-2 items-center">
             <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." class="flex-1 p-4 rounded-2xl bg-white border-0 focus:ring-0 text-sm">
             <button onclick="sendMessage()" class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg"><i data-lucide="send" class="w-5 h-5"></i></button>
@@ -575,11 +593,13 @@
             gifts: [], 
             luckGifts: [], 
             magicLevels: {}, 
-            wealthLevels: {} 
+            wealthLevels: {},
+            chatBubbles: []
         };
         let currentChatFriend = null;
         let chatUnsubscribe = null;
         let activeSvgaPlayers = {};
+        let activeChatBubble = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -588,11 +608,9 @@
                 const querySnapshot = await getDocs(q);
                 
                 if (!querySnapshot.empty) {
-                    // المستخدم موجود في Firestore
                     const userDoc = querySnapshot.docs[0];
                     userData = { uid: userDoc.id, ...userDoc.data() };
                     
-                    // الاستماع للتحديثات
                     onSnapshot(doc(db, "users", userDoc.id), async (docSnap) => {
                         if (docSnap.exists()) {
                             userData = { uid: docSnap.id, ...docSnap.data() };
@@ -602,15 +620,12 @@
                         }
                     });
                 } else {
-                    // المستخدم غير موجود في Firestore، التحقق من Realtime Database
                     const rtdbRef = ref(rtdb, `users/${user.uid}`);
                     
                     onValue(rtdbRef, async (snapshot) => {
                         if (snapshot.exists()) {
-                            // يوجد بيانات قديمة في Realtime Database
                             const oldData = snapshot.val();
                             
-                            // إنشاء مستند جديد في Firestore مع البيانات القديمة
                             const newUserRef = doc(collection(db, "users"));
                             await setDoc(newUserRef, {
                                 uid: user.uid,
@@ -623,20 +638,21 @@
                                 purchasedFrames: oldData.purchasedFrames || [],
                                 purchasedBadges: oldData.purchasedBadges || [],
                                 purchasedSvga: oldData.purchasedSvga || [],
+                                purchasedChatBubbles: oldData.purchasedChatBubbles || [],
                                 activeFrame: oldData.activeFrame || null,
                                 activeBadges: oldData.activeBadges || [],
+                                activeChatBubble: oldData.activeChatBubble || null,
                                 friends: oldData.friends || [],
                                 friendRequests: oldData.friendRequests || [],
                                 sentRequests: oldData.sentRequests || [],
+                                blockedUsers: oldData.blockedUsers || [],
                                 createdAt: serverTimestamp()
                             });
                             
-                            // حذف البيانات القديمة من Realtime Database
                             await set(rtdbRef, null);
                             
                             userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
                         } else {
-                            // لا توجد بيانات قديمة، إنشاء مستخدم جديد
                             const newUserRef = doc(collection(db, "users"));
                             await setDoc(newUserRef, {
                                 uid: user.uid,
@@ -649,18 +665,20 @@
                                 purchasedFrames: [],
                                 purchasedBadges: [],
                                 purchasedSvga: [],
+                                purchasedChatBubbles: [],
                                 activeFrame: null,
                                 activeBadges: [],
+                                activeChatBubble: null,
                                 friends: [],
                                 friendRequests: [],
                                 sentRequests: [],
+                                blockedUsers: [],
                                 createdAt: serverTimestamp()
                             });
                             
                             userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
                         }
                         
-                        // الآن الاستماع للتحديثات
                         onSnapshot(doc(db, "users", userData.uid), async (docSnap) => {
                             if (docSnap.exists()) {
                                 userData = { uid: docSnap.id, ...docSnap.data() };
@@ -700,6 +718,9 @@
             
             const wlSnap = await getDocs(collection(db, "wealthLevels"));
             wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+            
+            const cbSnap = await getDocs(collection(db, "chatBubbles"));
+            storeData.chatBubbles = cbSnap.docs.map(d => ({id: d.id, ...d.data()}));
             
             await updateUI();
         }
@@ -855,24 +876,39 @@
             const grid = document.getElementById('storeGrid');
             grid.innerHTML = '';
             
-            let items = storeData.items.filter(item => item.type === type);
+            let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
             
             document.getElementById('store-tab-frames').className = type === 'frame' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
             document.getElementById('store-tab-badges').className = type === 'badge' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
             document.getElementById('store-tab-svga').className = type === 'svga' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-chatbubble').className = type === 'chatbubble' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
 
             items.forEach(item => {
                 let field = '';
-                if (item.type === 'frame') field = 'purchasedFrames';
-                else if (item.type === 'badge') field = 'purchasedBadges';
-                else if (item.type === 'svga') field = 'purchasedSvga';
+                if (type === 'frame') field = 'purchasedFrames';
+                else if (type === 'badge') field = 'purchasedBadges';
+                else if (type === 'svga') field = 'purchasedSvga';
+                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
                 
                 const owned = userData[field]?.some(i => i.id === item.id);
                 
                 let previewHTML = '';
                 let extraTag = '';
                 
-                if (item.itemType === 'svga') {
+                if (type === 'chatbubble') {
+                    previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
+                    if (item.fileUrl) {
+                        setTimeout(() => {
+                            const container = document.getElementById(`preview-cb-${item.id}`);
+                            if (container) {
+                                playSvga(item.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: true 
+                                });
+                            }
+                        }, 100);
+                    }
+                } else if (item.itemType === 'svga') {
                     previewHTML = `<div class="svga-preview mb-2" id="preview-${item.id}"></div>`;
                     extraTag = '<span class="svga-icon">SVGA</span>';
                 } else {
@@ -884,13 +920,13 @@
                         ${previewHTML}
                         <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
                         ${extraTag}
-                        <button onclick="${owned ? '' : `buyItem('${item.type}', '${item.id}', ${item.price})`}" 
+                        <button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" 
                                 class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl mt-2">
                             ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
                         </button>
                     </div>`;
                 
-                if (item.itemType === 'svga' && item.fileUrl) {
+                if (item.itemType === 'svga' && item.fileUrl && type !== 'chatbubble') {
                     setTimeout(() => {
                         const previewContainer = document.getElementById(`preview-${item.id}`);
                         if (previewContainer) {
@@ -919,13 +955,14 @@
             if (type === 'frame') field = 'purchasedFrames';
             else if (type === 'badge') field = 'purchasedBadges';
             else if (type === 'svga') field = 'purchasedSvga';
+            else if (type === 'chatbubble') field = 'purchasedChatBubbles';
             
             await updateDoc(doc(db, "users", userData.uid), {
                 balance: increment(-price),
                 [field]: arrayUnion({ 
                     id: id, 
                     purchasedAt: new Date(),
-                    itemType: storeData.itemsById[id]?.itemType || 'image'
+                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 ساعة
                 })
             });
             
@@ -937,11 +974,13 @@
             const bGrid = document.getElementById('badgesBagGrid');
             const sGrid = document.getElementById('svgaBagGrid');
             const aGrid = document.getElementById('activeBadgesGrid');
+            const cbGrid = document.getElementById('chatbubblesBagGrid');
             
             fGrid.innerHTML = ''; 
             bGrid.innerHTML = '';
             sGrid.innerHTML = '';
             aGrid.innerHTML = '';
+            cbGrid.innerHTML = '';
             
             const frames = userData.purchasedFrames || [];
             for (const f of frames) {
@@ -1061,6 +1100,35 @@
                     }
                 }
             }
+
+            const chatBubbles = userData.purchasedChatBubbles || [];
+            for (const cb of chatBubbles) {
+                const bubble = storeData.chatBubbles.find(b => b.id === cb.id);
+                if (bubble) {
+                    const isActive = userData.activeChatBubble === cb.id;
+                    
+                    cbGrid.innerHTML += `
+                        <div onclick="equipChatBubble('${cb.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
+                            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-cb-${cb.id}">
+                                <span class="text-xs font-bold text-gray-600">فقاعة</span>
+                            </div>
+                            <p class="text-xs text-center truncate w-full">${bubble.name}</p>
+                            ${isActive ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
+                        </div>`;
+                    
+                    if (bubble.fileUrl) {
+                        setTimeout(() => {
+                            const container = document.getElementById(`bag-cb-${cb.id}`);
+                            if (container) {
+                                playSvga(bubble.fileUrl, container, { 
+                                    loops: 1, 
+                                    clearsAfterStop: false 
+                                });
+                            }
+                        }, 100);
+                    }
+                }
+            }
         };
 
         window.equipFrame = async (id) => {
@@ -1089,6 +1157,16 @@
             setTimeout(() => updateUI(), 100);
         };
 
+        window.equipChatBubble = async (id) => {
+            const newBubble = userData.activeChatBubble === id ? null : id;
+            await updateDoc(doc(db, "users", userData.uid), { 
+                activeChatBubble: newBubble 
+            });
+            
+            activeChatBubble = newBubble ? storeData.chatBubbles.find(b => b.id === id) : null;
+            loadBagItems();
+        };
+
         window.toggleBadge = async (id) => {
             const item = storeData.itemsById[id];
             if (!item || item.type !== 'badge') return;
@@ -1106,20 +1184,17 @@
             const email = document.getElementById('searchUserInput').value.trim().toLowerCase();
             if (!email) return;
             
-            // التحقق من صيغة البريد الإلكتروني
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert('يرجى إدخال بريد إلكتروني صحيح');
                 return;
             }
             
-            // منع البحث عن المستخدم نفسه
             if (email === userData.email?.toLowerCase()) {
                 alert('لا يمكنك البحث عن نفسك');
                 return;
             }
             
-            // البحث في Firestore باستخدام email
             const q = query(collection(db, "users"), where("email", "==", email));
             const snap = await getDocs(q);
             const results = document.getElementById('searchResults');
@@ -1165,7 +1240,6 @@
                     buttonIcon = 'user-check';
                 }
                 
-                // الحصول على مستوى السحر والثروة
                 const magicLevel = user.magicLevel || 1;
                 const wealthLevel = user.wealthLevel || 1;
                 const magicLevelImg = storeData.magicLevels[magicLevel]?.image || '';
@@ -1220,7 +1294,6 @@
                 
                 lucide.createIcons();
                 
-                // إذا كان المستخدم لديه إطار SVGA نشط، قم بتشغيله
                 if (user.activeFrame && storeData.itemsById[user.activeFrame]?.itemType === 'svga') {
                     setTimeout(() => {
                         const frameItem = storeData.itemsById[user.activeFrame];
@@ -1371,7 +1444,53 @@
             
             document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
             document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
+            
+            const magicLevel = currentChatFriend.magicLevel || 1;
+            const wealthLevel = currentChatFriend.wealthLevel || 1;
+            const magicLevelImg = document.getElementById('chatUserMagicLevel');
+            const wealthLevelImg = document.getElementById('chatUserWealthLevel');
+            
+            if (storeData.magicLevels[magicLevel]) {
+                magicLevelImg.src = storeData.magicLevels[magicLevel].image;
+            }
+            if (storeData.wealthLevels[wealthLevel]) {
+                wealthLevelImg.src = storeData.wealthLevels[wealthLevel].image;
+            }
+            
+            const frameEl = document.getElementById('chatUserFrame');
+            const svgaContainer = document.getElementById('chatUserSvgaFrame');
+            
+            frameEl.classList.add('hidden');
+            svgaContainer.classList.add('hidden');
+            svgaContainer.innerHTML = '';
+            
+            if (currentChatFriend.activeFrame) {
+                const item = storeData.itemsById[currentChatFriend.activeFrame];
+                if (item) {
+                    if (item.itemType === 'svga') {
+                        svgaContainer.classList.remove('hidden');
+                        playPerfectSvga(item.fileUrl, svgaContainer, { 
+                            loops: 0, 
+                            clearsAfterStop: false 
+                        });
+                    } else {
+                        frameEl.src = item.image;
+                        frameEl.classList.remove('hidden');
+                    }
+                }
+            }
+            
+            const isFollowing = userData.friends?.includes(uid);
+            const unfollowBtn = document.getElementById('unfollowBtn');
+            if (isFollowing) {
+                unfollowBtn.classList.remove('hidden');
+            } else {
+                unfollowBtn.classList.add('hidden');
+            }
+            
             document.getElementById('chatModal').classList.remove('hidden');
+            document.getElementById('homeIcon').classList.add('hidden');
+            document.getElementById('friendsIcon').classList.remove('hidden');
             
             const chatId = [userData.uid, uid].sort().join('_');
             const chatRef = ref(rtdb, `chats/${chatId}/messages`);
@@ -1388,6 +1507,9 @@
                         .sort((a, b) => a.timestamp - b.timestamp)
                         .forEach(msg => {
                             const isMe = msg.senderId === userData.uid;
+                            const senderId = isMe ? userData.uid : currentChatFriend.uid;
+                            const senderData = isMe ? userData : currentChatFriend;
+                            
                             if (msg.type === 'gift') {
                                 container.innerHTML += `
                                     <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
@@ -1400,12 +1522,60 @@
                                         </div>
                                     </div>`;
                             } else {
+                                const senderBadges = isMe ? (userData.activeBadges || []) : (currentChatFriend.activeBadges || []);
+                                let badgesHTML = '';
+                                
+                                if (senderBadges.length > 0) {
+                                    badgesHTML = `
+                                        <div class="sender-badges">
+                                            ${senderBadges.slice(0, 3).map(badgeId => {
+                                                const badge = storeData.itemsById[badgeId];
+                                                if (badge) {
+                                                    if (badge.itemType === 'svga') {
+                                                        return `<div class="sender-badge" id="chat-badge-${badgeId}-${senderId}"></div>`;
+                                                    } else {
+                                                        return `<img src="${badge.image}" class="sender-badge object-contain" title="${badge.name}">`;
+                                                    }
+                                                }
+                                                return '';
+                                            }).join('')}
+                                        </div>`;
+                                }
+                                
+                                const bubbleClass = isMe ? 'chat-bubble-me' : 'chat-bubble-them';
+                                const timestampClass = isMe ? '' : 'them';
+                                
                                 container.innerHTML += `
-                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
-                                        <div class="max-w-[80%] p-3 ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} text-sm font-medium">
+                                    <div class="relative">
+                                        <div class="chat-sender-info ${isMe ? 'me' : ''}">
+                                            ${badgesHTML}
+                                            <span class="sender-name">${senderData.displayName}</span>
+                                            <div class="sender-avatar-wrapper">
+                                                <img src="${senderData.photoURL}" class="sender-avatar">
+                                            </div>
+                                        </div>
+                                        <div class="${bubbleClass}">
                                             ${msg.text}
+                                            <div class="chat-timestamp ${timestampClass}">${new Date(msg.timestamp).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</div>
                                         </div>
                                     </div>`;
+                                
+                                if (senderBadges.length > 0) {
+                                    setTimeout(() => {
+                                        senderBadges.slice(0, 3).forEach(badgeId => {
+                                            const badge = storeData.itemsById[badgeId];
+                                            if (badge && badge.itemType === 'svga' && badge.fileUrl) {
+                                                const container = document.getElementById(`chat-badge-${badgeId}-${senderId}`);
+                                                if (container) {
+                                                    playSvga(badge.fileUrl, container, { 
+                                                        loops: 1, 
+                                                        clearsAfterStop: false 
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    }, 100);
+                                }
                             }
                         });
                     container.scrollTop = container.scrollHeight;
@@ -1440,6 +1610,29 @@
                 chatUnsubscribe = null;
             }
             currentChatFriend = null;
+            document.getElementById('homeIcon').classList.remove('hidden');
+            document.getElementById('friendsIcon').classList.add('hidden');
+        };
+
+        window.unfollowInChat = async () => {
+            if (!currentChatFriend) return;
+            
+            if (confirm('هل تريد إلغاء متابعة هذا المستخدم؟')) {
+                await unfollowUser(currentChatFriend.uid);
+                document.getElementById('unfollowBtn').classList.add('hidden');
+            }
+        };
+
+        window.blockUserInChat = async () => {
+            if (!currentChatFriend) return;
+            
+            if (confirm('هل تريد حظر هذا المستخدم؟')) {
+                await updateDoc(doc(db, "users", userData.uid), {
+                    blockedUsers: arrayUnion(currentChatFriend.uid)
+                });
+                closeChat();
+                alert('تم حظر المستخدم');
+            }
         };
 
         window.toggleGiftBox = () => {
@@ -1641,12 +1834,11 @@
             if (bDoc.exists()) {
                 const b = bDoc.data();
                 container.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-r ${b.gradient} opacity-80"></div>
-                    <img src="${b.image}" class="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay">
+                    <img src="${b.image}" class="absolute inset-0 w-full h-full object-cover rounded-[28px]">
                 `;
             } else {
                 container.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 opacity-80"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 rounded-[28px]"></div>
                 `;
             }
         }
@@ -1659,7 +1851,7 @@
             rSnap.docs.forEach(d => {
                 const r = d.data();
                 grid.innerHTML += `
-                    <div class="glass-card p-4 rounded-3xl flex items-center gap-4">
+                    <div onclick="window.location.href='room.html?id=${d.id}'" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition">
                         <div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div>
                         <div class="flex-1">
                             <h4 class="font-bold text-gray-900">${r.name}</h4>
@@ -1674,6 +1866,43 @@
             document.getElementById('btn-public').className = t === 'public' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
             document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all';
         };
+
+        async function checkExpiredItems() {
+            const now = new Date();
+            const updates = {};
+            
+            if (userData.purchasedFrames) {
+                const expiredFrames = userData.purchasedFrames.filter(f => f.expiresAt && new Date(f.expiresAt) < now);
+                if (expiredFrames.length > 0) {
+                    updates.purchasedFrames = userData.purchasedFrames.filter(f => !expiredFrames.includes(f));
+                    if (userData.activeFrame && expiredFrames.some(f => f.id === userData.activeFrame)) {
+                        updates.activeFrame = null;
+                    }
+                }
+            }
+            
+            if (userData.purchasedBadges) {
+                const expiredBadges = userData.purchasedBadges.filter(b => b.expiresAt && new Date(b.expiresAt) < now);
+                if (expiredBadges.length > 0) {
+                    updates.purchasedBadges = userData.purchasedBadges.filter(b => !expiredBadges.includes(b));
+                    updates.activeBadges = (userData.activeBadges || []).filter(b => !expiredBadges.some(eb => eb.id === b));
+                }
+            }
+            
+            if (userData.purchasedChatBubbles) {
+                const expiredBubbles = userData.purchasedChatBubbles.filter(cb => cb.expiresAt && new Date(cb.expiresAt) < now);
+                if (expiredBubbles.length > 0) {
+                    updates.purchasedChatBubbles = userData.purchasedChatBubbles.filter(cb => !expiredBubbles.includes(cb));
+                    if (userData.activeChatBubble && expiredBubbles.some(cb => cb.id === userData.activeChatBubble)) {
+                        updates.activeChatBubble = null;
+                    }
+                }
+            }
+            
+            if (Object.keys(updates).length > 0) {
+                await updateDoc(doc(db, "users", userData.uid), updates);
+            }
+        }
 
         lucide.createIcons();
         setInterval(() => lucide.createIcons(), 1000);
