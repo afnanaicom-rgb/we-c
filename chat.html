@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Afnan AI - محادثة</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Noto Sans Arabic', sans-serif;
+            touch-action: manipulation;
+        }
+        body {
+            background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%);
+            color: #1f2937;
+            min-height: 100vh;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02), inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chat-bubble-me {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px 4px 20px 20px;
+            position: relative;
+            overflow: visible;
+        }
+        .chat-bubble-them {
+            background: white;
+            color: #1f2937;
+            border-radius: 4px 20px 20px 20px;
+            border: 1px solid rgba(0,0,0,0.05);
+            position: relative;
+            overflow: visible;
+        }
+        .avatar-wrapper {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: visible;
+        }
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            position: relative;
+            z-index: 1;
+        }
+        .svga-avatar-frame {
+            position: absolute;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            top: calc(50% + 2px);
+            left: calc(50% - 1.5px);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .perfect-frame {
+            position: absolute;
+            width: calc(100% + 4px);
+            height: calc(100% + 4px);
+            top: calc(50% + 2px);
+            left: calc(50% - 1.5px);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 2;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+        .badges-container {
+            position: absolute;
+            top: -25px;
+            right: 0;
+            left: 0;
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            z-index: 10;
+        }
+        .badge-mini {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: white;
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .level-badge {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+            z-index: 3;
+        }
+        .chat-bubble-svga {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+            border-radius: inherit;
+            overflow: hidden;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .gift-message {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #fbbf24;
+            border-radius: 20px;
+            padding: 12px;
+            text-align: center;
+            margin: 8px 0;
+        }
+        .gift-message-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 8px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="fixed inset-0 flex flex-col">
+        <!-- HEADER -->
+        <header class="h-20 glass flex items-center px-6 justify-between z-10">
+            <div class="flex items-center gap-3">
+                <button onclick="window.close()" class="p-2 rounded-full hover:bg-gray-100">
+                    <i data-lucide="chevron-right" class="w-6 h-6"></i>
+                </button>
+                <div class="flex items-center gap-2">
+                    <div class="avatar-wrapper">
+                        <img id="chatUserAvatar" src="" class="avatar-img">
+                        <div id="chatUserFrame" class="svga-avatar-frame"></div>
+                        <img id="chatUserFrameImg" src="" class="perfect-frame hidden">
+                        <div id="chatUserLevel" class="level-badge">1</div>
+                    </div>
+                    <div>
+                        <h4 id="chatUserName" class="font-bold text-sm">...</h4>
+                        <p class="text-[10px] text-green-500 font-bold">متصل الآن</p>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+                    <i data-lucide="gift" class="w-5 h-5"></i>
+                </button>
+                <button onclick="toggleProfileMenu()" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
+                    <i data-lucide="more-vertical" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- CHAT MESSAGES -->
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-6 no-scrollbar"></div>
+
+        <!-- CHAT INPUT -->
+        <div class="p-4 glass flex gap-2 items-center">
+            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." 
+                   class="flex-1 p-4 rounded-2xl bg-white border-0 focus:ring-0 text-sm focus:outline-none">
+            <button onclick="sendMessage()" class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg">
+                <i data-lucide="send" class="w-5 h-5"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- PROFILE MENU -->
+    <div id="profileMenu" class="fixed bottom-24 right-4 bg-white rounded-2xl shadow-2xl z-50 hidden min-w-[150px]">
+        <div class="p-2">
+            <button onclick="unfollowUser()" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 text-gray-700">
+                <i data-lucide="user-minus" class="w-4 h-4"></i>
+                إلغاء المتابعة
+            </button>
+            <button onclick="blockUser()" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 text-red-500">
+                <i data-lucide="ban" class="w-4 h-4"></i>
+                حظر المستخدم
+            </button>
+        </div>
+    </div>
+
+    <!-- GIFT BOX -->
+    <div id="giftBox" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="toggleGiftBox()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[40px] h-[45vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-6 flex justify-between items-center border-b border-gray-100">
+                <div class="flex gap-4">
+                    <button onclick="switchGiftTab('fixed')" id="tab-fixed" class="font-bold text-black border-b-2 border-black pb-1">هدايا ثابتة</button>
+                    <button onclick="switchGiftTab('luck')" id="tab-luck" class="font-bold text-gray-400 pb-1">هدايا الحظ</button>
+                </div>
+                <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
+                    <i data-lucide="coins" class="w-3 h-3 text-yellow-600"></i>
+                    <span id="giftWalletBalance" class="text-xs font-bold text-yellow-700">0</span>
+                </div>
+            </div>
+            <div id="giftGrid" class="flex-1 overflow-y-auto p-6 grid grid-cols-4 gap-4 no-scrollbar"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
+            authDomain: "rtx3090-28439.firebaseapp.com",
+            projectId: "rtx3090-28439",
+            storageBucket: "rtx3090-28439.firebasestorage.app",
+            messagingSenderId: "178612030690",
+            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const friendUid = urlParams.get('uid');
+        
+        let userData = {};
+        let friendData = {};
+        let storeData = { itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {} };
+        let chatUnsubscribe = null;
+        let activeSvgaPlayers = {};
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) return window.close();
+            
+            // Load user data
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            userData = userSnap.exists() ? { uid: userSnap.id, ...userSnap.data() } : {};
+            
+            // Load friend data
+            const friendSnap = await getDoc(doc(db, "users", friendUid));
+            friendData = friendSnap.exists() ? { uid: friendSnap.id, ...friendSnap.data() } : {};
+            
+            await loadGlobalData();
+            updateChatHeader();
+            loadChatMessages();
+        });
+
+        async function loadGlobalData() {
+            const storeSnap = await getDocs(collection(db, "storeItems"));
+            storeSnap.docs.forEach(d => {
+                storeData.itemsById[d.id] = { id: d.id, ...d.data() };
+            });
+            
+            const gSnap = await getDocs(collection(db, "gifts"));
+            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'wealth'}));
+            
+            const lgSnap = await getDocs(collection(db, "luckGifts"));
+            storeData.luckGifts = lgSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'magic'}));
+            
+            const mlSnap = await getDocs(collection(db, "magicLevels"));
+            mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
+            
+            const wlSnap = await getDocs(collection(db, "wealthLevels"));
+            wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+        }
+
+        function updateChatHeader() {
+            document.getElementById('chatUserName').innerText = friendData.displayName || "مستخدم";
+            document.getElementById('chatUserAvatar').src = friendData.photoURL || 'https://via.placeholder.com/150';
+            document.getElementById('chatUserLevel').innerText = friendData.wealthLevel || 1;
+            
+            // Update friend frame
+            const frameEl = document.getElementById('chatUserFrameImg');
+            const svgaContainer = document.getElementById('chatUserFrame');
+            
+            frameEl.classList.add('hidden');
+            svgaContainer.classList.add('hidden');
+            svgaContainer.innerHTML = '';
+            
+            if (friendData.activeFrame) {
+                const item = storeData.itemsById[friendData.activeFrame];
+                if (item) {
+                    if (item.itemType === 'svga') {
+                        svgaContainer.classList.remove('hidden');
+                        playSvga(item.fileUrl, svgaContainer, { loops: 0 });
+                    } else {
+                        frameEl.src = item.image;
+                        frameEl.classList.remove('hidden');
+                    }
+                }
+            }
+            
+            document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
+        }
+
+        function loadChatMessages() {
+            const chatId = [userData.uid, friendUid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            const messagesQuery = query(chatRef, orderByChild('timestamp'), limitToLast(100));
+            
+            if (chatUnsubscribe) chatUnsubscribe();
+            
+            chatUnsubscribe = onValue(messagesQuery, (snapshot) => {
+                const messages = snapshot.val();
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = '';
+                
+                if (messages) {
+                    Object.values(messages)
+                        .sort((a, b) => a.timestamp - b.timestamp)
+                        .forEach(msg => {
+                            const isMe = msg.senderId === userData.uid;
+                            const senderData = isMe ? userData : friendData;
+                            const senderFrame = senderData.activeFrame;
+                            const senderBadges = senderData.activeBadges || [];
+                            const senderBubble = senderData.activeChatBubble;
+                            
+                            if (msg.type === 'gift') {
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'}">
+                                        <div class="gift-message max-w-[80%]">
+                                            <div class="gift-message-icon">
+                                                <img src="${msg.giftImage}" class="w-full h-full object-contain">
+                                            </div>
+                                            <p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p>
+                                            <p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p>
+                                        </div>
+                                    </div>`;
+                            } else {
+                                // Render badges
+                                let badgesHTML = '';
+                                senderBadges.slice(0, 5).forEach(badgeId => {
+                                    const badge = storeData.itemsById[badgeId];
+                                    if (badge) {
+                                        badgesHTML += `
+                                            <div class="badge-mini">
+                                                ${badge.itemType === 'svga' ? 
+                                                    `<div id="msg-badge-${Date.now()}-${badgeId}" class="w-3 h-3"></div>` :
+                                                    `<img src="${badge.image}" class="w-3 h-3 object-contain">`
+                                                }
+                                            </div>`;
+                                    }
+                                });
+                                
+                                // Get bubble SVGA if exists
+                                let bubbleSVGA = '';
+                                if (senderBubble && storeData.itemsById[senderBubble]?.itemType === 'svga') {
+                                    bubbleSVGA = `<div id="bubble-${Date.now()}" class="chat-bubble-svga"></div>`;
+                                }
+                                
+                                container.innerHTML += `
+                                    <div class="flex ${isMe ? 'justify-end' : 'justify-start'} items-end gap-2">
+                                        ${!isMe ? `
+                                            <div class="relative">
+                                                <div class="avatar-wrapper">
+                                                    <img src="${senderData.photoURL}" class="avatar-img">
+                                                    ${senderFrame ? `
+                                                        <div id="msg-frame-${Date.now()}" class="svga-avatar-frame"></div>
+                                                        <img src="${storeData.itemsById[senderFrame]?.image || ''}" 
+                                                             class="perfect-frame ${storeData.itemsById[senderFrame]?.itemType === 'svga' ? 'hidden' : ''}">
+                                                    ` : ''}
+                                                    <div class="level-badge">${senderData.wealthLevel || 1}</div>
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                        
+                                        <div class="relative max-w-[70%]">
+                                            ${!isMe && badgesHTML ? `
+                                                <div class="badges-container">
+                                                    ${badgesHTML}
+                                                </div>
+                                            ` : ''}
+                                            
+                                            <div class="relative ${isMe ? 'chat-bubble-me' : 'chat-bubble-them'} p-3 ${senderBubble && storeData.itemsById[senderBubble]?.itemType === 'svga' ? 'bg-transparent' : ''}">
+                                                ${bubbleSVGA}
+                                                <div class="relative z-10">
+                                                    ${!isMe ? `<p class="text-[10px] text-gray-500 mb-1">${senderData.displayName}</p>` : ''}
+                                                    <p class="text-sm">${msg.text}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        ${isMe ? `
+                                            <div class="relative">
+                                                <div class="avatar-wrapper">
+                                                    <img src="${senderData.photoURL}" class="avatar-img">
+                                                    ${senderFrame ? `
+                                                        <div id="msg-frame-me-${Date.now()}" class="svga-avatar-frame"></div>
+                                                        <img src="${storeData.itemsById[senderFrame]?.image || ''}" 
+                                                             class="perfect-frame ${storeData.itemsById[senderFrame]?.itemType === 'svga' ? 'hidden' : ''}">
+                                                    ` : ''}
+                                                    <div class="level-badge">${senderData.wealthLevel || 1}</div>
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                    </div>`;
+                                
+                                // Initialize SVGA elements
+                                setTimeout(() => {
+                                    // Initialize frame SVGA
+                                    if (senderFrame && storeData.itemsById[senderFrame]?.itemType === 'svga') {
+                                        const frameContainer = document.getElementById(`msg-frame-${Date.now()}`) || 
+                                                              document.getElementById(`msg-frame-me-${Date.now()}`);
+                                        if (frameContainer && storeData.itemsById[senderFrame]?.fileUrl) {
+                                            playSvga(storeData.itemsById[senderFrame].fileUrl, frameContainer, { loops: 0 });
+                                        }
+                                    }
+                                    
+                                    // Initialize bubble SVGA
+                                    if (senderBubble && storeData.itemsById[senderBubble]?.itemType === 'svga') {
+                                        const bubbleContainer = document.getElementById(`bubble-${Date.now()}`);
+                                        if (bubbleContainer && storeData.itemsById[senderBubble]?.fileUrl) {
+                                            playSvga(storeData.itemsById[senderBubble].fileUrl, bubbleContainer, { loops: 0 });
+                                        }
+                                    }
+                                    
+                                    // Initialize badge SVGAs
+                                    senderBadges.slice(0, 5).forEach(badgeId => {
+                                        const badge = storeData.itemsById[badgeId];
+                                        if (badge?.itemType === 'svga' && badge.fileUrl) {
+                                            const badgeContainer = document.getElementById(`msg-badge-${Date.now()}-${badgeId}`);
+                                            if (badgeContainer) {
+                                                playSvga(badge.fileUrl, badgeContainer, { loops: 1 });
+                                            }
+                                        }
+                                    });
+                                }, 50);
+                            }
+                        });
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
+        }
+
+        function playSvga(url, container, options = {}) {
+            try {
+                container.innerHTML = '';
+                const player = new SVGA.Player(container);
+                const parser = new SVGA.Parser();
+                parser.load(url, (videoItem) => {
+                    player.setVideoItem(videoItem);
+                    player.loops = options.loops || 0;
+                    player.clearsAfterStop = options.clearsAfterStop || false;
+                    player.startAnimation();
+                });
+            } catch (error) {
+                console.error('SVGA error:', error);
+            }
+        }
+
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            
+            if (!text || !friendUid) return;
+            
+            const chatId = [userData.uid, friendUid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
+            await push(chatRef, {
+                senderId: userData.uid,
+                receiverId: friendUid,
+                text: text,
+                type: 'text',
+                timestamp: Date.now()
+            });
+            
+            input.value = '';
+        };
+
+        window.toggleGiftBox = () => {
+            const giftBox = document.getElementById('giftBox');
+            giftBox.classList.toggle('hidden');
+            if (!giftBox.classList.contains('hidden')) {
+                switchGiftTab('fixed');
+            }
+        };
+
+        window.switchGiftTab = (type) => {
+            const grid = document.getElementById('giftGrid');
+            grid.innerHTML = '';
+            
+            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
+            
+            document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            
+            items.forEach(item => {
+                grid.innerHTML += `
+                    <div onclick="sendGift('${item.id}', '${item.type}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
+                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
+                            <img src="${item.image}" class="w-full h-full object-contain">
+                        </div>
+                        <span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span>
+                        <span class="text-[8px] text-yellow-600 font-black">${item.price || 0} 💰</span>
+                    </div>`;
+            });
+        };
+
+        window.sendGift = async (giftId, giftType) => {
+            if (userData.balance < (storeData.gifts.find(g => g.id === giftId)?.price || 0)) {
+                return alert('رصيدك غير كافٍ!');
+            }
+
+            const giftList = giftType === 'magic' ? storeData.luckGifts : storeData.gifts;
+            const gift = giftList.find(g => g.id === giftId);
+            
+            await updateDoc(doc(db, "users", userData.uid), {
+                balance: increment(-(gift.price || 0))
+            });
+
+            const chatId = [userData.uid, friendUid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            
+            await push(chatRef, {
+                senderId: userData.uid,
+                receiverId: friendUid,
+                giftId: gift.id,
+                giftName: gift.name,
+                giftImage: gift.image,
+                giftType: gift.type,
+                type: 'gift',
+                timestamp: Date.now()
+            });
+
+            toggleGiftBox();
+        };
+
+        window.toggleProfileMenu = () => {
+            const menu = document.getElementById('profileMenu');
+            menu.classList.toggle('hidden');
+        };
+
+        window.unfollowUser = async () => {
+            if (confirm('هل تريد إلغاء متابعة هذا المستخدم؟')) {
+                await updateDoc(doc(db, "users", userData.uid), {
+                    friends: arrayRemove(friendUid)
+                });
+                await updateDoc(doc(db, "users", friendUid), {
+                    friends: arrayRemove(userData.uid)
+                });
+                alert('تم إلغاء المتابعة');
+                window.close();
+            }
+        };
+
+        window.blockUser = () => {
+            if (confirm('هل تريد حظر هذا المستخدم؟')) {
+                alert('تم حظر المستخدم');
+                window.close();
+            }
+        };
+
+        // Close profile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('#profileMenu') && !e.target.closest('button[onclick="toggleProfileMenu()"]')) {
+                document.getElementById('profileMenu').classList.add('hidden');
+            }
+        });
+
+        // Enter key to send message
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
