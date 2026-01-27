@@ -616,92 +616,69 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // البحث عن المستخدم في Firestore باستخدام email
-                const q = query(collection(db, "users"), where("email", "==", user.email));
-                const querySnapshot = await getDocs(q);
+                // الاعتماد الكلي على user.uid ليتوافق مع قواعد الحماية (Rules)
+                const userDocRef = doc(db, "users", user.uid);
                 
-                if (!querySnapshot.empty) {
-                    const userDoc = querySnapshot.docs[0];
-                    userData = { uid: userDoc.id, ...userDoc.data() };
-                    
-                    onSnapshot(doc(db, "users", userDoc.id), async (docSnap) => {
-                        if (docSnap.exists()) {
-                            userData = { uid: docSnap.id, ...docSnap.data() };
-                            await updateUI();
-                            await loadFriendRequests();
-                            await loadFriends();
-                        }
-                    });
-                } else {
-                    const rtdbRef = ref(rtdb, `users/${user.uid}`);
-                    
-                    onValue(rtdbRef, async (snapshot) => {
-                        if (snapshot.exists()) {
-                            const oldData = snapshot.val();
-                            
-                            const newUserRef = doc(collection(db, "users"));
-                            await setDoc(newUserRef, {
-                                uid: user.uid,
-                                email: user.email,
-                                displayName: user.displayName || oldData.displayName || "مستخدم",
-                                photoURL: user.photoURL || oldData.photoURL || 'https://via.placeholder.com/150',
-                                balance: oldData.balance || 0,
-                                magicLevel: oldData.magicLevel || 1,
-                                wealthLevel: oldData.wealthLevel || 1,
-                                purchasedFrames: oldData.purchasedFrames || [],
-                                purchasedBadges: oldData.purchasedBadges || [],
-                                purchasedSvga: oldData.purchasedSvga || [],
-                                purchasedChatBubbles: oldData.purchasedChatBubbles || [],
-                                activeFrame: oldData.activeFrame || null,
-                                activeBadges: oldData.activeBadges || [],
-                                activeChatBubble: oldData.activeChatBubble || null,
-                                friends: oldData.friends || [],
-                                friendRequests: oldData.friendRequests || [],
-                                sentRequests: oldData.sentRequests || [],
-                                blockedUsers: oldData.blockedUsers || [],
-                                createdAt: serverTimestamp()
-                            });
-                            
-                            await set(rtdbRef, null);
-                            
-                            userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
-                        } else {
-                            const newUserRef = doc(collection(db, "users"));
-                            await setDoc(newUserRef, {
-                                uid: user.uid,
-                                email: user.email,
-                                displayName: user.displayName || "مستخدم",
-                                photoURL: user.photoURL || 'https://via.placeholder.com/150',
-                                balance: 0,
-                                magicLevel: 1,
-                                wealthLevel: 1,
-                                purchasedFrames: [],
-                                purchasedBadges: [],
-                                purchasedSvga: [],
-                                purchasedChatBubbles: [],
-                                activeFrame: null,
-                                activeBadges: [],
-                                activeChatBubble: null,
-                                friends: [],
-                                friendRequests: [],
-                                sentRequests: [],
-                                blockedUsers: [],
-                                createdAt: serverTimestamp()
-                            });
-                            
-                            userData = await getDoc(newUserRef).then(doc => ({ uid: doc.id, ...doc.data() }));
-                        }
-                        
-                        onSnapshot(doc(db, "users", userData.uid), async (docSnap) => {
-                            if (docSnap.exists()) {
-                                userData = { uid: docSnap.id, ...docSnap.data() };
-                                await updateUI();
-                                await loadFriendRequests();
-                                await loadFriends();
+                onSnapshot(userDocRef, async (docSnap) => {
+                    if (docSnap.exists()) {
+                        userData = { uid: docSnap.id, ...docSnap.data() };
+                        await updateUI();
+                        await loadFriendRequests();
+                        await loadFriends();
+                    } else {
+                        // محاولة الجلب من RTDB للمستخدمين القدامى ونقلهم لـ Firestore بنفس الـ UID
+                        const rtdbRef = ref(rtdb, `users/${user.uid}`);
+                        onValue(rtdbRef, async (snapshot) => {
+                            if (snapshot.exists()) {
+                                const oldData = snapshot.val();
+                                await setDoc(userDocRef, {
+                                    uid: user.uid,
+                                    email: user.email,
+                                    displayName: user.displayName || oldData.displayName || "مستخدم",
+                                    photoURL: user.photoURL || oldData.photoURL || 'https://via.placeholder.com/150',
+                                    balance: oldData.balance || 0,
+                                    magicLevel: oldData.magicLevel || 1,
+                                    wealthLevel: oldData.wealthLevel || 1,
+                                    purchasedFrames: oldData.purchasedFrames || [],
+                                    purchasedBadges: oldData.purchasedBadges || [],
+                                    purchasedSvga: oldData.purchasedSvga || [],
+                                    purchasedChatBubbles: oldData.purchasedChatBubbles || [],
+                                    activeFrame: oldData.activeFrame || null,
+                                    activeBadges: oldData.activeBadges || [],
+                                    activeChatBubble: oldData.activeChatBubble || null,
+                                    friends: oldData.friends || [],
+                                    friendRequests: oldData.friendRequests || [],
+                                    sentRequests: oldData.sentRequests || [],
+                                    blockedUsers: oldData.blockedUsers || [],
+                                    createdAt: serverTimestamp()
+                                });
+                            } else {
+                                // مستخدم جديد تماماً - يتم إنشاؤه بالـ UID الخاص به
+                                await setDoc(userDocRef, {
+                                    uid: user.uid,
+                                    email: user.email,
+                                    displayName: user.displayName || "مستخدم جديد",
+                                    photoURL: user.photoURL || 'https://via.placeholder.com/150',
+                                    balance: 1000,
+                                    magicLevel: 1,
+                                    wealthLevel: 1,
+                                    purchasedFrames: [],
+                                    purchasedBadges: [],
+                                    purchasedSvga: [],
+                                    purchasedChatBubbles: [],
+                                    activeFrame: null,
+                                    activeBadges: [],
+                                    activeChatBubble: null,
+                                    friends: [],
+                                    friendRequests: [],
+                                    sentRequests: [],
+                                    blockedUsers: [],
+                                    createdAt: serverTimestamp()
+                                });
                             }
-                        });
-                    }, { onlyOnce: true });
-                }
+                        }, { onlyOnce: true });
+                    }
+                });
                 
                 await loadBanner();
                 await loadGlobalData();
