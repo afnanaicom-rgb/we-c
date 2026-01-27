@@ -149,12 +149,14 @@
         .svga-avatar-frame canvas {
             border-radius: 50%;
             object-fit: contain;
-            width: 100% !important;
-            height: 100% !important;
+            width: 100% !important; 
+            height: 60% !important;
+            transform: translateX(25px) !important;
+            z-index: 2;
+            margin: auto;
             position: absolute !important;
             top: 50% !important;
             left: 50% !important;
-            transform: translate(-50%, -50%) !important;
             max-width: 100% !important;
             max-height: 100% !important;
             min-width: 100% !important;
@@ -308,6 +310,15 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        /* --- VGA Player Canvas --- */
+        .vga-player-canvas { 
+            width: 100% !important; 
+            height: 60% !important;
+            transform: translateX(25px) !important;
+            z-index: 2;
+            margin: auto;
         }
     </style>
 </head>
@@ -813,6 +824,15 @@
                     player.clearsAfterStop = options.clearsAfterStop || false;
                     player.startAnimation();
                     
+                    setTimeout(() => {
+                        const canvas = container.querySelector('canvas');
+                        if (canvas) {
+                            canvas.classList.add('vga-player-canvas');
+                            canvas.style.objectFit = 'contain';
+                            canvas.style.display = 'block';
+                        }
+                    }, 50);
+
                     const id = 'player_' + Date.now();
                     activeSvgaPlayers[id] = { player, container };
                     container.dataset.playerId = id;
@@ -843,18 +863,11 @@
                     setTimeout(() => {
                         const canvas = container.querySelector('canvas');
                         if (canvas) {
-                            canvas.style.width = '100%';
-                            canvas.style.height = '100%';
+                            // تطبيق الفئة المطلوبة للحفاظ على المقاسات والتحويل
+                            canvas.classList.add('vga-player-canvas');
+                            
+                            // الحفاظ على الخصائص الأساسية الأخرى
                             canvas.style.objectFit = 'contain';
-                            canvas.style.borderRadius = '50%';
-                            canvas.style.position = 'absolute';
-                            canvas.style.top = '50%';
-                            canvas.style.left = '50%';
-                            canvas.style.transform = 'translate(-50%, -50%)';
-                            canvas.style.maxWidth = '100%';
-                            canvas.style.maxHeight = '100%';
-                            canvas.style.minWidth = '100%';
-                            canvas.style.minHeight = '100%';
                             canvas.style.display = 'block';
                         }
                     }, 50);
