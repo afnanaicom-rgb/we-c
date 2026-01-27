@@ -964,24 +964,33 @@
         };
 
         window.buyItem = async (type, id, price) => {
-            if (userData.balance < price) return alert('رصيدك غير كافٍ!');
-            
-            let field = '';
-            if (type === 'frame') field = 'purchasedFrames';
-            else if (type === 'badge') field = 'purchasedBadges';
-            else if (type === 'svga') field = 'purchasedSvga';
-            else if (type === 'chatbubble') field = 'purchasedChatBubbles';
-            
-            await updateDoc(doc(db, "users", userData.uid), {
-                balance: increment(-price),
-                [field]: arrayUnion({ 
-                    id: id, 
-                    purchasedAt: new Date(),
-                    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 ساعة
-                })
-            });
-            
-            loadStoreItems(type);
+            try {
+                if (!userData.uid) return alert('خطأ: لم يتم تحميل بيانات المستخدم');
+                if ((userData.balance || 0) < price) return alert('رصيدك غير كافٍ!');
+                
+                let field = '';
+                if (type === 'frame') field = 'purchasedFrames';
+                else if (type === 'badge') field = 'purchasedBadges';
+                else if (type === 'svga') field = 'purchasedSvga';
+                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
+                
+                if (!field) return alert('خطأ: نوع العنصر غير معروف');
+
+                await updateDoc(doc(db, "users", userData.uid), {
+                    balance: increment(-price),
+                    [field]: arrayUnion({ 
+                        id: id, 
+                        purchasedAt: new Date(),
+                        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // تعديل الصلاحية لـ 30 يوم بدلاً من 24 ساعة ليكون أكثر منطقية للمتجر
+                    })
+                });
+                
+                alert('تم الشراء بنجاح!');
+                loadStoreItems(type);
+            } catch (error) {
+                console.error("Purchase error:", error);
+                alert('فشل الشراء: ' + error.message);
+            }
         };
 
         window.loadBagItems = async () => {
@@ -1827,7 +1836,18 @@
             toggleSidebar(false);
         };
         
-        window.recharge = (a) => updateDoc(doc(db, "users", userData.uid), { balance: increment(a) }).then(() => alert('تم الشحن!'));
+        window.recharge = async (a) => {
+            try {
+                if (!userData.uid) return alert('خطأ: لم يتم تحميل بيانات المستخدم');
+                await updateDoc(doc(db, "users", userData.uid), { 
+                    balance: increment(a) 
+                });
+                alert('تم الشحن بنجاح!');
+            } catch (error) {
+                console.error("Recharge error:", error);
+                alert('فشل الشحن: ' + error.message);
+            }
+        };
         window.openEditProfile = () => {
             document.getElementById('editNameInp').value = userData.displayName;
             document.getElementById('editPhotoInp').value = userData.photoURL;
