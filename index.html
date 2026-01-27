@@ -95,7 +95,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
@@ -118,31 +118,35 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // إنشاء وثيقة المستخدم إذا لم تكن موجودة
-                const userDoc = await doc(db, "users", user.uid);
-                const userData = {
-                    displayName: user.displayName || "مستخدم جديد",
-                    photoURL: user.photoURL || "https://via.placeholder.com/150",
-                    email: user.email,
-                    uid: user.uid,
-                    balance: 1000,
-                    jewels: 0,
-                    magicLevel: 1,
-                    wealthLevel: 1,
-                    customId: Math.floor(100000 + Math.random() * 900000).toString(),
-                    purchasedFrames: [],
-                    purchasedBadges: [],
-                    activeFrame: null,
-                    activeBadges: [],
-                    friends: [],
-                    friendRequests: [],
-                    sentRequests: [],
-                    createdAt: new Date()
-                };
+                // التحقق من وجود المستخدم في Firestore أولاً لمنع إنشاء حساب جديد أو مسح البيانات
+                const userDocRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userDocRef);
                 
-                await setDoc(userDoc, userData, { merge: true });
+                if (!userSnap.exists()) {
+                    // يتم إنشاء الحساب فقط إذا لم يكن البريد الإلكتروني موجوداً مسبقاً في Firestore
+                    const userData = {
+                        displayName: user.displayName || "مستخدم جديد",
+                        photoURL: user.photoURL || "https://via.placeholder.com/150",
+                        email: user.email,
+                        uid: user.uid,
+                        balance: 1000,
+                        jewels: 0,
+                        magicLevel: 1,
+                        wealthLevel: 1,
+                        customId: Math.floor(100000 + Math.random() * 900000).toString(),
+                        purchasedFrames: [],
+                        purchasedBadges: [],
+                        activeFrame: null,
+                        activeBadges: [],
+                        friends: [],
+                        friendRequests: [],
+                        sentRequests: [],
+                        createdAt: new Date()
+                    };
+                    await setDoc(userDocRef, userData);
+                }
                 
-                // الانتقال إلى الصفحة الرئيسية
+                // الانتقال إلى الصفحة الرئيسية (سواء كان الحساب موجوداً أو تم إنشاؤه للتو)
                 window.location.href = "home.html";
             }
         });
