@@ -1964,7 +1964,7 @@ window.sendFriendRequest = async (uid) => {
 	        window.sendTelegramMessage = async (text) => {
 	            if (!userData.telegramId) return;
 	            try {
-	                const response = await fetch('https://8000-idbb5hrz6a1ukxe2vp50b-e04b51d7.sg1.manus.im/send_message', {
+	                const response = await fetch('https://8000-idbb5hrz6a1ukxe2vp50b-e04b51d7.sg1.manus.computer/send_message', {
 	                    method: 'POST',
 	                    headers: { 'Content-Type': 'application/json' },
 	                    body: JSON.stringify({
