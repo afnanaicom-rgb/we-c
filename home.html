@@ -315,12 +315,112 @@
         .vga-player-canvas { 
             width: 100% !important; 
             height: 60% !important;
-            transform: translateX(25px) !important;
+            transform: translateX(25px);
             z-index: 2;
             margin: auto;
-            position: relative !important;
-            top: 0 !important;
-            left: 0 !important;
+        }
+        
+        /* --- أنماط المتجر الجديدة --- */
+        /* الصورة (الحاوية) جهة اليسار */
+        .product-overlay-img {
+            position: absolute; 
+            top: 50%; 
+            left: 15px;
+            transform: translateY(-50%);
+            width: 60%; 
+            height: 60%;
+            object-fit: contain; 
+            pointer-events: none; 
+            z-index: 1;
+        }
+        
+        .watermark { 
+            position: absolute; 
+            bottom: 5px; 
+            right: 8px; 
+            font-size: 0.5rem; 
+            opacity: 0.4; 
+            z-index: 10; 
+            color: #fff;
+        }
+
+        .info { 
+            padding: 8px; 
+            text-align: center; 
+        }
+        
+        .info h3 { 
+            font-size: 0.8rem; 
+            margin-bottom: 4px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+        }
+        
+        .price { 
+            color: var(--price-color, #1f2937); 
+            font-weight: bold; 
+            font-size: 0.9rem; 
+            margin-bottom: 8px; 
+            display: block; 
+        }
+        
+        .buy-btn {
+            width: 90%; 
+            margin: 0 auto; 
+            padding: 8px; 
+            border: none;
+            border-radius: 6px; 
+            background: var(--accent-color, #1f2937); 
+            color: #fff;
+            font-weight: bold; 
+            font-size: 0.75rem; 
+            cursor: pointer;
+        }
+        
+        .buy-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        /* --- عدادات الوقت --- */
+        .timer {
+            font-size: 0.7rem;
+            color: #ef4444;
+            font-weight: bold;
+            direction: ltr;
+            text-align: center;
+            margin-top: 4px;
+        }
+        
+        .store-timer {
+            font-size: 0.65rem;
+            color: #6b7280;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+        
+        /* --- إطارات مخصصة --- */
+        .custom-frame-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            pointer-events: none;
+        }
+        
+        .custom-frame-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* --- شبكة الشارات --- */
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 8px;
         }
     </style>
 </head>
@@ -447,25 +547,25 @@
             <div class="text-center mb-6">
                 <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
                 <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
-<span class="text-xs font-bold text-gray-400">البريد:</span>
-	                    <span id="sideEmail" class="text-sm font-medium text-gray-600 truncate max-w-[150px]">...</span>
-	                    <button onclick="copyEmail()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
-	                </div>
-	            </div>
-	            <div class="flex gap-3 mb-8">
-	                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-	                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
-	                        <img id="magicLevelImg" src="" class="w-full h-full object-contain">
-	                    </div>
-	                    <span id="sideMagicLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
-	                </div>
-	                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-	                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
-	                        <img id="wealthLevelImg" src="" class="w-full h-full object-contain">
-	                    </div>
-	                    <span id="sideWealthLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
-	                </div>
-	            </div>
+                    <span class="text-xs font-bold text-gray-400">البريد:</span>
+                    <span id="sideEmail" class="text-sm font-medium text-gray-600 truncate max-w-[150px]">...</span>
+                    <button onclick="copyEmail()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                </div>
+            </div>
+            <div class="flex gap-3 mb-8">
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
+                        <img id="magicLevelImg" src="" class="w-full h-full object-contain">
+                    </div>
+                    <span id="sideMagicLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
+                </div>
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
+                        <img id="wealthLevelImg" src="" class="w-full h-full object-contain">
+                    </div>
+                    <span id="sideWealthLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
+                </div>
+            </div>
             <div class="mb-6">
                 <div id="sidebarActiveBadges" class="badges-grid"></div>
             </div>
@@ -524,12 +624,11 @@
                     </div>
                 </div>
             </div>
-<div class="flex gap-2">
-	                <button onclick="startTelegramCall()" class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600"><i data-lucide="phone" class="w-5 h-5"></i></button>
-	                <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
-	                <button onclick="unfollowInChat()" id="unfollowBtn" class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 hidden"><i data-lucide="user-x" class="w-5 h-5"></i></button>
-	                <button onclick="blockUserInChat()" id="blockBtn" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i data-lucide="shield-off" class="w-5 h-5"></i></button>
-	            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
+                <button onclick="unfollowInChat()" id="unfollowBtn" class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 hidden"><i data-lucide="user-x" class="w-5 h-5"></i></button>
+                <button onclick="blockUserInChat()" id="blockBtn" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i data-lucide="shield-off" class="w-5 h-5"></i></button>
+            </div>
         </header>
         <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar"></div>
         <div class="p-4 glass flex gap-2 items-center">
@@ -614,10 +713,63 @@
         let chatUnsubscribe = null;
         let activeSvgaPlayers = {};
         let activeChatBubble = null;
+        let bagInterval = null;
+
+        // دالة تحويل الوقت المتبقي
+        function formatTimeRemaining(expiresAt) {
+            if (!expiresAt) return '∞';
+            const now = new Date();
+            const expires = new Date(expiresAt);
+            const diff = expires - now;
+            
+            if (diff <= 0) return 'منتهي';
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // دالة التحقق من المستخدم عبر البريد الإلكتروني
+        async function verifyUserByEmail(email, uid) {
+            try {
+                // التحقق من وجود المستخدم عبر البريد الإلكتروني في قسم المصادقة
+                const usersRef = collection(db, "users");
+                const q = query(usersRef, where("email", "==", email));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    // إذا لم يوجد مستخدم بهذا البريد، رفض الدخول
+                    await signOut(auth);
+                    alert('لا يوجد حساب مرتبط بهذا البريد الإلكتروني. يرجى التواصل مع المسؤول.');
+                    window.location.href = "index.html";
+                    return false;
+                }
+                
+                // التحقق من أن الـ UID مطابق للبريد الإلكتروني
+                const userDoc = querySnapshot.docs[0];
+                if (userDoc.id !== uid) {
+                    await signOut(auth);
+                    alert('خطأ في التحقق من هوية المستخدم.');
+                    window.location.href = "index.html";
+                    return false;
+                }
+                
+                return true;
+            } catch (error) {
+                console.error("Error verifying user:", error);
+                return false;
+            }
+        }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // الاعتماد الكلي على user.uid ليتوافق مع قواعد الحماية (Rules)
+                // التحقق من المستخدم عبر البريد الإلكتروني
+                const isVerified = await verifyUserByEmail(user.email, user.uid);
+                if (!isVerified) return;
+
+                // الاعتماد الكلي على user.uid
                 const userDocRef = doc(db, "users", user.uid);
                 
                 onSnapshot(userDocRef, async (docSnap) => {
@@ -626,58 +778,12 @@
                         await updateUI();
                         await loadFriendRequests();
                         await loadFriends();
+                        await checkExpiredItems(); // التحقق من العناصر المنتهية
                     } else {
-                        // محاولة الجلب من RTDB للمستخدمين القدامى ونقلهم لـ Firestore بنفس الـ UID
-                        const rtdbRef = ref(rtdb, `users/${user.uid}`);
-                        onValue(rtdbRef, async (snapshot) => {
-                            if (snapshot.exists()) {
-                                const oldData = snapshot.val();
-                                await setDoc(userDocRef, {
-                                    uid: user.uid,
-                                    email: user.email,
-                                    displayName: user.displayName || oldData.displayName || "مستخدم",
-                                    photoURL: user.photoURL || oldData.photoURL || 'https://via.placeholder.com/150',
-                                    balance: oldData.balance || 0,
-                                    magicLevel: oldData.magicLevel || 1,
-                                    wealthLevel: oldData.wealthLevel || 1,
-                                    purchasedFrames: oldData.purchasedFrames || [],
-                                    purchasedBadges: oldData.purchasedBadges || [],
-                                    purchasedSvga: oldData.purchasedSvga || [],
-                                    purchasedChatBubbles: oldData.purchasedChatBubbles || [],
-                                    activeFrame: oldData.activeFrame || null,
-                                    activeBadges: oldData.activeBadges || [],
-                                    activeChatBubble: oldData.activeChatBubble || null,
-                                    friends: oldData.friends || [],
-                                    friendRequests: oldData.friendRequests || [],
-                                    sentRequests: oldData.sentRequests || [],
-                                    blockedUsers: oldData.blockedUsers || [],
-                                    createdAt: serverTimestamp()
-                                });
-                            } else {
-                                // مستخدم جديد تماماً - يتم إنشاؤه بالـ UID الخاص به
-                                await setDoc(userDocRef, {
-                                    uid: user.uid,
-                                    email: user.email,
-                                    displayName: user.displayName || "مستخدم جديد",
-                                    photoURL: user.photoURL || 'https://via.placeholder.com/150',
-                                    balance: 1000,
-                                    magicLevel: 1,
-                                    wealthLevel: 1,
-                                    purchasedFrames: [],
-                                    purchasedBadges: [],
-                                    purchasedSvga: [],
-                                    purchasedChatBubbles: [],
-                                    activeFrame: null,
-                                    activeBadges: [],
-                                    activeChatBubble: null,
-                                    friends: [],
-                                    friendRequests: [],
-                                    sentRequests: [],
-                                    blockedUsers: [],
-                                    createdAt: serverTimestamp()
-                                });
-                            }
-                        }, { onlyOnce: true });
+                        // إذا لم يوجد مستند للمستخدم، رفض الدخول
+                        await signOut(auth);
+                        alert('لا يوجد حساب مرتبط بهذا البريد الإلكتروني. يرجى التواصل مع المسؤول.');
+                        window.location.href = "index.html";
                     }
                 });
                 
@@ -731,15 +837,15 @@
             const magicImg = document.getElementById('magicLevelImg');
             const wealthImg = document.getElementById('wealthLevelImg');
             
-	            if (storeData.magicLevels[ml]) {
-	                magicImg.src = storeData.magicLevels[ml].image;
-	                document.getElementById('sideMagicLevelText').innerText = ml;
-	            }
-	            
-	            if (storeData.wealthLevels[wl]) {
-	                wealthImg.src = storeData.wealthLevels[wl].image;
-	                document.getElementById('sideWealthLevelText').innerText = wl;
-	            }
+            if (storeData.magicLevels[ml]) {
+                magicImg.src = storeData.magicLevels[ml].image;
+                document.getElementById('sideMagicLevelText').innerText = ml;
+            }
+            
+            if (storeData.wealthLevels[wl]) {
+                wealthImg.src = storeData.wealthLevels[wl].image;
+                document.getElementById('sideWealthLevelText').innerText = wl;
+            }
 
             const frameEl = document.getElementById('sideFrame');
             const svgaContainer = document.getElementById('sideSvgaFrame');
@@ -845,10 +951,7 @@
                     setTimeout(() => {
                         const canvas = container.querySelector('canvas');
                         if (canvas) {
-                            // تطبيق الفئة المطلوبة للحفاظ على المقاسات والتحويل
                             canvas.classList.add('vga-player-canvas');
-                            
-                            // الحفاظ على الخصائص الأساسية الأخرى
                             canvas.style.objectFit = 'contain';
                             canvas.style.display = 'block';
                         }
@@ -891,7 +994,11 @@
                 let extraTag = '';
                 
                 if (type === 'chatbubble') {
-                    previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
+                    previewHTML = `
+                        <div class="relative w-full h-32 overflow-hidden rounded-t-2xl bg-gradient-to-br from-blue-50 to-purple-50">
+                            <div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>
+                            <div class="watermark">فقاعة دردشة</div>
+                        </div>`;
                     if (item.fileUrl) {
                         setTimeout(() => {
                             const container = document.getElementById(`preview-cb-${item.id}`);
@@ -904,24 +1011,53 @@
                         }, 100);
                     }
                 } else if (item.itemType === 'svga') {
-                    previewHTML = `<div class="svga-preview mb-2" id="preview-${item.id}"></div>`;
+                    // تصميم جديد للإطارات المتحركة
+                    previewHTML = `
+                        <div class="relative w-full h-32 overflow-hidden rounded-t-2xl bg-gradient-to-br from-pink-50 to-rose-50">
+                            <img src="${item.image || 'https://via.placeholder.com/150'}" class="product-overlay-img" alt="${item.name}">
+                            <div class="svga-preview absolute inset-0" id="preview-${item.id}"></div>
+                            <div class="watermark">إطار متحرك</div>
+                        </div>
+                    `;
                     extraTag = '<span class="svga-icon">SVGA</span>';
+                } else if (type === 'frame') {
+                    // إطارات ثابتة
+                    previewHTML = `
+                        <div class="relative w-full h-32 overflow-hidden rounded-t-2xl bg-gradient-to-br from-emerald-50 to-teal-50">
+                            <img src="${item.image}" class="w-full h-full object-cover" alt="${item.name}">
+                            <div class="watermark">إطار</div>
+                        </div>
+                    `;
+                } else if (type === 'badge') {
+                    // شارات
+                    previewHTML = `
+                        <div class="relative w-full h-32 overflow-hidden rounded-t-2xl bg-gradient-to-br from-amber-50 to-yellow-50">
+                            ${item.itemType === 'svga' ? 
+                                `<div class="svga-preview w-full h-full" id="preview-${item.id}"></div>` :
+                                `<img src="${item.image}" class="w-full h-full object-contain p-4" alt="${item.name}">`
+                            }
+                            <div class="watermark">شارة</div>
+                        </div>
+                    `;
                 } else {
                     previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
                 }
                 
                 grid.innerHTML += `
-                    <div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">
+                    <div class="glass-card rounded-3xl overflow-hidden min-h-[280px] flex flex-col relative">
                         ${previewHTML}
-                        <h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>
-                        ${extraTag}
-                        <button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" 
-                                class="w-full py-2 ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'} text-xs font-bold rounded-xl mt-2">
-                            ${owned ? 'مملوك' : `${item.price} 💰 شراء`}
-                        </button>
+                        <div class="info flex-1 flex flex-col justify-between p-4">
+                            <h3 class="font-bold text-gray-900">${item.name}</h3>
+                            <span class="price text-gray-700">${item.price} 💰</span>
+                            <button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" 
+                                    class="buy-btn ${owned ? 'bg-gray-400' : 'bg-gray-900 hover:bg-black'}" ${owned ? 'disabled' : ''}>
+                                ${owned ? 'مملوك' : 'شراء الآن'}
+                            </button>
+                            <div class="store-timer">⏳ صلاحية: 24 ساعة</div>
+                        </div>
                     </div>`;
                 
-                if (item.itemType === 'svga' && item.fileUrl && type !== 'chatbubble') {
+                if ((item.itemType === 'svga' || (type === 'badge' && item.itemType === 'svga')) && item.fileUrl) {
                     setTimeout(() => {
                         const previewContainer = document.getElementById(`preview-${item.id}`);
                         if (previewContainer) {
@@ -956,16 +1092,19 @@
                 
                 if (!field) return alert('خطأ: نوع العنصر غير معروف');
 
+                // حساب وقت انتهاء الصلاحية (24 ساعة من الآن)
+                const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                
                 await updateDoc(doc(db, "users", userData.uid), {
                     balance: increment(-price),
                     [field]: arrayUnion({ 
                         id: id, 
                         purchasedAt: new Date(),
-                        expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // تعديل الصلاحية لـ 30 يوم بدلاً من 24 ساعة ليكون أكثر منطقية للمتجر
+                        expiresAt: expiresAt
                     })
                 });
                 
-                alert('تم الشراء بنجاح!');
+                alert('تم الشراء بنجاح! العنصر صالح لمدة 24 ساعة');
                 loadStoreItems(type);
             } catch (error) {
                 console.error("Purchase error:", error);
@@ -986,11 +1125,13 @@
             aGrid.innerHTML = '';
             cbGrid.innerHTML = '';
             
+            const now = new Date();
             const frames = userData.purchasedFrames || [];
             for (const f of frames) {
                 const item = storeData.itemsById[f.id];
                 if (item && item.type === 'frame') {
                     const isEquipped = userData.activeFrame === f.id;
+                    const timeRemaining = formatTimeRemaining(f.expiresAt);
                     
                     if (item.itemType === 'svga') {
                         fGrid.innerHTML += `
@@ -998,6 +1139,7 @@
                                 <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}">
                                     <span class="text-xs font-bold text-gray-600">SVGA</span>
                                 </div>
+                                <div class="timer">${timeRemaining}</div>
                                 ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                             </div>`;
                         
@@ -1014,6 +1156,7 @@
                         fGrid.innerHTML += `
                             <div onclick="equipFrame('${f.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
                                 <img src="${item.image}" class="w-12 h-12 object-contain rounded-full">
+                                <div class="timer">${timeRemaining}</div>
                                 ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                             </div>`;
                     }
@@ -1025,15 +1168,17 @@
                 const item = storeData.itemsById[b.id];
                 if (item && item.type === 'badge') {
                     const isActive = userData.activeBadges?.includes(b.id);
+                    const timeRemaining = formatTimeRemaining(b.expiresAt);
                     
                     bGrid.innerHTML += `
-                        <div onclick="toggleBadge('${b.id}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
-                            <div class="w-8 h-8 flex items-center justify-center" id="bag-badge-${b.id}">
+                        <div onclick="toggleBadge('${b.id}')" class="p-2 rounded-xl glass-card flex flex-col items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
+                            <div class="w-8 h-8 flex items-center justify-center mb-1" id="bag-badge-${b.id}">
                                 ${item.itemType === 'svga' ? 
                                     '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : 
                                     `<img src="${item.image}" class="w-full h-full object-contain">`
                                 }
                             </div>
+                            <div class="timer text-[0.6rem]">${timeRemaining}</div>
                         </div>`;
                     
                     if (item.itemType === 'svga' && item.fileUrl) {
@@ -1055,13 +1200,14 @@
                 const item = storeData.itemsById[s.id];
                 if (item && item.type === 'svga') {
                     const isEquipped = userData.activeFrame === s.id;
+                    const timeRemaining = formatTimeRemaining(s.expiresAt);
                     
                     sGrid.innerHTML += `
                         <div onclick="equipSvga('${s.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">
                             <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-svga-${s.id}">
                                 <span class="text-xs font-bold text-gray-600">SVGA</span>
                             </div>
-                            <p class="text-xs text-center truncate w-full">${item.name}</p>
+                            <div class="timer">${timeRemaining}</div>
                             ${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                         </div>`;
                     
@@ -1081,14 +1227,18 @@
             for (const badgeId of activeBadges) {
                 const item = storeData.itemsById[badgeId];
                 if (item && item.type === 'badge') {
+                    const badgeData = userData.purchasedBadges?.find(b => b.id === badgeId);
+                    const timeRemaining = formatTimeRemaining(badgeData?.expiresAt);
+                    
                     aGrid.innerHTML += `
-                        <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white">
-                            <div class="w-8 h-8 flex items-center justify-center" id="active-badge-${badgeId}">
+                        <div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex flex-col items-center justify-center cursor-pointer border-2 border-black bg-white">
+                            <div class="w-8 h-8 flex items-center justify-center mb-1" id="active-badge-${badgeId}">
                                 ${item.itemType === 'svga' ? 
                                     '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : 
                                     `<img src="${item.image}" class="w-full h-full object-contain">`
                                 }
                             </div>
+                            <div class="timer text-[0.6rem]">${timeRemaining}</div>
                         </div>`;
                     
                     if (item.itemType === 'svga' && item.fileUrl) {
@@ -1110,13 +1260,14 @@
                 const bubble = storeData.chatBubbles.find(b => b.id === cb.id);
                 if (bubble) {
                     const isActive = userData.activeChatBubble === cb.id;
+                    const timeRemaining = formatTimeRemaining(cb.expiresAt);
                     
                     cbGrid.innerHTML += `
                         <div onclick="equipChatBubble('${cb.id}')" class="p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">
                             <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-cb-${cb.id}">
                                 <span class="text-xs font-bold text-gray-600">فقاعة</span>
                             </div>
-                            <p class="text-xs text-center truncate w-full">${bubble.name}</p>
+                            <div class="timer">${timeRemaining}</div>
                             ${isActive ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}
                         </div>`;
                     
@@ -1279,14 +1430,14 @@
                                 <div class="w-6 h-6 flex items-center justify-center">
                                     <img src="${magicLevelImg}" class="w-5 h-5 object-contain">
                                 </div>
-	                                <span class="text-xs font-bold text-gray-700">${magicLevel}</span>
-	                            </div>
-	                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
-	                                <div class="w-6 h-6 flex items-center justify-center">
-	                                    <img src="${wealthLevelImg}" class="w-5 h-5 object-contain">
-	                                </div>
-	                                <span class="text-xs font-bold text-gray-700">${wealthLevel}</span>
-	                            </div>
+                                <span class="text-xs font-bold text-gray-700">${magicLevel}</span>
+                            </div>
+                            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full">
+                                <div class="w-6 h-6 flex items-center justify-center">
+                                    <img src="${wealthLevelImg}" class="w-5 h-5 object-contain">
+                                </div>
+                                <span class="text-xs font-bold text-gray-700">${wealthLevel}</span>
+                            </div>
                         </div>
                         
                         <button onclick="${buttonAction}" 
@@ -1313,37 +1464,28 @@
             }
         };
 
-window.sendFriendRequest = async (uid) => {
-		            try {
-		                if (!userData.uid) {
-		                    alert("يرجى الانتظار حتى تحميل بياناتك");
-		                    return;
-		                }
-		                
-		                // تحديث قائمة الطلبات المرسلة للمستخدم الحالي
-		                await updateDoc(doc(db, "users", userData.uid), {
-		                    sentRequests: arrayUnion(uid)
-		                });
-		                
-		                // تحديث قائمة طلبات الصداقة للمستخدم المستهدف
-		                await updateDoc(doc(db, "users", uid), {
-		                    friendRequests: arrayUnion(userData.uid)
-		                });
-		                
-		                // تحديث البيانات المحلية فوراً لتحسين تجربة المستخدم
-		                if (!userData.sentRequests) userData.sentRequests = [];
-		                userData.sentRequests.push(uid);
-		                
-		                alert('تم إرسال طلب المتابعة بنجاح!');
-		                
-		                // إعادة تحميل واجهة البحث لتعكس الحالة الجديدة (تم الإرسال)
-		                if (typeof searchUser === 'function') searchUser();
-		                if (typeof loadFriendRequests === 'function') loadFriendRequests();
-		            } catch (error) {
-		                console.error("Friend request error:", error);
-		                alert('فشل إرسال الطلب: ' + error.message);
-		            }
-		        };
+        window.sendFriendRequest = async (uid) => {
+            try {
+                if (!userData.uid) {
+                    alert("يرجى الانتظار حتى تحميل بياناتك");
+                    return;
+                }
+                await updateDoc(doc(db, "users", userData.uid), {
+                    sentRequests: arrayUnion(uid)
+                });
+                
+                await updateDoc(doc(db, "users", uid), {
+                    friendRequests: arrayUnion(userData.uid)
+                });
+                
+                alert('تم إرسال طلب المتابعة بنجاح!');
+                searchUser();
+                loadFriendRequests();
+            } catch (error) {
+                console.error("Friend request error:", error);
+                alert('فشل إرسال الطلب: ' + error.message);
+            }
+        };
 
         window.cancelFriendRequest = async (uid) => {
             await updateDoc(doc(db, "users", userData.uid), {
@@ -1801,6 +1943,10 @@ window.sendFriendRequest = async (uid) => {
                     } catch (e) {}
                 });
                 activeSvgaPlayers = {};
+                if (bagInterval) {
+                    clearInterval(bagInterval);
+                    bagInterval = null;
+                }
                 signOut(auth);
             }
         };
@@ -1825,7 +1971,18 @@ window.sendFriendRequest = async (uid) => {
                 v === 'store' ? 'المتجر' : 
                 v === 'bag' ? 'حقيبتي' : 'أصدقائي';
             
-            if(v === 'bag') loadBagItems();
+            if(v === 'bag') {
+                loadBagItems();
+                // تحديث العد التنازلي كل ثانية
+                if (bagInterval) clearInterval(bagInterval);
+                bagInterval = setInterval(loadBagItems, 1000);
+            } else {
+                if (bagInterval) {
+                    clearInterval(bagInterval);
+                    bagInterval = null;
+                }
+            }
+            
             if(v === 'store') loadStoreItems('frame');
             if(v === 'friends') {
                 loadFriendRequests();
@@ -1847,13 +2004,16 @@ window.sendFriendRequest = async (uid) => {
                 alert('فشل الشحن: ' + error.message);
             }
         };
+        
         window.openEditProfile = () => {
             document.getElementById('editNameInp').value = userData.displayName;
             document.getElementById('editPhotoInp').value = userData.photoURL;
             document.getElementById('editModal').classList.remove('hidden');
             toggleSidebar(false);
         };
+        
         window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        
         window.saveProfileChanges = async () => {
             const n = document.getElementById('editNameInp').value;
             const p = document.getElementById('editPhotoInp').value;
@@ -1923,6 +2083,16 @@ window.sendFriendRequest = async (uid) => {
                 }
             }
             
+            if (userData.purchasedSvga) {
+                const expiredSvga = userData.purchasedSvga.filter(s => s.expiresAt && new Date(s.expiresAt) < now);
+                if (expiredSvga.length > 0) {
+                    updates.purchasedSvga = userData.purchasedSvga.filter(s => !expiredSvga.includes(s));
+                    if (userData.activeFrame && expiredSvga.some(s => s.id === userData.activeFrame)) {
+                        updates.activeFrame = null;
+                    }
+                }
+            }
+            
             if (userData.purchasedChatBubbles) {
                 const expiredBubbles = userData.purchasedChatBubbles.filter(cb => cb.expiresAt && new Date(cb.expiresAt) < now);
                 if (expiredBubbles.length > 0) {
@@ -1935,57 +2105,19 @@ window.sendFriendRequest = async (uid) => {
             
             if (Object.keys(updates).length > 0) {
                 await updateDoc(doc(db, "users", userData.uid), updates);
+                alert('تمت إزالة بعض العناصر المنتهية الصلاحية من حقيبتك');
             }
         }
+
+        // تحديث العد التنازلي كل دقيقة
+        setInterval(async () => {
+            if (userData.uid) {
+                await checkExpiredItems();
+            }
+        }, 60000);
 
         lucide.createIcons();
         setInterval(() => lucide.createIcons(), 1000);
     </script>
 </body>
 </html>
-
-	        // --- Telegram API Integration Functions ---
-	        window.startTelegramCall = () => {
-	            if (!userData.telegramId) {
-	                alert('يرجى ربط حساب تلجرام أولاً لتتمكن من إجراء المكالمات');
-	                // يمكن إضافة نافذة منبثقة هنا لطلب الـ ID
-	                const tId = prompt("يرجى إدخال معرف تلجرام الخاص بك (Telegram ID):");
-	                if (tId) {
-	                    updateDoc(doc(db, "users", userData.uid), { telegramId: tId });
-	                    userData.telegramId = tId;
-	                    alert("تم حفظ المعرف بنجاح. حاول الاتصال مرة أخرى.");
-	                }
-	                return;
-	            }
-	            alert('جاري بدء مكالمة صوتية عبر تلجرام...');
-	            window.open(`tg://user?id=${userData.telegramId}`, '_blank');
-	        };
-
-	        window.sendTelegramMessage = async (text) => {
-	            if (!userData.telegramId) return;
-	            try {
-	                const response = await fetch('https://8000-idbb5hrz6a1ukxe2vp50b-e04b51d7.sg1.manus.computer/send_message', {
-	                    method: 'POST',
-	                    headers: { 'Content-Type': 'application/json' },
-	                    body: JSON.stringify({
-	                        target_id: userData.telegramId,
-	                        text: text
-	                    })
-	                });
-	                const result = await response.json();
-	                console.log("Telegram API Response:", result);
-	            } catch (error) {
-	                console.error("Error sending Telegram message:", error);
-	            }
-	        };
-
-	        // ربط الـ ID الذي يولده تلجرام بـ Firebase عند التسجيل الجديد
-	        async function syncTelegramId(telegramId) {
-	            if (userData.uid) {
-	                await updateDoc(doc(db, "users", userData.uid), {
-	                    telegramId: telegramId,
-	                    // جلب الليفل والثروة والسحر بناءً على الـ ID
-	                    lastSync: serverTimestamp()
-	                });
-	            }
-	        }
