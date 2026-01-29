@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Afnan AI - White Edition (Ultimate)</title>
+    <title>Afnan AI - White Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,169 +11,83 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation; }
         body { background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%); color: #1f2937; overflow-x: hidden; min-height: 100vh; }
-        
-        /* Glassmorphism */
-        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04); }
-        .glass-deep { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(25px) saturate(200%); border-right: 1px solid rgba(255, 255, 255, 0.8); }
-        .glass-card { background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .glass-card:active { transform: scale(0.98); }
-        
-        /* Sidebar */
-        .sidebar-container { position: fixed; top: 0; right: 0; width: 85%; max-width: 320px; height: 100%; z-index: 100; transform: translateX(110%); transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1); }
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02), inset 0 1px 0 0 rgba(255, 255, 255, 0.4); }
+        .glass-deep { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%); border-right: 1px solid rgba(255, 255, 255, 0.8); }
+        .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.5); }
+        .glass-card:active { transform: scale(0.97); box-shadow: 0 1px 3px -1px rgba(0, 0, 0, 0.02), inset 0 2px 0 0 rgba(255, 255, 255, 0.3); }
+        .sidebar-container { position: fixed; top: 0; right: 0; width: 85%; max-width: 320px; height: 100%; z-index: 50; transform: translateX(110%); transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1); }
         .sidebar-container.open { transform: translateX(0); }
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.15); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
-        
-        /* Avatar & Frames - Perfect Centering Logic */
-        .avatar-wrapper { 
-            position: relative; 
-            width: 80px; /* Base size */
-            height: 80px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            margin: 0 auto;
-        }
-        
-        .avatar-img { 
-            width: 100%; 
-            height: 100%; 
-            border-radius: 50%; 
-            object-fit: cover; 
-            border: 2px solid rgba(255,255,255,0.8); 
-            z-index: 1; 
-            position: relative;
-        }
-        
-        .svga-avatar-frame, .perfect-frame { 
-            position: absolute !important; 
-            pointer-events: none; 
-            z-index: 2; 
-            top: 50% !important; 
-            left: 50% !important; 
-            transform: translate(-50%, -50%) !important; 
-            /* Slightly larger to cover/frame the image properly */
-            width: 135% !important; 
-            height: 135% !important;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .svga-avatar-frame canvas {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain;
-        }
-
-        /* Smaller avatars (Chat/Lists) */
-        .avatar-wrapper.sm { width: 45px; height: 45px; }
-        .avatar-wrapper.lg { width: 100px; height: 100px; }
-        
-        /* Chat Design */
-        .chat-container { height: calc(100vh - 140px); overflow-y: auto; padding-bottom: 20px; }
-        .message-row { display: flex; gap: 10px; margin-bottom: 16px; padding: 0 16px; align-items: flex-end; }
-        .message-row.me { flex-direction: row-reverse; }
-        
-        .msg-bubble { position: relative; max-width: 75%; padding: 10px 14px; border-radius: 20px 20px 20px 4px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.5); }
-        .message-row.me .msg-bubble { border-radius: 20px 20px 4px 20px; background: #1f2937; color: white; }
-        
-        .msg-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap; }
-        .msg-name { font-size: 11px; font-weight: 800; color: #4b5563; }
-        .message-row.me .msg-name { color: #d1d5db; display: none; }
-        .msg-badges { display: flex; align-items: center; gap: 2px; }
-        .msg-badge { width: 16px; height: 16px; object-fit: contain; }
-        .badge-dots { font-size: 10px; color: #9ca3af; letter-spacing: 1px; }
-        .msg-text { font-size: 13px; line-height: 1.5; word-break: break-word; }
-        
-        /* Levels Badge */
-        .level-badge { display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; }
-        .level-badge img { width: 100%; height: 100%; object-fit: contain; }
-        
-        /* Entry Effect */
-        #entryEffectLayer { position: fixed; inset: 0; pointer-events: none; z-index: 200; display: flex; align-items: center; justify-content: center; }
-        #entryEffectLayer canvas { width: 100% !important; height: 100% !important; object-fit: contain; }
-
-        /* Profile Sheet */
-        .profile-sheet { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 30px 30px 0 0; z-index: 150; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.1); max-height: 85vh; overflow-y: auto; }
-        .profile-sheet.active { transform: translateY(0); }
-        
-        /* Utility */
+        .avatar-wrapper { position: relative; width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: visible; }
+        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 1; }
+        .svga-avatar-frame { position: absolute; pointer-events: none; z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: frameFloat 3s ease-in-out infinite; overflow: visible; width: calc(100% + 16px); height: calc(100% + 16px); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .svga-avatar-frame canvas { border-radius: 50%; object-fit: contain; width: 100% !important; height: 100% !important; position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; max-width: 100% !important; max-height: 100% !important; min-width: 100% !important; min-height: 100% !important; z-index: 2; }
+        .perfect-frame { position: absolute; pointer-events: none; z-index: 2; object-fit: contain; border-radius: 50%; animation: frameFloat 3s ease-in-out infinite; width: calc(100% + 16px); height: calc(100% + 16px); top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        @keyframes frameFloat { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.05); } }
+        .chat-bubble-me { position: relative; background: #1f2937; color: white; border-radius: 20px 4px 20px 20px; margin-left: 50px; min-height: 60px; padding: 12px 16px 40px 16px; }
+        .chat-bubble-them { position: relative; background: white; color: #1f2937; border-radius: 4px 20px 20px 20px; border: 1px solid rgba(0,0,0,0.05); margin-right: 50px; min-height: 60px; padding: 12px 16px 40px 16px; }
+        .chat-sender-info { position: absolute; top: -45px; right: 0; display: flex; align-items: center; gap: 8px; z-index: 5; }
+        .chat-sender-info.me { left: 0; right: auto; }
+        .sender-avatar-wrapper { position: relative; width: 32px; height: 32px; }
+        .sender-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .sender-badges { display: flex; gap: 2px; margin-right: 8px; }
+        .sender-badge { width: 16px; height: 16px; border-radius: 4px; overflow: hidden; }
+        .sender-name { font-size: 11px; font-weight: bold; color: #374151; }
+        .chat-timestamp { position: absolute; bottom: 8px; left: 16px; font-size: 10px; color: rgba(255,255,255,0.7); }
+        .chat-timestamp.them { color: #6b7280; right: 16px; left: auto; }
+        @keyframes giftFly { 0% { transform: translate(-50%, 100%) scale(0.5); opacity: 0; } 20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(150%, -150%) scale(0.5); opacity: 0; } }
+        .gift-animation { position: fixed; left: 50%; top: 50%; z-index: 100; pointer-events: none; animation: giftFly 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .hidden { display: none !important; }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .store-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding-bottom: 80px; }
-        .banner-container { height: 140px; margin-bottom: 24px; position: relative; border-radius: 28px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .banner-container { height: 120px; margin-top: 20px; }
+        .header-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.8); }
+        .svga-player-canvas { width: 100% !important; height: 60% !important; transform: translateX(25px) !important; z-index: 2; margin: auto; position: relative !important; top: 0 !important; left: 0 !important; }
+        .product-overlay-img { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); width: 60%; height: 60%; object-fit: contain; pointer-events: none; z-index: 1; }
+        .watermark { position: absolute; bottom: 5px; right: 8px; font-size: 0.5rem; opacity: 0.4; z-index: 10; color: #fff; }
+        .info { padding: 8px; text-align: center; }
+        .info h3 { font-size: 0.8rem; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .price { color: #eab308; font-weight: bold; font-size: 0.9rem; margin-bottom: 8px; display: block; }
+        .buy-btn { width: 90%; margin: 0 auto; padding: 8px; border: none; border-radius: 6px; background: #000; color: #fff; font-weight: bold; font-size: 0.75rem; cursor: pointer; transition: all 0.3s ease; }
+        .buy-btn:hover { background: #333; transform: translateY(-2px); }
+        .buy-btn:active { transform: scale(0.98); }
+        .buy-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+        .countdown-timer { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #ef4444, #dc2626); color: white; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; white-space: nowrap; z-index: 10; box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4); }
+        .countdown-timer.store-timer { background: linear-gradient(135deg, #3b82f6, #2563eb); box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4); }
+        .frame-size-small .svga-avatar-frame, .frame-size-small .perfect-frame { width: calc(100% + 8px); height: calc(100% + 8px); }
+        .frame-size-medium .svga-avatar-frame, .frame-size-medium .perfect-frame { width: calc(100% + 16px); height: calc(100% + 16px); }
+        .frame-size-large .svga-avatar-frame, .frame-size-large .perfect-frame { width: calc(100% + 24px); height: calc(100% + 24px); }
+        .frame-size-xl .svga-avatar-frame, .frame-size-xl .perfect-frame { width: calc(100% + 32px); height: calc(100% + 32px); }
+        .badges-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .gift-message { background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; border: 2px solid #fbbf24; }
+        .gift-message-icon { width: 48px; height: 48px; }
     </style>
 </head>
-<body class="antialiased">
-
-    <!-- Global Entry Effect Layer -->
-    <div id="entryEffectLayer"></div>
-
-    <!-- Main App Container -->
-    <div id="main-app" class="min-h-screen pb-24 relative">
-        
-        <!-- Header -->
-        <header id="mainHeader" class="fixed top-0 left-0 right-0 h-20 z-40 px-6 flex items-center justify-between glass">
+<body class="antialiased selection:bg-blue-100 selection:text-blue-900">
+    <div id="main-app" class="min-h-screen pb-24">
+        <header class="fixed top-0 left-0 right-0 h-20 z-30 px-6 flex items-center justify-between glass">
             <div class="flex items-center gap-2">
-                <div class="w-8 h-8 rounded-xl bg-gray-100 flex items-center justify-center border border-gray-200">
-                    <i data-lucide="home" class="w-4 h-4 text-gray-700" id="headerIcon"></i>
-                </div>
-                <h2 id="pageTitle" class="text-lg font-bold text-gray-800">الرئيسية</h2>
+                <div class="header-icon"><i data-lucide="home" class="w-4 h-4 text-gray-700" id="homeIcon"></i></div>
+                <div class="header-icon hidden" id="friendsIcon"><i data-lucide="users" class="w-4 h-4 text-gray-700"></i></div>
+                <h2 id="pageTitle" class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">الرئيسية</h2>
             </div>
-            <button onclick="toggleSidebar(true)" class="p-2 rounded-full hover:bg-gray-100 transition"><i data-lucide="menu" class="text-gray-900 w-6 h-6"></i></button>
+            <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition"><i data-lucide="menu" class="text-black w-6 h-6"></i></button>
         </header>
-
-        <!-- Room Header -->
-        <header id="roomHeader" class="fixed top-0 left-0 right-0 h-24 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 hidden transition-all">
-            <div class="flex items-center justify-between px-4 pt-4 pb-2">
-                <div class="flex items-center gap-3">
-                    <button onclick="exitRoom()" class="p-2 rounded-full bg-red-50 text-red-500"><i data-lucide="log-out" class="w-5 h-5 flip-rtl"></i></button>
-                    <div>
-                        <h3 id="roomNameHeader" class="font-bold text-sm text-gray-900">...</h3>
-                        <p id="roomOnlineCount" class="text-xs text-green-500 font-bold">0 متصل</p>
-                    </div>
-                </div>
-                <div id="roomOwnerControls" class="hidden">
-                    <button onclick="openRoomSettings()" class="p-2 rounded-full bg-gray-100"><i data-lucide="settings" class="w-5 h-5 text-gray-600"></i></button>
-                </div>
-            </div>
-            <div id="onlineUsersStrip" class="flex gap-2 px-4 pb-2 overflow-x-auto no-scrollbar"></div>
-        </header>
-
-        <!-- Main Content Area -->
         <main class="pt-24 px-5">
-            
-            <!-- Home View -->
             <div id="view-home" class="view-section fade-in">
-                <!-- Home Banner -->
-                <div id="homeBanner" class="banner-container glass-card">
-                    <div class="absolute inset-0 bg-gray-200 animate-pulse"></div>
+                <div id="homeBanner" class="w-full banner-container rounded-[28px] glass-card mb-6 relative overflow-hidden flex items-center justify-center shadow-sm group"></div>
+                <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
+                    <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
+                    <button id="btn-private" onclick="filterRooms('private')" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
                 </div>
-
-                <!-- Create/Enter Room Banner (Dynamic) -->
-                <div id="roomActionBanner" class="w-full h-24 mb-6 rounded-[24px] bg-gradient-to-r from-gray-900 to-gray-700 flex items-center justify-center relative overflow-hidden shadow-lg cursor-pointer group">
-                    <!-- Injected by JS -->
-                </div>
-
-                <!-- Rooms List -->
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="font-bold text-xl text-gray-800">الغرف النشطة</h3>
-                    <button onclick="loadRooms()" class="text-xs text-gray-500"><i data-lucide="refresh-ccw" class="w-4 h-4"></i></button>
-                </div>
-                <div id="roomsList" class="space-y-3 pb-20"></div>
+                <div id="roomsGrid" class="space-y-3"></div>
             </div>
-
-            <!-- Wallet View -->
             <div id="view-wallet" class="view-section hidden fade-in">
                 <div class="glass-card rounded-[40px] p-8 text-center mb-8 relative overflow-hidden">
                     <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl"></div>
                     <div class="relative z-10">
                         <p class="text-gray-500 text-sm font-semibold mb-2">الرصيد الكلي</p>
-                        <h2 class="text-6xl font-black text-gray-900 tracking-tight mb-2" id="walletAmountDisplay">0</h2>
+                        <h2 class="text-6xl font-black text-gray-900 tracking-tight mb-2" id="walletAmount">0</h2>
                         <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold"><i data-lucide="coins" class="w-3 h-3"></i> عملة ذهبية</span>
                     </div>
                 </div>
@@ -185,221 +99,151 @@
                     <div onclick="recharge(850000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition"><span class="text-2xl font-black text-gray-900">850,000</span><span class="text-gray-400 text-xs">$10</span></div>
                 </div>
             </div>
-
-            <!-- Friends View -->
+            <div id="view-store" class="view-section hidden fade-in">
+                <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2">
+                    <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
+                    <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
+                    <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
+                    <button onclick="loadStoreItems('chatbubble')" id="store-tab-chatbubble" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">فقاعات</button>
+                </div>
+                <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
+            </div>
+            <div id="view-bag" class="view-section hidden fade-in">
+                <h3 class="font-bold text-lg mb-4 text-gray-800">إطاراتي</h3>
+                <div id="bagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي</h3>
+                <div id="badgesBagGrid" class="badges-grid mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">رسوم متحركة</h3>
+                <div id="svgaBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي النشطة</h3>
+                <div id="activeBadgesGrid" class="badges-grid mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">فقاعاتي</h3>
+                <div id="chatbubblesBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
+            </div>
             <div id="view-friends" class="view-section hidden fade-in">
                 <div class="relative mb-6">
-                    <input type="text" id="searchUserInput" placeholder="ابحث بالبريد الإلكتروني..." class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm">
+                    <input type="text" id="searchUserInput" placeholder="ابحث عن مستخدم بواسطة البريد الإلكتروني..." class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-0 focus:outline-none text-sm">
                     <button onclick="searchUser()" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"><i data-lucide="search" class="w-5 h-5"></i></button>
                 </div>
-                <div id="searchResults" class="mb-8 hidden">
-                    <h3 class="font-bold text-sm text-gray-400 mb-2">نتائج البحث</h3>
+                <div id="searchResults" class="space-y-3 mb-8 hidden">
+                    <h3 class="font-bold text-lg text-gray-800">نتائج البحث</h3>
                     <div id="userResult" class="glass-card p-4 rounded-3xl"></div>
                 </div>
-                <div id="friendRequestsSection" class="hidden mb-6">
-                    <h3 class="font-bold text-lg mb-3 text-gray-800">طلبات المتابعة</h3>
-                    <div id="friendRequestsList" class="space-y-3"></div>
-                </div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">طلبات المتابعة</h3>
+                <div id="friendRequestsList" class="space-y-3 mb-6"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">أصدقائي</h3>
-                <div id="friendsList" class="space-y-3 pb-20"></div>
+                <div id="friendsList" class="space-y-3"></div>
             </div>
-
-            <!-- Store View -->
-            <div id="view-store" class="view-section hidden fade-in">
-                <div class="flex gap-2 mb-6 overflow-x-auto no-scrollbar pb-2">
-                    <button onclick="loadStoreItems('frame')" class="store-tab flex-none px-5 py-2 rounded-full text-xs font-bold bg-black text-white">إطارات</button>
-                    <button onclick="loadStoreItems('badge')" class="store-tab flex-none px-5 py-2 rounded-full text-xs font-bold bg-white border">شارات</button>
-                    <button onclick="loadStoreItems('entry')" class="store-tab flex-none px-5 py-2 rounded-full text-xs font-bold bg-white border">دخول</button>
-                    <button onclick="loadStoreItems('bubble')" class="store-tab flex-none px-5 py-2 rounded-full text-xs font-bold bg-white border">فقاعات</button>
-                </div>
-                <div id="storeGrid" class="store-grid"></div>
-            </div>
-
-            <!-- Bag View -->
-            <div id="view-bag" class="view-section hidden fade-in">
-                <h3 class="font-bold text-lg mb-4">ممتلكاتي</h3>
-                <div id="bagContent" class="space-y-6 pb-20"></div>
-            </div>
-
-            <!-- Room Chat View -->
-            <div id="view-room" class="view-section hidden h-screen fixed inset-0 z-30 bg-white">
-                <div id="roomBackgroundLayer" class="absolute inset-0 z-0 bg-cover bg-center transition-all bg-gray-50"></div>
-                <!-- Chat Area -->
-                <div id="chatArea" class="chat-container pt-28 px-4 relative z-10"></div>
-                <!-- Chat Input Area -->
-                <div class="fixed bottom-0 left-0 right-0 p-4 glass-deep border-t border-white flex items-center gap-3 z-40">
-                    <button id="giftTriggerBtn" onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 transition-transform active:scale-90">
-                        <i data-lucide="gift" class="w-5 h-5"></i>
-                    </button>
-                    <button id="sendBtn" onclick="sendRoomMessage()" class="w-10 h-10 rounded-full bg-blue-600 hidden items-center justify-center text-white transition-transform active:scale-90 shadow-lg shadow-blue-200">
-                        <i data-lucide="send" class="w-5 h-5 rtl:rotate-180"></i>
-                    </button>
-                    <input type="text" id="roomMsgInput" placeholder="اكتب رسالة..." class="flex-1 bg-gray-100/80 border-0 rounded-2xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition" oninput="toggleInputIcons(this)">
-                </div>
-            </div>
-
         </main>
     </div>
-
-    <!-- Sidebar -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
-    <aside id="sidebar" class="sidebar-container glass-deep flex flex-col">
-        <div class="p-6 flex justify-between items-center border-b border-gray-100">
-            <h3 class="font-bold text-lg">القائمة</h3>
-            <button onclick="toggleSidebar(false)"><i data-lucide="x" class="text-gray-500"></i></button>
+    <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
+        <div class="pt-12 px-6 flex justify-between items-start">
+            <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/50 hover:bg-gray-200/50 transition"><i data-lucide="x" class="w-5 h-5 text-gray-500"></i></button>
+            <button onclick="openEditProfile()" class="p-3 rounded-full glass hover:bg-white transition shadow-sm group"><i data-lucide="edit-3" class="w-5 h-5 text-gray-600 group-hover:text-black"></i></button>
         </div>
-        <div class="p-6 flex flex-col items-center flex-1 overflow-y-auto">
-            <!-- Profile Avatar & Frame -->
-            <div class="avatar-wrapper mb-4" id="sidebarAvatar">
-                <img id="sideUserImg" src="" class="avatar-img">
-                <div id="sideUserFrame" class="svga-avatar-frame"></div>
-            </div>
-            
-            <h3 id="sideUserName" class="font-bold text-xl mb-1">...</h3>
-            <p id="sideUserEmail" class="text-xs text-gray-400 mb-6">...</p>
-            
-            <!-- Wealth & Magic Levels in Sidebar -->
-            <div class="flex gap-4 w-full mb-6 justify-center">
-                <div class="glass-card p-2 rounded-xl flex-1 flex flex-col items-center gap-1">
-                    <img id="sideMagicImg" src="https://cdn-icons-png.flaticon.com/512/616/616490.png" class="w-8 h-8 object-contain">
-                    <span id="sideMagicLevel" class="text-xs font-bold text-purple-600">Lv.1</span>
-                </div>
-                <div class="glass-card p-2 rounded-xl flex-1 flex flex-col items-center gap-1">
-                    <img id="sideWealthImg" src="https://cdn-icons-png.flaticon.com/512/2535/2535556.png" class="w-8 h-8 object-contain">
-                    <span id="sideWealthLevel" class="text-xs font-bold text-yellow-600">Lv.1</span>
+        <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-2 pb-10">
+            <div class="mb-6 mt-4">
+                <div class="avatar-wrapper" id="sidebarAvatarWrapper">
+                    <img id="sideAvatar" src="https://via.placeholder.com/150" class="avatar-img">
+                    <div id="sideSvgaFrame" class="svga-avatar-frame"></div>
+                    <img id="sideFrame" src="" class="perfect-frame hidden">
                 </div>
             </div>
-
-            <nav class="w-full space-y-2">
-                <button onclick="switchView('home')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i> الرئيسية</button>
-                <button onclick="switchView('wallet')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i> المحفظة</button>
-                <button onclick="switchView('store')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i> المتجر</button>
-                <button onclick="switchView('bag')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i> حقيبتي</button>
-                <button onclick="switchView('friends')" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-100 transition"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i> أصدقائي</button>
-                <button onclick="logout()" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 text-red-500 transition mt-4"><i data-lucide="log-out" class="w-5 h-5"></i> تسجيل خروج</button>
+            <div class="text-center mb-6">
+                <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
+                <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
+                    <span class="text-xs font-bold text-gray-400">البريد:</span>
+                    <span id="sideEmail" class="text-sm font-medium text-gray-600 truncate max-w-[150px]">...</span>
+                    <button onclick="copyEmail()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
+                </div>
+            </div>
+            <div class="flex gap-3 mb-8">
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden"><img id="magicLevelImg" src="" class="w-full h-full object-contain"></div>
+                    <span id="sideMagicLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
+                </div>
+                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
+                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden"><img id="wealthLevelImg" src="" class="w-full h-full object-contain"></div>
+                    <span id="sideWealthLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
+                </div>
+            </div>
+            <div class="mb-6"><div id="sidebarActiveBadges" class="badges-grid"></div></div>
+            <nav class="space-y-3">
+                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>الرئيسية</button>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>المحفظة</button>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>المتجر</button>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>حقيبتي</button>
+                <button onclick="switchView('friends')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>أصدقائي</button>
             </nav>
+            <div class="mt-8">
+                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2"><i data-lucide="log-out" class="w-5 h-5"></i>تسجيل خروج</button>
+            </div>
         </div>
     </aside>
-
-    <!-- User Profile Sheet -->
-    <div id="profileOverlay" class="fixed inset-0 bg-black/30 z-[140] hidden backdrop-blur-sm" onclick="closeProfileSheet()"></div>
-    <div id="userProfileSheet" class="profile-sheet flex flex-col">
-        <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mt-3 mb-6"></div>
-        <div class="px-6 flex flex-col items-center relative">
-            <div class="avatar-wrapper lg mb-4" id="sheetAvatarWrapper">
-                <img id="sheetImg" src="" class="avatar-img">
-                <div id="sheetFrame" class="svga-avatar-frame"></div>
-            </div>
-            <h2 id="sheetName" class="text-2xl font-black text-gray-900 mb-1">...</h2>
-            
-            <!-- Wealth & Magic Levels in Profile -->
-            <div class="flex items-center gap-3 mb-2">
-                <div class="flex items-center gap-1 bg-purple-50 px-2 py-1 rounded-lg">
-                    <img id="sheetMagicImg" src="https://cdn-icons-png.flaticon.com/512/616/616490.png" class="w-4 h-4">
-                    <span id="sheetMagicLevel" class="text-xs font-bold text-purple-700">Lv.1</span>
-                </div>
-                <div class="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg">
-                    <img id="sheetWealthImg" src="https://cdn-icons-png.flaticon.com/512/2535/2535556.png" class="w-4 h-4">
-                    <span id="sheetWealthLevel" class="text-xs font-bold text-yellow-700">Lv.1</span>
+    <div id="chatModal" class="fixed inset-0 z-[60] hidden flex flex-col bg-gray-50">
+        <header class="h-20 glass flex items-center px-6 justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="closeChat()" class="p-2 rounded-full hover:bg-gray-100"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+                <div class="flex items-center gap-2">
+                    <div class="avatar-wrapper" id="chatAvatarWrapper" style="width: 40px; height: 40px;">
+                        <img id="chatUserAvatar" src="" class="avatar-img">
+                        <div id="chatUserSvgaFrame" class="svga-avatar-frame"></div>
+                        <img id="chatUserFrame" src="" class="perfect-frame hidden">
+                    </div>
+                    <div>
+                        <h4 id="chatUserName" class="font-bold text-sm">...</h4>
+                        <div class="flex items-center gap-1">
+                            <div class="w-4 h-4 flex items-center justify-center"><img id="chatUserMagicLevel" src="" class="w-3 h-3 object-contain"></div>
+                            <div class="w-4 h-4 flex items-center justify-center"><img id="chatUserWealthLevel" src="" class="w-3 h-3 object-contain"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <p id="sheetId" class="text-xs text-gray-400 font-mono bg-gray-100 px-2 py-1 rounded mb-4">ID: ...</p>
-            
-            <div class="flex gap-4 mb-6 w-full justify-center">
-                <div class="text-center bg-gray-50 p-3 rounded-2xl flex-1">
-                    <span id="sheetFriends" class="block font-bold text-lg">0</span>
-                    <span class="text-[10px] text-gray-400">أصدقاء</span>
-                </div>
-                <div class="text-center bg-gray-50 p-3 rounded-2xl flex-1">
-                    <span id="sheetVisitors" class="block font-bold text-lg">0</span>
-                    <span class="text-[10px] text-gray-400">زوار</span>
-                </div>
+            <div class="flex gap-2">
+                <button onclick="toggleGiftBox()" class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600"><i data-lucide="gift" class="w-5 h-5"></i></button>
+                <button onclick="unfollowInChat()" id="unfollowBtn" class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 hidden"><i data-lucide="user-x" class="w-5 h-5"></i></button>
+                <button onclick="blockUserInChat()" id="blockBtn" class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600"><i data-lucide="shield-off" class="w-5 h-5"></i></button>
             </div>
-
-            <div class="w-full mb-6">
-                <h4 class="text-xs font-bold text-gray-400 mb-2">الشارات النشطة</h4>
-                <div id="sheetBadges" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
-            </div>
-
-            <div class="grid grid-cols-4 gap-3 w-full mb-8">
-                <button onclick="prepareGift()" class="flex flex-col items-center gap-1 group">
-                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 group-active:scale-90 transition"><i data-lucide="gift" class="w-6 h-6"></i></div>
-                    <span class="text-[10px] font-bold">هدايا</span>
-                </button>
-                <button id="btnFollowAction" onclick="sendFriendReq()" class="flex flex-col items-center gap-1 group">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-active:scale-90 transition"><i data-lucide="user-plus" class="w-6 h-6"></i></div>
-                    <span class="text-[10px] font-bold">متابعة</span>
-                </button>
-                <button onclick="startPrivateChat()" class="flex flex-col items-center gap-1 group">
-                    <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 group-active:scale-90 transition"><i data-lucide="message-circle" class="w-6 h-6"></i></div>
-                    <span class="text-[10px] font-bold">رسالة</span>
-                </button>
-                <button onclick="blockUser()" class="flex flex-col items-center gap-1 group">
-                    <div class="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-active:scale-90 transition"><i data-lucide="shield-off" class="w-6 h-6"></i></div>
-                    <span class="text-[10px] font-bold">حظر</span>
-                </button>
-            </div>
-
-            <div id="ownerControls" class="w-full border-t border-gray-100 pt-4 mb-8 hidden">
-                <h4 class="text-xs font-bold text-red-400 mb-3">إدارة الغرفة</h4>
-                <div class="flex gap-3">
-                    <button onclick="kickUser()" class="flex-1 py-3 bg-red-50 text-red-600 rounded-xl text-sm font-bold">طرد وحظر</button>
-                    <button onclick="makeAdmin()" class="flex-1 py-3 bg-gray-900 text-white rounded-xl text-sm font-bold">تعيين أدمن</button>
-                </div>
-            </div>
+        </header>
+        <div id="chatMessages" class="flex-1 overflow-y-auto p-6 space-y-8 no-scrollbar"></div>
+        <div class="p-4 glass flex gap-2 items-center">
+            <input type="text" id="chatInput" placeholder="اكتب رسالتك هنا..." class="flex-1 p-4 rounded-2xl bg-white border-0 focus:ring-0 text-sm">
+            <button onclick="sendMessage()" class="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center shadow-lg"><i data-lucide="send" class="w-5 h-5"></i></button>
         </div>
     </div>
-
-    <!-- Gift Box & Other Modals -->
-    <div id="giftBox" class="fixed inset-0 z-[160] hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="toggleGiftBox()"></div>
-        <div class="relative w-full max-w-sm bg-white rounded-[32px] overflow-hidden shadow-2xl flex flex-col h-[60vh]">
-            <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
-                <h3 class="font-bold">إرسال هدية</h3>
-                <div class="flex items-center gap-1 bg-white px-2 py-1 rounded-full border">
-                    <span id="giftWallet" class="font-bold text-xs text-yellow-600">0</span>
-                    <i data-lucide="coins" class="w-3 h-3 text-yellow-500"></i>
+    <div id="giftBox" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="toggleGiftBox()"></div>
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[40px] h-[45vh] flex flex-col overflow-hidden shadow-2xl">
+            <div class="p-6 flex justify-between items-center border-b border-gray-100">
+                <div class="flex gap-4">
+                    <button onclick="switchGiftTab('fixed')" id="tab-fixed" class="font-bold text-black border-b-2 border-black pb-1">هدايا ثابتة</button>
+                    <button onclick="switchGiftTab('luck')" id="tab-luck" class="font-bold text-gray-400 pb-1">هدايا الحظ</button>
                 </div>
+                <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full"><i data-lucide="coins" class="w-3 h-3 text-yellow-600"></i><span id="giftWalletBalance" class="text-xs font-bold text-yellow-700">0</span></div>
             </div>
-            <div id="giftList" class="flex-1 overflow-y-auto p-4 grid grid-cols-4 gap-3 content-start"></div>
-            <div class="p-4 border-t bg-white">
-                <div id="giftTargetInfo" class="flex items-center gap-2 mb-3 hidden">
-                    <img id="giftTargetImg" src="" class="w-6 h-6 rounded-full">
-                    <span id="giftTargetName" class="text-xs font-bold">...</span>
-                </div>
-                <button onclick="sendSelectedGift()" class="w-full py-3 bg-yellow-500 text-white rounded-xl font-bold shadow-lg shadow-yellow-200 active:scale-95 transition">إرسال</button>
-            </div>
+            <div id="giftGrid" class="flex-1 overflow-y-auto p-6 grid grid-cols-4 gap-4 no-scrollbar"></div>
         </div>
     </div>
-
-    <div id="roomSettingsModal" class="fixed inset-0 z-[160] hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeRoomSettings()"></div>
-        <div class="relative w-full max-w-sm bg-white rounded-[30px] p-6 shadow-2xl">
-            <h3 class="font-bold text-lg mb-4">إعدادات الغرفة</h3>
+    <div id="editModal" class="fixed inset-0 z-[60] hidden flex items-center justify-center px-4">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeEditModal()"></div>
+        <div class="relative w-full max-w-sm glass-deep rounded-[40px] p-6 shadow-2xl fade-in">
+            <h3 class="text-center font-bold text-xl mb-6">تعديل الملف</h3>
             <div class="space-y-4">
-                <div><label class="text-xs text-gray-500 font-bold">اسم الغرفة</label><input type="text" id="editRoomName" class="w-full p-3 bg-gray-50 rounded-xl border mt-1"></div>
-                <div><label class="text-xs text-gray-500 font-bold">رابط الخلفية</label><input type="text" id="editRoomBg" class="w-full p-3 bg-gray-50 rounded-xl border mt-1"></div>
-                <button onclick="saveRoomSettings()" class="w-full py-3 bg-black text-white rounded-xl font-bold mt-2">حفظ التغييرات</button>
+                <div><label class="block text-xs font-bold text-gray-400 mb-2 mr-2">الاسم الظاهر</label><input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center"></div>
+                <div><label class="block text-xs font-bold text-gray-400 mb-2 mr-2">رابط الصورة</label><input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500"></div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button onclick="closeEditModal()" class="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200">إلغاء</button>
+                <button onclick="saveProfileChanges()" class="flex-1 py-3 rounded-2xl bg-black text-white font-bold hover:shadow-lg hover:-translate-y-1 transition">حفظ</button>
             </div>
         </div>
     </div>
-
-    <div id="createRoomModal" class="fixed inset-0 z-[160] hidden flex items-center justify-center px-4">
-        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeCreateRoom()"></div>
-        <div class="relative w-full max-w-sm bg-white rounded-[30px] p-6 shadow-2xl">
-            <h3 class="font-bold text-lg mb-4">إنشاء غرفة جديدة</h3>
-            <p class="text-xs text-gray-500 mb-4">يمكنك إنشاء غرفة واحدة فقط.</p>
-            <input type="text" id="newRoomName" placeholder="اسم الغرفة" class="w-full p-3 bg-gray-50 rounded-xl border mb-4">
-            <button onclick="createNewRoom()" class="w-full py-3 bg-black text-white rounded-xl font-bold">إنشاء</button>
-        </div>
-    </div>
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, setDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getDatabase, ref, push, onValue, set, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
@@ -416,708 +260,596 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        let currentUser = null;
-        let itemsCache = {}; 
-        let usersCache = {};
-        let levelsCache = { magic: {}, wealth: {} };
-        let currentRoomId = null;
-        let selectedProfileUser = null;
-        let selectedGiftId = null;
+        let userData = {};
+        let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {}, chatBubbles: [] };
+        let currentChatFriend = null;
+        let chatUnsubscribe = null;
+        let activeSvgaPlayers = {};
+        let countdownIntervals = {};
 
-        lucide.createIcons();
-
-        // --- AUTH & INIT ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                onSnapshot(doc(db, "users", user.uid), (snap) => {
-                    currentUser = { uid: snap.id, ...snap.data() };
-                    updateSidebar();
-                    updateWalletUI();
-                    updateRoomBanner();
-                    if(document.getElementById('view-friends').classList.contains('hidden') === false) {
-                        loadFriends();
-                        loadFriendRequests();
-                    }
-                });
-                await loadAllStoreItems();
-                await loadLevelsData();
-                await loadBanner();
-                loadRooms();
+                const userDocRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userDocRef);
+                if (userSnap.exists()) {
+                    userData = { uid: userSnap.id, ...userSnap.data() };
+                    onSnapshot(userDocRef, async (docSnap) => {
+                        if (docSnap.exists()) {
+                            userData = { uid: docSnap.id, ...docSnap.data() };
+                            await updateUI();
+                            await loadFriendRequests();
+                            await loadFriends();
+                        }
+                    });
+                    await loadBanner();
+                    await loadGlobalData();
+                    await loadRooms();
+                    await checkExpiredItems();
+                } else {
+                    alert('هذا الحساب غير مسجل في النظام. يرجى التواصل مع الإدارة.');
+                    await signOut(auth);
+                    window.location.href = "login.html";
+                }
             } else {
                 window.location.href = "login.html";
             }
         });
 
-        async function loadAllStoreItems() {
-            const snap = await getDocs(collection(db, "storeItems"));
-            snap.forEach(d => { itemsCache[d.id] = d.data(); });
+        async function loadGlobalData() {
+            const storeSnap = await getDocs(collection(db, "storeItems"));
+            storeData.items = storeSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            storeData.itemsById = {};
+            storeData.items.forEach(item => { storeData.itemsById[item.id] = item; });
+            const gSnap = await getDocs(collection(db, "gifts"));
+            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'wealth'}));
+            const lgSnap = await getDocs(collection(db, "luckGifts"));
+            storeData.luckGifts = lgSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'magic'}));
+            const mlSnap = await getDocs(collection(db, "magicLevels"));
+            mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
+            const wlSnap = await getDocs(collection(db, "wealthLevels"));
+            wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+            const cbSnap = await getDocs(collection(db, "chatBubbles"));
+            storeData.chatBubbles = cbSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            await updateUI();
         }
 
-        async function loadLevelsData() {
-            try {
-                const magicSnap = await getDocs(collection(db, "magicLevels"));
-                magicSnap.forEach(d => levelsCache.magic[d.id] = d.data());
-                const wealthSnap = await getDocs(collection(db, "wealthLevels"));
-                wealthSnap.forEach(d => levelsCache.wealth[d.id] = d.data());
-            } catch (e) { console.log("Levels error", e); }
+        function getFrameSizeClass(frameConfig) {
+            if (!frameConfig || !frameConfig.size) return '';
+            const sizeMap = { 'small': 'frame-size-small', 'medium': 'frame-size-medium', 'large': 'frame-size-large', 'xl': 'frame-size-xl' };
+            return sizeMap[frameConfig.size] || '';
         }
 
-        async function loadBanner() {
-            try {
-                const bDoc = await getDoc(doc(db, "appData", "banner"));
-                const container = document.getElementById('homeBanner');
-                if (bDoc.exists()) {
-                    const b = bDoc.data();
-                    container.innerHTML = `<img src="${b.image}" class="absolute inset-0 w-full h-full object-cover rounded-[28px]">`;
+        function applyFrameStyles(element, frameConfig) {
+            if (!frameConfig) return;
+            const frameEl = element.querySelector('.svga-avatar-frame, .perfect-frame');
+            if (!frameEl) return;
+            if (frameConfig.width) frameEl.style.width = frameConfig.width;
+            if (frameConfig.height) frameEl.style.height = frameConfig.height;
+            if (frameConfig.top) frameEl.style.top = frameConfig.top;
+            if (frameConfig.left) frameEl.style.left = frameConfig.left;
+            if (frameConfig.transform) frameEl.style.transform = frameConfig.transform;
+        }
+
+        async function updateUI() {
+            if (!auth.currentUser || !userData.uid) return;
+            document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
+            document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
+            document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
+            document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
+            document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
+            const ml = userData.magicLevel || 1;
+            const wl = userData.wealthLevel || 1;
+            const magicImg = document.getElementById('magicLevelImg');
+            const wealthImg = document.getElementById('wealthLevelImg');
+            if (storeData.magicLevels[ml]) { magicImg.src = storeData.magicLevels[ml].image; document.getElementById('sideMagicLevelText').innerText = ml; }
+            if (storeData.wealthLevels[wl]) { wealthImg.src = storeData.wealthLevels[wl].image; document.getElementById('sideWealthLevelText').innerText = wl; }
+            const avatarWrapper = document.getElementById('sidebarAvatarWrapper');
+            const frameEl = document.getElementById('sideFrame');
+            const svgaContainer = document.getElementById('sideSvgaFrame');
+            frameEl.classList.add('hidden');
+            svgaContainer.classList.add('hidden');
+            svgaContainer.innerHTML = '';
+            avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
+            if (userData.activeFrame) {
+                const item = storeData.itemsById[userData.activeFrame];
+                if (item) {
+                    const sizeClass = getFrameSizeClass(item.frameConfig);
+                    if (sizeClass) avatarWrapper.classList.add(sizeClass);
+                    if (item.itemType === 'svga') {
+                        svgaContainer.classList.remove('hidden');
+                        playPerfectSvga(item.fileUrl, svgaContainer, { loops: 0, clearsAfterStop: false });
+                        applyFrameStyles(avatarWrapper, item.frameConfig);
+                    } else {
+                        frameEl.src = item.image;
+                        frameEl.classList.remove('hidden');
+                        applyFrameStyles(avatarWrapper, item.frameConfig);
+                    }
+                } else {
+                    await updateDoc(doc(db, "users", userData.uid), { activeFrame: null });
                 }
-            } catch (e) {}
-        }
-
-        // --- ROOM ACTION BANNER ---
-        function updateRoomBanner() {
-            const banner = document.getElementById('roomActionBanner');
-            if (currentUser.ownedRoomId) {
-                // User has a room -> Show Enter Room
-                banner.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-r from-blue-900 to-blue-700"></div>
-                    <div class="text-center z-10 text-white flex items-center gap-3" onclick="enterRoom('${currentUser.ownedRoomId}')">
-                        <i data-lucide="door-open" class="w-6 h-6 opacity-80"></i>
-                        <div>
-                            <h3 class="font-bold text-sm">الدخول لغرفتي</h3>
-                            <p class="text-[10px] text-gray-300">أدر غرفتك الآن</p>
-                        </div>
-                    </div>
-                `;
-            } else {
-                // No room -> Show Create Room
-                banner.innerHTML = `
-                    <div class="absolute inset-0 bg-gradient-to-r from-gray-900 to-gray-700"></div>
-                    <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
-                    <div class="text-center z-10 text-white flex items-center gap-3" onclick="checkCreateRoom()">
-                        <i data-lucide="plus-circle" class="w-6 h-6 opacity-80"></i>
-                        <div>
-                            <h3 class="font-bold text-sm">غرفتي الخاصة</h3>
-                            <p class="text-[10px] text-gray-300">أنشئ مجتمعك الآن</p>
-                        </div>
-                    </div>
-                `;
             }
-            lucide.createIcons();
-        }
-
-        // --- NAVIGATION ---
-        window.toggleSidebar = (show) => {
-            document.getElementById('sidebar').classList.toggle('open', show);
-            document.getElementById('sidebarOverlay').classList.toggle('visible', show);
-        };
-
-        window.switchView = (viewName) => {
-            document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
-            
-            const mainHeader = document.getElementById('mainHeader');
-            const roomHeader = document.getElementById('roomHeader');
-            const icon = document.getElementById('headerIcon');
-            let title = 'الرئيسية';
-            let iconName = 'home';
-
-            if (viewName === 'room') {
-                mainHeader.classList.add('hidden');
-                roomHeader.classList.remove('hidden');
-            } else {
-                mainHeader.classList.remove('hidden');
-                roomHeader.classList.add('hidden');
-                if (viewName === 'wallet') { title = 'المحفظة'; iconName = 'wallet'; }
-                else if (viewName === 'store') { title = 'المتجر'; iconName = 'shopping-bag'; loadStoreItems('frame'); }
-                else if (viewName === 'friends') { title = 'أصدقائي'; iconName = 'users'; loadFriends(); loadFriendRequests(); }
-                else if (viewName === 'bag') { title = 'حقيبتي'; iconName = 'backpack'; loadBag(); }
-                
-                document.getElementById('pageTitle').innerText = title;
-                icon.setAttribute('data-lucide', iconName);
-                lucide.createIcons();
+            const sidebarBadges = document.getElementById('sidebarActiveBadges');
+            sidebarBadges.innerHTML = '';
+            if (userData.activeBadges && userData.activeBadges.length > 0) {
+                userData.activeBadges.forEach(badgeId => {
+                    const badge = storeData.itemsById[badgeId];
+                    if (badge && badge.type === 'badge') {
+                        if (badge.itemType === 'svga') {
+                            const badgeContainer = document.createElement('div');
+                            badgeContainer.className = 'flex items-center justify-center w-8 h-8';
+                            badgeContainer.id = `badge-${badgeId}`;
+                            sidebarBadges.appendChild(badgeContainer);
+                            playSvga(badge.fileUrl, badgeContainer, { loops: 1, clearsAfterStop: false });
+                        } else {
+                            sidebarBadges.innerHTML += `<div class="flex items-center justify-center"><img src="${badge.image}" class="w-8 h-8 object-contain" title="${badge.name}"></div>`;
+                        }
+                    }
+                });
             }
-            toggleSidebar(false);
-        };
-
-        function updateSidebar() {
-            if (!currentUser) return;
-            document.getElementById('sideUserName').innerText = currentUser.displayName;
-            document.getElementById('sideUserEmail').innerText = currentUser.email;
-            document.getElementById('sideUserImg').src = currentUser.photoURL;
-            
-            // Frame
-            const frame = itemsCache[currentUser.activeFrame];
-            const frameContainer = document.getElementById('sideUserFrame');
-            frameContainer.innerHTML = '';
-            if (frame && frame.itemType === 'svga') playSvga(frame.fileUrl, frameContainer);
-
-            // Levels
-            const magicLvl = currentUser.magicLevel || 1;
-            const wealthLvl = currentUser.wealthLevel || 1;
-            
-            document.getElementById('sideMagicLevel').innerText = `Lv.${magicLvl}`;
-            document.getElementById('sideWealthLevel').innerText = `Lv.${wealthLvl}`;
-            
-            if (levelsCache.magic[magicLvl]) document.getElementById('sideMagicImg').src = levelsCache.magic[magicLvl].image;
-            if (levelsCache.wealth[wealthLvl]) document.getElementById('sideWealthImg').src = levelsCache.wealth[wealthLvl].image;
         }
 
-        // --- WALLET ---
-        function updateWalletUI() {
-            const els = document.querySelectorAll('#giftWallet');
-            els.forEach(el => el.innerText = (currentUser?.balance || 0).toLocaleString());
-            const display = document.getElementById('walletAmountDisplay');
-            if(display) display.innerText = (currentUser?.balance || 0).toLocaleString();
-        }
-
-        window.recharge = async (amount) => {
+        function playSvga(url, container, options = {}) {
             try {
-                await updateDoc(doc(db, "users", currentUser.uid), { balance: increment(amount) });
-                alert(`تم شحن ${amount.toLocaleString()} بنجاح!`);
-            } catch (error) { alert('فشل الشحن: ' + error.message); }
+                container.innerHTML = '';
+                const player = new SVGA.Player(container);
+                const parser = new SVGA.Parser();
+                parser.load(url, (videoItem) => {
+                    player.setVideoItem(videoItem);
+                    player.loops = options.loops || 0;
+                    player.clearsAfterStop = options.clearsAfterStop || false;
+                    player.startAnimation();
+                    setTimeout(() => {
+                        const canvas = container.querySelector('canvas');
+                        if (canvas) { canvas.classList.add('vga-player-canvas'); canvas.style.objectFit = 'contain'; canvas.style.display = 'block'; }
+                    }, 50);
+                    const id = 'player_' + Date.now();
+                    activeSvgaPlayers[id] = { player, container };
+                    container.dataset.playerId = id;
+                }, (error) => { container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>'; });
+            } catch (error) { container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>'; }
+        }
+
+        function playPerfectSvga(url, container, options = {}) {
+            try {
+                container.innerHTML = '';
+                const player = new SVGA.Player(container);
+                const parser = new SVGA.Parser();
+                parser.load(url, (videoItem) => {
+                    player.setVideoItem(videoItem);
+                    player.loops = options.loops || 0;
+                    player.clearsAfterStop = options.clearsAfterStop || false;
+                    player.startAnimation();
+                    setTimeout(() => {
+                        const canvas = container.querySelector('canvas');
+                        if (canvas) { canvas.classList.add('vga-player-canvas'); canvas.style.objectFit = 'contain'; canvas.style.display = 'block'; }
+                    }, 50);
+                    const id = 'player_' + Date.now();
+                    activeSvgaPlayers[id] = { player, container };
+                    container.dataset.playerId = id;
+                }, (error) => { container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>'; });
+            } catch (error) { container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>'; }
+        }
+
+        function startCountdown(elementId, endTime, onExpire) {
+            if (countdownIntervals[elementId]) clearInterval(countdownIntervals[elementId]);
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            function updateTimer() {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+                if (distance < 0) { clearInterval(countdownIntervals[elementId]); element.innerText = "انتهى"; if (onExpire) onExpire(); return; }
+                const hours = Math.floor(distance / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                element.innerText = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            updateTimer();
+            countdownIntervals[elementId] = setInterval(updateTimer, 1000);
+        }
+
+        function formatTimeRemaining(endTime) {
+            const now = new Date().getTime();
+            const distance = endTime - now;
+            if (distance < 0) return "منتهي";
+            const hours = Math.floor(distance / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        window.loadStoreItems = (type) => {
+            const grid = document.getElementById('storeGrid');
+            grid.innerHTML = '';
+            let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
+            document.getElementById('store-tab-frames').className = type === 'frame' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-badges').className = type === 'badge' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-svga').className = type === 'svga' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            document.getElementById('store-tab-chatbubble').className = type === 'chatbubble' ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            items.forEach(item => {
+                let field = '';
+                if (type === 'frame') field = 'purchasedFrames';
+                else if (type === 'badge') field = 'purchasedBadges';
+                else if (type === 'svga') field = 'purchasedSvga';
+                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
+                const owned = userData[field]?.some(i => i.id === item.id);
+                let previewHTML = '';
+                let extraTag = '';
+                const storeEndTime = new Date().getTime() + (24 * 60 * 60 * 1000);
+                let timerHTML = `<div class="countdown-timer store-timer" id="store-timer-${item.id}">24:00:00</div>`;
+                if (type === 'chatbubble') {
+                    previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
+                    if (item.fileUrl) setTimeout(() => { const container = document.getElementById(`preview-cb-${item.id}`); if (container) playSvga(item.fileUrl, container, { loops: 1, clearsAfterStop: true }); }, 100);
+                } else if (item.itemType === 'svga') {
+                    previewHTML = `<div class="svga-preview mb-2 relative" id="preview-${item.id}"></div>`;
+                    extraTag = '<span class="svga-icon">SVGA</span>';
+                } else previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
+                grid.innerHTML += `<div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">${timerHTML}${previewHTML}<h4 class="font-bold text-sm text-center mb-2">${item.name}</h4>${extraTag}<button onclick="${owned ? '' : `buyItem('${type}', '${item.id}', ${item.price})`}" class="buy-btn ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'}">${owned ? 'مملوك' : `${item.price} 💰 شراء`}</button></div>`;
+                setTimeout(() => { startCountdown(`store-timer-${item.id}`, storeEndTime, null); }, 100);
+                if (item.itemType === 'svga' && item.fileUrl && type !== 'chatbubble') setTimeout(() => { const previewContainer = document.getElementById(`preview-${item.id}`); if (previewContainer) playSvga(item.fileUrl, previewContainer, { loops: 1, clearsAfterStop: true }); }, 100);
+            });
+            if (items.length === 0) grid.innerHTML = `<div class="col-span-2 glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center"><i data-lucide="package" class="w-12 h-12 text-gray-300 mb-4"></i><p class="text-gray-400 text-sm">لا توجد عناصر في هذا القسم</p></div>`;
+            lucide.createIcons();
         };
 
-        // --- FRIENDS ---
+        window.buyItem = async (type, id, price) => {
+            try {
+                if (!userData.uid) return alert('خطأ: لم يتم تحميل بيانات المستخدم');
+                if ((userData.balance || 0) < price) return alert('رصيدك غير كافٍ!');
+                let field = '';
+                if (type === 'frame') field = 'purchasedFrames';
+                else if (type === 'badge') field = 'purchasedBadges';
+                else if (type === 'svga') field = 'purchasedSvga';
+                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
+                if (!field) return alert('خطأ: نوع العنصر غير معروف');
+                const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                await updateDoc(doc(db, "users", userData.uid), { balance: increment(-price), [field]: arrayUnion({ id: id, purchasedAt: new Date(), expiresAt: expiresAt }) });
+                alert('تم الشراء بنجاح! سينتهي العنصر بعد 24 ساعة.');
+                loadStoreItems(type);
+            } catch (error) { alert('فشل الشراء: ' + error.message); }
+        };
+
+        window.loadBagItems = async () => {
+            const fGrid = document.getElementById('bagGrid');
+            const bGrid = document.getElementById('badgesBagGrid');
+            const sGrid = document.getElementById('svgaBagGrid');
+            const aGrid = document.getElementById('activeBadgesGrid');
+            const cbGrid = document.getElementById('chatbubblesBagGrid');
+            fGrid.innerHTML = ''; bGrid.innerHTML = ''; sGrid.innerHTML = ''; aGrid.innerHTML = ''; cbGrid.innerHTML = '';
+            Object.keys(countdownIntervals).forEach(key => { if (key.startsWith('bag-')) clearInterval(countdownIntervals[key]); });
+            const frames = userData.purchasedFrames || [];
+            for (const f of frames) {
+                const item = storeData.itemsById[f.id];
+                if (item && item.type === 'frame') {
+                    const isEquipped = userData.activeFrame === f.id;
+                    const expiresAt = f.expiresAt ? new Date(f.expiresAt).getTime() : null;
+                    const timerId = `bag-timer-frame-${f.id}`;
+                    let timerHTML = expiresAt ? `<div class="countdown-timer" id="${timerId}">${formatTimeRemaining(expiresAt)}</div>` : '';
+                    if (item.itemType === 'svga') {
+                        fGrid.innerHTML += `<div onclick="equipFrame('${f.id}')" class="relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">${timerHTML}<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}"><span class="text-xs font-bold text-gray-600">SVGA</span></div>${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}</div>`;
+                        setTimeout(() => { const container = document.getElementById(`bag-frame-${f.id}`); if (container) playSvga(item.fileUrl, container, { loops: 1, clearsAfterStop: false }); }, 100);
+                    } else fGrid.innerHTML += `<div onclick="equipFrame('${f.id}')" class="relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">${timerHTML}<img src="${item.image}" class="w-12 h-12 object-contain rounded-full">${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}</div>`;
+                    if (expiresAt) setTimeout(() => { startCountdown(timerId, expiresAt, () => { checkExpiredItems(); loadBagItems(); }); }, 100);
+                }
+            }
+            const badges = userData.purchasedBadges || [];
+            for (const b of badges) {
+                const item = storeData.itemsById[b.id];
+                if (item && item.type === 'badge') {
+                    const isActive = userData.activeBadges?.includes(b.id);
+                    const expiresAt = b.expiresAt ? new Date(b.expiresAt).getTime() : null;
+                    const timerId = `bag-timer-badge-${b.id}`;
+                    let timerHTML = expiresAt ? `<div class="countdown-timer" id="${timerId}">${formatTimeRemaining(expiresAt)}</div>` : '';
+                    bGrid.innerHTML += `<div onclick="toggleBadge('${b.id}')" class="relative p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">${timerHTML}<div class="w-8 h-8 flex items-center justify-center" id="bag-badge-${b.id}">${item.itemType === 'svga' ? '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : `<img src="${item.image}" class="w-full h-full object-contain">`}</div></div>`;
+                    if (item.itemType === 'svga' && item.fileUrl) setTimeout(() => { const container = document.getElementById(`bag-badge-${b.id}`); if (container) playSvga(item.fileUrl, container, { loops: 1, clearsAfterStop: false }); }, 100);
+                    if (expiresAt) setTimeout(() => { startCountdown(timerId, expiresAt, () => { checkExpiredItems(); loadBagItems(); }); }, 100);
+                }
+            }
+            const svgaItems = userData.purchasedSvga || [];
+            for (const s of svgaItems) {
+                const item = storeData.itemsById[s.id];
+                if (item && item.type === 'svga') {
+                    const isEquipped = userData.activeFrame === s.id;
+                    const expiresAt = s.expiresAt ? new Date(s.expiresAt).getTime() : null;
+                    const timerId = `bag-timer-svga-${s.id}`;
+                    let timerHTML = expiresAt ? `<div class="countdown-timer" id="${timerId}">${formatTimeRemaining(expiresAt)}</div>` : '';
+                    sGrid.innerHTML += `<div onclick="equipSvga('${s.id}')" class="relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}">${timerHTML}<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-svga-${s.id}"><span class="text-xs font-bold text-gray-600">SVGA</span></div><p class="text-xs text-center truncate w-full">${item.name}</p>${isEquipped ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}</div>`;
+                    setTimeout(() => { const container = document.getElementById(`bag-svga-${s.id}`); if (container) playSvga(item.fileUrl, container, { loops: 1, clearsAfterStop: false }); }, 100);
+                    if (expiresAt) setTimeout(() => { startCountdown(timerId, expiresAt, () => { checkExpiredItems(); loadBagItems(); }); }, 100);
+                }
+            }
+            const activeBadges = userData.activeBadges || [];
+            for (const badgeId of activeBadges) {
+                const item = storeData.itemsById[badgeId];
+                if (item && item.type === 'badge') {
+                    aGrid.innerHTML += `<div onclick="toggleBadge('${badgeId}')" class="p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer border-2 border-black bg-white"><div class="w-8 h-8 flex items-center justify-center" id="active-badge-${badgeId}">${item.itemType === 'svga' ? '<span class="text-[8px] font-bold text-gray-400">SVGA</span>' : `<img src="${item.image}" class="w-full h-full object-contain">`}</div></div>`;
+                    if (item.itemType === 'svga' && item.fileUrl) setTimeout(() => { const container = document.getElementById(`active-badge-${badgeId}`); if (container) playSvga(item.fileUrl, container, { loops: 1, clearsAfterStop: false }); }, 100);
+                }
+            }
+            const chatBubbles = userData.purchasedChatBubbles || [];
+            for (const cb of chatBubbles) {
+                const bubble = storeData.chatBubbles.find(b => b.id === cb.id);
+                if (bubble) {
+                    const isActive = userData.activeChatBubble === cb.id;
+                    const expiresAt = cb.expiresAt ? new Date(cb.expiresAt).getTime() : null;
+                    const timerId = `bag-timer-cb-${cb.id}`;
+                    let timerHTML = expiresAt ? `<div class="countdown-timer" id="${timerId}">${formatTimeRemaining(expiresAt)}</div>` : '';
+                    cbGrid.innerHTML += `<div onclick="equipChatBubble('${cb.id}')" class="relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}">${timerHTML}<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-cb-${cb.id}"><span class="text-xs font-bold text-gray-600">فقاعة</span></div><p class="text-xs text-center truncate w-full">${bubble.name}</p>${isActive ? '<p class="text-xs mt-1 text-green-600 font-bold">✓</p>' : ''}</div>`;
+                    if (bubble.fileUrl) setTimeout(() => { const container = document.getElementById(`bag-cb-${cb.id}`); if (container) playSvga(bubble.fileUrl, container, { loops: 1, clearsAfterStop: false }); }, 100);
+                    if (expiresAt) setTimeout(() => { startCountdown(timerId, expiresAt, () => { checkExpiredItems(); loadBagItems(); }); }, 100);
+                }
+            }
+        };
+
+        window.equipFrame = async (id) => { const item = storeData.itemsById[id]; if (!item) return; const newFrame = userData.activeFrame === id ? null : id; await updateDoc(doc(db, "users", userData.uid), { activeFrame: newFrame }); loadBagItems(); setTimeout(() => updateUI(), 100); };
+        window.equipSvga = async (id) => { const item = storeData.itemsById[id]; if (!item || item.type !== 'svga') return; const newFrame = userData.activeFrame === id ? null : id; await updateDoc(doc(db, "users", userData.uid), { activeFrame: newFrame }); loadBagItems(); setTimeout(() => updateUI(), 100); };
+        window.equipChatBubble = async (id) => { const newBubble = userData.activeChatBubble === id ? null : id; await updateDoc(doc(db, "users", userData.uid), { activeChatBubble: newBubble }); loadBagItems(); };
+        window.toggleBadge = async (id) => { const item = storeData.itemsById[id]; if (!item || item.type !== 'badge') return; const isActive = userData.activeBadges?.includes(id); await updateDoc(doc(db, "users", userData.uid), { activeBadges: isActive ? arrayRemove(id) : arrayUnion(id) }); loadBagItems(); await updateUI(); };
+
+        async function checkExpiredItems() {
+            const now = new Date();
+            const updates = {};
+            let hasUpdates = false;
+            if (userData.purchasedFrames) {
+                const validFrames = userData.purchasedFrames.filter(f => { if (!f.expiresAt) return true; return new Date(f.expiresAt) > now; });
+                const expiredFrames = userData.purchasedFrames.filter(f => { if (!f.expiresAt) return false; return new Date(f.expiresAt) <= now; });
+                if (expiredFrames.length > 0) { updates.purchasedFrames = validFrames; hasUpdates = true; if (userData.activeFrame && expiredFrames.some(f => f.id === userData.activeFrame)) updates.activeFrame = null; }
+            }
+            if (userData.purchasedBadges) {
+                const validBadges = userData.purchasedBadges.filter(b => { if (!b.expiresAt) return true; return new Date(b.expiresAt) > now; });
+                const expiredBadges = userData.purchasedBadges.filter(b => { if (!b.expiresAt) return false; return new Date(b.expiresAt) <= now; });
+                if (expiredBadges.length > 0) { updates.purchasedBadges = validBadges; hasUpdates = true; const expiredBadgeIds = expiredBadges.map(b => b.id); updates.activeBadges = (userData.activeBadges || []).filter(b => !expiredBadgeIds.includes(b)); }
+            }
+            if (userData.purchasedSvga) {
+                const validSvga = userData.purchasedSvga.filter(s => { if (!s.expiresAt) return true; return new Date(s.expiresAt) > now; });
+                const expiredSvga = userData.purchasedSvga.filter(s => { if (!s.expiresAt) return false; return new Date(s.expiresAt) <= now; });
+                if (expiredSvga.length > 0) { updates.purchasedSvga = validSvga; hasUpdates = true; if (userData.activeFrame && expiredSvga.some(s => s.id === userData.activeFrame)) updates.activeFrame = null; }
+            }
+            if (userData.purchasedChatBubbles) {
+                const validBubbles = userData.purchasedChatBubbles.filter(cb => { if (!cb.expiresAt) return true; return new Date(cb.expiresAt) > now; });
+                const expiredBubbles = userData.purchasedChatBubbles.filter(cb => { if (!cb.expiresAt) return false; return new Date(cb.expiresAt) <= now; });
+                if (expiredBubbles.length > 0) { updates.purchasedChatBubbles = validBubbles; hasUpdates = true; if (userData.activeChatBubble && expiredBubbles.some(cb => cb.id === userData.activeChatBubble)) updates.activeChatBubble = null; }
+            }
+            if (hasUpdates) { await updateDoc(doc(db, "users", userData.uid), updates); if (updates.purchasedFrames || updates.purchasedBadges || updates.purchasedSvga || updates.purchasedChatBubbles) showNotification('انتهت صلاحية بعض العناصر الخاصة بك'); }
+        }
+
+        function showNotification(message) { const notification = document.createElement('div'); notification.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-bold z-50 shadow-xl animate-bounce'; notification.innerText = message; document.body.appendChild(notification); setTimeout(() => notification.remove(), 3000); }
+
         window.searchUser = async () => {
             const email = document.getElementById('searchUserInput').value.trim().toLowerCase();
             if (!email) return;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) { alert('يرجى إدخال بريد إلكتروني صحيح'); return; }
+            if (email === userData.email?.toLowerCase()) { alert('لا يمكنك البحث عن نفسك'); return; }
             const q = query(collection(db, "users"), where("email", "==", email));
             const snap = await getDocs(q);
+            const results = document.getElementById('searchResults');
             const container = document.getElementById('userResult');
-            document.getElementById('searchResults').classList.remove('hidden');
-            
+            results.classList.remove('hidden');
             if (snap.empty) {
-                container.innerHTML = '<p class="text-center text-gray-400">لا يوجد نتائج</p>';
+                container.innerHTML = `<div class="text-center p-6"><i data-lucide="user-x" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i><p class="text-gray-400 text-sm mb-2">لم يتم العثور على مستخدم بهذا البريد</p><p class="text-xs text-gray-300">تأكد من كتابة البريد الإلكتروني بشكل صحيح</p></div>`;
+                lucide.createIcons();
             } else {
-                const u = snap.docs[0].data();
-                const uid = snap.docs[0].id;
-                const isFriend = currentUser.friends?.includes(uid);
-                
-                // Fetch Levels for search result
-                const magicLvl = u.magicLevel || 1;
-                const wealthLvl = u.wealthLevel || 1;
-                const magicImg = levelsCache.magic[magicLvl]?.image || '';
-                const wealthImg = levelsCache.wealth[wealthLvl]?.image || '';
-
-                container.innerHTML = `
-                    <div class="flex flex-col gap-3">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <img src="${u.photoURL}" class="w-10 h-10 rounded-full">
-                                <div><h4 class="font-bold text-sm">${u.displayName}</h4></div>
-                            </div>
-                            ${uid === currentUser.uid ? '' : 
-                            `<button onclick="${isFriend ? `unfollowUser('${uid}')` : `sendFriendReq('${uid}')`}" class="px-4 py-2 rounded-xl text-xs font-bold ${isFriend ? 'bg-gray-100' : 'bg-blue-600 text-white'}">
-                                ${isFriend ? 'إلغاء المتابعة' : 'متابعة'}
-                            </button>`}
-                        </div>
-                        <div class="flex gap-2 justify-center">
-                            <div class="flex items-center gap-1 bg-purple-50 px-2 py-1 rounded text-xs text-purple-600 font-bold"><img src="${magicImg}" class="w-3 h-3"> ${magicLvl}</div>
-                            <div class="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded text-xs text-yellow-600 font-bold"><img src="${wealthImg}" class="w-3 h-3"> ${wealthLvl}</div>
-                        </div>
-                    </div>
-                `;
+                const user = snap.docs[0].data();
+                const userUid = snap.docs[0].id;
+                const isFollowing = userData.friends?.includes(userUid);
+                const hasSentRequest = userData.sentRequests?.includes(userUid);
+                const hasReceivedRequest = userData.friendRequests?.includes(userUid);
+                let buttonText = 'متابعة'; let buttonClass = 'bg-gradient-to-r from-blue-500 to-purple-500 text-white'; let buttonAction = `sendFriendRequest('${userUid}')`; let buttonIcon = 'user-plus';
+                if (isFollowing) { buttonText = 'متابع ✓'; buttonClass = 'bg-gray-100 text-gray-500 border border-gray-300'; buttonAction = `unfollowUser('${userUid}')`; buttonIcon = 'user-check'; }
+                else if (hasSentRequest) { buttonText = 'تم الإرسال'; buttonClass = 'bg-blue-100 text-blue-600 border border-blue-200'; buttonAction = `cancelFriendRequest('${userUid}')`; buttonIcon = 'clock'; }
+                else if (hasReceivedRequest) { buttonText = 'قبول الطلب'; buttonClass = 'bg-green-100 text-green-600 border border-green-200'; buttonAction = `acceptFriendRequest('${userUid}')`; buttonIcon = 'user-check'; }
+                const magicLevel = user.magicLevel || 1;
+                const wealthLevel = user.wealthLevel || 1;
+                const magicLevelImg = storeData.magicLevels[magicLevel]?.image || '';
+                const wealthLevelImg = storeData.wealthLevels[wealthLevel]?.image || '';
+                const frameItem = user.activeFrame ? storeData.itemsById[user.activeFrame] : null;
+                const frameSizeClass = getFrameSizeClass(frameItem?.frameConfig);
+                container.innerHTML = `<div class="flex flex-col items-center"><div class="relative mb-4"><div class="avatar-wrapper mb-2 ${frameSizeClass}" id="search-avatar-${userUid}"><img src="${user.photoURL || 'https://via.placeholder.com/150'}" class="avatar-img">${user.activeFrame ? `<div id="search-frame-${userUid}" class="svga-avatar-frame"></div><img src="${storeData.itemsById[user.activeFrame]?.image || ''}" class="perfect-frame ${storeData.itemsById[user.activeFrame]?.itemType === 'svga' ? 'hidden' : ''}">` : ''}</div></div><div class="text-center mb-4"><h4 class="font-bold text-lg text-gray-900 mb-1">${user.displayName}</h4><div class="flex items-center justify-center gap-2 mb-2"><span class="text-xs text-gray-400">${user.email}</span><button onclick="copyText('${user.email}')" class="text-gray-400 hover:text-black p-1"><i data-lucide="copy" class="w-3 h-3"></i></button></div></div><div class="flex gap-3 mb-4"><div class="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full"><div class="w-6 h-6 flex items-center justify-center"><img src="${magicLevelImg}" class="w-5 h-5 object-contain"></div><span class="text-xs font-bold text-gray-700">${magicLevel}</span></div><div class="flex items-center gap-2 bg-gray-50 px-3 py-1 rounded-full"><div class="w-6 h-6 flex items-center justify-center"><img src="${wealthLevelImg}" class="w-5 h-5 object-contain"></div><span class="text-xs font-bold text-gray-700">${wealthLevel}</span></div></div><button onclick="${buttonAction}" class="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl ${buttonClass} font-bold text-sm transition-all hover:scale-[1.02] active:scale-[0.98]"><i data-lucide="${buttonIcon}" class="w-4 h-4"></i>${buttonText}</button></div>`;
+                lucide.createIcons();
+                if (frameItem?.frameConfig) setTimeout(() => { const avatarWrapper = document.getElementById(`search-avatar-${userUid}`); if (avatarWrapper) applyFrameStyles(avatarWrapper, frameItem.frameConfig); }, 100);
+                if (user.activeFrame && storeData.itemsById[user.activeFrame]?.itemType === 'svga') setTimeout(() => { const frameItem = storeData.itemsById[user.activeFrame]; const frameContainer = document.getElementById(`search-frame-${userUid}`); if (frameContainer && frameItem?.fileUrl) playPerfectSvga(frameItem.fileUrl, frameContainer, { loops: 0, clearsAfterStop: false }); }, 100);
             }
         };
 
+        window.sendFriendRequest = async (uid) => {
+            try {
+                if (!userData.uid) { alert("يرجى الانتظار حتى تحميل بياناتك"); return; }
+                await updateDoc(doc(db, "users", userData.uid), { sentRequests: arrayUnion(uid) });
+                await updateDoc(doc(db, "users", uid), { friendRequests: arrayUnion(userData.uid) });
+                alert('تم إرسال طلب المتابعة بنجاح!');
+                searchUser();
+                loadFriendRequests();
+            } catch (error) { alert('فشل إرسال الطلب: ' + error.message); }
+        };
+
+        window.cancelFriendRequest = async (uid) => { await updateDoc(doc(db, "users", userData.uid), { sentRequests: arrayRemove(uid) }); await updateDoc(doc(db, "users", uid), { friendRequests: arrayRemove(userData.uid) }); searchUser(); loadFriendRequests(); };
+        window.acceptFriendRequest = async (uid) => { await updateDoc(doc(db, "users", userData.uid), { friendRequests: arrayRemove(uid), friends: arrayUnion(uid) }); await updateDoc(doc(db, "users", uid), { sentRequests: arrayRemove(userData.uid), friends: arrayUnion(userData.uid) }); searchUser(); loadFriendRequests(); loadFriends(); };
+        window.unfollowUser = async (uid) => { await updateDoc(doc(db, "users", userData.uid), { friends: arrayRemove(uid) }); await updateDoc(doc(db, "users", uid), { friends: arrayRemove(userData.uid) }); searchUser(); loadFriends(); };
+
         async function loadFriendRequests() {
             const list = document.getElementById('friendRequestsList');
-            const section = document.getElementById('friendRequestsSection');
             list.innerHTML = '';
-            
-            if (!currentUser.friendRequests || currentUser.friendRequests.length === 0) {
-                section.classList.add('hidden');
-                return;
-            }
-            section.classList.remove('hidden');
-            
-            for (const uid of currentUser.friendRequests) {
-                const u = await getUserData(uid);
-                if (u) {
-                    list.innerHTML += `
-                        <div class="glass-card p-3 rounded-2xl flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <img src="${u.photoURL}" class="w-10 h-10 rounded-full">
-                                <span class="font-bold text-sm">${u.displayName}</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="acceptFriendRequest('${uid}')" class="p-2 bg-green-100 text-green-600 rounded-lg"><i data-lucide="check" class="w-4 h-4"></i></button>
-                                <button onclick="rejectFriendRequest('${uid}')" class="p-2 bg-red-100 text-red-600 rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>
-                    `;
+            if (!userData.friendRequests || userData.friendRequests.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا توجد طلبات متابعة</p>'; return; }
+            for (const uid of userData.friendRequests) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const user = snap.data();
+                    list.innerHTML += `<div class="glass-card p-4 rounded-3xl"><div class="flex items-center justify-between"><div class="flex items-center gap-3"><img src="${user.photoURL}" class="w-12 h-12 rounded-full object-cover"><div><h4 class="font-bold text-sm">${user.displayName}</h4><p class="text-xs text-gray-400">${user.email}</p></div></div><div class="flex gap-2"><button onclick="acceptFriendRequest('${uid}')" class="px-3 py-1 bg-green-100 text-green-600 rounded-lg text-xs font-bold">قبول</button><button onclick="rejectFriendRequest('${uid}')" class="px-3 py-1 bg-red-100 text-red-600 rounded-lg text-xs font-bold">رفض</button></div></div></div>`;
                 }
             }
-            lucide.createIcons();
         }
+
+        window.rejectFriendRequest = async (uid) => { await updateDoc(doc(db, "users", userData.uid), { friendRequests: arrayRemove(uid) }); await updateDoc(doc(db, "users", uid), { sentRequests: arrayRemove(userData.uid) }); loadFriendRequests(); };
 
         async function loadFriends() {
             const list = document.getElementById('friendsList');
             list.innerHTML = '';
-            
-            if (!currentUser.friends || currentUser.friends.length === 0) {
-                list.innerHTML = '<p class="text-center text-gray-400 py-4">لا يوجد أصدقاء</p>';
-                return;
-            }
-
-            for (const uid of currentUser.friends) {
-                const u = await getUserData(uid);
-                if (u) {
-                    list.innerHTML += `
-                        <div onclick="openProfile('${uid}')" class="glass-card p-3 rounded-2xl flex items-center justify-between cursor-pointer">
-                            <div class="flex items-center gap-3">
-                                <img src="${u.photoURL}" class="w-10 h-10 rounded-full">
-                                <div>
-                                    <h4 class="font-bold text-sm">${u.displayName}</h4>
-                                    <p class="text-[10px] text-gray-400">${u.email}</p>
-                                </div>
-                            </div>
-                            <i data-lucide="more-horizontal" class="text-gray-400"></i>
-                        </div>
-                    `;
+            if (!userData.friends || userData.friends.length === 0) { list.innerHTML = '<p class="text-center text-gray-400 text-sm py-4">لا يوجد أصدقاء بعد</p>'; return; }
+            for (const uid of userData.friends) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const friend = snap.data();
+                    list.innerHTML += `<div onclick="openChat('${uid}')" class="glass-card p-4 rounded-3xl flex items-center justify-between cursor-pointer hover:bg-white transition"><div class="flex items-center gap-3"><img src="${friend.photoURL}" class="w-12 h-12 rounded-full object-cover"><div><h4 class="font-bold text-sm">${friend.displayName}</h4><p class="text-xs text-gray-400">${friend.email}</p></div></div><i data-lucide="message-circle" class="w-5 h-5 text-gray-300"></i></div>`;
                 }
             }
             lucide.createIcons();
         }
 
-        window.sendFriendReq = async (uid = null) => {
-            const targetId = uid || selectedProfileUser?.uid;
-            if (!targetId) return;
-            try {
-                await updateDoc(doc(db, "users", targetId), { friendRequests: arrayUnion(currentUser.uid) });
-                alert("تم إرسال الطلب");
-                if(selectedProfileUser) closeProfileSheet();
-            } catch(e) { alert(e.message); }
-        };
-
-        window.acceptFriendRequest = async (uid) => {
-            await updateDoc(doc(db, "users", currentUser.uid), { friendRequests: arrayRemove(uid), friends: arrayUnion(uid) });
-            await updateDoc(doc(db, "users", uid), { friends: arrayUnion(currentUser.uid) });
-            loadFriendRequests();
-            loadFriends();
-        };
-
-        window.rejectFriendRequest = async (uid) => {
-            await updateDoc(doc(db, "users", currentUser.uid), { friendRequests: arrayRemove(uid) });
-            loadFriendRequests();
-        };
-
-        window.unfollowUser = async (uid) => {
-            await updateDoc(doc(db, "users", currentUser.uid), { friends: arrayRemove(uid) });
-            await updateDoc(doc(db, "users", uid), { friends: arrayRemove(currentUser.uid) });
-            loadFriends();
-            if(document.getElementById('searchResults').classList.contains('hidden') === false) searchUser();
-        };
-
-        // --- ROOMS LOGIC ---
-        window.loadRooms = async () => {
-            const grid = document.getElementById('roomsList');
-            grid.innerHTML = '<div class="text-center p-4"><div class="animate-spin w-6 h-6 border-2 border-black border-t-transparent rounded-full mx-auto"></div></div>';
-            
-            const snap = await getDocs(collection(db, "rooms"));
-            grid.innerHTML = '';
-            
-            snap.forEach(doc => {
-                const room = doc.data();
-                grid.innerHTML += `
-                    <div onclick="enterRoom('${doc.id}')" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition relative overflow-hidden">
-                        ${room.image ? `<img src="${room.image}" class="w-16 h-16 rounded-2xl object-cover bg-gray-200">` : 
-                        `<div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center text-2xl">🏠</div>`}
-                        <div class="flex-1">
-                            <h4 class="font-bold text-gray-900">${room.name}</h4>
-                            <p class="text-xs text-gray-500 line-clamp-1">${room.description || 'غرفة دردشة عامة'}</p>
-                        </div>
-                        <i data-lucide="chevron-left" class="text-gray-400 w-5 h-5 rtl:rotate-180"></i>
-                    </div>
-                `;
-            });
-            lucide.createIcons();
-        };
-
-        window.enterRoom = async (roomId) => {
-            const roomSnap = await getDoc(doc(db, "rooms", roomId));
-            if (!roomSnap.exists()) return;
-            const roomData = roomSnap.data();
-            
-            if (roomData.bannedUsers && roomData.bannedUsers.includes(currentUser.uid)) {
-                alert("أنت محظور من دخول هذه الغرفة");
-                return;
-            }
-
-            currentRoomId = roomId;
-            document.getElementById('roomNameHeader').innerText = roomData.name;
-            const bgLayer = document.getElementById('roomBackgroundLayer');
-            bgLayer.style.backgroundImage = roomData.backgroundImage ? `url('${roomData.backgroundImage}')` : 'none';
-            
-            const isOwner = roomData.ownerId === currentUser.uid;
-            document.getElementById('roomOwnerControls').classList.toggle('hidden', !isOwner);
-
-            switchView('room');
-            
-            const presenceRef = ref(rtdb, `room-users/${roomId}/${currentUser.uid}`);
-            set(presenceRef, {
-                uid: currentUser.uid,
-                photoURL: currentUser.photoURL,
-                frame: currentUser.activeFrame || null,
-                timestamp: serverTimestamp()
-            });
-            onDisconnect(presenceRef).remove();
-
-            listenToChat(roomId);
-            listenToOnlineUsers(roomId);
-
-            if (currentUser.activeEntryEffect) {
-                const entryItem = itemsCache[currentUser.activeEntryEffect];
-                if (entryItem) playEntryEffect(entryItem.fileUrl);
-            }
-        };
-
-        window.exitRoom = () => {
-            if (currentRoomId) {
-                remove(ref(rtdb, `room-users/${currentRoomId}/${currentUser.uid}`));
-                currentRoomId = null;
-                switchView('home');
-                document.getElementById('chatArea').innerHTML = '';
-            }
-        };
-
-        // --- CHAT SYSTEM ---
-        function listenToChat(roomId) {
-            const chatRef = ref(rtdb, `room-messages/${roomId}`);
-            onValue(chatRef, (snapshot) => {
-                const data = snapshot.val();
-                const container = document.getElementById('chatArea');
-                container.innerHTML = '';
-                if (data) {
-                    const msgs = Object.values(data).sort((a,b) => a.timestamp - b.timestamp);
-                    msgs.forEach(async msg => {
-                        if (currentUser.blockedUsers && currentUser.blockedUsers.includes(msg.senderId)) return;
-                        await renderMessage(msg, container);
-                    });
-                    setTimeout(() => container.scrollTop = container.scrollHeight, 100);
-                }
-            });
-        }
-
-        async function getUserData(uid) {
-            if (usersCache[uid]) return usersCache[uid];
+        window.openChat = async (uid) => {
             const snap = await getDoc(doc(db, "users", uid));
-            if (snap.exists()) {
-                usersCache[uid] = snap.data();
-                return usersCache[uid];
-            }
-            return null;
-        }
-
-        async function renderMessage(msg, container) {
-            const isMe = msg.senderId === currentUser.uid;
-            const userData = isMe ? currentUser : await getUserData(msg.senderId);
-            if (!userData) return;
-
-            const frameItem = userData.activeFrame ? itemsCache[userData.activeFrame] : null;
-            let frameHtml = frameItem ? `<div id="frame-${msg.timestamp}" class="msg-frame"></div>` : '';
-
-            let badgesHtml = '';
-            if (userData.activeBadges && userData.activeBadges.length > 0) {
-                userData.activeBadges.slice(0, 3).forEach(bid => {
-                    const bItem = itemsCache[bid];
-                    if (bItem) badgesHtml += `<img src="${bItem.image}" class="msg-badge">`;
-                });
-                if (userData.activeBadges.length > 3) badgesHtml += `<span class="badge-dots">•••</span>`;
-            }
-
-            const bubbleItem = userData.activeChatBubble ? itemsCache[userData.activeChatBubble] : null;
-            const bubbleStyle = bubbleItem ? 'border: 2px solid #fbbf24; background: #fffbeb;' : '';
-
-            const div = document.createElement('div');
-            div.className = `message-row ${isMe ? 'me' : ''}`;
-            
-            let content = '';
-            if (msg.type === 'gift') {
-                content = `
-                <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 flex flex-col items-center">
-                    <p class="text-[10px] text-yellow-600 font-bold mb-1">🎁 هدية</p>
-                    <p class="text-sm font-bold">${msg.text.replace('أرسل هدية', '')}</p>
-                </div>`;
-            } else {
-                content = `
-                <div class="msg-bubble" style="${bubbleStyle}">
-                    <div class="msg-header">
-                        ${badgesHtml}
-                        <span class="msg-name">${userData.displayName}</span>
-                    </div>
-                    <p class="msg-text text-gray-800">${msg.text}</p>
-                </div>`;
-            }
-
-            div.innerHTML = `
-                <div class="msg-avatar-container" onclick="openProfile('${msg.senderId}')">
-                    <img src="${userData.photoURL}" class="msg-avatar">
-                    ${frameHtml}
-                </div>
-                ${content}
-            `;
-            container.appendChild(div);
-
-            if (frameItem && frameItem.itemType === 'svga') {
-                playSvga(frameItem.fileUrl, document.getElementById(`frame-${msg.timestamp}`));
-            }
-        }
-
-        window.toggleInputIcons = (input) => {
-            const hasText = input.value.trim().length > 0;
-            document.getElementById('giftTriggerBtn').classList.toggle('hidden', hasText);
-            document.getElementById('sendBtn').classList.toggle('hidden', !hasText);
-            document.getElementById('sendBtn').classList.toggle('flex', hasText);
-        };
-
-        window.sendRoomMessage = async () => {
-            const input = document.getElementById('roomMsgInput');
-            const text = input.value.trim();
-            if (!text || !currentRoomId) return;
-
-            const msgRef = ref(rtdb, `room-messages/${currentRoomId}`);
-            await push(msgRef, {
-                senderId: currentUser.uid,
-                text: text,
-                timestamp: serverTimestamp(),
-                type: 'text'
-            });
-            input.value = '';
-            toggleInputIcons(input);
-        };
-
-        // --- PROFILE & ACTIONS ---
-        window.openProfile = async (uid) => {
-            selectedProfileUser = await getUserData(uid);
-            selectedProfileUser.uid = uid;
-
-            document.getElementById('sheetName').innerText = selectedProfileUser.displayName;
-            document.getElementById('sheetId').innerText = `ID: ${uid.substring(0, 8)}`;
-            document.getElementById('sheetImg').src = selectedProfileUser.photoURL;
-            document.getElementById('sheetFriends').innerText = (selectedProfileUser.friends || []).length;
-            document.getElementById('sheetVisitors').innerText = Math.floor(Math.random() * 100);
-
-            // Levels in Profile
-            const magicLvl = selectedProfileUser.magicLevel || 1;
-            const wealthLvl = selectedProfileUser.wealthLevel || 1;
-            document.getElementById('sheetMagicLevel').innerText = `Lv.${magicLvl}`;
-            document.getElementById('sheetWealthLevel').innerText = `Lv.${wealthLvl}`;
-            if(levelsCache.magic[magicLvl]) document.getElementById('sheetMagicImg').src = levelsCache.magic[magicLvl].image;
-            if(levelsCache.wealth[wealthLvl]) document.getElementById('sheetWealthImg').src = levelsCache.wealth[wealthLvl].image;
-
-            const frameContainer = document.getElementById('sheetFrame');
-            frameContainer.innerHTML = '';
-            if (selectedProfileUser.activeFrame) {
-                const item = itemsCache[selectedProfileUser.activeFrame];
-                if (item && item.itemType === 'svga') playSvga(item.fileUrl, frameContainer);
-            }
-
-            const badgeContainer = document.getElementById('sheetBadges');
-            badgeContainer.innerHTML = '';
-            if (selectedProfileUser.activeBadges) {
-                selectedProfileUser.activeBadges.forEach(bid => {
-                    const bItem = itemsCache[bid];
-                    if (bItem) badgeContainer.innerHTML += `<div class="flex-none w-8 h-8 bg-gray-50 rounded-lg p-1 border"><img src="${bItem.image}" class="w-full h-full object-contain"></div>`;
-                });
-            }
-
-            const isFriend = currentUser.friends?.includes(uid);
-            const followBtn = document.getElementById('btnFollowAction');
-            followBtn.onclick = isFriend ? () => unfollowUser(uid) : () => sendFriendReq(uid);
-            followBtn.querySelector('span').innerText = isFriend ? 'إلغاء' : 'متابعة';
-
-            const roomSnap = await getDoc(doc(db, "rooms", currentRoomId));
-            const roomData = roomSnap.data();
-            const isOwner = roomData.ownerId === currentUser.uid && currentUser.uid !== uid;
-            document.getElementById('ownerControls').classList.toggle('hidden', !isOwner);
-
-            document.getElementById('userProfileSheet').classList.add('active');
-            document.getElementById('profileOverlay').classList.remove('hidden');
-        };
-
-        window.closeProfileSheet = () => {
-            document.getElementById('userProfileSheet').classList.remove('active');
-            document.getElementById('profileOverlay').classList.add('hidden');
-        };
-
-        window.prepareGift = () => {
-            closeProfileSheet();
-            toggleGiftBox(selectedProfileUser);
-        };
-
-        window.blockUser = async () => {
-            if (confirm("هل تريد حظر هذا المستخدم؟")) {
-                await updateDoc(doc(db, "users", currentUser.uid), { blockedUsers: arrayUnion(selectedProfileUser.uid) });
-                alert("تم الحظر");
-                closeProfileSheet();
-            }
-        };
-
-        window.kickUser = async () => {
-            if (!currentRoomId || !selectedProfileUser) return;
-            await updateDoc(doc(db, "rooms", currentRoomId), { bannedUsers: arrayUnion(selectedProfileUser.uid) });
-            alert("تم حظر المستخدم من الغرفة");
-            closeProfileSheet();
-        };
-
-        // --- GIFT SYSTEM ---
-        window.toggleGiftBox = (targetUser = null) => {
-            const box = document.getElementById('giftBox');
-            if (box.classList.contains('hidden')) {
-                box.classList.remove('hidden');
-                loadGiftsIntoBox();
-                if (targetUser) {
-                    document.getElementById('giftTargetInfo').classList.remove('hidden');
-                    document.getElementById('giftTargetImg').src = targetUser.photoURL;
-                    document.getElementById('giftTargetName').innerText = targetUser.displayName;
-                } else {
-                    document.getElementById('giftTargetInfo').classList.add('hidden');
+            currentChatFriend = { uid, ...snap.data() };
+            document.getElementById('chatUserName').innerText = currentChatFriend.displayName;
+            document.getElementById('chatUserAvatar').src = currentChatFriend.photoURL;
+            const magicLevel = currentChatFriend.magicLevel || 1;
+            const wealthLevel = currentChatFriend.wealthLevel || 1;
+            const magicLevelImg = document.getElementById('chatUserMagicLevel');
+            const wealthLevelImg = document.getElementById('chatUserWealthLevel');
+            if (storeData.magicLevels[magicLevel]) magicLevelImg.src = storeData.magicLevels[magicLevel].image;
+            if (storeData.wealthLevels[wealthLevel]) wealthLevelImg.src = storeData.wealthLevels[wealthLevel].image;
+            const avatarWrapper = document.getElementById('chatAvatarWrapper');
+            const frameEl = document.getElementById('chatUserFrame');
+            const svgaContainer = document.getElementById('chatUserSvgaFrame');
+            avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
+            frameEl.classList.add('hidden');
+            svgaContainer.classList.add('hidden');
+            svgaContainer.innerHTML = '';
+            if (currentChatFriend.activeFrame) {
+                const item = storeData.itemsById[currentChatFriend.activeFrame];
+                if (item) {
+                    const sizeClass = getFrameSizeClass(item.frameConfig);
+                    if (sizeClass) avatarWrapper.classList.add(sizeClass);
+                    if (item.itemType === 'svga') {
+                        svgaContainer.classList.remove('hidden');
+                        playPerfectSvga(item.fileUrl, svgaContainer, { loops: 0, clearsAfterStop: false });
+                        applyFrameStyles(avatarWrapper, item.frameConfig);
+                    } else {
+                        frameEl.src = item.image;
+                        frameEl.classList.remove('hidden');
+                        applyFrameStyles(avatarWrapper, item.frameConfig);
+                    }
                 }
-            } else {
-                box.classList.add('hidden');
             }
+            const isFollowing = userData.friends?.includes(uid);
+            const unfollowBtn = document.getElementById('unfollowBtn');
+            if (isFollowing) unfollowBtn.classList.remove('hidden');
+            else unfollowBtn.classList.add('hidden');
+            document.getElementById('chatModal').classList.remove('hidden');
+            document.getElementById('homeIcon').classList.add('hidden');
+            document.getElementById('friendsIcon').classList.remove('hidden');
+            const chatId = [userData.uid, uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            if (chatUnsubscribe) chatUnsubscribe();
+            chatUnsubscribe = onValue(chatRef, (snapshot) => {
+                const messages = snapshot.val();
+                const container = document.getElementById('chatMessages');
+                container.innerHTML = '';
+                if (messages) {
+                    Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
+                        const isMe = msg.senderId === userData.uid;
+                        const senderId = isMe ? userData.uid : currentChatFriend.uid;
+                        const senderData = isMe ? userData : currentChatFriend;
+                        if (msg.type === 'gift') {
+                            container.innerHTML += `<div class="flex ${isMe ? 'justify-end' : 'justify-start'}"><div class="gift-message max-w-[80%]"><div class="gift-message-icon"><img src="${msg.giftImage}" class="w-full h-full object-contain"></div><p class="text-xs font-bold text-gray-800 mb-1">🎁 ${msg.giftName}</p><p class="text-[10px] text-gray-600">${isMe ? 'لقد أرسلت هدية' : 'لقد استلمت هدية'}</p></div></div>`;
+                        } else {
+                            const senderBadges = isMe ? (userData.activeBadges || []) : (currentChatFriend.activeBadges || []);
+                            let badgesHTML = '';
+                            if (senderBadges.length > 0) badgesHTML = `<div class="sender-badges">${senderBadges.slice(0, 3).map(badgeId => { const badge = storeData.itemsById[badgeId]; if (badge) { if (badge.itemType === 'svga') return `<div class="sender-badge" id="chat-badge-${badgeId}-${senderId}"></div>`; else return `<img src="${badge.image}" class="sender-badge object-contain" title="${badge.name}">`; } return ''; }).join('')}</div>`;
+                            const bubbleClass = isMe ? 'chat-bubble-me' : 'chat-bubble-them';
+                            const timestampClass = isMe ? '' : 'them';
+                            container.innerHTML += `<div class="relative"><div class="chat-sender-info ${isMe ? 'me' : ''}">${badgesHTML}<span class="sender-name">${senderData.displayName}</span><div class="sender-avatar-wrapper"><img src="${senderData.photoURL}" class="sender-avatar"></div></div><div class="${bubbleClass}">${msg.text}<div class="chat-timestamp ${timestampClass}">${new Date(msg.timestamp).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</div></div></div>`;
+                            if (senderBadges.length > 0) setTimeout(() => { senderBadges.slice(0, 3).forEach(badgeId => { const badge = storeData.itemsById[badgeId]; if (badge && badge.itemType === 'svga' && badge.fileUrl) { const container = document.getElementById(`chat-badge-${badgeId}-${senderId}`); if (container) playSvga(badge.fileUrl, container, { loops: 1, clearsAfterStop: false }); } }); }, 100);
+                        }
+                    });
+                    container.scrollTop = container.scrollHeight;
+                }
+            });
         };
 
-        async function loadGiftsIntoBox() {
-            const grid = document.getElementById('giftList');
-            const snap = await getDocs(collection(db, "gifts"));
+        window.sendMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentChatFriend) return;
+            const chatId = [userData.uid, currentChatFriend.uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            await push(chatRef, { senderId: userData.uid, receiverId: currentChatFriend.uid, text: text, type: 'text', timestamp: Date.now() });
+            input.value = '';
+        };
+
+        window.closeChat = () => { document.getElementById('chatModal').classList.add('hidden'); if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; } currentChatFriend = null; document.getElementById('homeIcon').classList.remove('hidden'); document.getElementById('friendsIcon').classList.add('hidden'); };
+        window.unfollowInChat = async () => { if (!currentChatFriend) return; if (confirm('هل تريد إلغاء متابعة هذا المستخدم؟')) { await unfollowUser(currentChatFriend.uid); document.getElementById('unfollowBtn').classList.add('hidden'); } };
+        window.blockUserInChat = async () => { if (!currentChatFriend) return; if (confirm('هل تريد حظر هذا المستخدم؟')) { await updateDoc(doc(db, "users", userData.uid), { blockedUsers: arrayUnion(currentChatFriend.uid) }); closeChat(); alert('تم حظر المستخدم'); } };
+        window.toggleGiftBox = () => { const giftBox = document.getElementById('giftBox'); const isHidden = giftBox.classList.contains('hidden'); giftBox.classList.toggle('hidden'); if (isHidden) switchGiftTab('fixed'); };
+
+        window.switchGiftTab = (type) => {
+            const grid = document.getElementById('giftGrid');
             grid.innerHTML = '';
-            snap.forEach(d => {
-                const g = d.data();
-                grid.innerHTML += `
-                    <div onclick="selectGift(this, '${d.id}')" class="gift-item flex flex-col items-center p-2 rounded-xl border border-transparent hover:border-yellow-400 cursor-pointer transition">
-                        <img src="${g.image}" class="w-12 h-12 object-contain mb-1">
-                        <span class="text-[10px] font-bold">${g.name}</span>
-                        <span class="text-[9px] text-yellow-600 font-bold">${g.price}💰</span>
-                    </div>
-                `;
-            });
-        }
-
-        window.selectGift = (el, id) => {
-            document.querySelectorAll('.gift-item').forEach(e => e.classList.remove('bg-yellow-50', 'border-yellow-400'));
-            el.classList.add('bg-yellow-50', 'border-yellow-400');
-            selectedGiftId = id;
+            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
+            document.getElementById('tab-fixed').className = type === 'fixed' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            document.getElementById('tab-luck').className = type === 'luck' ? 'font-bold text-black border-b-2 border-black pb-1' : 'font-bold text-gray-400 pb-1';
+            if (items.length === 0) { grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">لا توجد هدايا متاحة</p>'; return; }
+            items.forEach(item => { grid.innerHTML += `<div onclick="sendGift('${item.id}', '${item.type}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition"><div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2"><img src="${item.image}" class="w-full h-full object-contain"></div><span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span><span class="text-[8px] text-yellow-600 font-black">${item.price || 0} 💰</span></div>`; });
         };
 
-        window.sendSelectedGift = async () => {
-            if (!selectedGiftId || !currentRoomId) return;
-            const msgRef = ref(rtdb, `room-messages/${currentRoomId}`);
-            await push(msgRef, {
-                senderId: currentUser.uid,
-                text: `أرسل هدية 🎁`, 
-                type: 'gift',
-                timestamp: serverTimestamp()
-            });
+        window.sendGift = async (giftId, giftType) => {
+            if (!currentChatFriend) { alert('يجب فتح محادثة مع صديق أولاً'); toggleGiftBox(); return; }
+            const giftList = giftType === 'magic' ? storeData.luckGifts : storeData.gifts;
+            const gift = giftList.find(g => g.id === giftId);
+            if (userData.balance < (gift.price || 0)) { alert('رصيدك غير كافٍ!'); return; }
+            await updateDoc(doc(db, "users", userData.uid), { balance: increment(-(gift.price || 0)) });
+            const chatId = [userData.uid, currentChatFriend.uid].sort().join('_');
+            const chatRef = ref(rtdb, `chats/${chatId}/messages`);
+            await push(chatRef, { senderId: userData.uid, receiverId: currentChatFriend.uid, giftId: gift.id, giftName: gift.name, giftImage: gift.image, giftType: gift.type, type: 'gift', timestamp: Date.now() });
+            const receiverRef = doc(db, "users", currentChatFriend.uid);
+            const receiverSnap = await getDoc(receiverRef);
+            if (receiverSnap.exists()) {
+                const receiverData = receiverSnap.data();
+                if (giftType === 'magic') {
+                    const newJewels = (receiverData.jewels || 0) + 10;
+                    let newCoins = receiverData.balance || 0;
+                    let newMagicLevel = receiverData.magicLevel || 1;
+                    if (newJewels >= 10) { const coinsToAdd = Math.floor(newJewels / 10); newCoins += coinsToAdd; const magicPoints = newCoins; if (magicPoints >= 100 * newMagicLevel) newMagicLevel += 1; }
+                    await updateDoc(receiverRef, { jewels: newJewels % 10, balance: newCoins, magicLevel: newMagicLevel });
+                } else if (giftType === 'wealth') {
+                    const wealthGiftValue = gift.reward || 1;
+                    const currentWealth = receiverData.wealthLevel || 1;
+                    const newWealthLevel = currentWealth + wealthGiftValue;
+                    await updateDoc(receiverRef, { wealthLevel: newWealthLevel, balance: increment(gift.reward || 0) });
+                }
+            }
+            showGiftAnimation(gift, `تم إرسال هدية ${gift.name} إلى ${currentChatFriend.displayName}`);
             toggleGiftBox();
         };
 
-        // --- ENTRY EFFECT ---
-        function playEntryEffect(url) {
-            const layer = document.getElementById('entryEffectLayer');
-            layer.innerHTML = '';
-            const div = document.createElement('div');
-            layer.appendChild(div);
-            
-            const player = new SVGA.Player(div);
-            const parser = new SVGA.Parser();
-            parser.load(url, (videoItem) => {
-                player.setVideoItem(videoItem);
-                player.loops = 1;
-                player.clearsAfterStop = true;
-                player.startAnimation();
-            });
+        function showGiftAnimation(gift, text) { const anim = document.createElement('div'); anim.className = 'gift-animation flex flex-col items-center gap-4'; anim.innerHTML = `<img src="${gift.image}" class="w-32 h-32 object-contain drop-shadow-2xl"><div class="glass px-6 py-3 rounded-2xl shadow-xl border-2 border-white"><p class="font-black text-gray-900 text-center">${text}</p></div>`; document.body.appendChild(anim); setTimeout(() => anim.remove(), 3000); }
+        window.copyText = (text) => { navigator.clipboard.writeText(text).then(() => { const notification = document.createElement('div'); notification.className = 'fixed top-20 right-1/2 transform translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold z-50 animate-bounce'; notification.innerText = 'تم النسخ!'; document.body.appendChild(notification); setTimeout(() => notification.remove(), 2000); }); };
+        window.copyEmail = () => copyText(userData.email);
+        window.confirmLogout = () => { if (confirm('هل تريد تسجيل الخروج؟')) { Object.keys(countdownIntervals).forEach(key => clearInterval(countdownIntervals[key])); countdownIntervals = {}; Object.keys(activeSvgaPlayers).forEach(id => { try { activeSvgaPlayers[id].player.clear(); } catch (e) {} }); activeSvgaPlayers = {}; signOut(auth); } };
+        window.toggleSidebar = (show) => { const s = document.getElementById('sidebar'); const o = document.getElementById('sidebarOverlay'); s.classList.toggle('open', show); o.classList.toggle('hidden', !show); if(show) setTimeout(() => o.classList.add('visible'), 10); else o.classList.remove('visible'); };
+        window.switchView = (v) => { document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden')); document.getElementById('view-' + v).classList.remove('hidden'); document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : v === 'bag' ? 'حقيبتي' : 'أصدقائي'; if(v === 'bag') loadBagItems(); if(v === 'store') loadStoreItems('frame'); if(v === 'friends') { loadFriendRequests(); loadFriends(); } toggleSidebar(false); };
+        window.recharge = async (a) => { try { if (!userData.uid) return alert('خطأ: لم يتم تحميل بيانات المستخدم'); await updateDoc(doc(db, "users", userData.uid), { balance: increment(a) }); alert('تم الشحن بنجاح!'); } catch (error) { alert('فشل الشحن: ' + error.message); } };
+        window.openEditProfile = () => { document.getElementById('editNameInp').value = userData.displayName; document.getElementById('editPhotoInp').value = userData.photoURL; document.getElementById('editModal').classList.remove('hidden'); toggleSidebar(false); };
+        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        window.saveProfileChanges = async () => { const n = document.getElementById('editNameInp').value; const p = document.getElementById('editPhotoInp').value; await updateDoc(doc(db, "users", userData.uid), { displayName: n, photoURL: p }); closeEditModal(); };
+
+        async function loadBanner() {
+            const bDoc = await getDoc(doc(db, "appData", "banner"));
+            const container = document.getElementById('homeBanner');
+            if (bDoc.exists()) { const b = bDoc.data(); container.innerHTML = `<img src="${b.image}" class="absolute inset-0 w-full h-full object-cover rounded-[28px]">`; }
+            else container.innerHTML = `<div class="absolute inset-0 bg-gradient-to-r from-blue-100 to-purple-100 rounded-[28px]"></div>`;
         }
 
-        // --- CHECK & CREATE ROOM ---
-        window.checkCreateRoom = () => {
-            if (currentUser.ownedRoomId) {
-                // Should not happen due to UI hiding, but safe guard
-                alert("لديك غرفة بالفعل!");
-                return;
-            }
-            document.getElementById('createRoomModal').classList.remove('hidden');
-        };
-        
-        window.closeCreateRoom = () => document.getElementById('createRoomModal').classList.add('hidden');
-
-        window.createNewRoom = async () => {
-            const name = document.getElementById('newRoomName').value;
-            if (!name) return;
-            
-            const docRef = await addDoc(collection(db, "rooms"), {
-                name: name, ownerId: currentUser.uid, createdAt: serverTimestamp(), image: '', description: 'غرفة جديدة'
-            });
-            await updateDoc(doc(db, "users", currentUser.uid), { ownedRoomId: docRef.id });
-            closeCreateRoom();
-            alert("تم إنشاء الغرفة!");
-            loadRooms();
-        };
-
-        window.logout = () => {
-            signOut(auth);
-            window.location.href = "login.html";
-        };
-
-        // --- STORE LOGIC (Simplified) ---
-        window.loadStoreItems = async (type) => {
-            const grid = document.getElementById('storeGrid');
+        async function loadRooms() {
+            const rSnap = await getDocs(collection(db, "rooms"));
+            const grid = document.getElementById('roomsGrid');
             grid.innerHTML = '';
-            Object.keys(itemsCache).forEach(key => {
-                const item = itemsCache[key];
-                let show = (type === 'frame' && item.type === 'frame') ||
-                           (type === 'badge' && item.type === 'badge') ||
-                           (type === 'entry' && item.type === 'entry') ||
-                           (type === 'bubble' && item.type === 'bubble');
-                
-                if (show) {
-                    grid.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex flex-col items-center">
-                            <div class="h-20 w-20 flex items-center justify-center mb-2">
-                                ${item.itemType === 'svga' ? `<div id="preview-${key}" class="w-full h-full"></div>` : `<img src="${item.image}" class="w-full h-full object-contain">`}
-                            </div>
-                            <h4 class="font-bold text-sm mb-1">${item.name}</h4>
-                            <button onclick="buyItem('${key}', ${item.price}, '${item.type}')" class="bg-black text-white px-4 py-2 rounded-xl text-xs font-bold w-full">${item.price} 💰</button>
-                        </div>
-                    `;
-                    if (item.itemType === 'svga') setTimeout(() => playSvga(item.fileUrl, document.getElementById(`preview-${key}`)), 100);
-                }
-            });
-        };
-
-        window.buyItem = async (id, price, type) => {
-            if (currentUser.balance < price) { alert("رصيد غير كاف"); return; }
-            let field = type === 'frame' ? 'purchasedFrames' : type === 'entry' ? 'purchasedEntries' : type === 'bubble' ? 'purchasedBubbles' : 'purchasedBadges';
-            await updateDoc(doc(db, "users", currentUser.uid), { balance: increment(-price), [field]: arrayUnion({ id: id, purchasedAt: new Date() }) });
-            alert("تم الشراء بنجاح");
-        };
-
-        function playSvga(url, container) {
-            try {
-                const player = new SVGA.Player(container);
-                const parser = new SVGA.Parser();
-                parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.startAnimation(); });
-            } catch(e) { console.error(e); }
+            rSnap.docs.forEach(d => { const r = d.data(); grid.innerHTML += `<div onclick="window.location.href='room.html?id=${d.id}'" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition"><div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div><div class="flex-1"><h4 class="font-bold text-gray-900">${r.name}</h4><p class="text-xs text-gray-500">${r.description}</p></div><i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i></div>`; });
+            lucide.createIcons();
         }
 
-        function listenToOnlineUsers(roomId) {
-            const strip = document.getElementById('onlineUsersStrip');
-            const countEl = document.getElementById('roomOnlineCount');
-            const usersRef = ref(rtdb, `room-users/${roomId}`);
-            onValue(usersRef, (snap) => {
-                const users = snap.val();
-                strip.innerHTML = '';
-                if (users) {
-                    const list = Object.values(users);
-                    countEl.innerText = `${list.length} متصل`;
-                    list.forEach(u => {
-                        strip.innerHTML += `<div onclick="openProfile('${u.uid}')" class="relative w-10 h-10 flex-shrink-0 cursor-pointer"><img src="${u.photoURL}" class="w-full h-full rounded-full border border-white"></div>`;
-                    });
-                } else { countEl.innerText = `0 متصل`; }
-            });
-        }
+        window.filterRooms = (t) => { document.getElementById('btn-public').className = t === 'public' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all'; document.getElementById('btn-private').className = t === 'private' ? 'flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all' : 'flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all'; };
+        lucide.createIcons();
+        setInterval(() => lucide.createIcons(), 1000);
+        setInterval(checkExpiredItems, 60000);
     </script>
 </body>
-</html>
-
+    </html>
