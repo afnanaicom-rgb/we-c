@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Afnan AI - تسجيل الدخول</title>
     
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.gstatic.com">
+    
     <!-- Fonts: Noto Sans Arabic -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -93,23 +98,10 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { auth, db } from './js/firebase-config.js';
+        import { TwitterAuthProvider, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-            authDomain: "rtx3090-28439.firebaseapp.com",
-            projectId: "rtx3090-28439",
-            storageBucket: "rtx3090-28439.firebasestorage.app",
-            messagingSenderId: "178612030690",
-            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
-            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
         const twitterProvider = new TwitterAuthProvider();
         const googleProvider = new GoogleAuthProvider();
 
@@ -118,12 +110,10 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // التحقق من وجود المستخدم في Firestore أولاً لمنع إنشاء حساب جديد أو مسح البيانات
                 const userDocRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userDocRef);
                 
                 if (!userSnap.exists()) {
-                    // يتم إنشاء الحساب فقط إذا لم يكن البريد الإلكتروني موجوداً مسبقاً في Firestore
                     const userData = {
                         displayName: user.displayName || "مستخدم جديد",
                         photoURL: user.photoURL || "https://via.placeholder.com/150",
@@ -145,8 +135,6 @@
                     };
                     await setDoc(userDocRef, userData);
                 }
-                
-                // الانتقال إلى الصفحة الرئيسية (سواء كان الحساب موجوداً أو تم إنشاؤه للتو)
                 window.location.href = "home.html";
             }
         });
