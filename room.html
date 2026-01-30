@@ -1,58 +1,99 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Premium Room - Light Mode</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Premium Chat Room</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
 
     <style>
         :root {
-            /* Light Mode Palette */
-            --bg-main: #f3f4f6;
+            --bg-body: #f3f4f6;
             --bg-card: #ffffff;
+            --primary: #6366f1;
+            --accent: #f59e0b;
             --text-main: #1f2937;
             --text-sec: #6b7280;
-            --primary: #6366f1; /* Indigo */
-            --accent: #f59e0b; /* Amber */
             --border: #e5e7eb;
-            --bubble-sent: #e0e7ff;
-            --bubble-received: #ffffff;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --msg-me: #e0e7ff;
+            --msg-other: #ffffff;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-            font-family: 'Cairo', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
 
         body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            height: 100dvh; /* Dynamic Viewport Height */
-            overflow: hidden; /* لمنع السكرول للصفحة كلها، السكرول داخلي فقط */
+            background: var(--bg-body);
+            height: 100dvh;
             display: flex;
             justify-content: center;
+            overflow: hidden;
+            color: var(--text-main);
         }
 
         .app-container {
             width: 100%;
-            max-width: 600px; /* توسيع العرض قليلاً */
+            max-width: 500px;
             height: 100%;
-            background: var(--bg-main);
+            background: var(--bg-body);
             display: flex;
             flex-direction: column;
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.05);
         }
 
-        /* --- Header --- */
+        /* --- حل مشكلة الإطار (The Magic Fix) --- */
+        /* الحاوية الأساسية للصورة والإطار */
+        .avatar-wrapper {
+            position: relative; /* ضروري جداً */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* صورة المستخدم */
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1; /* الصورة في الخلف */
+        }
+
+        /* الإطار (SVGA أو صورة) */
+        .frame-overlay {
+            position: absolute; /* يطفو فوق الصورة */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10; /* الإطار في الأمام */
+            pointer-events: none; /* يسمح بالضغط على الصورة تحته */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* تعديل الـ Canvas الخاص بـ SVGA ليملأ الإطار تماماً */
+        .frame-overlay canvas {
+            width: 100% !important;
+            height: 100% !important;
+            transform: scale(1.1); /* تكبير بسيط لتغطية الحواف */
+        }
+
+        /* أحجام الصور */
+        .size-header { width: 40px; height: 40px; }
+        .size-list { width: 55px; height: 55px; }
+        .size-chat { width: 42px; height: 42px; }
+        .size-profile { width: 100px; height: 100px; margin: 0 auto; }
+
+        /* --- الهيدر --- */
         .header {
             padding: 10px 15px;
             background: var(--bg-card);
@@ -60,77 +101,39 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 10;
             height: 60px;
+            z-index: 20;
         }
 
-        .room-info-card {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .owner-avatar-wrapper {
-            position: relative;
-            width: 40px;
-            height: 40px;
-        }
-        
-        .avatar-base {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .frame-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 5;
-            pointer-events: none; /* يسمح بالضغط على الصورة تحته */
-        }
-
-        /* --- Users Bar --- */
+        /* --- شريط المستخدمين --- */
         .users-bar {
-            display: flex;
-            overflow-x: auto;
-            gap: 12px;
-            padding: 10px 15px;
             background: var(--bg-card);
+            padding: 10px;
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
             border-bottom: 1px solid var(--border);
-            min-height: 85px;
+            min-height: 90px;
             scrollbar-width: none;
         }
         .users-bar::-webkit-scrollbar { display: none; }
-
-        .user-circle {
+        
+        .user-item-col {
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-width: 55px;
-            cursor: pointer;
+            min-width: 60px;
         }
-
-        .user-circle-img-box {
-            position: relative;
-            width: 50px;
-            height: 50px;
-        }
-
-        .user-name-micro {
+        .user-name-small {
             font-size: 10px;
-            margin-top: 4px;
-            color: var(--text-sec);
-            max-width: 55px;
-            white-space: nowrap;
+            margin-top: 5px;
+            max-width: 60px;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        /* --- Chat Area --- */
+        /* --- الشات --- */
         .chat-area {
             flex: 1;
             overflow-y: auto;
@@ -138,56 +141,46 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%239C92AC' fill-opacity='0.05' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
-        .chat-msg-row {
+        .msg-row {
             display: flex;
             gap: 10px;
             align-items: flex-end;
             animation: fadeIn 0.3s ease;
         }
-        
-        .chat-msg-row.me {
-            flex-direction: row-reverse;
-        }
+        .msg-row.me { flex-direction: row-reverse; }
 
-        .chat-avatar-container {
-            width: 42px;
-            height: 42px;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        .chat-bubble {
+        .msg-bubble {
             max-width: 75%;
             padding: 8px 12px;
-            border-radius: 16px;
+            border-radius: 18px;
+            background: var(--msg-other);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             position: relative;
-            box-shadow: var(--shadow);
-            background-color: var(--bubble-received);
-            border: 1px solid var(--border);
+            border: 1px solid transparent;
         }
-
-        .chat-msg-row.me .chat-bubble {
-            background-color: var(--bubble-sent);
-            border-color: #c7d2fe;
-            border-bottom-left-radius: 16px;
+        .msg-row.me .msg-bubble {
+            background: var(--msg-me);
+            border-bottom-left-radius: 18px;
             border-bottom-right-radius: 4px;
+            border-color: #c7d2fe;
         }
-
-        .chat-msg-row:not(.me) .chat-bubble {
+        .msg-row:not(.me) .msg-bubble {
             border-bottom-left-radius: 4px;
         }
 
-        /* فقاعات مخصصة (صور/تدرجات) */
-        .chat-bubble.custom-bubble {
-            background-size: cover; /* جعل الصورة تغطي الفقاعة */
-            background-position: center;
-            background-repeat: no-repeat;
-            color: #fff; /* النص أبيض غالباً مع الخلفيات الملونة */
-            border: none;
+        /* فقاعات مخصصة */
+        .custom-bubble {
+            background-size: 100% 100% !important;
+            color: #fff !important;
+            border: none !important;
+            background-color: transparent !important;
+            box-shadow: none !important;
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            padding: 12px 18px; /* مساحة أكبر للفقاعات المخصصة */
         }
 
         .msg-header {
@@ -195,35 +188,16 @@
             align-items: center;
             gap: 5px;
             margin-bottom: 4px;
-            flex-wrap: wrap;
-        }
-
-        .msg-name {
-            font-size: 11px;
-            font-weight: 700;
+            font-size: 10px;
+            font-weight: bold;
             color: var(--text-sec);
         }
-
         .level-badge {
             height: 14px;
-            border-radius: 4px;
-            display: inline-flex;
-            align-items: center;
-        }
-        .level-badge img {
-            height: 100%;
-            width: auto;
+            vertical-align: middle;
         }
 
-        .msg-text {
-            font-size: 13px;
-            line-height: 1.5;
-            word-break: break-word;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* --- Footer --- */
+        /* --- الفوتر --- */
         .footer {
             padding: 10px 15px;
             background: var(--bg-card);
@@ -232,253 +206,162 @@
             align-items: center;
             gap: 10px;
         }
-
-        .input-wrapper {
+        .input-box {
             flex: 1;
-            background: var(--bg-main);
-            border-radius: 25px;
-            padding: 0 15px;
-            height: 45px;
-            display: flex;
-            align-items: center;
+            height: 40px;
+            border-radius: 20px;
             border: 1px solid var(--border);
-        }
-
-        .chat-input {
-            width: 100%;
-            background: transparent;
-            border: none;
+            background: var(--bg-body);
+            padding: 0 15px;
             font-size: 14px;
-            color: var(--text-main);
         }
-
         .action-btn {
-            width: 45px;
-            height: 45px;
+            width: 40px; height: 40px;
             border-radius: 50%;
             border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
             font-size: 18px;
-            transition: 0.2s;
-            color: white;
-            box-shadow: var(--shadow);
-        }
-
-        /* --- Layers (Modals/Effects) --- */
-        .overlay-layer {
-            position: fixed;
-            inset: 0;
-            z-index: 2000;
-            pointer-events: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .svga-fullscreen {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-        }
-
-        /* Gift Animation Flying */
-        .flying-gift {
-            position: fixed;
-            z-index: 3000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            pointer-events: none;
-            transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        .flying-gift img {
-            width: 60px;
-            height: 60px;
-            filter: drop-shadow(0 0 10px rgba(255,215,0,0.5));
-        }
-        .flying-info {
-            background: rgba(0,0,0,0.7);
+            cursor: pointer;
             color: #fff;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 10px;
-            margin-top: 5px;
+            transition: 0.2s;
         }
 
-        /* Sheets (Bottom Modals) */
-        .sheet-container {
-            position: fixed;
-            inset: 0;
-            z-index: 1500;
+        /* --- نوافذ منبثقة (Sheets) --- */
+        .sheet-overlay {
+            position: fixed; inset: 0;
             background: rgba(0,0,0,0.4);
+            z-index: 1000;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
+            opacity: 0; pointer-events: none;
+            transition: 0.3s;
         }
-        .sheet-container.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+        
         .sheet-content {
             background: var(--bg-card);
-            border-top-left-radius: 25px;
-            border-top-right-radius: 25px;
+            border-radius: 25px 25px 0 0;
             padding: 20px;
             transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 80vh; overflow-y: auto;
         }
-        .sheet-container.active .sheet-content {
-            transform: translateY(0);
+        .sheet-overlay.active .sheet-content { transform: translateY(0); }
+
+        /* البروفايل */
+        .profile-info { text-align: center; margin-top: -10px; }
+        .profile-btn-group {
+            display: flex; justify-content: center; gap: 10px; margin-top: 20px;
+        }
+        .btn-friend {
+            background: var(--primary); color: #fff;
+            border: none; padding: 10px 20px; border-radius: 20px;
+            font-weight: bold; font-size: 14px; cursor: pointer;
+            width: 100%;
+        }
+        .btn-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            border: 1px solid var(--border); background: #fff;
+            cursor: pointer; color: var(--text-sec);
         }
 
-        /* Profile Styles */
-        .profile-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .profile-avatar-large {
-            width: 100px;
-            height: 100px;
-            position: relative;
-            margin-bottom: 10px;
-        }
-        .profile-stats {
-            display: flex;
-            gap: 15px;
-            margin-top: 10px;
-            font-size: 12px;
-            color: var(--text-sec);
-        }
-        
-        /* Gift Grid */
+        /* الهدايا */
         .gifts-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px;
         }
-        .gift-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: 0.2s;
+        .gift-card {
+            border: 1px solid var(--border); border-radius: 10px;
+            padding: 5px; text-align: center; cursor: pointer;
         }
-        .gift-item.selected {
-            border-color: var(--accent);
-            background: #fffbeb;
+        .gift-card.selected { border-color: var(--accent); background: #fffbeb; }
+        .gift-img { width: 45px; height: 45px; object-fit: contain; }
+
+        /* طبقة التأثيرات (SVGA Fullscreen) */
+        #effectsLayer {
+            position: fixed; inset: 0; pointer-events: none; z-index: 2000;
         }
-        .gift-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
+        .svga-full { width: 100%; height: 100%; object-fit: contain; }
 
         .hidden { display: none !important; }
-
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: 0; } }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    
-    <div id="effectsLayer" class="overlay-layer"></div>
+    <div id="effectsLayer"></div>
 
     <header class="header">
-        <div class="room-info-card" onclick="openProfileById(roomOwnerId)">
-            <div class="owner-avatar-wrapper">
-                <img id="headerOwnerImg" src="https://via.placeholder.com/150" class="avatar-base">
-                <div id="headerOwnerFrame" class="frame-overlay"></div>
+        <div style="display:flex; align-items:center; gap:10px;" onclick="openProfileById(currentRoomOwnerId)">
+            <div class="avatar-wrapper size-header">
+                <img id="ownerImg" src="https://via.placeholder.com/100" class="avatar-img">
+                <div id="ownerFrame" class="frame-overlay"></div>
             </div>
             <div>
-                <div id="headerOwnerName" style="font-weight: 700; font-size: 14px;">...</div>
-                <div style="font-size: 10px; color: var(--text-sec);">ID: <span id="headerOwnerId">...</span></div>
+                <div id="ownerName" style="font-weight:700; font-size:14px;">...</div>
+                <div id="ownerId" style="font-size:10px; color:var(--text-sec);">ID: ...</div>
             </div>
         </div>
-        <div style="display: flex; gap: 10px;">
-            <button class="action-btn" style="width:35px; height:35px; background: #eee; color:#333;" onclick="window.history.back()">
-                <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
+        <button class="action-btn" style="background:#eee; color:#333;" onclick="alert('خروج')">
+            <i class="fa-solid fa-arrow-right"></i>
+        </button>
     </header>
 
     <div class="users-bar" id="usersBar">
         </div>
 
-    <div class="chat-area" id="chatArea">
-        <div class="chat-msg-row">
-            <div class="chat-bubble">
-                <div class="msg-text">مرحباً بك في الغرفة! ابدأ المحادثة الآن.</div>
-            </div>
-        </div>
-    </div>
+    <div class="chat-area" id="chatArea"></div>
 
     <footer class="footer">
-        <div class="input-wrapper">
-            <input type="text" id="chatInput" class="chat-input" placeholder="اكتب رسالة..." autocomplete="off">
-        </div>
-        
-        <button id="giftBtn" class="action-btn" style="background: var(--accent);" onclick="openGiftSheet()">
+        <input type="text" id="chatInput" class="input-box" placeholder="اكتب رسالة..." autocomplete="off">
+        <button id="giftBtn" class="action-btn" style="background:var(--accent);" onclick="toggleSheet('giftSheet', true)">
             <i class="fa-solid fa-gift"></i>
         </button>
-        
-        <button id="sendBtn" class="action-btn hidden" style="background: var(--primary);" onclick="sendMessage()">
+        <button id="sendBtn" class="action-btn hidden" style="background:var(--primary);" onclick="sendMessage()">
             <i class="fa-solid fa-paper-plane"></i>
         </button>
     </footer>
 </div>
 
-<div id="profileSheet" class="sheet-container">
-    <div style="flex:1" onclick="closeSheet('profileSheet')"></div>
+<div id="profileSheet" class="sheet-overlay">
+    <div style="flex:1" onclick="toggleSheet('profileSheet', false)"></div>
     <div class="sheet-content">
-        <div class="profile-header">
-            <div class="profile-avatar-large">
-                <img id="p-img" src="" class="avatar-base">
+        <div class="profile-info">
+            <div class="avatar-wrapper size-profile">
+                <img id="p-img" src="" class="avatar-img">
                 <div id="p-frame" class="frame-overlay"></div>
             </div>
-            <h3 id="p-name" style="margin-bottom: 5px;">User Name</h3>
-            <div id="p-id" style="color: var(--text-sec); font-size: 12px;">ID: 00000</div>
             
-            <div class="profile-stats">
-                <span id="p-followers">0 متابعين</span>
-                <span id="p-following">0 يتابع</span>
+            <h3 id="p-name" style="margin-top:10px;">User</h3>
+            <p id="p-id" style="font-size:12px; color:var(--text-sec); margin-bottom:5px;">ID: 000</p>
+            
+            <div style="display:flex; justify-content:center; gap:15px; font-size:12px;">
+                <span id="p-wealth" class="badge">Lv.0</span>
+                <span id="p-magic" class="badge">Magic.0</span>
             </div>
 
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button id="followBtn" style="padding: 8px 25px; border-radius: 20px; border: none; background: var(--primary); color: #fff; font-weight: bold;">متابعة</button>
-                <button onclick="mentionUser()" style="width: 40px; height: 35px; border-radius: 10px; border: 1px solid var(--border); background: #fff;"><i class="fa-solid fa-at"></i></button>
-                <button onclick="giftUserFromProfile()" style="width: 40px; height: 35px; border-radius: 10px; border: 1px solid var(--border); background: #fff; color: var(--accent);"><i class="fa-solid fa-gift"></i></button>
+            <div class="profile-btn-group">
+                <button class="btn-icon" onclick="mentionUser()"><i class="fa-solid fa-at"></i></button>
+                <button class="btn-icon" onclick="giftFromProfile()"><i class="fa-solid fa-gift"></i></button>
+                <div style="flex:1">
+                    <button id="friendBtn" class="btn-friend" onclick="sendFriendRequest()">
+                        <i class="fa-solid fa-user-plus"></i> إرسال طلب صداقة
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="giftSheet" class="sheet-container">
-    <div style="flex:1" onclick="closeSheet('giftSheet')"></div>
+<div id="giftSheet" class="sheet-overlay">
+    <div style="flex:1" onclick="toggleSheet('giftSheet', false)"></div>
     <div class="sheet-content">
-        <h4 style="text-align: center; margin-bottom: 10px;">إرسال هدية</h4>
-        <div style="margin-bottom: 10px; font-size: 12px;">إلى: <b id="giftTargetName">الجميع</b></div>
-        
-        <div class="gifts-grid" id="giftsGrid">
-            </div>
-
-        <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <div style="font-size: 12px; font-weight: bold;">رصيدك: <span id="myBalance" style="color: var(--accent);">0</span></div>
-            <button onclick="sendSelectedGift()" style="background: var(--accent); color: #fff; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold;">إرسال</button>
+        <h4 style="text-align:center;">إرسال هدية إلى: <span id="giftTargetName" style="color:var(--primary)">الجميع</span></h4>
+        <div id="giftsGrid" class="gifts-grid"></div>
+        <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; font-weight:bold;">رصيدك: <span id="myBalance" style="color:var(--accent)">0</span></span>
+            <button class="action-btn" style="background:var(--accent); width:auto; padding:0 20px; border-radius:20px; font-size:14px;" onclick="sendGift()">إرسال</button>
         </div>
     </div>
 </div>
@@ -486,18 +369,17 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getDatabase, ref, push, onValue, set, onDisconnect, child, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, arrayUnion, query, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getDatabase, ref, push, onChildAdded, onDisconnect, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    // --- Firebase Configuration ---
+    // --- إعدادات الفايربيس (استبدل القيم بقيم مشروعك الحقيقية) ---
     const firebaseConfig = {
-        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-        authDomain: "rtx3090-28439.firebaseapp.com",
-        projectId: "rtx3090-28439",
-        storageBucket: "rtx3090-28439.firebasestorage.app",
-        messagingSenderId: "178612030690",
-        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
-        databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -505,105 +387,75 @@
     const db = getFirestore(app);
     const rtdb = getDatabase(app);
 
-    // --- Global State ---
+    // --- المتغيرات العامة ---
     let currentUser = null;
-    let roomOwnerId = null;
-    let storeData = { itemsById: {}, wealthLevels: {}, magicLevels: {} }; // For badges and SVGAs
     let currentProfileUser = null;
+    let currentRoomOwnerId = "room_owner_id"; // معرف الغرفة
+    let storeData = { items: {}, levels: {}, gifts: [] };
+    let giftRecipient = null;
     let selectedGift = null;
-    let giftRecipient = null; // null implies "everyone" or room owner if desired
-    
-    // URL Params
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('id') || 'test-room';
+    let svgaParser = new SVGA.Parser();
 
-    // --- SVGA Player Helper ---
-    const svgaParser = new SVGA.Parser();
-    function playSvga(url, targetDiv, isFullScreen = false, loops = 1) {
-        if (!url) return;
-        targetDiv.innerHTML = '';
-        const player = new SVGA.Player(targetDiv);
-        player.loops = loops;
-        player.clearsAfterStop = !isFullScreen; // Keep frame, clear gift
+    // --- دوال المساعدة ---
+    
+    // تشغيل SVGA في حاوية محددة (مع إصلاح الحجم)
+    function playSvga(url, containerId, loops = 0, isFullScreen = false) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
         
+        // تنظيف الحاوية
+        container.innerHTML = '';
+        
+        const player = new SVGA.Player(container);
+        player.loops = loops;
+        player.clearsAfterStop = !isFullScreen; // إذا كان كامل الشاشة يختفي بعد الانتهاء
+        player.fillMode = "Forward";
+
         svgaParser.load(url, (videoItem) => {
             player.setVideoItem(videoItem);
             player.startAnimation();
+            
             if(isFullScreen) {
-                // Remove player div after animation
                 player.onFinished(() => {
-                    targetDiv.innerHTML = ''; 
+                    container.innerHTML = ''; // إزالة بعد الانتهاء
                 });
             }
         });
     }
 
-    // --- Initialization ---
-    async function init() {
-        // 1. Load Store Data (Levels, Frames, Bubbles, Gifts)
-        await loadStoreData();
-
-        // 2. Auth Listener
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                // Fetch user data
-                onSnapshot(doc(db, "users", user.uid), (snap) => {
-                    currentUser = { uid: snap.id, ...snap.data() };
-                    document.getElementById('myBalance').innerText = (currentUser.balance || 0).toLocaleString();
-                    checkEntranceEffect(); // Check if I should play my entrance effect
-                });
-                
-                // Room Owner Logic (Assuming URL param ID is the owner)
-                roomOwnerId = roomId; 
-                loadRoomOwnerInfo(roomOwnerId);
-                
-                // Load Users
-                loadUsersList();
-                
-                // Load Chat
-                loadChat();
-
-            } else {
-                window.location.href = 'login.html';
-            }
-        });
-
-        // 3. UI Listeners
-        const input = document.getElementById('chatInput');
-        input.addEventListener('input', (e) => {
-            const hasText = e.target.value.trim().length > 0;
-            document.getElementById('giftBtn').classList.toggle('hidden', hasText);
-            document.getElementById('sendBtn').classList.toggle('hidden', !hasText);
-        });
-    }
-
-    async function loadStoreData() {
-        // Load items, levels, gifts to memory
+    // --- تحميل البيانات الأولية ---
+    async function loadInitialData() {
+        // 1. تحميل الإطارات والفقاعات من storeItems
         const itemsSnap = await getDocs(collection(db, "storeItems"));
-        itemsSnap.forEach(d => { storeData.itemsById[d.id] = d.data(); });
+        itemsSnap.forEach(doc => {
+            storeData.items[doc.id] = doc.data();
+        });
 
-        const wlSnap = await getDocs(collection(db, "wealthLevels"));
-        wlSnap.forEach(d => { storeData.wealthLevels[d.data().level] = d.data(); });
-        
-        const mlSnap = await getDocs(collection(db, "magicLevels"));
-        mlSnap.forEach(d => { storeData.magicLevels[d.data().level] = d.data(); });
-        
-        // Also load Gifts
-        const giftSnap = await getDocs(collection(db, "gifts"));
-        const grid = document.getElementById('giftsGrid');
+        // 2. تحميل مستويات الثروة
+        const wealthSnap = await getDocs(collection(db, "wealthLevels"));
+        wealthSnap.forEach(doc => {
+            storeData.levels[doc.data().level] = doc.data().icon;
+        });
+
+        // 3. تحميل الهدايا
+        const giftsSnap = await getDocs(collection(db, "gifts"));
+        const grid = document.getElementById("giftsGrid");
         grid.innerHTML = '';
-        giftSnap.forEach(d => {
-            const g = { id: d.id, ...d.data() };
-            // Append to Grid
-            const el = document.createElement('div');
-            el.className = 'gift-item';
+        
+        giftsSnap.forEach(doc => {
+            const g = { id: doc.id, ...doc.data() };
+            storeData.gifts.push(g);
+            
+            // رسم الهدية في القائمة
+            const el = document.createElement("div");
+            el.className = "gift-card";
             el.innerHTML = `
-                <img src="${g.image || 'gift.png'}" class="gift-img">
-                <div style="font-size:10px">${g.name}</div>
-                <div style="font-size:10px;color:var(--accent)">${g.price}</div>
+                <img src="${g.image}" class="gift-img">
+                <div style="font-size:10px; font-weight:bold;">${g.name}</div>
+                <div style="font-size:10px; color:var(--accent);">${g.price}</div>
             `;
             el.onclick = () => {
-                document.querySelectorAll('.gift-item').forEach(x => x.classList.remove('selected'));
+                document.querySelectorAll('.gift-card').forEach(x => x.classList.remove('selected'));
                 el.classList.add('selected');
                 selectedGift = g;
             };
@@ -611,355 +463,352 @@
         });
     }
 
-    // --- Logic Functions ---
+    // --- إدارة المستخدم ---
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // استماع لبيانات المستخدم الحية
+            onSnapshot(doc(db, "users", user.uid), (snap) => {
+                currentUser = { uid: snap.id, ...snap.data() };
+                document.getElementById("myBalance").innerText = currentUser.balance || 0;
+                
+                // تشغيل تأثير الدخول (السيارة) مرة واحدة عند التحميل
+                checkEntranceEffect();
+            });
 
-    function loadRoomOwnerInfo(uid) {
-        getDoc(doc(db, "users", uid)).then(snap => {
-            if(snap.exists()) {
-                const data = snap.data();
-                document.getElementById('headerOwnerName').textContent = data.displayName;
-                document.getElementById('headerOwnerId').textContent = uid.substring(0,6);
-                document.getElementById('headerOwnerImg').src = data.photoURL;
-                // Owner Frame
-                if(data.activeFrame && storeData.itemsById[data.activeFrame]) {
-                    const item = storeData.itemsById[data.activeFrame];
-                    if(item.itemType === 'svga') {
-                        playSvga(item.fileUrl, document.getElementById('headerOwnerFrame'), false, 0);
-                    }
-                }
+            await loadInitialData();
+            loadUsersList();
+            loadChat();
+            
+            // تحميل بيانات صاحب الغرفة
+            // افتراضياً سنحمل بيانات المستخدم الحالي كصاحب غرفة للتجربة
+            updateRoomHeader(currentUser); 
+
+        } else {
+            console.log("No user logged in");
+            // window.location.href = "login.html";
+        }
+    });
+
+    function updateRoomHeader(user) {
+        if(!user) return;
+        document.getElementById("ownerName").innerText = user.displayName;
+        document.getElementById("ownerId").innerText = "ID: " + user.uid.substr(0,6);
+        document.getElementById("ownerImg").src = user.photoURL;
+        
+        // إطار صاحب الغرفة
+        const frameDiv = document.getElementById("ownerFrame");
+        frameDiv.innerHTML = '';
+        if (user.activeFrame && storeData.items[user.activeFrame]) {
+            const item = storeData.items[user.activeFrame];
+            if (item.type === 'svga') {
+                playSvga(item.url, "ownerFrame");
             }
-        });
+        }
     }
 
+    // --- قائمة المتواجدين (Users Bar) ---
     function loadUsersList() {
-        const usersRef = collection(db, "users");
-        // For demo, fetching all. In production, use presence or subcollection
-        getDocs(usersRef).then(snap => {
-            const container = document.getElementById('usersBar');
-            container.innerHTML = '';
-            snap.forEach(docSnap => {
-                const u = docSnap.data();
-                const div = document.createElement('div');
-                div.className = 'user-circle';
-                div.onclick = () => openProfile(u, docSnap.id);
+        // للتجربة سنجلب جميع المستخدمين، في الواقع يجب استخدام Realtime Presence
+        getDocs(collection(db, "users")).then(snap => {
+            const bar = document.getElementById("usersBar");
+            bar.innerHTML = '';
+            
+            snap.forEach(doc => {
+                const u = doc.data();
+                const uid = doc.id;
+                const frameId = `list-frame-${uid}`;
                 
-                let frameHtml = '';
-                // Frame for user list
-                const frameId = `frame-list-${docSnap.id}`;
-                
+                const div = document.createElement("div");
+                div.className = "user-item-col";
+                div.onclick = () => openProfile(u, uid);
+
+                // الهيكلية الصحيحة للإطار والصورة
                 div.innerHTML = `
-                    <div class="user-circle-img-box">
-                        <img src="${u.photoURL}" class="avatar-base">
+                    <div class="avatar-wrapper size-list">
+                        <img src="${u.photoURL}" class="avatar-img">
                         <div id="${frameId}" class="frame-overlay"></div>
                     </div>
-                    <div class="user-name-micro">${u.displayName}</div>
+                    <div class="user-name-small">${u.displayName}</div>
                 `;
-                container.appendChild(div);
+                bar.appendChild(div);
 
-                // Play Frame SVGA
-                if(u.activeFrame && storeData.itemsById[u.activeFrame]) {
-                    const item = storeData.itemsById[u.activeFrame];
-                    if(item.itemType === 'svga') {
-                        setTimeout(() => playSvga(item.fileUrl, document.getElementById(frameId), false, 0), 500);
-                    }
+                // تحميل إطار SVGA إذا وجد
+                if (u.activeFrame && storeData.items[u.activeFrame]) {
+                    const item = storeData.items[u.activeFrame];
+                    // تأخير بسيط لضمان وجود العنصر في DOM
+                    setTimeout(() => playSvga(item.url, frameId), 100);
                 }
             });
         });
     }
 
-    // --- Chat & Effects ---
-    
+    // --- الشات والرسائل ---
     function loadChat() {
-        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
-        onValue(chatRef, (snapshot) => {
-            const msgs = snapshot.val();
-            if(!msgs) return;
-            const container = document.getElementById('chatArea');
-            container.innerHTML = ''; // Simplistic redraw. Optimize for real app.
-
-            Object.values(msgs).forEach(msg => {
-                renderMessage(msg, container);
-            });
-            container.scrollTop = container.scrollHeight;
-        });
+        const chatRef = ref(rtdb, `rooms/${currentRoomOwnerId}/messages`);
+        const q = query(chatRef, limit(50));
         
-        // Listen for new child added specifically for effects (Car/Gift)
-        // Note: onValue redraws everything, but we need effects to play once.
-        // We use a separate listener or timestamp check for effects.
-        // Implementation: Just checking the last message if it's new and an effect.
-    }
-
-    function renderMessage(msg, container) {
-        // Logic to show gift animation if it's recent (handled separately usually, but here simple)
-        if(msg.type === 'gift' && Date.now() - msg.timestamp < 3000) {
-            // Trigger animation only if it's very recent (avoids replay on reload)
-            // But better handled by child_added event.
-        }
-
-        const isMe = msg.senderId === currentUser.uid;
-        const row = document.createElement('div');
-        row.className = `chat-msg-row ${isMe ? 'me' : ''}`;
-
-        // Prepare Avatar with Frame
-        let avatarHtml = `
-            <div class="chat-avatar-container" onclick="window.openProfileById('${msg.senderId}')">
-                <img src="${msg.senderPhoto}" class="avatar-base">
-                <div id="chat-frame-${msg.id}" class="frame-overlay"></div>
-            </div>
-        `;
-
-        // Bubble Styling
-        let bubbleStyle = '';
-        let bubbleClass = 'chat-bubble';
-        
-        // Custom Bubble Logic
-        if(msg.bubbleId && storeData.itemsById[msg.bubbleId]) {
-            const bubbleItem = storeData.itemsById[msg.bubbleId];
-            if(bubbleItem.image) {
-                bubbleClass += ' custom-bubble';
-                bubbleStyle = `background-image: url('${bubbleItem.image}');`;
+        onChildAdded(chatRef, (snapshot) => {
+            const msg = snapshot.val();
+            renderMessage(msg, snapshot.key);
+            
+            // التحقق من وجود هدية لعرضها (Animation)
+            if (msg.type === 'gift' && Date.now() - msg.timestamp < 5000) {
+                playGiftAnimation(msg);
             }
-        }
+            // التحقق من دخول سيارة
+            if (msg.type === 'entrance' && Date.now() - msg.timestamp < 5000) {
+                playEntranceEffect(msg.url);
+            }
+        });
+    }
 
-        // Level Badges (Capped at 100)
-        const wLvl = Math.min(msg.wealthLevel || 1, 100);
-        const wBadgeUrl = storeData.wealthLevels[wLvl]?.icon || ''; // Get from stored data
+    function renderMessage(msg, key) {
+        const container = document.getElementById("chatArea");
+        const isMe = msg.senderId === currentUser.uid;
+        const frameDivId = `chat-frame-${key}`;
         
-        let badgesHtml = '';
-        if(wBadgeUrl) badgesHtml += `<span class="level-badge"><img src="${wBadgeUrl}"></span>`;
-
-        // Active Badges beside avatar
-        if(msg.activeBadges) {
-            // Logic to render active badges next to name
+        const div = document.createElement("div");
+        div.className = `msg-row ${isMe ? 'me' : ''}`;
+        
+        // شارة المستوى
+        let badgeHtml = '';
+        if (msg.wealthLevel && storeData.levels[msg.wealthLevel]) {
+            badgeHtml = `<img src="${storeData.levels[msg.wealthLevel]}" class="level-badge"> `;
         }
 
-        row.innerHTML = `
-            ${avatarHtml}
+        // ستايل الفقاعة (مخصصة أم عادية)
+        let bubbleStyle = '';
+        let bubbleClass = 'msg-bubble';
+        if (msg.bubbleId && storeData.items[msg.bubbleId]) {
+            bubbleClass += ' custom-bubble';
+            bubbleStyle = `background-image: url('${storeData.items[msg.bubbleId].image}');`;
+        }
+
+        div.innerHTML = `
+            <div class="avatar-wrapper size-chat" onclick="openProfileById('${msg.senderId}')">
+                <img src="${msg.senderPhoto}" class="avatar-img">
+                <div id="${frameDivId}" class="frame-overlay"></div>
+            </div>
             <div class="${bubbleClass}" style="${bubbleStyle}">
-                <div class="msg-header" ${isMe ? 'style="justify-content: flex-end"' : ''}>
-                    ${badgesHtml}
-                    <span class="msg-name">${msg.senderName}</span>
+                <div class="msg-header" ${isMe ? 'style="justify-content:flex-end"' : ''}>
+                    ${badgeHtml} ${msg.senderName}
                 </div>
-                <div class="msg-text">${msg.text}</div>
+                <div>${msg.text}</div>
             </div>
         `;
         
-        container.appendChild(row);
+        container.appendChild(div);
+        container.scrollTop = container.scrollHeight;
 
-        // Sync Frame
-        if(msg.frameId && storeData.itemsById[msg.frameId]) {
-            setTimeout(() => {
-                const el = document.getElementById(`chat-frame-${msg.id}`);
-                if(el) playSvga(storeData.itemsById[msg.frameId].fileUrl, el, false, 0);
-            }, 100);
+        // تحميل الإطار
+        if (msg.frameId && storeData.items[msg.frameId]) {
+            setTimeout(() => playSvga(storeData.items[msg.frameId].url, frameDivId), 100);
         }
     }
 
-    // --- Sending ---
+    // --- إرسال الرسائل ---
     window.sendMessage = async () => {
-        const input = document.getElementById('chatInput');
+        const input = document.getElementById("chatInput");
         const text = input.value.trim();
-        if(!text) return;
+        if (!text) return;
 
         const msgData = {
             senderId: currentUser.uid,
             senderName: currentUser.displayName,
             senderPhoto: currentUser.photoURL,
             text: text,
-            timestamp: Date.now(),
-            wealthLevel: currentUser.wealthLevel || 1,
+            type: 'text',
+            wealthLevel: currentUser.wealthLevel || 0,
             frameId: currentUser.activeFrame || null,
-            bubbleId: currentUser.activeBubble || null, // Bubble logic
-            id: Date.now() + Math.random().toString() // unique ID for DOM
+            bubbleId: currentUser.activeBubble || null,
+            timestamp: serverTimestamp()
         };
 
-        await push(ref(rtdb, `roomChats/${roomId}/messages`), msgData);
+        await push(ref(rtdb, `rooms/${currentRoomOwnerId}/messages`), msgData);
         input.value = '';
-        document.getElementById('giftBtn').classList.remove('hidden');
-        document.getElementById('sendBtn').classList.add('hidden');
+        document.getElementById("sendBtn").classList.add("hidden");
+        document.getElementById("giftBtn").classList.remove("hidden");
     };
 
-    // --- Gift Logic ---
-    window.openGiftSheet = () => {
-        giftRecipient = currentProfileUser || null; // If opened from profile, send to them, else everyone
-        document.getElementById('giftTargetName').innerText = giftRecipient ? giftRecipient.displayName : "غرفة (المالك)";
-        document.getElementById('giftSheet').classList.add('active');
+    // التبديل بين زر الهدايا والإرسال
+    document.getElementById("chatInput").addEventListener("input", (e) => {
+        if (e.target.value.length > 0) {
+            document.getElementById("sendBtn").classList.remove("hidden");
+            document.getElementById("giftBtn").classList.add("hidden");
+        } else {
+            document.getElementById("sendBtn").classList.add("hidden");
+            document.getElementById("giftBtn").classList.remove("hidden");
+        }
+    });
+
+    // --- البروفايل وطلبات الصداقة ---
+    window.openProfile = (user, uid) => {
+        currentProfileUser = { uid, ...user };
+        
+        document.getElementById("p-name").innerText = user.displayName;
+        document.getElementById("p-id").innerText = "ID: " + uid.substr(0,8);
+        document.getElementById("p-img").src = user.photoURL;
+        document.getElementById("p-wealth").innerText = "Lv." + (user.wealthLevel || 0);
+        
+        // إعادة تعيين زر الصداقة
+        const btn = document.getElementById("friendBtn");
+        if (currentUser.friends && currentUser.friends.includes(uid)) {
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> أصدقاء';
+            btn.style.background = "#10b981";
+        } else if (currentUser.sentRequests && currentUser.sentRequests.includes(uid)) {
+            btn.innerHTML = '<i class="fa-solid fa-clock"></i> تم الإرسال';
+            btn.style.background = "#6b7280";
+        } else {
+            btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> إرسال طلب صداقة';
+            btn.style.background = "var(--primary)";
+        }
+
+        // تشغيل إطار البروفايل
+        const frameContainer = document.getElementById("p-frame");
+        frameContainer.innerHTML = ''; // مسح القديم
+        if (user.activeFrame && storeData.items[user.activeFrame]) {
+            setTimeout(() => playSvga(storeData.items[user.activeFrame].url, "p-frame"), 50);
+        }
+
+        toggleSheet("profileSheet", true);
     };
 
-    window.sendSelectedGift = async () => {
-        if(!selectedGift) return alert("اختر هدية");
-        if(currentUser.balance < selectedGift.price) return alert("الرصيد غير كافي");
+    window.openProfileById = async (uid) => {
+        const snap = await getDoc(doc(db, "users", uid));
+        if (snap.exists()) {
+            openProfile(snap.data(), uid);
+        }
+    };
 
-        // 1. Deduct Balance (Firestore)
+    // دالة إرسال طلب الصداقة (تحديث قاعدة البيانات)
+    window.sendFriendRequest = async () => {
+        if (!currentProfileUser || currentProfileUser.uid === currentUser.uid) return;
+        
+        const btn = document.getElementById("friendBtn");
+        btn.innerText = "جاري الإرسال...";
+        
+        try {
+            // إضافة المعرف إلى مصفوفة friendRequests للمستقبل
+            await updateDoc(doc(db, "users", currentProfileUser.uid), {
+                friendRequests: arrayUnion(currentUser.uid)
+            });
+            // إضافة المعرف إلى sentRequests للمرسل
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                sentRequests: arrayUnion(currentProfileUser.uid)
+            });
+            
+            btn.innerHTML = '<i class="fa-solid fa-clock"></i> تم الإرسال';
+            btn.style.background = "#6b7280";
+        } catch (e) {
+            console.error(e);
+            btn.innerText = "خطأ!";
+        }
+    };
+
+    window.mentionUser = () => {
+        toggleSheet("profileSheet", false);
+        const input = document.getElementById("chatInput");
+        input.value = `@${currentProfileUser.displayName} `;
+        input.focus();
+    };
+
+    // --- الهدايا ---
+    window.giftFromProfile = () => {
+        giftRecipient = currentProfileUser;
+        toggleSheet("profileSheet", false);
+        document.getElementById("giftTargetName").innerText = currentProfileUser.displayName;
+        toggleSheet("giftSheet", true);
+    };
+
+    window.sendGift = async () => {
+        if (!selectedGift) return alert("اختر هدية");
+        if (currentUser.balance < selectedGift.price) return alert("لا يوجد رصيد كافي");
+
+        const targetId = giftRecipient ? giftRecipient.uid : currentRoomOwnerId;
+        const targetName = giftRecipient ? giftRecipient.displayName : "الجميع";
+
+        // خصم الرصيد
         await updateDoc(doc(db, "users", currentUser.uid), {
             balance: increment(-selectedGift.price)
         });
 
-        // 2. Add Wealth/Magic to Recipient (Firestore) - Logic simplified
-        // ...
-
-        // 3. Send Message to RTDB with type 'gift' to trigger animation
-        const targetId = giftRecipient ? giftRecipient.uid : roomOwnerId;
-        const targetName = giftRecipient ? giftRecipient.displayName : "المالك";
-        
+        // إرسال رسالة الهدية لتفعيل الأنيميشن
         const giftMsg = {
-            type: 'gift',
-            giftId: selectedGift.id,
-            giftUrl: selectedGift.svgaUrl || selectedGift.image, // Prefer SVGA
-            isSvga: !!selectedGift.svgaUrl,
             senderId: currentUser.uid,
+            senderName: currentUser.displayName,
             senderPhoto: currentUser.photoURL,
-            receiverId: targetId,
-            receiverName: targetName,
-            price: selectedGift.price,
-            text: `أرسل ${selectedGift.name}`,
-            timestamp: Date.now()
+            text: `أرسل ${selectedGift.name} إلى ${targetName}`,
+            type: 'gift',
+            giftUrl: selectedGift.svga || selectedGift.image, // يفضل SVGA
+            isSvga: !!selectedGift.svga,
+            timestamp: serverTimestamp()
         };
 
-        await push(ref(rtdb, `roomChats/${roomId}/messages`), giftMsg);
-        
-        closeSheet('giftSheet');
+        await push(ref(rtdb, `rooms/${currentRoomOwnerId}/messages`), giftMsg);
+        toggleSheet("giftSheet", false);
     };
 
-    // --- Animation Handling (Listener) ---
-    const roomRef = ref(rtdb, `roomChats/${roomId}/messages`);
-    // Listen for new additions to play animations
-    onDisconnect(roomRef).cancel(); // cleanup
-    
-    // We use a query to limit only to new messages (simplified here via timestamp check in a real child_added)
-    // Here using child_added effectively:
-    let initialLoad = true;
-    setTimeout(() => { initialLoad = false; }, 2000); // Ignore old messages
-
-    import { query as rQuery, limitToLast, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    const newMsgQuery = rQuery(ref(rtdb, `roomChats/${roomId}/messages`), limitToLast(1));
-
-    onChildAdded(newMsgQuery, (snap) => {
-        if(initialLoad) return;
-        const msg = snap.val();
-        
-        // 1. Gift Animation
-        if(msg.type === 'gift') {
-            playGiftAnimation(msg);
+    // --- التأثيرات (سيارة الدخول / الهدايا) ---
+    function checkEntranceEffect() {
+        // إذا كان لدى المستخدم سيارة، نرسل إشارة للغرفة
+        if (currentUser.entranceEffect && storeData.items[currentUser.entranceEffect]) {
+            const effectUrl = storeData.items[currentUser.entranceEffect].url;
+            // نرسل رسالة مخفية لتفعيل التأثير عند الآخرين
+            push(ref(rtdb, `rooms/${currentRoomOwnerId}/messages`), {
+                type: 'entrance',
+                url: effectUrl,
+                senderId: currentUser.uid,
+                timestamp: serverTimestamp()
+            });
         }
+    }
+
+    function playEntranceEffect(url) {
+        const layer = document.createElement("div");
+        layer.id = "car-effect";
+        layer.style.cssText = "position:fixed; inset:0; z-index:2000; pointer-events:none;";
+        document.body.appendChild(layer);
         
-        // 2. Entrance Animation (If message type is 'entrance')
-        if(msg.type === 'entrance') {
-            playEntranceCar(msg.svgaUrl);
-        }
-    });
+        playSvga(url, "car-effect", 1, true); // 1 loop, fullscreen
+        
+        setTimeout(() => layer.remove(), 4000);
+    }
 
     function playGiftAnimation(msg) {
-        // A. Fly Animation
-        const senderEl = document.querySelector(`img[src="${msg.senderPhoto}"]`); // Rough finder
-        // In real app, find sender avatar rect and receiver avatar rect
+        const layer = document.getElementById("effectsLayer");
         
-        const startX = window.innerWidth / 2; // Fallback
-        const startY = window.innerHeight - 100;
-        
-        const flyer = document.createElement('div');
-        flyer.className = 'flying-gift';
-        flyer.style.left = startX + 'px';
-        flyer.style.top = startY + 'px';
-        flyer.innerHTML = `
-            <img src="${msg.isSvga ? 'gift_icon_placeholder.png' : msg.giftUrl}">
-            <div class="flying-info">x1 ${msg.price}</div>
-        `;
-        document.body.appendChild(flyer);
-
-        // Move to center
-        setTimeout(() => {
-            flyer.style.transform = `translateY(-${window.innerHeight/2}px) scale(1.5)`;
-            flyer.style.opacity = '1';
-        }, 50);
-
-        // B. Full Screen SVGA
-        if(msg.isSvga) {
+        if (msg.isSvga) {
+            // تأثير SVGA كامل الشاشة
+            const div = document.createElement("div");
+            div.className = "svga-full";
+            div.id = "gift-" + Date.now();
+            layer.appendChild(div);
+            playSvga(msg.giftUrl, div.id, 1, true);
+        } else {
+            // صورة عادية تطير
+            const img = document.createElement("img");
+            img.src = msg.giftUrl;
+            img.style.cssText = `position:fixed; left:50%; top:80%; width:100px; transition:1s; z-index:3000;`;
+            document.body.appendChild(img);
+            
             setTimeout(() => {
-                const layer = document.getElementById('effectsLayer');
-                const div = document.createElement('div');
-                div.className = 'svga-fullscreen';
-                layer.appendChild(div);
-                playSvga(msg.giftUrl, div, true, 1);
-                flyer.remove();
-            }, 800);
-        } else {
-            setTimeout(() => flyer.remove(), 2000);
+                img.style.top = "40%";
+                img.style.transform = "scale(1.5)";
+            }, 100);
+            
+            setTimeout(() => img.remove(), 2000);
         }
     }
 
-    function checkEntranceEffect() {
-        // Runs once on load
-        if(currentUser && currentUser.entranceCar) {
-            const item = storeData.itemsById[currentUser.entranceCar];
-            if(item && item.fileUrl) {
-                // Send 'entrance' signal to room
-                push(ref(rtdb, `roomChats/${roomId}/messages`), {
-                    type: 'entrance',
-                    senderId: currentUser.uid,
-                    svgaUrl: item.fileUrl,
-                    timestamp: Date.now()
-                });
-            }
-        }
-    }
-    
-    function playEntranceCar(url) {
-        const layer = document.getElementById('effectsLayer');
-        const div = document.createElement('div');
-        div.className = 'svga-fullscreen';
-        layer.appendChild(div);
-        playSvga(url, div, true, 1);
-    }
-
-    // --- Profile & UI Helpers ---
-    window.openProfile = (user, uid) => {
-        currentProfileUser = {uid, ...user};
-        document.getElementById('p-name').textContent = user.displayName;
-        document.getElementById('p-id').textContent = "ID: " + uid.substring(0,8);
-        document.getElementById('p-img').src = user.photoURL;
-        document.getElementById('p-followers').textContent = (user.friends?.length || 0) + " متابعين";
-        
-        // Profile Frame
-        if(user.activeFrame && storeData.itemsById[user.activeFrame]) {
-            const item = storeData.itemsById[user.activeFrame];
-            playSvga(item.fileUrl, document.getElementById('p-frame'), false, 0);
-        } else {
-            document.getElementById('p-frame').innerHTML = '';
-        }
-
-        document.getElementById('profileSheet').classList.add('active');
-    };
-
-    window.openProfileById = (uid) => {
-        // Fetch specific user then open
-        getDoc(doc(db, "users", uid)).then(snap => {
-            if(snap.exists()) window.openProfile(snap.data(), snap.id);
-        });
-    };
-
-    window.closeSheet = (id) => {
-        document.getElementById(id).classList.remove('active');
-        if(id === 'profileSheet') currentProfileUser = null;
-    };
-
-    window.mentionUser = () => {
-        if(currentProfileUser) {
-            document.getElementById('chatInput').value = `@${currentProfileUser.displayName} `;
-            closeSheet('profileSheet');
+    // --- إدارة النوافذ ---
+    window.toggleSheet = (id, show) => {
+        const el = document.getElementById(id);
+        if (show) el.classList.add("active");
+        else {
+            el.classList.remove("active");
+            if (id === 'giftSheet') giftRecipient = null; // إعادة تعيين المستلم
         }
     };
-    
-    window.giftUserFromProfile = () => {
-        if(currentProfileUser) {
-            giftRecipient = currentProfileUser;
-            closeSheet('profileSheet');
-            openGiftSheet();
-        }
-    };
-
-    // Start
-    init();
 
 </script>
 </body>
