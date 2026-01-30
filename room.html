@@ -3,777 +3,605 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Premium Live Room - Afnan AI</title>
-    <!-- Font Awesome للأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <!-- خط القاهرة -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <title>Live Room - Afnan AI</title>
     
+    <!-- مكتبات خارجية -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- مشغل SVGA للرسوم المتحركة (السيارات والهدايا) -->
+    <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+
     <style>
         :root {
-            --primary: #8b5cf6;
-            --primary-dark: #6d28d9;
-            --accent: #f59e0b; /* ذهبي */
-            --bg-black: #050505;
-            --glass: rgba(30, 30, 35, 0.7);
+            --primary: #7c3aed;
+            --accent: #f59e0b;
+            --bg-dark: #0f172a;
+            --glass: rgba(15, 23, 42, 0.7);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --wealth: #fbbf24;
-            --magic: #d946ef;
-            --danger: #ef4444;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        
         body {
             font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-black);
-            color: #fff; 
-            height: 100vh; 
-            overflow: hidden;
-            display: flex; 
-            justify-content: center;
-        }
-
-        /* خلفية التطبيق */
-        .app-bg {
-            position: fixed; inset: 0;
-            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #000000 70%);
-            z-index: -1;
-        }
-
-        .app-container { 
-            width: 100%; 
-            max-width: 480px; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            background: rgba(0,0,0,0.2);
-        }
-
-        /* --- الهيدر --- */
-        .header { 
-            padding: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            z-index: 100;
-            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
-        }
-
-        .room-info {
-            display: flex; align-items: center; gap: 10px; 
-            background: rgba(255,255,255,0.1);
-            padding: 5px 12px 5px 5px; 
-            border-radius: 30px; 
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
-            max-width: 50%;
-        }
-        
-        .owner-img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
-        
-        .header-controls { display: flex; gap: 8px; }
-        
-        .btn-control {
-            width: 38px; height: 38px; 
-            border-radius: 12px; 
-            border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05);
+            background-color: #000;
             color: #fff;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(5px);
-            transition: 0.2s;
+            overflow: hidden;
+            height: 100vh; /* استخدام dvh للموبايل */
+            height: 100dvh;
         }
-        .btn-control:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
-        .btn-control.exit { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
 
-        /* --- شريط المستخدمين العلوي (بديل الميكات) --- */
-        .users-bar {
-            padding: 10px 15px;
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            scrollbar-width: none; /* Firefox */
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(0,0,0,0.2);
-            min-height: 85px;
+        /* خلفية متدرجة فخمة */
+        .premium-bg {
+            position: fixed; inset: 0; z-index: -1;
+            background: radial-gradient(circle at 50% 10%, #2e1065 0%, #020617 80%);
         }
-        .users-bar::-webkit-scrollbar { display: none; }
 
-        .user-head {
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-            min-width: 55px; cursor: pointer;
-        }
-        .user-head-img-wrapper {
+        /* حاوية مرنة تملأ الشاشة */
+        .layout-container {
+            display: flex; flex-direction: column;
+            width: 100%; height: 100%;
+            max-width: 100%; /* تصميم حر */
+            margin: 0 auto;
             position: relative;
-            width: 50px; height: 50px;
         }
-        .user-head img {
-            width: 100%; height: 100%; 
-            border-radius: 50%; 
-            object-fit: cover;
+
+        /* --- تحسينات التمرير --- */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* --- أنماط الشات والبروفايل --- */
+        .chat-bubble {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.2s;
+        }
+        
+        /* إطار الصورة (Avatar Frame) */
+        .avatar-container {
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .user-avatar {
+            border-radius: 50%; object-fit: cover;
             border: 2px solid transparent;
-            transition: 0.2s;
         }
-        .user-head.online img { border-color: #10b981; }
-        .user-head span {
-            font-size: 10px; color: #ccc;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            max-width: 55px; text-align: center;
-        }
-
-        /* --- منطقة الشات --- */
-        .chat-area { 
-            flex: 1; 
-            overflow-y: auto; 
-            padding: 15px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px;
-            /* Scrollbar styling */
-            scrollbar-width: thin;
-            scrollbar-color: rgba(255,255,255,0.1) transparent;
+        .frame-overlay {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 135%; height: 135%; /* الإطار دائماً أكبر من الصورة */
+            pointer-events: none;
+            z-index: 2;
+            object-fit: contain;
         }
 
-        .msg-bubble {
-            background: rgba(40, 40, 45, 0.6); 
-            border: 1px solid var(--glass-border);
-            padding: 10px; 
-            border-radius: 18px; 
-            border-bottom-right-radius: 2px;
-            backdrop-filter: blur(5px); 
-            display: flex; align-items: flex-start; gap: 10px;
-            max-width: 85%; 
-            animation: slideIn 0.3s ease;
-            align-self: flex-start;
+        /* مستويات وشارات */
+        .level-badge {
+            display: inline-flex; align-items: center; gap: 2px;
+            padding: 1px 6px; border-radius: 10px;
+            font-size: 9px; font-weight: bold;
+            background: rgba(255,255,255,0.1);
         }
-        
-        .msg-bubble.me {
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
-            border-color: rgba(139, 92, 246, 0.3);
-            border-radius: 18px; 
-            border-bottom-left-radius: 2px;
-            flex-direction: row-reverse;
-            align-self: flex-end;
-        }
+        .badge-icon { width: 14px; height: 14px; object-fit: contain; }
 
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .msg-avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; object-fit: cover; }
-        
-        .msg-content { display: flex; flex-direction: column; gap: 2px; }
-        .msg-bubble.me .msg-content { align-items: flex-end; }
-        
-        .msg-user { font-size: 11px; font-weight: bold; color: var(--accent); display: flex; align-items: center; gap: 5px; }
-        .msg-bubble.me .msg-user { flex-direction: row-reverse; }
-
-        .msg-text { font-size: 13px; line-height: 1.4; color: #f3f4f6; }
-        
-        .badge { font-size: 8px; padding: 2px 6px; border-radius: 8px; font-weight: bold; display: inline-flex; align-items: center; gap: 2px; }
-        .b-wealth { background: linear-gradient(45deg, #f59e0b, #d97706); color: #fff; }
-        .b-magic { background: linear-gradient(45deg, #d946ef, #a21caf); color: #fff; }
-        .b-owner { background: linear-gradient(45deg, #6366f1, #4338ca); color: #fff; }
-
-        /* --- الفوتر --- */
-        .footer { 
-            padding: 10px 15px 20px; 
-            display: flex; align-items: center; gap: 10px; 
-            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
-            z-index: 500; 
-        }
-        
-        .input-box {
-            flex: 1; 
-            background: rgba(255,255,255,0.08); 
-            border: 1px solid var(--glass-border);
-            border-radius: 25px; 
-            height: 46px; 
-            padding: 0 15px; 
-            display: flex; align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        
-        .main-input { 
-            background: transparent; border: none; color: #fff; width: 100%; font-size: 14px; 
-            font-family: 'Cairo', sans-serif;
-        }
-        .main-input::placeholder { color: rgba(255,255,255,0.4); }
-
-        .btn-action {
-            width: 44px; height: 44px; border-radius: 50%; border: none;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            transition: 0.2s;
-        }
-        .btn-action:active { transform: scale(0.9); }
-        .btn-gift { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
-        .btn-send { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
-
-        /* --- النوافذ المنبثقة (Sheets) --- */
-        .sheet-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end;
-            opacity: 0; pointer-events: none; transition: 0.3s;
-        }
-        .sheet-overlay.show { opacity: 1; pointer-events: auto; }
-        
-        .bottom-sheet {
-            background: #141418;
-            width: 100%; border-radius: 30px 30px 0 0; 
-            border-top: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
-            transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            padding: 25px; position: relative;
-            max-height: 80vh; overflow-y: auto;
-        }
-        .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
-
-        /* --- تصميم البروفايل --- */
-        .profile-header { text-align: center; margin-bottom: 20px; }
-        .profile-img-lg { 
-            width: 100px; height: 100px; border-radius: 50%; 
-            border: 3px solid var(--accent); 
-            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
-            margin-bottom: 10px;
-            object-fit: cover;
-        }
-        .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
-        .profile-id { color: #888; font-size: 12px; font-family: monospace; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
-
-        .stats-row { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
-        .stat-box { 
-            background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; min-width: 80px;
-        }
-        .stat-val { font-weight: bold; font-size: 16px; }
-        .stat-label { font-size: 10px; color: #aaa; margin-top: 2px; }
-        .stat-box.wealth .stat-val { color: var(--wealth); }
-        .stat-box.magic .stat-val { color: var(--magic); }
-
-        .profile-tools { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .tool-btn {
-            width: 50px; height: 50px; border-radius: 18px; 
-            background: rgba(255,255,255,0.08);
-            border: 1px solid var(--glass-border); color: #fff; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 20px; transition: 0.2s;
-        }
-        .tool-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.15); }
-        .tool-btn.gift { color: var(--accent); border-color: rgba(245, 158, 11, 0.3); }
-        .tool-btn.follow { 
-            width: auto; padding: 0 30px; font-size: 14px; font-weight: bold;
-            background: var(--primary); border: none;
-        }
-
-        /* --- تصميم الهدايا --- */
-        .gifts-grid { 
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; 
-            max-height: 250px; overflow-y: auto; padding-bottom: 10px;
-        }
-        .gift-card {
-            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 5px;
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            border: 1px solid transparent; cursor: pointer; transition: 0.2s;
-        }
-        .gift-card:active { transform: scale(0.95); }
-        .gift-card.selected { background: rgba(245, 158, 11, 0.15); border-color: var(--accent); }
-        .gift-img { width: 45px; height: 45px; object-fit: contain; }
-        .gift-price { font-size: 10px; color: var(--wealth); font-weight: bold; }
-
-        .hidden { display: none !important; }
-
-        /* أنيميشن الهدايا */
-        .gift-fx-container {
-            position: fixed; inset: 0; pointer-events: none; z-index: 3000;
+        /* --- طبقة الأنيميشن (دخول السيارات) --- */
+        #animationLayer {
+            position: fixed; inset: 0; z-index: 9999;
+            pointer-events: none; /* يسمح بالضغط من خلاله */
             display: flex; align-items: center; justify-content: center;
         }
-        .gift-fx-item {
-            width: 150px; height: 150px;
-            animation: giftPop 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        .svga-canvas {
+            width: 100%; height: 100%;
+            max-width: 600px; /* حجم السيارة */
         }
-        @keyframes giftPop {
-            0% { transform: scale(0) translateY(100px); opacity: 0; }
-            20% { transform: scale(1.2) translateY(0); opacity: 1; }
-            80% { opacity: 1; transform: scale(1); }
-            100% { opacity: 0; transform: scale(1.5) translateY(-50px); }
+        
+        /* رسالة الترحيب عند الدخول */
+        .entry-banner {
+            position: absolute; top: 20%; left: 0; right: 0;
+            text-align: center;
+            animation: slideInLeft 1s ease-out;
+            z-index: 10000;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* حالة التحميل */
-        .loader {
-            width: 20px; height: 20px; border: 2px solid #fff; 
-            border-bottom-color: transparent; border-radius: 50%; 
-            display: inline-block; animation: rotation 1s linear infinite;
+        /* القوائم السفلية (Sheets) */
+        .bottom-sheet {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            background: #1e1b4b;
+            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            transform: translateY(110%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 50;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            max-width: 600px; margin: 0 auto; /* تقييد العرض في الشاشات الكبيرة */
         }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .bottom-sheet.active { transform: translateY(0); }
+        .sheet-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+            z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+
     </style>
 </head>
-<body onclick="handleGlobalClick(event)">
+<body>
 
-<div class="app-bg"></div>
+    <!-- الخلفية -->
+    <div class="premium-bg"></div>
+    <!-- طبقة الرسوم المتحركة (SVGA) -->
+    <div id="animationLayer"></div>
 
-<div class="app-container">
-    <!-- الهيدر -->
-    <header class="header">
-        <div class="room-info" id="roomHeaderInfo" onclick="if(currentRoomOwnerId) openProfile(currentRoomOwnerId)">
-            <img id="headerOwnerImg" src="https://via.placeholder.com/150" class="owner-img">
-            <div style="margin-right: 8px;">
-                <div id="headerRoomName" style="font-size:12px; font-weight:bold; line-height:1.2;">جار التحميل...</div>
-                <span id="headerOwnerId" style="font-size:9px; color:rgba(255,255,255,0.6)">ID: ...</span>
-            </div>
-        </div>
-        <div class="header-controls">
-            <button class="btn-control" onclick="alert('الأدوات قريباً')" title="أدوات"><i class="fa-solid fa-toolbox"></i></button>
-            <button class="btn-control" onclick="alert('تم التصغير')" title="تصغير"><i class="fa-solid fa-minus"></i></button>
-            <button class="btn-control exit" onclick="exitRoom()" title="خروج"><i class="fa-solid fa-power-off"></i></button>
-        </div>
-    </header>
-
-    <!-- شريط المستخدمين (بديل الميكات) -->
-    <div class="users-bar" id="usersBar">
-        <!-- سيتم ملؤه بواسطة JS -->
-        <div style="display:flex; align-items:center; justify-content:center; width:100%; color:#888; font-size:12px;">جاري تحميل المتواجدين...</div>
-    </div>
-
-    <!-- منطقة الشات -->
-    <div class="chat-area" id="chatArea"></div>
-
-    <!-- الفوتر -->
-    <footer class="footer">
-        <div class="input-box" onclick="event.stopPropagation()">
-            <input type="text" id="chatInput" class="main-input" placeholder="اكتب رسالة..." autocomplete="off">
-        </div>
-        <button id="giftBtn" class="btn-action btn-gift" onclick="openGiftSheet()">
-            <i class="fa-solid fa-gift"></i>
-        </button>
-        <button id="sendBtn" class="btn-action btn-send hidden" onclick="sendMessage()">
-            <i class="fa-solid fa-paper-plane"></i>
-        </button>
-    </footer>
-</div>
-
-<!-- نافذة البروفايل -->
-<div class="sheet-overlay" id="profileSheet">
-    <div style="flex:1" onclick="toggleSheet('profileSheet', false)"></div>
-    <div class="bottom-sheet">
-        <div id="profileLoading" style="text-align:center; padding:20px;">
-            <span class="loader" style="border-color: var(--accent); border-bottom-color: transparent;"></span>
-        </div>
+    <div class="layout-container">
         
-        <div id="profileContent" class="hidden">
-            <div class="profile-header">
-                <img id="p-img" src="" class="profile-img-lg">
-                <h3 id="p-name" class="profile-name">اسم المستخدم</h3>
-                <span id="p-id" class="profile-id">ID: ---</span>
-            </div>
-
-            <div class="stats-row">
-                <div class="stat-box wealth">
-                    <span id="p-wealth" class="stat-val">0</span>
-                    <span class="stat-label"><i class="fa-solid fa-gem"></i> ثروة</span>
+        <!-- Header -->
+        <header class="flex items-center justify-between p-4 z-20 bg-gradient-to-b from-black/60 to-transparent">
+            <!-- Room Info -->
+            <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10" onclick="showRoomProfile()">
+                <div class="avatar-container w-9 h-9">
+                    <img id="roomOwnerImg" src="https://via.placeholder.com/100" class="user-avatar w-full h-full">
+                    <!-- إطار المالك إذا وجد -->
+                    <img id="roomOwnerFrame" src="" class="frame-overlay hidden">
                 </div>
-                <div class="stat-box magic">
-                    <span id="p-magic" class="stat-val">0</span>
-                    <span class="stat-label"><i class="fa-solid fa-star"></i> سحر</span>
-                </div>
-                <div class="stat-box">
-                    <span id="p-level" class="stat-val" style="color:#fff">0</span>
-                    <span class="stat-label">مستوى</span>
+                <div class="flex flex-col">
+                    <span id="roomName" class="text-xs font-bold text-white truncate max-w-[100px]">...</span>
+                    <span id="roomID" class="text-[9px] text-gray-300 font-mono">ID: ...</span>
                 </div>
             </div>
-            
-            <div class="profile-tools">
-                <button class="tool-btn gift" onclick="handleProfileGift()"><i class="fa-solid fa-gift"></i></button>
-                <button class="tool-btn" onclick="handleProfileMention()" style="color:#60a5fa"><i class="fa-solid fa-at"></i></button>
-                <button class="tool-btn follow" onclick="handleFollow()">متابعة</button>
+
+            <!-- Header Users (Online) -->
+            <div class="flex-1 mx-3 overflow-hidden">
+                <div id="topUsersList" class="flex gap-2 overflow-x-auto hide-scrollbar items-center">
+                    <!-- سيتم ملؤها عبر JS -->
+                </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<!-- نافذة الهدايا -->
-<div class="sheet-overlay" id="giftSheet">
-    <div style="flex:1" onclick="toggleSheet('giftSheet', false)"></div>
-    <div class="bottom-sheet">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-            <span style="font-weight:bold; font-size:14px;">إرسال هدية إلى: <span id="giftTargetName" style="color:var(--accent)">المالك</span></span>
-            <span style="font-size:12px; color:#888">رصيدك: <span id="myBalance" style="color:var(--wealth); font-weight:bold">0</span> 💰</span>
-        </div>
-        
-        <div class="gifts-grid" id="giftsGrid"></div>
-        
-        <div style="display:flex; align-items:center; justify-content:flex-end; margin-top:15px; gap:10px;">
-            <button class="btn-send" onclick="sendSelectedGift()" style="width:100%; border-radius:12px; height:40px; font-weight:bold; border:none;">إرسال</button>
-        </div>
-    </div>
-</div>
+            <!-- Controls -->
+            <button onclick="exitRoom()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center border border-red-500/30">
+                <i class="fa-solid fa-power-off text-sm"></i>
+            </button>
+        </header>
 
-<!-- Scripts -->
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, orderBy, limit, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getDatabase, ref, push, onValue, set, onDisconnect, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        <!-- Main Chat Area -->
+        <main id="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-3 relative z-10 hide-scrollbar scroll-smooth">
+            <div class="text-center py-4 text-white/30 text-xs">مرحباً بك في غرفة البث المباشر</div>
+        </main>
 
-    // 1. إعدادات Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-        authDomain: "rtx3090-28439.firebaseapp.com",
-        projectId: "rtx3090-28439",
-        storageBucket: "rtx3090-28439.firebasestorage.app",
-        messagingSenderId: "178612030690",
-        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
-        databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const rtdb = getDatabase(app);
-
-    // 2. المتغيرات العامة
-    let currentUser = null;
-    let currentRoomOwnerId = null;
-    let currentProfileUser = null; // المستخدم المعروض في البروفايل
-    let giftTargetUser = null; // المستخدم الذي سترسل له هدية
-    let selectedGiftId = null;
-    let allUsersCache = {}; // تخزين مؤقت لبيانات المستخدمين
-    let storeGifts = [];
-    
-    // الحصول على ID الغرفة من الرابط
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('id');
-    const roomType = urlParams.get('type') || 'private';
-
-    // 3. التهيئة والتحقق
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            // جلب بياناتي
-            const userSnap = await getDoc(doc(db, "users", user.uid));
-            if(userSnap.exists()){
-                currentUser = { uid: userSnap.id, ...userSnap.data() };
-                document.getElementById('myBalance').innerText = (currentUser.balance || 0).toLocaleString();
+        <!-- Footer -->
+        <footer class="p-3 pb-5 z-20 bg-gradient-to-t from-black via-black/80 to-transparent">
+            <div class="flex items-center gap-2 max-w-4xl mx-auto">
+                <div class="flex-1 bg-white/10 backdrop-blur rounded-full h-11 flex items-center px-4 border border-white/10">
+                    <input type="text" id="msgInput" placeholder="قل شيئاً..." class="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-400 font-cairo">
+                </div>
                 
-                initRoom();
-            }
-        } else {
-            window.location.href = "login.html";
-        }
-    });
-
-    // 4. منطق الغرفة
-    async function initRoom() {
-        // تحديد المالك
-        currentRoomOwnerId = roomId; 
-        
-        // تحميل بيانات المالك في الهيدر
-        loadRoomHeader();
-        
-        // تحميل الهدايا
-        loadGifts();
-
-        // الاستماع للشات
-        setupChatListener();
-
-        // الاستماع للمتواجدين (نستخدم allUsers من الكود الأصلي كقائمة متواجدين)
-        loadUsersBar();
-    }
-
-    async function loadRoomHeader() {
-        if(roomType === 'private') {
-            const ownerDoc = await getDoc(doc(db, "users", currentRoomOwnerId));
-            if(ownerDoc.exists()) {
-                const data = ownerDoc.data();
-                document.getElementById('headerOwnerImg').src = data.photoURL || 'https://via.placeholder.com/150';
-                document.getElementById('headerRoomName').innerText = `غرفة ${data.displayName}`;
-                document.getElementById('headerOwnerId').innerText = `ID: ${data.uid.substring(0,6)}`;
-                giftTargetUser = { uid: data.uid, name: data.displayName }; // الافتراضي للهدايا
-            }
-        } else {
-            // منطق الغرف العامة
-            document.getElementById('headerRoomName').innerText = "غرفة عامة";
-        }
-    }
-
-    // شريط المستخدمين العلوي
-    async function loadUsersBar() {
-        const usersSnap = await getDocs(collection(db, "users"));
-        const bar = document.getElementById('usersBar');
-        bar.innerHTML = '';
-
-        // إضافة المالك أولاً إذا كان موجوداً
-        if (roomType === 'private') {
-             // (تم تحميله في الهيدر، لكن يمكن إضافته هنا أيضاً بتمييز)
-        }
-
-        usersSnap.forEach(doc => {
-            const u = doc.data();
-            allUsersCache[doc.id] = u; // تخزين للكاش
-            
-            // عدم عرض نفسي في الشريط (اختياري)
-            // if(doc.id === currentUser.uid) return;
-
-            const div = document.createElement('div');
-            div.className = 'user-head';
-            div.onclick = () => openProfile(doc.id); // فتح البروفايل عند الضغط
-            
-            // التحقق من حالة الاتصال (بسيط)
-            const isOnline = u.lastSeen && (Date.now() - u.lastSeen.toDate().getTime()) < 300000;
-            
-            div.innerHTML = `
-                <div class="user-head-img-wrapper">
-                    <img src="${u.photoURL || 'https://via.placeholder.com/150'}" style="border-color: ${isOnline ? '#10b981' : 'transparent'}">
-                </div>
-                <span>${u.displayName.split(' ')[0]}</span>
-            `;
-            bar.appendChild(div);
-        });
-    }
-
-    // الشات
-    function setupChatListener() {
-        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
-        onValue(chatRef, (snapshot) => {
-            const messages = snapshot.val();
-            const area = document.getElementById('chatArea');
-            area.innerHTML = '';
-            
-            if (messages) {
-                const sortedMsgs = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
-                sortedMsgs.forEach(msg => {
-                    const isMe = msg.senderId === currentUser.uid;
-                    // الحصول على بيانات المرسل من الكاش أو الرسالة
-                    const senderData = allUsersCache[msg.senderId] || { magicLevel: 1, wealthLevel: 1, photoURL: 'https://via.placeholder.com/150' };
-                    
-                    const div = document.createElement('div');
-                    div.className = `msg-bubble ${isMe ? 'me' : ''}`;
-                    
-                    // محتوى الرسالة
-                    let contentHTML = '';
-                    if(msg.type === 'gift') {
-                        contentHTML = `<div style="color:var(--accent); font-weight:bold;">أرسل هدية ${msg.giftName} 🎁</div>`;
-                    } else {
-                        contentHTML = `<div class="msg-text">${msg.text}</div>`;
-                    }
-
-                    div.innerHTML = `
-                        <img src="${senderData.photoURL || 'https://via.placeholder.com/150'}" class="msg-avatar" onclick="window.openProfile('${msg.senderId}')">
-                        <div class="msg-content">
-                            <div class="msg-user">
-                                ${msg.senderName}
-                                ${!isMe ? `
-                                <span class="badge b-wealth"><i class="fa-solid fa-gem" style="font-size:6px"></i> ${senderData.wealthLevel || 1}</span>
-                                <span class="badge b-magic"><i class="fa-solid fa-star" style="font-size:6px"></i> ${senderData.magicLevel || 1}</span>
-                                ` : ''}
-                            </div>
-                            ${contentHTML}
-                        </div>
-                    `;
-                    area.appendChild(div);
-                });
-                area.scrollTop = area.scrollHeight;
-            }
-        });
-    }
-
-    // إرسال رسالة
-    window.sendMessage = async () => {
-        const input = document.getElementById('chatInput');
-        const text = input.value.trim();
-        if(!text) return;
-
-        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
-        await push(chatRef, {
-            senderId: currentUser.uid,
-            senderName: currentUser.displayName,
-            text: text,
-            timestamp: rtdbTimestamp(),
-            type: 'text'
-        });
-        input.value = '';
-        input.focus();
-    };
-
-    // 5. منطق البروفايل (الأهم)
-    window.openProfile = async (uid) => {
-        toggleSheet('profileSheet', true);
-        document.getElementById('profileContent').classList.add('hidden');
-        document.getElementById('profileLoading').classList.remove('hidden');
-
-        try {
-            // جلب بيانات حية من فير بيز
-            const docRef = doc(db, "users", uid);
-            const docSnap = await getDoc(docRef);
-            
-            if(docSnap.exists()) {
-                const data = docSnap.data();
-                currentProfileUser = { uid: docSnap.id, ...data };
+                <button onclick="toggleGiftSheet()" class="w-11 h-11 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 active:scale-95 transition">
+                    <i class="fa-solid fa-gift text-white text-lg animate-pulse"></i>
+                </button>
                 
-                document.getElementById('p-img').src = data.photoURL || 'https://via.placeholder.com/150';
-                document.getElementById('p-name').innerText = data.displayName;
-                document.getElementById('p-id').innerText = `ID: ${data.uid}`;
-                document.getElementById('p-wealth').innerText = data.wealthLevel || 1;
-                document.getElementById('p-magic').innerText = data.magicLevel || 1;
-                document.getElementById('p-level').innerText = Math.floor(((data.wealthLevel||0) + (data.magicLevel||0))/2) || 1;
+                <button id="sendBtn" onclick="sendMessage()" class="w-11 h-11 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg active:scale-95 transition hidden">
+                    <i class="fa-solid fa-paper-plane text-white text-sm"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
 
-                document.getElementById('profileLoading').classList.add('hidden');
-                document.getElementById('profileContent').classList.remove('hidden');
+    <!-- User Profile Sheet -->
+    <div id="profileOverlay" class="sheet-overlay" onclick="closeSheets()"></div>
+    <div id="profileSheet" class="bottom-sheet p-6 text-center">
+        <div class="avatar-container w-24 h-24 mx-auto mb-3">
+            <img id="p-avatar" src="" class="user-avatar w-full h-full border-2 border-indigo-500">
+            <img id="p-frame" src="" class="frame-overlay hidden">
+        </div>
+        
+        <h2 id="p-name" class="text-xl font-bold mb-1">User Name</h2>
+        <p id="p-id" class="text-xs text-gray-400 mb-4 font-mono">ID: 123456</p>
+
+        <!-- المستويات -->
+        <div class="flex justify-center gap-4 mb-6">
+            <div class="bg-white/5 p-2 rounded-xl min-w-[80px]">
+                <div class="flex items-center justify-center gap-1 text-amber-400 text-xs mb-1">
+                    <img id="p-wealth-icon" src="" class="w-4 h-4 object-contain"> ثروة
+                </div>
+                <span id="p-wealth-val" class="text-lg font-bold">0</span>
+            </div>
+            <div class="bg-white/5 p-2 rounded-xl min-w-[80px]">
+                <div class="flex items-center justify-center gap-1 text-purple-400 text-xs mb-1">
+                    <img id="p-magic-icon" src="" class="w-4 h-4 object-contain"> سحر
+                </div>
+                <span id="p-magic-val" class="text-lg font-bold">0</span>
+            </div>
+        </div>
+
+        <!-- الشارات -->
+        <div id="p-badges" class="flex flex-wrap justify-center gap-2 mb-6"></div>
+
+        <div class="flex gap-3">
+            <button class="flex-1 py-3 bg-white/10 rounded-xl font-bold" onclick="alert('قريباً')">متابعة</button>
+            <button class="flex-1 py-3 bg-indigo-600 rounded-xl font-bold" onclick="prepareGift()">إرسال هدية</button>
+        </div>
+    </div>
+
+    <!-- Firebase Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, collection, getDocs, onSnapshot, updateDoc, increment, addDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getDatabase, ref, push, onChildAdded, set, onDisconnect, serverTimestamp as rtdbTimestamp, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // --- تكوين Firebase ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
+            authDomain: "rtx3090-28439.firebaseapp.com",
+            projectId: "rtx3090-28439",
+            storageBucket: "rtx3090-28439.firebasestorage.app",
+            messagingSenderId: "178612030690",
+            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const rtdb = getDatabase(app);
+
+        // --- المتغيرات العامة (Caches) ---
+        let currentUser = null;
+        let currentRoomId = new URLSearchParams(window.location.search).get('id');
+        let appData = {
+            wealthLevels: {},
+            magicLevels: {},
+            badges: {},
+            storeItems: {} // للإطارات والسيارات
+        };
+        let usersCache = {};
+        let activeProfileUser = null;
+
+        // --- 1. التهيئة وتحميل البيانات الوصفية (Metadata) ---
+        async function initApp() {
+            // تحميل المستويات والشارات والإطارات مرة واحدة عند الفتح
+            try {
+                // مستويات الثروة
+                const wealthSnap = await getDocs(collection(db, "wealthLevels"));
+                wealthSnap.forEach(d => appData.wealthLevels[d.id] = d.data());
+
+                // مستويات السحر
+                const magicSnap = await getDocs(collection(db, "magicLevels"));
+                magicSnap.forEach(d => appData.magicLevels[d.id] = d.data());
+
+                // الشارات
+                const badgesSnap = await getDocs(collection(db, "badges"));
+                badgesSnap.forEach(d => appData.badges[d.id] = d.data());
+
+                // عناصر المتجر (الإطارات + السيارات)
+                const storeSnap = await getDocs(collection(db, "storeItems"));
+                storeSnap.forEach(d => appData.storeItems[d.id] = d.data());
+
+                console.log("Metadata Loaded:", appData);
+            } catch (e) {
+                console.error("Error loading metadata:", e);
             }
-        } catch (e) {
-            console.error(e);
-            alert("تعذر تحميل البيانات");
-            toggleSheet('profileSheet', false);
-        }
-    };
-    
-    // ربط الدالة بالنافذة لتكون متاحة من HTML
-    window.window.openProfile = window.openProfile;
-
-    window.handleProfileMention = () => {
-        toggleSheet('profileSheet', false);
-        const input = document.getElementById('chatInput');
-        input.value = `@${currentProfileUser.displayName} `;
-        input.focus();
-    };
-
-    window.handleProfileGift = () => {
-        giftTargetUser = currentProfileUser; // تحديد الهدف
-        toggleSheet('profileSheet', false);
-        openGiftSheet();
-    };
-
-    // 6. منطق الهدايا
-    async function loadGifts() {
-        // تحميل من فير بيز (محاكاة هنا للكود، لكن استخدمنا الكود الأصلي)
-        try {
-             const gSnap = await getDocs(collection(db, "gifts"));
-             storeGifts = gSnap.docs.map(d => ({id: d.id, ...d.data()}));
-             renderGiftsGrid();
-        } catch(e) { console.log("Gifts load error", e); }
-    }
-
-    function renderGiftsGrid() {
-        const grid = document.getElementById('giftsGrid');
-        grid.innerHTML = '';
-        if(storeGifts.length === 0) {
-            grid.innerHTML = '<div style="color:#888; grid-column:span 4; text-align:center">لا توجد هدايا</div>';
-            return;
         }
 
-        storeGifts.forEach(gift => {
-            const div = document.createElement('div');
-            div.className = 'gift-card';
-            div.onclick = () => {
-                document.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
-                div.classList.add('selected');
-                selectedGiftId = gift.id;
+        // --- 2. إدارة المصادقة والدخول ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                await initApp();
+                const userDoc = await getDoc(doc(db, "users", user.uid));
+                if (userDoc.exists()) {
+                    currentUser = { uid: user.uid, ...userDoc.data() };
+                    
+                    // تسجيل الدخول في الـ Realtime Database للحضور
+                    setupPresence();
+                    
+                    // بدء الاستماع للشات
+                    startChatListener();
+                    
+                    // تحميل معلومات الغرفة
+                    loadRoomInfo();
+                }
+            } else {
+                window.location.href = "login.html"; // توجيه للخروج
+            }
+        });
+
+        // --- 3. نظام الحضور والدخول (Entrance System) ---
+        function setupPresence() {
+            const userStatusRef = ref(rtdb, `roomUsers/${currentRoomId}/${currentUser.uid}`);
+            
+            // بياناتي التي سيراها الآخرون
+            const myPresenceData = {
+                uid: currentUser.uid,
+                name: currentUser.displayName,
+                photo: currentUser.photoURL || "",
+                activeEntry: currentUser.activeEntry || null, // معرف السيارة
+                timestamp: rtdbTimestamp()
             };
-            div.innerHTML = `
-                <img src="${gift.image}" class="gift-img">
-                <span style="font-size:10px; font-weight:bold">${gift.name}</span>
-                <span class="gift-price">${gift.price} 💰</span>
+
+            set(userStatusRef, myPresenceData);
+            onDisconnect(userStatusRef).remove();
+
+            // الاستماع للمستخدمين الجدد (تأثير الدخول)
+            const roomUsersRef = ref(rtdb, `roomUsers/${currentRoomId}`);
+            let initialLoad = true;
+
+            onChildAdded(roomUsersRef, (snapshot) => {
+                const userData = snapshot.val();
+                
+                // إضافة للشريط العلوي
+                addHeaderUser(userData);
+
+                // تأثير الدخول (فقط للمستخدمين الجدد، ليس عند تحميل الصفحة)
+                if (!initialLoad && userData.uid !== currentUser.uid) {
+                    playEntryEffect(userData);
+                }
+            });
+
+            // بعد ثانية نعتبر التحميل الأولي انتهى
+            setTimeout(() => { initialLoad = false; }, 2000);
+        }
+
+        // --- 4. تشغيل تأثير الدخول (السيارة) ---
+        function playEntryEffect(user) {
+            if (!user.activeEntry) return; // ليس لديه سيارة
+
+            const entryItem = appData.storeItems[user.activeEntry];
+            if (!entryItem || !entryItem.fileUrl) return;
+
+            // إظهار بانر الاسم
+            const animationLayer = document.getElementById('animationLayer');
+            const banner = document.createElement('div');
+            banner.className = 'entry-banner';
+            banner.innerHTML = `
+                <div class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full font-bold shadow-lg border border-white/20">
+                    ✨ دخل ${user.name} ✨
+                </div>
             `;
-            grid.appendChild(div);
+            animationLayer.appendChild(banner);
+
+            // تشغيل SVGA
+            const playerDiv = document.createElement('div');
+            playerDiv.id = `entry-${Date.now()}`;
+            playerDiv.className = 'svga-canvas absolute inset-0 m-auto';
+            animationLayer.appendChild(playerDiv);
+
+            const player = new SVGA.Player(playerDiv);
+            const parser = new SVGA.Parser();
+
+            parser.load(entryItem.fileUrl, (videoItem) => {
+                player.setVideoItem(videoItem);
+                player.loops = 1;
+                player.clearsAfterStop = true;
+                player.startAnimation();
+                
+                player.onFinished(() => {
+                    playerDiv.remove();
+                    banner.remove();
+                });
+            }, (err) => console.log("SVGA Error", err));
+        }
+
+        // --- 5. الشات والعرض ---
+        function startChatListener() {
+            const chatRef = ref(rtdb, `roomChats/${currentRoomId}/messages`);
+            // في الواقع نستخدم onChildAdded للرسائل الجديدة لتقليل الحمل
+            // هنا للتبسيط onChildAdded
+            onChildAdded(chatRef, async (snapshot) => {
+                const msg = snapshot.val();
+                await renderMessage(msg);
+            });
+        }
+
+        async function renderMessage(msg) {
+            // نحتاج بيانات المستخدم الحالية (للحصول على الليفل والإطار المحدث)
+            // لذا قد نجلبها من الكاش أو Firestore إذا لم تكن موجودة
+            let userData = usersCache[msg.senderId];
+            if (!userData) {
+                const snap = await getDoc(doc(db, "users", msg.senderId));
+                if (snap.exists()) {
+                    userData = snap.data();
+                    usersCache[msg.senderId] = userData;
+                } else {
+                    userData = { displayName: msg.senderName, photoURL: 'default.png' };
+                }
+            }
+
+            // تجهيز الأصول (Assets)
+            const frameUrl = userData.activeFrame && appData.storeItems[userData.activeFrame] ? appData.storeItems[userData.activeFrame].image : null;
+            const wealthIcon = appData.wealthLevels[userData.wealthLevel]?.image || '';
+            const magicIcon = appData.magicLevels[userData.magicLevel]?.image || '';
+            
+            // الشارات
+            let badgesHtml = '';
+            if (userData.badges && Array.isArray(userData.badges)) {
+                userData.badges.forEach(bid => {
+                    if (appData.badges[bid]) {
+                        badgesHtml += `<img src="${appData.badges[bid].image}" class="w-4 h-4 object-contain" title="${appData.badges[bid].name}">`;
+                    }
+                });
+            }
+
+            const container = document.getElementById('chatContainer');
+            const isMe = msg.senderId === currentUser.uid;
+
+            const html = `
+                <div class="flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''} animate-fade-in mb-4">
+                    <!-- الصورة + الإطار -->
+                    <div class="avatar-container w-10 h-10 flex-shrink-0 cursor-pointer" onclick="openProfile('${msg.senderId}')">
+                        <img src="${userData.photoURL}" class="user-avatar w-full h-full">
+                        ${frameUrl ? `<img src="${frameUrl}" class="frame-overlay">` : ''}
+                    </div>
+
+                    <div class="flex flex-col max-w-[80%] ${isMe ? 'items-end' : 'items-start'}">
+                        <!-- الاسم + المستويات + الشارات -->
+                        <div class="flex items-center gap-2 mb-1 flex-wrap ${isMe ? 'flex-row-reverse' : ''}">
+                            <span class="text-gray-300 text-xs font-bold">${userData.displayName}</span>
+                            
+                            <!-- ليفل الثروة -->
+                            ${wealthIcon ? `
+                                <div class="level-badge bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                                    <img src="${wealthIcon}" class="badge-icon"> ${userData.wealthLevel || 0}
+                                </div>
+                            ` : ''}
+                            
+                            <!-- ليفل السحر -->
+                            ${magicIcon ? `
+                                <div class="level-badge bg-purple-500/20 text-purple-400 border border-purple-500/30">
+                                    <img src="${magicIcon}" class="badge-icon"> ${userData.magicLevel || 0}
+                                </div>
+                            ` : ''}
+
+                            <!-- الشارات -->
+                            <div class="flex gap-1">${badgesHtml}</div>
+                        </div>
+
+                        <!-- نص الرسالة -->
+                        <div class="chat-bubble px-4 py-2 rounded-2xl ${isMe ? 'rounded-tr-sm bg-indigo-600/50 border-indigo-500/30' : 'rounded-tl-sm'}">
+                            <p class="text-sm text-white leading-relaxed">${msg.text}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', html);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // --- 6. البروفايل (النافذة المنبثقة) ---
+        window.openProfile = async (uid) => {
+            const docSnap = await getDoc(doc(db, "users", uid));
+            if (!docSnap.exists()) return;
+            
+            const data = docSnap.data();
+            activeProfileUser = { uid: uid, ...data };
+
+            document.getElementById('p-name').innerText = data.displayName;
+            document.getElementById('p-id').innerText = "ID: " + data.uid;
+            document.getElementById('p-avatar').src = data.photoURL;
+
+            // الإطار في البروفايل
+            const frameEl = document.getElementById('p-frame');
+            if (data.activeFrame && appData.storeItems[data.activeFrame]) {
+                frameEl.src = appData.storeItems[data.activeFrame].image;
+                frameEl.classList.remove('hidden');
+            } else {
+                frameEl.classList.add('hidden');
+            }
+
+            // المستويات
+            document.getElementById('p-wealth-val').innerText = data.wealthLevel || 0;
+            if(appData.wealthLevels[data.wealthLevel]) {
+                document.getElementById('p-wealth-icon').src = appData.wealthLevels[data.wealthLevel].image;
+            }
+
+            document.getElementById('p-magic-val').innerText = data.magicLevel || 0;
+            if(appData.magicLevels[data.magicLevel]) {
+                document.getElementById('p-magic-icon').src = appData.magicLevels[data.magicLevel].image;
+            }
+
+            // الشارات
+            const badgesContainer = document.getElementById('p-badges');
+            badgesContainer.innerHTML = '';
+            if (data.badges) {
+                data.badges.forEach(bid => {
+                    if (appData.badges[bid]) {
+                        badgesContainer.innerHTML += `
+                            <div class="bg-white/10 px-2 py-1 rounded flex items-center gap-1 border border-white/5">
+                                <img src="${appData.badges[bid].image}" class="w-4 h-4">
+                                <span class="text-[10px]">${appData.badges[bid].name}</span>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            document.getElementById('profileOverlay').classList.add('active');
+            document.getElementById('profileSheet').classList.add('active');
+        };
+
+        // --- دوال مساعدة ---
+        window.sendMessage = async () => {
+            const input = document.getElementById('msgInput');
+            const txt = input.value.trim();
+            if (!txt) return;
+
+            const chatRef = ref(rtdb, `roomChats/${currentRoomId}/messages`);
+            await push(chatRef, {
+                senderId: currentUser.uid,
+                senderName: currentUser.displayName,
+                text: txt,
+                timestamp: rtdbTimestamp()
+            });
+            input.value = '';
+        };
+
+        // إظهار زر الإرسال عند الكتابة
+        document.getElementById('msgInput').addEventListener('input', (e) => {
+            const btn = document.getElementById('sendBtn');
+            if(e.target.value.trim().length > 0) btn.classList.remove('hidden');
+            else btn.classList.add('hidden');
         });
-    }
 
-    window.openGiftSheet = () => {
-        if(!giftTargetUser) giftTargetUser = { uid: currentRoomOwnerId, name: "المالك" };
-        document.getElementById('giftTargetName').innerText = giftTargetUser.name;
-        toggleSheet('giftSheet', true);
-    };
+        // إضافة مستخدم للشريط العلوي
+        function addHeaderUser(user) {
+            const list = document.getElementById('topUsersList');
+            // تجنب التكرار
+            if (document.getElementById(`u-head-${user.uid}`)) return;
 
-    window.sendSelectedGift = async () => {
-        if(!selectedGiftId) return alert("اختر هدية أولاً");
-        const gift = storeGifts.find(g => g.id === selectedGiftId);
-        
-        if(currentUser.balance < gift.price) {
-            alert("رصيدك غير كافٍ!");
-            return;
+            const div = document.createElement('div');
+            div.id = `u-head-${user.uid}`;
+            div.className = 'flex flex-col items-center min-w-[45px] cursor-pointer animate-fade-in';
+            div.onclick = () => openProfile(user.uid);
+
+            const userFrame = usersCache[user.uid]?.activeFrame || null; // محاولة جلب الإطار
+            // ملاحظة: للشريط العلوي ليكون سريعاً قد لا نحمل الإطارات فوراً، أو نعتمد على أن البيانات مخزنة في usersCache
+
+            div.innerHTML = `
+                <div class="avatar-container w-9 h-9 mb-1">
+                    <img src="${user.photo || 'default.png'}" class="user-avatar w-full h-full border border-white/30">
+                </div>
+            `;
+            list.prepend(div);
         }
 
-        toggleSheet('giftSheet', false);
-
-        // 1. خصم الرصيد
-        await updateDoc(doc(db, "users", currentUser.uid), {
-            balance: increment(-gift.price)
-        });
-        currentUser.balance -= gift.price;
-        document.getElementById('myBalance').innerText = currentUser.balance.toLocaleString();
-
-        // 2. تحديث المستلم (إضافة نقاط/ثروة)
-        // (يمكنك إضافة منطق زيادة الثروة هنا كما في الكود الأصلي)
-
-        // 3. إرسال رسالة بالشات
-        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
-        await push(chatRef, {
-            senderId: currentUser.uid,
-            senderName: currentUser.displayName,
-            text: `أرسل ${gift.name} إلى ${giftTargetUser.name}`,
-            giftName: gift.name,
-            timestamp: rtdbTimestamp(),
-            type: 'gift'
-        });
-
-        // 4. تشغيل الأنيميشن
-        showGiftAnimation(gift.image);
-    };
-
-    function showGiftAnimation(imgSrc) {
-        const div = document.createElement('div');
-        div.className = 'gift-fx-container';
-        div.innerHTML = `<img src="${imgSrc}" class="gift-fx-item">`;
-        document.body.appendChild(div);
-        setTimeout(() => div.remove(), 2500);
-    }
-
-    // 7. أدوات الواجهة
-    window.toggleSheet = (id, show) => {
-        const el = document.getElementById(id);
-        if(show) el.classList.add('show');
-        else el.classList.remove('show');
-    };
-
-    window.handleGlobalClick = (e) => {
-        const input = document.getElementById('chatInput');
-        const giftBtn = document.getElementById('giftBtn');
-        const sendBtn = document.getElementById('sendBtn');
-        
-        if (e.target !== input) {
-            // input.blur(); // اختياري
+        async function loadRoomInfo() {
+            // تحميل معلومات مالك الغرفة للهيدر
+            const ownerSnap = await getDoc(doc(db, "users", currentRoomId));
+            if(ownerSnap.exists()){
+                const d = ownerSnap.data();
+                document.getElementById('roomName').innerText = d.displayName;
+                document.getElementById('roomID').innerText = "ID: " + d.uid;
+                document.getElementById('roomOwnerImg').src = d.photoURL;
+                
+                // إطار المالك
+                if(d.activeFrame && appData.storeItems[d.activeFrame]) {
+                    const f = document.getElementById('roomOwnerFrame');
+                    f.src = appData.storeItems[d.activeFrame].image;
+                    f.classList.remove('hidden');
+                }
+            }
         }
-    };
 
-    document.getElementById('chatInput').addEventListener('input', (e) => {
-        const val = e.target.value.trim();
-        if(val.length > 0) {
-            document.getElementById('giftBtn').classList.add('hidden');
-            document.getElementById('sendBtn').classList.remove('hidden');
-        } else {
-            document.getElementById('giftBtn').classList.remove('hidden');
-            document.getElementById('sendBtn').classList.add('hidden');
-        }
-    });
+        window.closeSheets = () => {
+            document.querySelectorAll('.sheet-overlay, .bottom-sheet').forEach(el => el.classList.remove('active'));
+        };
 
-    window.exitRoom = () => {
-        if(confirm("هل تود المغادرة؟")) {
-            window.history.back();
-        }
-    };
-    
-    // جعل الدوال متاحة للـ HTML
-    window.exitRoom = window.exitRoom;
-    window.handleGlobalClick = window.handleGlobalClick;
-    window.sendMessage = window.sendMessage;
-    window.openGiftSheet = window.openGiftSheet;
-    window.sendSelectedGift = window.sendSelectedGift;
-    window.toggleSheet = window.toggleSheet;
-    window.handleProfileMention = window.handleProfileMention;
-    window.handleProfileGift = window.handleProfileGift;
+        window.exitRoom = () => {
+             // تنظيف الحضور
+            const userStatusRef = ref(rtdb, `roomUsers/${currentRoomId}/${currentUser.uid}`);
+            set(userStatusRef, null).then(() => window.history.back());
+        };
 
-</script>
+        // تصدير الدوال للـ HTML
+        window.openProfile = window.openProfile;
+        window.closeSheets = window.closeSheets;
+        window.sendMessage = window.sendMessage;
+        window.exitRoom = window.exitRoom;
 
+    </script>
 </body>
 </html>
 
