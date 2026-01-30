@@ -3,22 +3,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Live Room - Afnan AI</title>
+    <title>Premium Live - SVGA Engine</title>
     
     <!-- مكتبات خارجية -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- مشغل SVGA للرسوم المتحركة (السيارات والهدايا) -->
+    
+    <!-- مكتبة تشغيل ملفات SVGA -->
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
 
     <style>
         :root {
             --primary: #7c3aed;
-            --accent: #f59e0b;
             --bg-dark: #0f172a;
-            --glass: rgba(15, 23, 42, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -26,202 +24,184 @@
             background-color: #000;
             color: #fff;
             overflow: hidden;
-            height: 100vh; /* استخدام dvh للموبايل */
+            height: 100vh;
             height: 100dvh;
         }
 
-        /* خلفية متدرجة فخمة */
-        .premium-bg {
+        /* خلفية التطبيق */
+        .app-bg {
             position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at 50% 10%, #2e1065 0%, #020617 80%);
+            background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #000000 90%);
         }
 
-        /* حاوية مرنة تملأ الشاشة */
-        .layout-container {
-            display: flex; flex-direction: column;
-            width: 100%; height: 100%;
-            max-width: 100%; /* تصميم حر */
-            margin: 0 auto;
-            position: relative;
-        }
-
-        /* --- تحسينات التمرير --- */
-        .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        /* --- أنماط الشات والبروفايل --- */
-        .chat-bubble {
-            background: rgba(30, 41, 59, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            transition: all 0.2s;
-        }
-        
-        /* إطار الصورة (Avatar Frame) */
-        .avatar-container {
+        /* --- حاويات الصور والـ SVGA --- */
+        .avatar-wrapper {
             position: relative;
             display: flex; justify-content: center; align-items: center;
         }
-        .user-avatar {
-            border-radius: 50%; object-fit: cover;
-            border: 2px solid transparent;
+        
+        .user-img {
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1; /* الصورة في الخلف */
         }
-        .frame-overlay {
+
+        /* حاوية الإطار المتحرك SVGA */
+        .svga-frame-container {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 135%; height: 135%; /* الإطار دائماً أكبر من الصورة */
+            width: 150%; /* الإطار أكبر من الصورة */
+            height: 150%;
+            z-index: 2; /* الإطار فوق الصورة */
             pointer-events: none;
-            z-index: 2;
-            object-fit: contain;
-        }
-
-        /* مستويات وشارات */
-        .level-badge {
-            display: inline-flex; align-items: center; gap: 2px;
-            padding: 1px 6px; border-radius: 10px;
-            font-size: 9px; font-weight: bold;
-            background: rgba(255,255,255,0.1);
-        }
-        .badge-icon { width: 14px; height: 14px; object-fit: contain; }
-
-        /* --- طبقة الأنيميشن (دخول السيارات) --- */
-        #animationLayer {
-            position: fixed; inset: 0; z-index: 9999;
-            pointer-events: none; /* يسمح بالضغط من خلاله */
             display: flex; align-items: center; justify-content: center;
         }
-        .svga-canvas {
-            width: 100%; height: 100%;
-            max-width: 600px; /* حجم السيارة */
-        }
         
-        /* رسالة الترحيب عند الدخول */
-        .entry-banner {
-            position: absolute; top: 20%; left: 0; right: 0;
-            text-align: center;
-            animation: slideInLeft 1s ease-out;
-            z-index: 10000;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-        @keyframes slideInLeft {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+        /* ضبط الكانفاس داخل الحاوية */
+        .svga-frame-container canvas {
+            width: 100% !important;
+            height: 100% !important;
         }
 
-        /* القوائم السفلية (Sheets) */
+        /* --- تحسينات الشات --- */
+        .chat-area::-webkit-scrollbar { width: 4px; }
+        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        
+        .chat-bubble {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        /* --- طبقة أنيميشن الدخول والهدايا --- */
+        #fullScreenAnimLayer {
+            position: fixed; inset: 0; 
+            z-index: 9999; 
+            pointer-events: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        
+        .entry-banner {
+            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.8), transparent);
+            padding: 10px 40px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s;
+            text-shadow: 0 2px 5px black;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* --- القوائم السفلية --- */
         .bottom-sheet {
             position: absolute; bottom: 0; left: 0; right: 0;
-            background: #1e1b4b;
-            border-top-left-radius: 24px; border-top-right-radius: 24px;
+            background: #111827;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: 24px 24px 0 0;
             transform: translateY(110%);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 50;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
-            max-width: 600px; margin: 0 auto; /* تقييد العرض في الشاشات الكبيرة */
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 100;
+            padding-bottom: env(safe-area-inset-bottom);
         }
         .bottom-sheet.active { transform: translateY(0); }
+        
         .sheet-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-            z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+            backdrop-filter: blur(2px);
         }
         .sheet-overlay.active { opacity: 1; pointer-events: auto; }
 
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
-    <!-- الخلفية -->
-    <div class="premium-bg"></div>
-    <!-- طبقة الرسوم المتحركة (SVGA) -->
-    <div id="animationLayer"></div>
+    <div class="app-bg"></div>
 
-    <div class="layout-container">
+    <!-- طبقة تأثيرات الدخول والهدايا (سيارات، صواريخ) -->
+    <div id="fullScreenAnimLayer"></div>
+
+    <div class="flex flex-col h-full w-full relative">
         
-        <!-- Header -->
-        <header class="flex items-center justify-between p-4 z-20 bg-gradient-to-b from-black/60 to-transparent">
-            <!-- Room Info -->
-            <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10" onclick="showRoomProfile()">
-                <div class="avatar-container w-9 h-9">
-                    <img id="roomOwnerImg" src="https://via.placeholder.com/100" class="user-avatar w-full h-full">
-                    <!-- إطار المالك إذا وجد -->
-                    <img id="roomOwnerFrame" src="" class="frame-overlay hidden">
+        <!-- الهيدر -->
+        <header class="flex justify-between items-center p-4 pt-6 z-20 bg-gradient-to-b from-black/80 to-transparent">
+            <!-- معلومات الغرفة -->
+            <div class="flex items-center gap-3 bg-white/5 pr-1 pl-4 py-1 rounded-full border border-white/10 backdrop-blur-md cursor-pointer" onclick="showOwnerProfile()">
+                <div class="avatar-wrapper w-10 h-10">
+                    <img id="roomOwnerImg" src="https://via.placeholder.com/100" class="user-img w-full h-full border border-white/20">
+                    <!-- حاوية إطار المالك SVGA -->
+                    <div id="roomOwnerFrame" class="svga-frame-container"></div>
                 </div>
                 <div class="flex flex-col">
-                    <span id="roomName" class="text-xs font-bold text-white truncate max-w-[100px]">...</span>
-                    <span id="roomID" class="text-[9px] text-gray-300 font-mono">ID: ...</span>
+                    <span id="roomName" class="text-sm font-bold text-white">جار التحميل...</span>
+                    <span id="roomIdDisp" class="text-[10px] text-gray-400 font-mono">ID: ...</span>
                 </div>
             </div>
 
-            <!-- Header Users (Online) -->
-            <div class="flex-1 mx-3 overflow-hidden">
-                <div id="topUsersList" class="flex gap-2 overflow-x-auto hide-scrollbar items-center">
-                    <!-- سيتم ملؤها عبر JS -->
-                </div>
+            <!-- أزرار التحكم -->
+            <div class="flex gap-3">
+                <button class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10" onclick="alert('قائمة المتواجدين')">
+                    <i class="fa-solid fa-users text-gray-300 text-sm"></i>
+                </button>
+                <button onclick="exitRoom()" class="w-9 h-9 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
+                    <i class="fa-solid fa-power-off text-sm"></i>
+                </button>
             </div>
-
-            <!-- Controls -->
-            <button onclick="exitRoom()" class="w-8 h-8 rounded-full bg-red-500/20 text-red-500 flex items-center justify-center border border-red-500/30">
-                <i class="fa-solid fa-power-off text-sm"></i>
-            </button>
         </header>
 
-        <!-- Main Chat Area -->
-        <main id="chatContainer" class="flex-1 overflow-y-auto p-4 space-y-3 relative z-10 hide-scrollbar scroll-smooth">
-            <div class="text-center py-4 text-white/30 text-xs">مرحباً بك في غرفة البث المباشر</div>
+        <!-- منطقة الشات -->
+        <main id="chatArea" class="chat-area flex-1 overflow-y-auto px-4 pb-4 space-y-4 relative z-10">
+            <div class="text-center py-6 opacity-40 text-xs">بداية المحادثة</div>
         </main>
 
-        <!-- Footer -->
-        <footer class="p-3 pb-5 z-20 bg-gradient-to-t from-black via-black/80 to-transparent">
-            <div class="flex items-center gap-2 max-w-4xl mx-auto">
-                <div class="flex-1 bg-white/10 backdrop-blur rounded-full h-11 flex items-center px-4 border border-white/10">
-                    <input type="text" id="msgInput" placeholder="قل شيئاً..." class="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-400 font-cairo">
+        <!-- الفوتر -->
+        <footer class="p-4 z-20 bg-gradient-to-t from-black via-black/90 to-transparent">
+            <div class="flex items-center gap-3">
+                <div class="flex-1 bg-gray-800/50 backdrop-blur-md rounded-full h-12 flex items-center px-5 border border-white/10 focus-within:border-purple-500/50 transition-colors">
+                    <input type="text" id="msgInput" placeholder="اكتب رسالة..." class="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500 font-cairo">
                 </div>
                 
-                <button onclick="toggleGiftSheet()" class="w-11 h-11 rounded-full bg-gradient-to-r from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20 active:scale-95 transition">
-                    <i class="fa-solid fa-gift text-white text-lg animate-pulse"></i>
+                <button onclick="openGiftSheet()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20 active:scale-95 transition-transform group">
+                    <i class="fa-solid fa-gift text-white text-xl group-hover:animate-bounce"></i>
                 </button>
-                
-                <button id="sendBtn" onclick="sendMessage()" class="w-11 h-11 rounded-full bg-indigo-600 flex items-center justify-center shadow-lg active:scale-95 transition hidden">
-                    <i class="fa-solid fa-paper-plane text-white text-sm"></i>
+
+                <button id="sendBtn" onclick="sendMessage()" class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center shadow-lg active:scale-95 transition-transform hidden">
+                    <i class="fa-solid fa-paper-plane text-white"></i>
                 </button>
             </div>
         </footer>
     </div>
 
-    <!-- User Profile Sheet -->
-    <div id="profileOverlay" class="sheet-overlay" onclick="closeSheets()"></div>
-    <div id="profileSheet" class="bottom-sheet p-6 text-center">
-        <div class="avatar-container w-24 h-24 mx-auto mb-3">
-            <img id="p-avatar" src="" class="user-avatar w-full h-full border-2 border-indigo-500">
-            <img id="p-frame" src="" class="frame-overlay hidden">
+    <!-- نافذة البروفايل -->
+    <div id="sheetOverlay" class="sheet-overlay" onclick="closeSheets()"></div>
+    <div id="profileSheet" class="bottom-sheet p-6">
+        <div class="flex flex-col items-center -mt-12 mb-4 relative">
+            <div class="avatar-wrapper w-28 h-28">
+                <img id="p-img" src="" class="user-img w-full h-full border-4 border-[#111827]">
+                <!-- إطار البروفايل SVGA -->
+                <div id="p-frame-container" class="svga-frame-container" style="width: 160%; height: 160%;"></div>
+            </div>
         </div>
         
-        <h2 id="p-name" class="text-xl font-bold mb-1">User Name</h2>
-        <p id="p-id" class="text-xs text-gray-400 mb-4 font-mono">ID: 123456</p>
-
-        <!-- المستويات -->
-        <div class="flex justify-center gap-4 mb-6">
-            <div class="bg-white/5 p-2 rounded-xl min-w-[80px]">
-                <div class="flex items-center justify-center gap-1 text-amber-400 text-xs mb-1">
-                    <img id="p-wealth-icon" src="" class="w-4 h-4 object-contain"> ثروة
-                </div>
-                <span id="p-wealth-val" class="text-lg font-bold">0</span>
+        <div class="text-center mb-6">
+            <h2 id="p-name" class="text-xl font-bold text-white mb-1">...</h2>
+            <div class="flex items-center justify-center gap-2 mb-3">
+                <span id="p-id" class="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded">ID: ...</span>
+                <span class="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded flex items-center gap-1">
+                    <i class="fa-solid fa-gem text-amber-500"></i> <span id="p-wealth">0</span>
+                </span>
             </div>
-            <div class="bg-white/5 p-2 rounded-xl min-w-[80px]">
-                <div class="flex items-center justify-center gap-1 text-purple-400 text-xs mb-1">
-                    <img id="p-magic-icon" src="" class="w-4 h-4 object-contain"> سحر
-                </div>
-                <span id="p-magic-val" class="text-lg font-bold">0</span>
-            </div>
+            
+            <!-- الشارات -->
+            <div id="p-badges" class="flex flex-wrap justify-center gap-2 min-h-[30px]"></div>
         </div>
 
-        <!-- الشارات -->
-        <div id="p-badges" class="flex flex-wrap justify-center gap-2 mb-6"></div>
-
-        <div class="flex gap-3">
-            <button class="flex-1 py-3 bg-white/10 rounded-xl font-bold" onclick="alert('قريباً')">متابعة</button>
-            <button class="flex-1 py-3 bg-indigo-600 rounded-xl font-bold" onclick="prepareGift()">إرسال هدية</button>
+        <div class="grid grid-cols-2 gap-4">
+            <button class="py-3.5 rounded-xl bg-white/5 font-bold hover:bg-white/10 transition">متابعة</button>
+            <button class="py-3.5 rounded-xl bg-purple-600 font-bold hover:bg-purple-700 transition" onclick="alert('إرسال هدية')">إرسال هدية</button>
         </div>
     </div>
 
@@ -230,9 +210,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, collection, getDocs, onSnapshot, updateDoc, increment, addDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getDatabase, ref, push, onChildAdded, set, onDisconnect, serverTimestamp as rtdbTimestamp, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, push, onChildAdded, set, onDisconnect, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        // --- تكوين Firebase ---
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
             authDomain: "rtx3090-28439.firebaseapp.com",
@@ -248,354 +228,294 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
-        // --- المتغيرات العامة (Caches) ---
+        // Variables
         let currentUser = null;
-        let currentRoomId = new URLSearchParams(window.location.search).get('id');
-        let appData = {
-            wealthLevels: {},
-            magicLevels: {},
-            badges: {},
-            storeItems: {} // للإطارات والسيارات
-        };
-        let usersCache = {};
-        let activeProfileUser = null;
+        let roomId = new URLSearchParams(window.location.search).get('id') || 'default';
+        let storeData = { frames: {}, cars: {}, badges: {} };
+        let svgaParser = new SVGA.Parser(); // Parser واحد عالمي
 
-        // --- 1. التهيئة وتحميل البيانات الوصفية (Metadata) ---
-        async function initApp() {
-            // تحميل المستويات والشارات والإطارات مرة واحدة عند الفتح
-            try {
-                // مستويات الثروة
-                const wealthSnap = await getDocs(collection(db, "wealthLevels"));
-                wealthSnap.forEach(d => appData.wealthLevels[d.id] = d.data());
+        // --- 1. SVGA HELPER FUNCTION (The Core) ---
+        // هذه الدالة هي القلب النابض الذي يشغل أي ملف SVGA في أي مكان
+        async function playSvga(url, targetElementId, options = {}) {
+            const container = document.getElementById(targetElementId);
+            if (!container) return;
 
-                // مستويات السحر
-                const magicSnap = await getDocs(collection(db, "magicLevels"));
-                magicSnap.forEach(d => appData.magicLevels[d.id] = d.data());
+            // تنظيف الحاوية السابقة إذا وجدت
+            container.innerHTML = '';
 
-                // الشارات
-                const badgesSnap = await getDocs(collection(db, "badges"));
-                badgesSnap.forEach(d => appData.badges[d.id] = d.data());
+            // إنشاء عنصر DIV جديد للتشغيل
+            const divId = `svga-${Math.random().toString(36).substr(2, 9)}`;
+            const div = document.createElement('div');
+            div.id = divId;
+            div.style.width = '100%';
+            div.style.height = '100%';
+            container.appendChild(div);
 
-                // عناصر المتجر (الإطارات + السيارات)
-                const storeSnap = await getDocs(collection(db, "storeItems"));
-                storeSnap.forEach(d => appData.storeItems[d.id] = d.data());
+            const player = new SVGA.Player(div);
+            
+            // إعدادات التشغيل
+            player.loops = options.loops || 0; // 0 = لانهائي
+            player.clearsAfterStop = options.clearsAfterStop || false;
 
-                console.log("Metadata Loaded:", appData);
-            } catch (e) {
-                console.error("Error loading metadata:", e);
-            }
+            svgaParser.load(url, (videoItem) => {
+                player.setVideoItem(videoItem);
+                player.startAnimation();
+                if (options.onFinish) {
+                    player.onFinished(() => options.onFinish(container));
+                }
+            }, (error) => {
+                console.error("SVGA Load Error:", error);
+            });
         }
 
-        // --- 2. إدارة المصادقة والدخول ---
+        // --- 2. التحميل الأولي (Metadata) ---
+        async function initData() {
+            try {
+                // جلب بيانات المتجر (الإطارات، السيارات)
+                const storeSnap = await getDocs(collection(db, "storeItems"));
+                storeSnap.forEach(doc => {
+                    const item = doc.data();
+                    // تصنيف العناصر بناءً على النوع
+                    // نفترض أن النوع يحدد في قاعدة البيانات، أو نخزن الكل في قاموس واحد
+                    // هنا سنخزن كل العناصر في قاموس واحد للسهولة باستخدام الـ ID
+                    storeData.frames[doc.id] = item; // نفترض أن الكل هنا للتبسيط
+                    storeData.cars[doc.id] = item;
+                });
+
+                // جلب الشارات
+                const badgesSnap = await getDocs(collection(db, "badges"));
+                badgesSnap.forEach(doc => {
+                    storeData.badges[doc.id] = doc.data();
+                });
+
+                console.log("Data loaded", storeData);
+            } catch (e) { console.error(e); }
+        }
+
+        // --- 3. المصادقة والبدء ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                await initApp();
+                await initData();
                 const userDoc = await getDoc(doc(db, "users", user.uid));
                 if (userDoc.exists()) {
                     currentUser = { uid: user.uid, ...userDoc.data() };
                     
-                    // تسجيل الدخول في الـ Realtime Database للحضور
+                    setupRoom();
                     setupPresence();
-                    
-                    // بدء الاستماع للشات
-                    startChatListener();
-                    
-                    // تحميل معلومات الغرفة
-                    loadRoomInfo();
                 }
             } else {
-                window.location.href = "login.html"; // توجيه للخروج
+                window.location.href = "login.html";
             }
         });
 
-        // --- 3. نظام الحضور والدخول (Entrance System) ---
+        // --- 4. إعداد الغرفة ---
+        async function setupRoom() {
+            // تحميل بيانات مالك الغرفة في الهيدر
+            const ownerSnap = await getDoc(doc(db, "users", roomId));
+            if (ownerSnap.exists()) {
+                const owner = ownerSnap.data();
+                document.getElementById('roomName').innerText = owner.displayName;
+                document.getElementById('roomIdDisp').innerText = `ID: ${owner.uid.substring(0,6)}`;
+                document.getElementById('roomOwnerImg').src = owner.photoURL;
+
+                // تشغيل إطار المالك (SVGA)
+                if (owner.activeFrame && storeData.frames[owner.activeFrame]) {
+                    playSvga(storeData.frames[owner.activeFrame].fileUrl || storeData.frames[owner.activeFrame].image, 'roomOwnerFrame', { loops: 0 });
+                }
+            }
+
+            // الاستماع للرسائل
+            const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
+            onChildAdded(chatRef, (snapshot) => {
+                renderMessage(snapshot.val());
+            });
+        }
+
+        // --- 5. نظام الحضور ودخول السيارات (SVGA) ---
         function setupPresence() {
-            const userStatusRef = ref(rtdb, `roomUsers/${currentRoomId}/${currentUser.uid}`);
-            
-            // بياناتي التي سيراها الآخرون
-            const myPresenceData = {
+            // تسجيل وجودي
+            const myRef = ref(rtdb, `roomUsers/${roomId}/${currentUser.uid}`);
+            set(myRef, {
                 uid: currentUser.uid,
                 name: currentUser.displayName,
-                photo: currentUser.photoURL || "",
                 activeEntry: currentUser.activeEntry || null, // معرف السيارة
                 timestamp: rtdbTimestamp()
-            };
+            });
+            onDisconnect(myRef).remove();
 
-            set(userStatusRef, myPresenceData);
-            onDisconnect(userStatusRef).remove();
-
-            // الاستماع للمستخدمين الجدد (تأثير الدخول)
-            const roomUsersRef = ref(rtdb, `roomUsers/${currentRoomId}`);
+            // الاستماع للآخرين لتشغيل دخول السيارات
+            const usersRef = ref(rtdb, `roomUsers/${roomId}`);
             let initialLoad = true;
 
-            onChildAdded(roomUsersRef, (snapshot) => {
-                const userData = snapshot.val();
-                
-                // إضافة للشريط العلوي
-                addHeaderUser(userData);
-
-                // تأثير الدخول (فقط للمستخدمين الجدد، ليس عند تحميل الصفحة)
-                if (!initialLoad && userData.uid !== currentUser.uid) {
-                    playEntryEffect(userData);
+            onChildAdded(usersRef, (snapshot) => {
+                const user = snapshot.val();
+                if (!initialLoad && user.uid !== currentUser.uid) {
+                    // مستخدم جديد دخل للتو -> تشغيل السيارة
+                    playEntryAnimation(user);
                 }
             });
 
-            // بعد ثانية نعتبر التحميل الأولي انتهى
-            setTimeout(() => { initialLoad = false; }, 2000);
+            setTimeout(() => initialLoad = false, 2000);
         }
 
-        // --- 4. تشغيل تأثير الدخول (السيارة) ---
-        function playEntryEffect(user) {
-            if (!user.activeEntry) return; // ليس لديه سيارة
+        function playEntryAnimation(user) {
+            // التحقق مما إذا كان المستخدم يملك سيارة دخول
+            if (!user.activeEntry) return;
+            const carItem = storeData.cars[user.activeEntry];
+            
+            // يجب أن يكون الرابط ملف SVGA
+            if (!carItem || !carItem.fileUrl) return;
 
-            const entryItem = appData.storeItems[user.activeEntry];
-            if (!entryItem || !entryItem.fileUrl) return;
-
-            // إظهار بانر الاسم
-            const animationLayer = document.getElementById('animationLayer');
+            // إنشاء حاوية مؤقتة للأنيميشن
+            const animLayer = document.getElementById('fullScreenAnimLayer');
+            
+            // بانر الاسم
             const banner = document.createElement('div');
-            banner.className = 'entry-banner';
-            banner.innerHTML = `
-                <div class="inline-block bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-2 rounded-full font-bold shadow-lg border border-white/20">
-                    ✨ دخل ${user.name} ✨
-                </div>
-            `;
-            animationLayer.appendChild(banner);
+            banner.className = 'entry-banner text-white rounded-full border border-white/20';
+            banner.innerHTML = `✨ ${user.name} انضم إلينا ✨`;
+            animLayer.appendChild(banner);
 
-            // تشغيل SVGA
-            const playerDiv = document.createElement('div');
-            playerDiv.id = `entry-${Date.now()}`;
-            playerDiv.className = 'svga-canvas absolute inset-0 m-auto';
-            animationLayer.appendChild(playerDiv);
+            // حاوية SVGA
+            const svgaContainer = document.createElement('div');
+            svgaContainer.id = `entry-${Date.now()}`;
+            svgaContainer.style.width = '100%';
+            svgaContainer.style.maxWidth = '600px';
+            svgaContainer.style.height = '400px'; // ارتفاع مناسب للسيارة
+            animLayer.appendChild(svgaContainer);
 
-            const player = new SVGA.Player(playerDiv);
-            const parser = new SVGA.Parser();
-
-            parser.load(entryItem.fileUrl, (videoItem) => {
-                player.setVideoItem(videoItem);
-                player.loops = 1;
-                player.clearsAfterStop = true;
-                player.startAnimation();
-                
-                player.onFinished(() => {
-                    playerDiv.remove();
+            // تشغيل الملف
+            playSvga(carItem.fileUrl, svgaContainer.id, {
+                loops: 1,
+                clearsAfterStop: true,
+                onFinish: (container) => {
+                    container.remove();
                     banner.remove();
-                });
-            }, (err) => console.log("SVGA Error", err));
-        }
-
-        // --- 5. الشات والعرض ---
-        function startChatListener() {
-            const chatRef = ref(rtdb, `roomChats/${currentRoomId}/messages`);
-            // في الواقع نستخدم onChildAdded للرسائل الجديدة لتقليل الحمل
-            // هنا للتبسيط onChildAdded
-            onChildAdded(chatRef, async (snapshot) => {
-                const msg = snapshot.val();
-                await renderMessage(msg);
+                }
             });
         }
 
+        // --- 6. عرض الرسائل (مع إطارات SVGA) ---
         async function renderMessage(msg) {
-            // نحتاج بيانات المستخدم الحالية (للحصول على الليفل والإطار المحدث)
-            // لذا قد نجلبها من الكاش أو Firestore إذا لم تكن موجودة
-            let userData = usersCache[msg.senderId];
-            if (!userData) {
+            // جلب بيانات المرسل (للحصول على الإطار المحدث)
+            let senderData = {};
+            if (msg.senderId === currentUser.uid) {
+                senderData = currentUser;
+            } else {
                 const snap = await getDoc(doc(db, "users", msg.senderId));
-                if (snap.exists()) {
-                    userData = snap.data();
-                    usersCache[msg.senderId] = userData;
-                } else {
-                    userData = { displayName: msg.senderName, photoURL: 'default.png' };
-                }
+                senderData = snap.exists() ? snap.data() : { displayName: msg.senderName, photoURL: 'https://via.placeholder.com/150' };
             }
 
-            // تجهيز الأصول (Assets)
-            const frameUrl = userData.activeFrame && appData.storeItems[userData.activeFrame] ? appData.storeItems[userData.activeFrame].image : null;
-            const wealthIcon = appData.wealthLevels[userData.wealthLevel]?.image || '';
-            const magicIcon = appData.magicLevels[userData.magicLevel]?.image || '';
-            
-            // الشارات
-            let badgesHtml = '';
-            if (userData.badges && Array.isArray(userData.badges)) {
-                userData.badges.forEach(bid => {
-                    if (appData.badges[bid]) {
-                        badgesHtml += `<img src="${appData.badges[bid].image}" class="w-4 h-4 object-contain" title="${appData.badges[bid].name}">`;
-                    }
-                });
-            }
-
-            const container = document.getElementById('chatContainer');
+            const chatArea = document.getElementById('chatArea');
             const isMe = msg.senderId === currentUser.uid;
+            
+            // معرفات فريدة للعناصر
+            const msgId = `msg-${Date.now()}-${Math.random()}`;
+            const frameContainerId = `frame-${msgId}`;
 
-            const html = `
-                <div class="flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''} animate-fade-in mb-4">
-                    <!-- الصورة + الإطار -->
-                    <div class="avatar-container w-10 h-10 flex-shrink-0 cursor-pointer" onclick="openProfile('${msg.senderId}')">
-                        <img src="${userData.photoURL}" class="user-avatar w-full h-full">
-                        ${frameUrl ? `<img src="${frameUrl}" class="frame-overlay">` : ''}
+            // HTML الرسالة
+            const msgHTML = `
+                <div class="flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''} animate-[fadeIn_0.3s_ease-out]">
+                    <!-- الصورة والإطار -->
+                    <div class="avatar-wrapper w-10 h-10 flex-shrink-0 cursor-pointer" onclick="openProfile('${msg.senderId}')">
+                        <img src="${senderData.photoURL}" class="user-img w-full h-full">
+                        <!-- مكان الإطار SVGA -->
+                        <div id="${frameContainerId}" class="svga-frame-container"></div>
                     </div>
 
-                    <div class="flex flex-col max-w-[80%] ${isMe ? 'items-end' : 'items-start'}">
-                        <!-- الاسم + المستويات + الشارات -->
-                        <div class="flex items-center gap-2 mb-1 flex-wrap ${isMe ? 'flex-row-reverse' : ''}">
-                            <span class="text-gray-300 text-xs font-bold">${userData.displayName}</span>
-                            
-                            <!-- ليفل الثروة -->
-                            ${wealthIcon ? `
-                                <div class="level-badge bg-amber-500/20 text-amber-500 border border-amber-500/30">
-                                    <img src="${wealthIcon}" class="badge-icon"> ${userData.wealthLevel || 0}
-                                </div>
-                            ` : ''}
-                            
-                            <!-- ليفل السحر -->
-                            ${magicIcon ? `
-                                <div class="level-badge bg-purple-500/20 text-purple-400 border border-purple-500/30">
-                                    <img src="${magicIcon}" class="badge-icon"> ${userData.magicLevel || 0}
-                                </div>
-                            ` : ''}
-
-                            <!-- الشارات -->
-                            <div class="flex gap-1">${badgesHtml}</div>
+                    <div class="flex flex-col max-w-[75%] ${isMe ? 'items-end' : 'items-start'}">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-[10px] text-gray-400 font-bold">${senderData.displayName}</span>
+                            <!-- مستويات -->
+                            ${senderData.wealthLevel ? `<span class="bg-amber-500/10 text-amber-500 text-[9px] px-1.5 rounded border border-amber-500/20">Lv.${senderData.wealthLevel}</span>` : ''}
                         </div>
-
-                        <!-- نص الرسالة -->
-                        <div class="chat-bubble px-4 py-2 rounded-2xl ${isMe ? 'rounded-tr-sm bg-indigo-600/50 border-indigo-500/30' : 'rounded-tl-sm'}">
-                            <p class="text-sm text-white leading-relaxed">${msg.text}</p>
+                        
+                        <div class="chat-bubble px-4 py-2 rounded-2xl text-sm leading-6 ${isMe ? 'rounded-tr-sm bg-purple-900/40 text-white' : 'rounded-tl-sm text-gray-100'}">
+                            ${msg.text}
                         </div>
                     </div>
                 </div>
             `;
-            
-            container.insertAdjacentHTML('beforeend', html);
-            container.scrollTop = container.scrollHeight;
+
+            chatArea.insertAdjacentHTML('beforeend', msgHTML);
+            chatArea.scrollTop = chatArea.scrollHeight;
+
+            // تشغيل إطار SVGA إذا وجد
+            if (senderData.activeFrame && storeData.frames[senderData.activeFrame]) {
+                const frameUrl = storeData.frames[senderData.activeFrame].fileUrl || storeData.frames[senderData.activeFrame].image;
+                // تأخير بسيط لضمان وجود العنصر في DOM
+                setTimeout(() => {
+                    playSvga(frameUrl, frameContainerId, { loops: 0 });
+                }, 50);
+            }
         }
 
-        // --- 6. البروفايل (النافذة المنبثقة) ---
+        // --- 7. البروفايل ---
         window.openProfile = async (uid) => {
             const docSnap = await getDoc(doc(db, "users", uid));
             if (!docSnap.exists()) return;
-            
             const data = docSnap.data();
-            activeProfileUser = { uid: uid, ...data };
 
             document.getElementById('p-name').innerText = data.displayName;
-            document.getElementById('p-id').innerText = "ID: " + data.uid;
-            document.getElementById('p-avatar').src = data.photoURL;
+            document.getElementById('p-id').innerText = `ID: ${data.uid}`;
+            document.getElementById('p-img').src = data.photoURL;
+            document.getElementById('p-wealth').innerText = data.wealthLevel || 0;
 
-            // الإطار في البروفايل
-            const frameEl = document.getElementById('p-frame');
-            if (data.activeFrame && appData.storeItems[data.activeFrame]) {
-                frameEl.src = appData.storeItems[data.activeFrame].image;
-                frameEl.classList.remove('hidden');
-            } else {
-                frameEl.classList.add('hidden');
-            }
-
-            // المستويات
-            document.getElementById('p-wealth-val').innerText = data.wealthLevel || 0;
-            if(appData.wealthLevels[data.wealthLevel]) {
-                document.getElementById('p-wealth-icon').src = appData.wealthLevels[data.wealthLevel].image;
-            }
-
-            document.getElementById('p-magic-val').innerText = data.magicLevel || 0;
-            if(appData.magicLevels[data.magicLevel]) {
-                document.getElementById('p-magic-icon').src = appData.magicLevels[data.magicLevel].image;
-            }
-
-            // الشارات
-            const badgesContainer = document.getElementById('p-badges');
-            badgesContainer.innerHTML = '';
+            // إظهار الشارات
+            const badgesDiv = document.getElementById('p-badges');
+            badgesDiv.innerHTML = '';
             if (data.badges) {
                 data.badges.forEach(bid => {
-                    if (appData.badges[bid]) {
-                        badgesContainer.innerHTML += `
-                            <div class="bg-white/10 px-2 py-1 rounded flex items-center gap-1 border border-white/5">
-                                <img src="${appData.badges[bid].image}" class="w-4 h-4">
-                                <span class="text-[10px]">${appData.badges[bid].name}</span>
-                            </div>
-                        `;
+                    if (storeData.badges[bid]) {
+                        // الشارات غالباً صور ثابتة، لكن لو كانت SVGA يمكن استخدام playSvga
+                        badgesDiv.innerHTML += `<img src="${storeData.badges[bid].image}" class="w-6 h-6 object-contain" title="${storeData.badges[bid].name}">`;
                     }
                 });
             }
 
-            document.getElementById('profileOverlay').classList.add('active');
+            // تشغيل إطار البروفايل الكبير SVGA
+            const pFrameContainer = document.getElementById('p-frame-container');
+            pFrameContainer.innerHTML = ''; // تنظيف القديم
+            
+            if (data.activeFrame && storeData.frames[data.activeFrame]) {
+                const frameUrl = storeData.frames[data.activeFrame].fileUrl || storeData.frames[data.activeFrame].image;
+                playSvga(frameUrl, 'p-frame-container', { loops: 0 });
+            }
+
+            // فتح النافذة
+            document.getElementById('sheetOverlay').classList.add('active');
             document.getElementById('profileSheet').classList.add('active');
         };
 
         // --- دوال مساعدة ---
         window.sendMessage = async () => {
             const input = document.getElementById('msgInput');
-            const txt = input.value.trim();
-            if (!txt) return;
-
-            const chatRef = ref(rtdb, `roomChats/${currentRoomId}/messages`);
-            await push(chatRef, {
+            if(!input.value.trim()) return;
+            
+            await push(ref(rtdb, `roomChats/${roomId}/messages`), {
                 senderId: currentUser.uid,
                 senderName: currentUser.displayName,
-                text: txt,
+                text: input.value,
                 timestamp: rtdbTimestamp()
             });
             input.value = '';
         };
 
-        // إظهار زر الإرسال عند الكتابة
         document.getElementById('msgInput').addEventListener('input', (e) => {
-            const btn = document.getElementById('sendBtn');
-            if(e.target.value.trim().length > 0) btn.classList.remove('hidden');
-            else btn.classList.add('hidden');
+            document.getElementById('sendBtn').classList.toggle('hidden', e.target.value.trim() === '');
         });
-
-        // إضافة مستخدم للشريط العلوي
-        function addHeaderUser(user) {
-            const list = document.getElementById('topUsersList');
-            // تجنب التكرار
-            if (document.getElementById(`u-head-${user.uid}`)) return;
-
-            const div = document.createElement('div');
-            div.id = `u-head-${user.uid}`;
-            div.className = 'flex flex-col items-center min-w-[45px] cursor-pointer animate-fade-in';
-            div.onclick = () => openProfile(user.uid);
-
-            const userFrame = usersCache[user.uid]?.activeFrame || null; // محاولة جلب الإطار
-            // ملاحظة: للشريط العلوي ليكون سريعاً قد لا نحمل الإطارات فوراً، أو نعتمد على أن البيانات مخزنة في usersCache
-
-            div.innerHTML = `
-                <div class="avatar-container w-9 h-9 mb-1">
-                    <img src="${user.photo || 'default.png'}" class="user-avatar w-full h-full border border-white/30">
-                </div>
-            `;
-            list.prepend(div);
-        }
-
-        async function loadRoomInfo() {
-            // تحميل معلومات مالك الغرفة للهيدر
-            const ownerSnap = await getDoc(doc(db, "users", currentRoomId));
-            if(ownerSnap.exists()){
-                const d = ownerSnap.data();
-                document.getElementById('roomName').innerText = d.displayName;
-                document.getElementById('roomID').innerText = "ID: " + d.uid;
-                document.getElementById('roomOwnerImg').src = d.photoURL;
-                
-                // إطار المالك
-                if(d.activeFrame && appData.storeItems[d.activeFrame]) {
-                    const f = document.getElementById('roomOwnerFrame');
-                    f.src = appData.storeItems[d.activeFrame].image;
-                    f.classList.remove('hidden');
-                }
-            }
-        }
 
         window.closeSheets = () => {
             document.querySelectorAll('.sheet-overlay, .bottom-sheet').forEach(el => el.classList.remove('active'));
         };
 
         window.exitRoom = () => {
-             // تنظيف الحضور
-            const userStatusRef = ref(rtdb, `roomUsers/${currentRoomId}/${currentUser.uid}`);
-            set(userStatusRef, null).then(() => window.history.back());
+            // إزالة بيانات الحضور
+            set(ref(rtdb, `roomUsers/${roomId}/${currentUser.uid}`), null).then(() => {
+                window.history.back();
+            });
         };
 
-        // تصدير الدوال للـ HTML
+        // تصدير الدوال
         window.openProfile = window.openProfile;
         window.closeSheets = window.closeSheets;
         window.sendMessage = window.sendMessage;
