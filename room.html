@@ -148,7 +148,21 @@
         }
 
         .hidden { display: none !important; }
-    </style>
+    
+    .msg-avatar-wrapper { position: relative; width: 45px; height: 45px; margin-left: 10px; }
+    .msg-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    .msg-frame-container { position: absolute; inset: -5px; width: 55px; height: 55px; pointer-events: none; z-index: 2; }
+    .badge-container { display: inline-flex; align-items: center; gap: 2px; vertical-align: middle; }
+    .lvl-badge { width: 24px; height: 24px; object-fit: contain; }
+    .admin-controls { display: flex; gap: 5px; margin-top: 10px; justify-content: center; }
+    .admin-btn { padding: 8px 15px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; }
+    .btn-kick { background: #fee2e2; color: #ef4444; }
+    .btn-admin { background: #dbeafe; color: #3b82f6; }
+    .room-settings-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; align-items: center; justify-content: center; }
+    .settings-content { background: white; padding: 20px; border-radius: 20px; width: 90%; max-width: 400px; }
+
+</style>
+    <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
 </head>
 <body>
 
@@ -240,6 +254,74 @@
 </div>
 
 <script>
+    let activeSvgaPlayers = {};
+    function playSvga(url, container, options = {}) {
+        try {
+            container.innerHTML = '';
+            const player = new SVGA.Player(container);
+            const parser = new SVGA.Parser();
+            parser.load(url, (videoItem) => {
+                player.setVideoItem(videoItem);
+                player.loops = options.loops || 0;
+                player.clearsAfterStop = options.clearsAfterStop || false;
+                player.startAnimation();
+                const id = 'player_' + Math.random().toString(36).substr(2, 9);
+                activeSvgaPlayers[id] = { player, container };
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    async function checkRoomAccess() {
+        const rDoc = await db.collection('rooms').doc(roomId).get();
+        if (!rDoc.exists) return true;
+        const rData = rDoc.data();
+        if (rData.password && rData.owner !== auth.currentUser.uid) {
+            const pass = prompt("هذه الغرفة محمية، أدخل كلمة المرور:");
+            if (pass !== rData.password) {
+                alert("كلمة مرور خاطئة!");
+                window.location.href = "index.html";
+                return false;
+            }
+        }
+        return true;
+    }
+
+    window.openRoomSettings = () => {
+        document.getElementById('setRoomName').value = room.name;
+        document.getElementById('setRoomPhoto').value = room.photo || '';
+        document.getElementById('setRoomBg').value = room.background || '';
+        document.getElementById('setRoomPass').value = room.password || '';
+        document.getElementById('roomSettingsModal').style.display = 'flex';
+    };
+
+    window.saveRoomSettings = async () => {
+        const name = document.getElementById('setRoomName').value;
+        const photo = document.getElementById('setRoomPhoto').value;
+        const bg = document.getElementById('setRoomBg').value;
+        const pass = document.getElementById('setRoomPass').value;
+        await db.collection('rooms').doc(roomId).update({
+            name, photo, background: bg, password: pass
+        });
+        document.getElementById('roomSettingsModal').style.display = 'none';
+        location.reload();
+    };
+
+    window.makeAdmin = async (uid) => {
+        if (!room.admins) room.admins = [];
+        if (!room.admins.includes(uid)) {
+            await db.collection('rooms').doc(roomId).update({
+                admins: firebase.firestore.FieldValue.arrayUnion(uid)
+            });
+            alert("تم تعيينه أدمن");
+        }
+    };
+
+    window.kickUser = async (uid) => {
+        await rtdb.ref(`rooms/${roomId}/kicked/${uid}`).set(true);
+        alert("تم طرد المستخدم");
+    };
+
+
     // Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
@@ -298,12 +380,17 @@
     }
 
     async function joinRoom() {
+        if(!(await checkRoomAccess())) return;
+        const kickedSnap = await rtdb.ref(`rooms/${roomId}/kicked/${user.uid}`).get();
+        if(kickedSnap.exists()){ alert("أنت مطرود من هذه الغرفة"); window.location.href="index.html"; return; }
         const rDoc = await db.collection('rooms').doc(roomId).get();
         if (!rDoc.exists) return;
         room = rDoc.data();
         
         document.getElementById('roomName').textContent = room.name;
         document.getElementById('roomOwnerId').textContent = `ID: ${room.owner}`;
+        if(room.owner === user.uid || (room.admins && room.admins.includes(user.uid))) document.getElementById('adminSettingsBtn').style.display = 'block';
+        if(room.background) document.body.style.backgroundImage = `url(${room.background})`;
         
         const oDoc = await db.collection('users').doc(room.owner).get();
         if(oDoc.exists) document.getElementById('roomOwnerImg').src = oDoc.data().photoURL;
@@ -371,7 +458,8 @@
         document.getElementById(`recv_${uid}`).classList.add('selected');
     }
 
-    function renderMsg(msg) {
+    
+    async function renderMsg(msg) {
         const area = document.getElementById('chatArea');
         const div = document.createElement('div');
         div.className = 'msg-bubble';
@@ -381,25 +469,45 @@
             div.style.background = "rgba(139, 92, 246, 0.15)";
             div.innerHTML = `<div class="msg-text">🎁 <b style="color:var(--accent)">${msg.senderName}</b> أرسل <b>${g?.name || 'هدية'}</b> إلى <b>${msg.toName}</b></div>`;
         } else {
-            const frameHtml = msg.frame ? `<img src="${storeData.frames[msg.frame]?.image}" class="msg-frame">` : '';
+            const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
             div.innerHTML = `
                 <div class="msg-avatar-wrapper">
                     <img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')">
-                    ${frameHtml}
+                    <div id="frame_${msgId}" class="msg-frame-container"></div>
                 </div>
                 <div style="flex:1">
-                    <div class="msg-user">
+                    <div class="msg-user" style="display:flex; align-items:center; gap:5px">
                         ${msg.senderName}
-                        <span class="badge b-wealth">W.${msg.lvlW}</span>
-                        <span class="badge b-magic">M.${msg.lvlM}</span>
+                        <div id="badges_${msgId}" class="badge-container"></div>
                     </div>
                     <div class="msg-text">${msg.text}</div>
                 </div>
             `;
+            area.appendChild(div);
+            
+            // تحميل الإطار والشارات
+            const uDoc = await db.collection('users').doc(msg.senderId).get();
+            const uData = uDoc.data();
+            if(uData) {
+                if(uData.activeFrame) {
+                    const frame = storeData.frames[uData.activeFrame];
+                    if(frame && frame.fileUrl) playSvga(frame.fileUrl, document.getElementById(`frame_${msgId}`));
+                    else if(frame) document.getElementById(`frame_${msgId}`).innerHTML = `<img src="${frame.image}" style="width:100%; height:100%">`;
+                }
+                const bContainer = document.getElementById(`badges_${msgId}`);
+                const mLevel = uData.magicLevel || 1;
+                const wLevel = uData.wealthLevel || 1;
+                const [mDoc, wDoc] = await Promise.all([
+                    db.collection('magicLevels').doc(String(mLevel)).get(),
+                    db.collection('wealthLevels').doc(String(wLevel)).get()
+                ]);
+                if(mDoc.exists) bContainer.innerHTML += `<img src="${mDoc.data().image}" class="lvl-badge">`;
+                if(wDoc.exists) bContainer.innerHTML += `<img src="${wDoc.data().image}" class="lvl-badge">`;
+            }
         }
-        area.appendChild(div);
         area.scrollTop = area.scrollHeight;
     }
+
 
     async function sendMsg() {
         const input = document.getElementById('chatInput');
@@ -420,27 +528,45 @@
         input.value = "";
     }
 
+    
     async function openProfile(uid) {
         const d = await db.collection('users').doc(uid).get();
         const p = d.data();
+        const isOwner = room.owner === user.uid;
+        const isRoomAdmin = room.admins && room.admins.includes(user.uid);
         
         document.getElementById('p-name').textContent = p.displayName;
         document.getElementById('p-id').textContent = `ID: ${uid}`;
         document.getElementById('p-magic-lvl').textContent = p.magicLevel || 1;
         document.getElementById('p-wealth-lvl').textContent = p.wealthLevel || 1;
         
-        // بناء الأفاتار مع الإطار (SVG أو Image)
         const container = document.getElementById('profileAvatarContainer');
-        const frameUrl = p.activeFrame ? storeData.frames[p.activeFrame]?.image : null;
-        
-        container.innerHTML = `
-            <img src="${p.photoURL}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid var(--accent)">
-            ${frameUrl ? `<img src="${frameUrl}" style="position:absolute; inset:-12px; width:114px; height:114px; pointer-events:none; z-index:2">` : ''}
-        `;
+        container.innerHTML = `<img src="${p.photoURL}" style="width:90px; height:90px; border-radius:50%; object-fit:cover; border:3px solid var(--accent)">`;
+        if(p.activeFrame) {
+            const frame = storeData.frames[p.activeFrame];
+            const frameDiv = document.createElement('div');
+            frameDiv.style.cssText = "position:absolute; inset:-12px; width:114px; height:114px; pointer-events:none; z-index:2";
+            container.appendChild(frameDiv);
+            if(frame.fileUrl) playSvga(frame.fileUrl, frameDiv);
+            else frameDiv.innerHTML = `<img src="${frame.image}" style="width:100%; height:100%">`;
+        }
+
+        // أزرار الإدارة
+        let adminHtml = '';
+        if((isOwner || isRoomAdmin) && uid !== user.uid) {
+            adminHtml = `<div class="admin-controls">
+                <button class="admin-btn btn-kick" onclick="kickUser('${uid}')">طرد</button>
+                ${isOwner ? `<button class="admin-btn btn-admin" onclick="makeAdmin('${uid}')">تعيين أدمن</button>` : ''}
+            </div>`;
+        }
+        const existingControls = document.querySelector('.admin-controls');
+        if(existingControls) existingControls.remove();
+        document.getElementById('profileSheet').querySelector('.sheet-content').insertAdjacentHTML('beforeend', adminHtml);
 
         toggleSheet('profileSheet', true);
-        selectedReceiverId = uid; // افتراضياً الشخص الذي تفتح بروفايله هو المستلم
+        selectedReceiverId = uid;
     }
+
 
     function renderGiftsList() {
         const grid = document.getElementById('giftsGrid');
@@ -546,6 +672,21 @@
         window.location.href = "index.html";
     }
 </script>
+
+    <div id="roomSettingsModal" class="room-settings-modal">
+        <div class="settings-content">
+            <h3 style="font-weight:bold; margin-bottom:15px; text-align:center">إعدادات الغرفة</h3>
+            <input type="text" id="setRoomName" placeholder="اسم الغرفة" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid #eee">
+            <input type="text" id="setRoomPhoto" placeholder="رابط صورة الغرفة" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid #eee">
+            <input type="text" id="setRoomBg" placeholder="رابط خلفية الغرفة" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid #eee">
+            <input type="password" id="setRoomPass" placeholder="كلمة مرور الغرفة (اختياري)" style="width:100%; padding:12px; margin-bottom:15px; border-radius:12px; border:1px solid #eee">
+            <div style="display:flex; gap:10px">
+                <button onclick="saveRoomSettings()" style="flex:1; padding:12px; background:black; color:white; border-radius:12px; border:none; font-weight:bold">حفظ</button>
+                <button onclick="document.getElementById('roomSettingsModal').style.display='none'" style="flex:1; padding:12px; background:#f5f5f5; border-radius:12px; border:none; font-weight:bold">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
 
