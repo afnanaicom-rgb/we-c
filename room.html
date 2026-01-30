@@ -1,890 +1,779 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>غرفة المستخدم - Afnan AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Premium Live Room - Afnan AI</title>
+    <!-- Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- خط القاهرة -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation; }
-        body { background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%); color: #1f2937; overflow-x: hidden; min-height: 100vh; }
-        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -1px rgba(0, 0, 0, 0.02), inset 0 1px 0 0 rgba(255, 255, 255, 0.4); }
-        .glass-deep { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%); border: 1px solid rgba(255, 255, 255, 0.6); }
-        .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.5); }
-        .glass-card:active { transform: scale(0.97); box-shadow: 0 1px 3px -1px rgba(0, 0, 0, 0.02), inset 0 2px 0 0 rgba(255, 255, 255, 0.3); }
-        .sidebar-container { position: fixed; top: 0; right: 0; width: 85%; max-width: 320px; height: 100%; z-index: 50; transform: translateX(110%); transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1); }
-        .sidebar-container.open { transform: translateX(0); }
-        .sidebar-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.15); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
-        .sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
-        .avatar-wrapper { position: relative; width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: visible; }
-        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 1; }
-        .svga-avatar-frame { position: absolute; pointer-events: none; z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: frameFloat 3s ease-in-out infinite; overflow: visible; width: calc(100% + 16px); height: calc(100% + 16px); top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        .svga-avatar-frame canvas { border-radius: 50%; object-fit: contain; width: 100% !important; height: 100% !important; position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; max-width: 100% !important; max-height: 100% !important; min-width: 100% !important; min-height: 100% !important; z-index: 2; }
-        .perfect-frame { position: absolute; pointer-events: none; z-index: 2; object-fit: contain; border-radius: 50%; animation: frameFloat 3s ease-inout infinite; width: calc(100% + 16px); height: calc(100% + 16px); top: 50%; left: 50%; transform: translate(-50%, -50%); }
-        @keyframes frameFloat { 0%, 100% { transform: translate(-50%, -50%) scale(1); } 50% { transform: translate(-50%, -50%) scale(1.05); } }
-        .chat-bubble-me { position: relative; background: #1f2937; color: white; border-radius: 20px 4px 20px 20px; margin-left: 50px; min-height: 60px; padding: 12px 16px 40px 16px; }
-        .chat-bubble-them { position: relative; background: white; color: #1f2937; border-radius: 4px 20px 20px 20px; border: 1px solid rgba(0,0,0,0.05); margin-right: 50px; min-height: 60px; padding: 12px 16px 40px 16px; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .header-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: rgba(255,255,255,0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.8); }
-        .frame-size-small .svga-avatar-frame, .frame-size-small .perfect-frame { width: calc(100% + 8px); height: calc(100% + 8px); }
-        .frame-size-medium .svga-avatar-frame, .frame-size-medium .perfect-frame { width: calc(100% + 16px); height: calc(100% + 16px); }
-        .frame-size-large .svga-avatar-frame, .frame-size-large .perfect-frame { width: calc(100% + 24px); height: calc(100% + 24px); }
-        .frame-size-xl .svga-avatar-frame, .frame-size-xl .perfect-frame { width: calc(100% + 32px); height: calc(100% + 32px); }
-        .room-header { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%); border-radius: 0 0 40px 40px; padding: 20px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); }
-        .user-card { background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 100%); border-radius: 24px; border: 2px solid rgba(255,255,255,0.8); box-shadow: 0 8px 32px rgba(0,0,0,0.08); transition: all 0.3s ease; }
-        .user-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
-        .user-card-active { border-color: #3b82f6; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(255,255,255,0.9) 100%); }
-        .badge-icon { width: 20px; height: 20px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .online-dot { position: absolute; bottom: 5px; right: 5px; width: 12px; height: 12px; background: #10b981; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
-        .offline-dot { position: absolute; bottom: 5px; right: 5px; width: 12px; height: 12px; background: #6b7280; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2); }
-        .level-badge { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px; }
-        .wealth-badge { background: linear-gradient(135deg, #10b981, #059669); color: white; font-size: 11px; font-weight: bold; padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px; }
-        .room-chat-container { background: linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(248, 250, 252, 0.95) 100%); border-radius: 32px 32px 0 0; box-shadow: 0 -10px 30px rgba(0,0,0,0.05); }
-        .gift-animation { position: fixed; left: 50%; top: 50%; z-index: 100; pointer-events: none; animation: giftFly 3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        @keyframes giftFly { 0% { transform: translate(-50%, 100%) scale(0.5); opacity: 0; } 20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; } 80% { transform: translate(-50%, -50%) scale(1); opacity: 1; } 100% { transform: translate(150%, -150%) scale(0.5); opacity: 0; } }
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #6d28d9;
+            --accent: #f59e0b; /* ذهبي */
+            --bg-black: #050505;
+            --glass: rgba(30, 30, 35, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --wealth: #fbbf24;
+            --magic: #d946ef;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-black);
+            color: #fff; 
+            height: 100vh; 
+            overflow: hidden;
+            display: flex; 
+            justify-content: center;
+        }
+
+        /* خلفية التطبيق */
+        .app-bg {
+            position: fixed; inset: 0;
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #000000 70%);
+            z-index: -1;
+        }
+
+        .app-container { 
+            width: 100%; 
+            max-width: 480px; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            background: rgba(0,0,0,0.2);
+        }
+
+        /* --- الهيدر --- */
+        .header { 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 100;
+            background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+        }
+
+        .room-info {
+            display: flex; align-items: center; gap: 10px; 
+            background: rgba(255,255,255,0.1);
+            padding: 5px 12px 5px 5px; 
+            border-radius: 30px; 
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            max-width: 50%;
+        }
+        
+        .owner-img { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
+        
+        .header-controls { display: flex; gap: 8px; }
+        
+        .btn-control {
+            width: 38px; height: 38px; 
+            border-radius: 12px; 
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
+            color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: 0.2s;
+        }
+        .btn-control:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
+        .btn-control.exit { color: var(--danger); background: rgba(239, 68, 68, 0.1); }
+
+        /* --- شريط المستخدمين العلوي (بديل الميكات) --- */
+        .users-bar {
+            padding: 10px 15px;
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2);
+            min-height: 85px;
+        }
+        .users-bar::-webkit-scrollbar { display: none; }
+
+        .user-head {
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            min-width: 55px; cursor: pointer;
+        }
+        .user-head-img-wrapper {
+            position: relative;
+            width: 50px; height: 50px;
+        }
+        .user-head img {
+            width: 100%; height: 100%; 
+            border-radius: 50%; 
+            object-fit: cover;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
+        .user-head.online img { border-color: #10b981; }
+        .user-head span {
+            font-size: 10px; color: #ccc;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            max-width: 55px; text-align: center;
+        }
+
+        /* --- منطقة الشات --- */
+        .chat-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px;
+            /* Scrollbar styling */
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255,255,255,0.1) transparent;
+        }
+
+        .msg-bubble {
+            background: rgba(40, 40, 45, 0.6); 
+            border: 1px solid var(--glass-border);
+            padding: 10px; 
+            border-radius: 18px; 
+            border-bottom-right-radius: 2px;
+            backdrop-filter: blur(5px); 
+            display: flex; align-items: flex-start; gap: 10px;
+            max-width: 85%; 
+            animation: slideIn 0.3s ease;
+            align-self: flex-start;
+        }
+        
+        .msg-bubble.me {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.1));
+            border-color: rgba(139, 92, 246, 0.3);
+            border-radius: 18px; 
+            border-bottom-left-radius: 2px;
+            flex-direction: row-reverse;
+            align-self: flex-end;
+        }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .msg-avatar { width: 35px; height: 35px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; object-fit: cover; }
+        
+        .msg-content { display: flex; flex-direction: column; gap: 2px; }
+        .msg-bubble.me .msg-content { align-items: flex-end; }
+        
+        .msg-user { font-size: 11px; font-weight: bold; color: var(--accent); display: flex; align-items: center; gap: 5px; }
+        .msg-bubble.me .msg-user { flex-direction: row-reverse; }
+
+        .msg-text { font-size: 13px; line-height: 1.4; color: #f3f4f6; }
+        
+        .badge { font-size: 8px; padding: 2px 6px; border-radius: 8px; font-weight: bold; display: inline-flex; align-items: center; gap: 2px; }
+        .b-wealth { background: linear-gradient(45deg, #f59e0b, #d97706); color: #fff; }
+        .b-magic { background: linear-gradient(45deg, #d946ef, #a21caf); color: #fff; }
+        .b-owner { background: linear-gradient(45deg, #6366f1, #4338ca); color: #fff; }
+
+        /* --- الفوتر --- */
+        .footer { 
+            padding: 10px 15px 20px; 
+            display: flex; align-items: center; gap: 10px; 
+            background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, transparent 100%);
+            z-index: 500; 
+        }
+        
+        .input-box {
+            flex: 1; 
+            background: rgba(255,255,255,0.08); 
+            border: 1px solid var(--glass-border);
+            border-radius: 25px; 
+            height: 46px; 
+            padding: 0 15px; 
+            display: flex; align-items: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .main-input { 
+            background: transparent; border: none; color: #fff; width: 100%; font-size: 14px; 
+            font-family: 'Cairo', sans-serif;
+        }
+        .main-input::placeholder { color: rgba(255,255,255,0.4); }
+
+        .btn-action {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+        .btn-action:active { transform: scale(0.9); }
+        .btn-gift { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
+        .btn-send { background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; }
+
+        /* --- النوافذ المنبثقة (Sheets) --- */
+        .sheet-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end;
+            opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .sheet-overlay.show { opacity: 1; pointer-events: auto; }
+        
+        .bottom-sheet {
+            background: #141418;
+            width: 100%; border-radius: 30px 30px 0 0; 
+            border-top: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 25px; position: relative;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
+
+        /* --- تصميم البروفايل --- */
+        .profile-header { text-align: center; margin-bottom: 20px; }
+        .profile-img-lg { 
+            width: 100px; height: 100px; border-radius: 50%; 
+            border: 3px solid var(--accent); 
+            box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+        .profile-name { font-size: 20px; font-weight: bold; margin-bottom: 5px; }
+        .profile-id { color: #888; font-size: 12px; font-family: monospace; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 6px; }
+
+        .stats-row { display: flex; justify-content: center; gap: 15px; margin: 20px 0; }
+        .stat-box { 
+            background: rgba(255,255,255,0.05); padding: 10px 15px; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; min-width: 80px;
+        }
+        .stat-val { font-weight: bold; font-size: 16px; }
+        .stat-label { font-size: 10px; color: #aaa; margin-top: 2px; }
+        .stat-box.wealth .stat-val { color: var(--wealth); }
+        .stat-box.magic .stat-val { color: var(--magic); }
+
+        .profile-tools { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .tool-btn {
+            width: 50px; height: 50px; border-radius: 18px; 
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border); color: #fff; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 20px; transition: 0.2s;
+        }
+        .tool-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.15); }
+        .tool-btn.gift { color: var(--accent); border-color: rgba(245, 158, 11, 0.3); }
+        .tool-btn.follow { 
+            width: auto; padding: 0 30px; font-size: 14px; font-weight: bold;
+            background: var(--primary); border: none;
+        }
+
+        /* --- تصميم الهدايا --- */
+        .gifts-grid { 
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; 
+            max-height: 250px; overflow-y: auto; padding-bottom: 10px;
+        }
+        .gift-card {
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 5px;
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+            border: 1px solid transparent; cursor: pointer; transition: 0.2s;
+        }
+        .gift-card:active { transform: scale(0.95); }
+        .gift-card.selected { background: rgba(245, 158, 11, 0.15); border-color: var(--accent); }
+        .gift-img { width: 45px; height: 45px; object-fit: contain; }
+        .gift-price { font-size: 10px; color: var(--wealth); font-weight: bold; }
+
+        .hidden { display: none !important; }
+
+        /* أنيميشن الهدايا */
+        .gift-fx-container {
+            position: fixed; inset: 0; pointer-events: none; z-index: 3000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .gift-fx-item {
+            width: 150px; height: 150px;
+            animation: giftPop 2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+        @keyframes giftPop {
+            0% { transform: scale(0) translateY(100px); opacity: 0; }
+            20% { transform: scale(1.2) translateY(0); opacity: 1; }
+            80% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(1.5) translateY(-50px); }
+        }
+
+        /* حالة التحميل */
+        .loader {
+            width: 20px; height: 20px; border: 2px solid #fff; 
+            border-bottom-color: transparent; border-radius: 50%; 
+            display: inline-block; animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="antialiased selection:bg-blue-100 selection:text-blue-900">
-    <div id="main-app" class="min-h-screen pb-24">
-        <header class="fixed top-0 left-0 right-0 h-20 z-30 px-6 flex items-center justify-between glass">
-            <div class="flex items-center gap-2">
-                <button onclick="goBack()" class="header-icon"><i data-lucide="arrow-right" class="w-4 h-4 text-gray-700"></i></button>
-                <h2 id="pageTitle" class="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">غرفة المستخدم</h2>
+<body onclick="handleGlobalClick(event)">
+
+<div class="app-bg"></div>
+
+<div class="app-container">
+    <!-- الهيدر -->
+    <header class="header">
+        <div class="room-info" id="roomHeaderInfo" onclick="if(currentRoomOwnerId) openProfile(currentRoomOwnerId)">
+            <img id="headerOwnerImg" src="https://via.placeholder.com/150" class="owner-img">
+            <div style="margin-right: 8px;">
+                <div id="headerRoomName" style="font-size:12px; font-weight:bold; line-height:1.2;">جار التحميل...</div>
+                <span id="headerOwnerId" style="font-size:9px; color:rgba(255,255,255,0.6)">ID: ...</span>
             </div>
-            <button onclick="toggleSidebar(true)" class="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition"><i data-lucide="menu" class="text-black w-6 h-6"></i></button>
-        </header>
+        </div>
+        <div class="header-controls">
+            <button class="btn-control" onclick="alert('الأدوات قريباً')" title="أدوات"><i class="fa-solid fa-toolbox"></i></button>
+            <button class="btn-control" onclick="alert('تم التصغير')" title="تصغير"><i class="fa-solid fa-minus"></i></button>
+            <button class="btn-control exit" onclick="exitRoom()" title="خروج"><i class="fa-solid fa-power-off"></i></button>
+        </div>
+    </header>
+
+    <!-- شريط المستخدمين (بديل الميكات) -->
+    <div class="users-bar" id="usersBar">
+        <!-- سيتم ملؤه بواسطة JS -->
+        <div style="display:flex; align-items:center; justify-content:center; width:100%; color:#888; font-size:12px;">جاري تحميل المتواجدين...</div>
+    </div>
+
+    <!-- منطقة الشات -->
+    <div class="chat-area" id="chatArea"></div>
+
+    <!-- الفوتر -->
+    <footer class="footer">
+        <div class="input-box" onclick="event.stopPropagation()">
+            <input type="text" id="chatInput" class="main-input" placeholder="اكتب رسالة..." autocomplete="off">
+        </div>
+        <button id="giftBtn" class="btn-action btn-gift" onclick="openGiftSheet()">
+            <i class="fa-solid fa-gift"></i>
+        </button>
+        <button id="sendBtn" class="btn-action btn-send hidden" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </footer>
+</div>
+
+<!-- نافذة البروفايل -->
+<div class="sheet-overlay" id="profileSheet">
+    <div style="flex:1" onclick="toggleSheet('profileSheet', false)"></div>
+    <div class="bottom-sheet">
+        <div id="profileLoading" style="text-align:center; padding:20px;">
+            <span class="loader" style="border-color: var(--accent); border-bottom-color: transparent;"></span>
+        </div>
         
-        <main class="pt-24 px-4">
-            <!-- رأس الغرفة -->
-            <div id="roomHeader" class="room-header text-white mb-6">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="avatar-wrapper" id="roomOwnerAvatarWrapper">
-                            <img id="roomOwnerAvatar" src="https://via.placeholder.com/150" class="avatar-img">
-                            <div id="roomOwnerSvgaFrame" class="svga-avatar-frame"></div>
-                            <img id="roomOwnerFrame" src="" class="perfect-frame hidden">
-                        </div>
-                        <div>
-                            <h1 id="roomOwnerName" class="text-2xl font-black">...</h1>
-                            <div class="flex items-center gap-3 mt-2">
-                                <div class="flex items-center gap-1">
-                                    <i data-lucide="star" class="w-4 h-4 text-yellow-300"></i>
-                                    <span id="roomOwnerMagicLevel" class="font-bold">1</span>
-                                </div>
-                                <div class="flex items-center gap-1">
-                                    <i data-lucide="gem" class="w-4 h-4 text-green-300"></i>
-                                    <span id="roomOwnerWealthLevel" class="font-bold">1</span>
-                                </div>
-                                <div id="roomTypeBadge" class="bg-white/20 px-3 py-1 rounded-full text-xs font-bold">خاصة</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p id="roomOwnerEmail" class="text-sm opacity-80">...</p>
-                        <p id="roomMemberCount" class="text-sm opacity-80 mt-1">1 عضو</p>
-                    </div>
+        <div id="profileContent" class="hidden">
+            <div class="profile-header">
+                <img id="p-img" src="" class="profile-img-lg">
+                <h3 id="p-name" class="profile-name">اسم المستخدم</h3>
+                <span id="p-id" class="profile-id">ID: ---</span>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-box wealth">
+                    <span id="p-wealth" class="stat-val">0</span>
+                    <span class="stat-label"><i class="fa-solid fa-gem"></i> ثروة</span>
+                </div>
+                <div class="stat-box magic">
+                    <span id="p-magic" class="stat-val">0</span>
+                    <span class="stat-label"><i class="fa-solid fa-star"></i> سحر</span>
+                </div>
+                <div class="stat-box">
+                    <span id="p-level" class="stat-val" style="color:#fff">0</span>
+                    <span class="stat-label">مستوى</span>
                 </div>
             </div>
             
-            <!-- مستطيل الدردشة -->
-            <div id="roomChatSection" class="room-chat-container p-6 mb-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold text-xl text-gray-800">دردشة الغرفة</h3>
-                    <div class="flex gap-2">
-                        <button onclick="toggleRoomChat()" class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition">
-                            <i data-lucide="message-square" class="w-5 h-5 text-gray-600"></i>
-                        </button>
-                        <button onclick="openGiftBox()" class="p-2 rounded-full bg-yellow-100 hover:bg-yellow-200 transition">
-                            <i data-lucide="gift" class="w-5 h-5 text-yellow-600"></i>
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="roomChatMessages" class="h-64 overflow-y-auto mb-4 space-y-4 p-2 no-scrollbar"></div>
-                
-                <div id="roomChatInputContainer" class="hidden">
-                    <div class="flex gap-2">
-                        <input type="text" id="roomChatInput" placeholder="اكتب رسالة في الغرفة..." class="flex-1 p-4 rounded-2xl bg-white border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                        <button onclick="sendRoomMessage()" class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white flex items-center justify-center shadow-lg hover:shadow-xl transition">
-                            <i data-lucide="send" class="w-5 h-5"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="roomChatClosed" class="text-center p-6">
-                    <i data-lucide="message-square" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
-                    <p class="text-gray-400 text-sm">الدردشة مغلقة حالياً</p>
-                    <button onclick="toggleRoomChat()" class="mt-3 px-6 py-2 bg-blue-100 text-blue-600 rounded-full text-sm font-bold hover:bg-blue-200 transition">فتح الدردشة</button>
-                </div>
+            <div class="profile-tools">
+                <button class="tool-btn gift" onclick="handleProfileGift()"><i class="fa-solid fa-gift"></i></button>
+                <button class="tool-btn" onclick="handleProfileMention()" style="color:#60a5fa"><i class="fa-solid fa-at"></i></button>
+                <button class="tool-btn follow" onclick="handleFollow()">متابعة</button>
             </div>
-            
-            <!-- جميع المستخدمين -->
-            <div class="mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-xl text-gray-800">جميع المستخدمين</h3>
-                    <div class="flex gap-2">
-                        <button onclick="filterUsers('online')" id="filterOnline" class="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-xs font-bold transition">المتصلون</button>
-                        <button onclick="filterUsers('all')" id="filterAll" class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold transition">الكل</button>
-                    </div>
-                </div>
-                
-                <div id="usersGrid" class="grid grid-cols-2 gap-4"></div>
-                
-                <div id="usersLoading" class="text-center py-10">
-                    <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-3"></div>
-                    <p class="text-gray-400 text-sm">جاري تحميل المستخدمين...</p>
-                </div>
-            </div>
-        </main>
-    </div>
-    
-    <!-- الشريط الجانبي -->
-    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
-    <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
-        <div class="pt-12 px-6 flex justify-between items-start">
-            <button onclick="toggleSidebar(false)" class="p-2 rounded-full bg-gray-100/50 hover:bg-gray-200/50 transition"><i data-lucide="x" class="w-5 h-5 text-gray-500"></i></button>
-            <button onclick="window.location.href='index.html'" class="p-3 rounded-full glass hover:bg-white transition shadow-sm group"><i data-lucide="home" class="w-5 h-5 text-gray-600 group-hover:text-black"></i></button>
-        </div>
-        <div class="flex-1 overflow-y-auto no-scrollbar px-6 pt-2 pb-10">
-            <div class="mb-6 mt-4">
-                <div class="avatar-wrapper" id="sidebarAvatarWrapper">
-                    <img id="sideAvatar" src="https://via.placeholder.com/150" class="avatar-img">
-                    <div id="sideSvgaFrame" class="svga-avatar-frame"></div>
-                    <img id="sideFrame" src="" class="perfect-frame hidden">
-                </div>
-            </div>
-            <div class="text-center mb-6">
-                <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
-                <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
-                    <span class="text-xs font-bold text-gray-400">البريد:</span>
-                    <span id="sideEmail" class="text-sm font-medium text-gray-600 truncate max-w-[150px]">...</span>
-                    <button onclick="copyEmail()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
-                </div>
-            </div>
-            <div class="flex gap-3 mb-8">
-                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
-                        <img id="magicLevelImg" src="" class="w-full h-full object-contain">
-                    </div>
-                    <span id="sideMagicLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
-                </div>
-                <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
-                    <div class="w-16 h-16 flex items-center justify-center overflow-hidden">
-                        <img id="wealthLevelImg" src="" class="w-full h-full object-contain">
-                    </div>
-                    <span id="sideWealthLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
-                </div>
-            </div>
-            
-            <nav class="space-y-3">
-                <button onclick="window.location.href='index.html'" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>
-                    الرئيسية
-                </button>
-                <button onclick="window.location.href='index.html#view-wallet'" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>
-                    المحفظة
-                </button>
-                <button onclick="window.location.href='index.html#view-store'" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold">
-                    <div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>
-                    المتجر
-                </button>
-            </nav>
-            
-            <div class="mt-8">
-                <button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2">
-                    <i data-lucide="log-out" class="w-5 h-5"></i>
-                    تسجيل خروج
-                </button>
-            </div>
-        </div>
-    </aside>
-    
-    <!-- صندوق الهدايا -->
-    <div id="giftBox" class="fixed inset-0 z-[70] hidden">
-        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeGiftBox()"></div>
-        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-[40px] h-[45vh] flex flex-col overflow-hidden shadow-2xl">
-            <div class="p-6 flex justify-between items-center border-b border-gray-100">
-                <div class="flex gap-4">
-                    <button onclick="switchGiftTab('fixed')" id="tab-fixed" class="font-bold text-black border-b-2 border-black pb-1">هدايا ثابتة</button>
-                    <button onclick="switchGiftTab('luck')" id="tab-luck" class="font-bold text-gray-400 pb-1">هدايا الحظ</button>
-                </div>
-                <div class="flex items-center gap-1 bg-yellow-50 px-3 py-1 rounded-full">
-                    <i data-lucide="coins" class="w-3 h-3 text-yellow-600"></i>
-                    <span id="giftWalletBalance" class="text-xs font-bold text-yellow-700">0</span>
-                </div>
-            </div>
-            <div id="giftGrid" class="flex-1 overflow-y-auto p-6 grid grid-cols-4 gap-4 no-scrollbar"></div>
         </div>
     </div>
+</div>
+
+<!-- نافذة الهدايا -->
+<div class="sheet-overlay" id="giftSheet">
+    <div style="flex:1" onclick="toggleSheet('giftSheet', false)"></div>
+    <div class="bottom-sheet">
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+            <span style="font-weight:bold; font-size:14px;">إرسال هدية إلى: <span id="giftTargetName" style="color:var(--accent)">المالك</span></span>
+            <span style="font-size:12px; color:#888">رصيدك: <span id="myBalance" style="color:var(--wealth); font-weight:bold">0</span> 💰</span>
+        </div>
+        
+        <div class="gifts-grid" id="giftsGrid"></div>
+        
+        <div style="display:flex; align-items:center; justify-content:flex-end; margin-top:15px; gap:10px;">
+            <button class="btn-send" onclick="sendSelectedGift()" style="width:100%; border-radius:12px; height:40px; font-weight:bold; border:none;">إرسال</button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, orderBy, limit, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getDatabase, ref, push, onValue, set, onDisconnect, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // 1. إعدادات Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
+        authDomain: "rtx3090-28439.firebaseapp.com",
+        projectId: "rtx3090-28439",
+        storageBucket: "rtx3090-28439.firebasestorage.app",
+        messagingSenderId: "178612030690",
+        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+        databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
+
+    // 2. المتغيرات العامة
+    let currentUser = null;
+    let currentRoomOwnerId = null;
+    let currentProfileUser = null; // المستخدم المعروض في البروفايل
+    let giftTargetUser = null; // المستخدم الذي سترسل له هدية
+    let selectedGiftId = null;
+    let allUsersCache = {}; // تخزين مؤقت لبيانات المستخدمين
+    let storeGifts = [];
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getDatabase, ref, push, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    // الحصول على ID الغرفة من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const roomId = urlParams.get('id');
+    const roomType = urlParams.get('type') || 'private';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-            authDomain: "rtx3090-28439.firebaseapp.com",
-            projectId: "rtx3090-28439",
-            storageBucket: "rtx3090-28439.firebasestorage.app",
-            messagingSenderId: "178612030690",
-            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
-            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
-        };
+    // 3. التهيئة والتحقق
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // جلب بياناتي
+            const userSnap = await getDoc(doc(db, "users", user.uid));
+            if(userSnap.exists()){
+                currentUser = { uid: userSnap.id, ...userSnap.data() };
+                document.getElementById('myBalance').innerText = (currentUser.balance || 0).toLocaleString();
+                
+                initRoom();
+            }
+        } else {
+            window.location.href = "login.html";
+        }
+    });
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const rtdb = getDatabase(app);
+    // 4. منطق الغرفة
+    async function initRoom() {
+        // تحديد المالك
+        currentRoomOwnerId = roomId; 
+        
+        // تحميل بيانات المالك في الهيدر
+        loadRoomHeader();
+        
+        // تحميل الهدايا
+        loadGifts();
 
-        let userData = {};
-        let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {} };
-        let roomOwnerData = {};
-        let allUsers = [];
-        let currentFilter = 'all';
-        let chatUnsubscribe = null;
-        let activeSvgaPlayers = {};
-        let roomType = 'private';
-        let roomId = '';
+        // الاستماع للشات
+        setupChatListener();
 
-        // الحصول على معاملات URL
-        const urlParams = new URLSearchParams(window.location.search);
-        roomId = urlParams.get('id');
-        roomType = urlParams.get('type') || 'private';
+        // الاستماع للمتواجدين (نستخدم allUsers من الكود الأصلي كقائمة متواجدين)
+        loadUsersBar();
+    }
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userDocRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userDocRef);
-                if (userSnap.exists()) {
-                    userData = { uid: userSnap.id, ...userSnap.data() };
-                    onSnapshot(userDocRef, async (docSnap) => {
-                        if (docSnap.exists()) {
-                            userData = { uid: docSnap.id, ...docSnap.data() };
-                            updateSidebarUI();
-                        }
-                    });
+    async function loadRoomHeader() {
+        if(roomType === 'private') {
+            const ownerDoc = await getDoc(doc(db, "users", currentRoomOwnerId));
+            if(ownerDoc.exists()) {
+                const data = ownerDoc.data();
+                document.getElementById('headerOwnerImg').src = data.photoURL || 'https://via.placeholder.com/150';
+                document.getElementById('headerRoomName').innerText = `غرفة ${data.displayName}`;
+                document.getElementById('headerOwnerId').innerText = `ID: ${data.uid.substring(0,6)}`;
+                giftTargetUser = { uid: data.uid, name: data.displayName }; // الافتراضي للهدايا
+            }
+        } else {
+            // منطق الغرف العامة
+            document.getElementById('headerRoomName').innerText = "غرفة عامة";
+        }
+    }
+
+    // شريط المستخدمين العلوي
+    async function loadUsersBar() {
+        const usersSnap = await getDocs(collection(db, "users"));
+        const bar = document.getElementById('usersBar');
+        bar.innerHTML = '';
+
+        // إضافة المالك أولاً إذا كان موجوداً
+        if (roomType === 'private') {
+             // (تم تحميله في الهيدر، لكن يمكن إضافته هنا أيضاً بتمييز)
+        }
+
+        usersSnap.forEach(doc => {
+            const u = doc.data();
+            allUsersCache[doc.id] = u; // تخزين للكاش
+            
+            // عدم عرض نفسي في الشريط (اختياري)
+            // if(doc.id === currentUser.uid) return;
+
+            const div = document.createElement('div');
+            div.className = 'user-head';
+            div.onclick = () => openProfile(doc.id); // فتح البروفايل عند الضغط
+            
+            // التحقق من حالة الاتصال (بسيط)
+            const isOnline = u.lastSeen && (Date.now() - u.lastSeen.toDate().getTime()) < 300000;
+            
+            div.innerHTML = `
+                <div class="user-head-img-wrapper">
+                    <img src="${u.photoURL || 'https://via.placeholder.com/150'}" style="border-color: ${isOnline ? '#10b981' : 'transparent'}">
+                </div>
+                <span>${u.displayName.split(' ')[0]}</span>
+            `;
+            bar.appendChild(div);
+        });
+    }
+
+    // الشات
+    function setupChatListener() {
+        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
+        onValue(chatRef, (snapshot) => {
+            const messages = snapshot.val();
+            const area = document.getElementById('chatArea');
+            area.innerHTML = '';
+            
+            if (messages) {
+                const sortedMsgs = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
+                sortedMsgs.forEach(msg => {
+                    const isMe = msg.senderId === currentUser.uid;
+                    // الحصول على بيانات المرسل من الكاش أو الرسالة
+                    const senderData = allUsersCache[msg.senderId] || { magicLevel: 1, wealthLevel: 1, photoURL: 'https://via.placeholder.com/150' };
                     
-                    await loadGlobalData();
-                    await loadRoomOwner();
-                    await loadAllUsers();
-                    setupPresence();
+                    const div = document.createElement('div');
+                    div.className = `msg-bubble ${isMe ? 'me' : ''}`;
                     
-                    // تحميل الدردشة إذا كانت الغرفة عامة
-                    if (roomType === 'public') {
-                        loadRoomChat();
+                    // محتوى الرسالة
+                    let contentHTML = '';
+                    if(msg.type === 'gift') {
+                        contentHTML = `<div style="color:var(--accent); font-weight:bold;">أرسل هدية ${msg.giftName} 🎁</div>`;
+                    } else {
+                        contentHTML = `<div class="msg-text">${msg.text}</div>`;
                     }
-                } else {
-                    alert('هذا الحساب غير مسجل في النظام. يرجى التواصل مع الإدارة.');
-                    await signOut(auth);
-                    window.location.href = "login.html";
-                }
-            } else {
-                window.location.href = "login.html";
+
+                    div.innerHTML = `
+                        <img src="${senderData.photoURL || 'https://via.placeholder.com/150'}" class="msg-avatar" onclick="window.openProfile('${msg.senderId}')">
+                        <div class="msg-content">
+                            <div class="msg-user">
+                                ${msg.senderName}
+                                ${!isMe ? `
+                                <span class="badge b-wealth"><i class="fa-solid fa-gem" style="font-size:6px"></i> ${senderData.wealthLevel || 1}</span>
+                                <span class="badge b-magic"><i class="fa-solid fa-star" style="font-size:6px"></i> ${senderData.magicLevel || 1}</span>
+                                ` : ''}
+                            </div>
+                            ${contentHTML}
+                        </div>
+                    `;
+                    area.appendChild(div);
+                });
+                area.scrollTop = area.scrollHeight;
             }
         });
+    }
 
-        async function loadGlobalData() {
-            try {
-                const storeSnap = await getDocs(collection(db, "storeItems"));
-                storeData.items = storeSnap.docs.map(d => ({id: d.id, ...d.data()}));
-                storeData.itemsById = {};
-                storeData.items.forEach(item => { storeData.itemsById[item.id] = item; });
+    // إرسال رسالة
+    window.sendMessage = async () => {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if(!text) return;
+
+        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
+        await push(chatRef, {
+            senderId: currentUser.uid,
+            senderName: currentUser.displayName,
+            text: text,
+            timestamp: rtdbTimestamp(),
+            type: 'text'
+        });
+        input.value = '';
+        input.focus();
+    };
+
+    // 5. منطق البروفايل (الأهم)
+    window.openProfile = async (uid) => {
+        toggleSheet('profileSheet', true);
+        document.getElementById('profileContent').classList.add('hidden');
+        document.getElementById('profileLoading').classList.remove('hidden');
+
+        try {
+            // جلب بيانات حية من فير بيز
+            const docRef = doc(db, "users", uid);
+            const docSnap = await getDoc(docRef);
+            
+            if(docSnap.exists()) {
+                const data = docSnap.data();
+                currentProfileUser = { uid: docSnap.id, ...data };
                 
-                const gSnap = await getDocs(collection(db, "gifts"));
-                storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'wealth'}));
-                
-                const lgSnap = await getDocs(collection(db, "luckGifts"));
-                storeData.luckGifts = lgSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'magic'}));
-                
-                const mlSnap = await getDocs(collection(db, "magicLevels"));
-                mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
-                
-                const wlSnap = await getDocs(collection(db, "wealthLevels"));
-                wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
-                
-                updateSidebarUI();
-            } catch (error) {
-                console.error('Error loading global data:', error);
+                document.getElementById('p-img').src = data.photoURL || 'https://via.placeholder.com/150';
+                document.getElementById('p-name').innerText = data.displayName;
+                document.getElementById('p-id').innerText = `ID: ${data.uid}`;
+                document.getElementById('p-wealth').innerText = data.wealthLevel || 1;
+                document.getElementById('p-magic').innerText = data.magicLevel || 1;
+                document.getElementById('p-level').innerText = Math.floor(((data.wealthLevel||0) + (data.magicLevel||0))/2) || 1;
+
+                document.getElementById('profileLoading').classList.add('hidden');
+                document.getElementById('profileContent').classList.remove('hidden');
             }
+        } catch (e) {
+            console.error(e);
+            alert("تعذر تحميل البيانات");
+            toggleSheet('profileSheet', false);
+        }
+    };
+    
+    // ربط الدالة بالنافذة لتكون متاحة من HTML
+    window.window.openProfile = window.openProfile;
+
+    window.handleProfileMention = () => {
+        toggleSheet('profileSheet', false);
+        const input = document.getElementById('chatInput');
+        input.value = `@${currentProfileUser.displayName} `;
+        input.focus();
+    };
+
+    window.handleProfileGift = () => {
+        giftTargetUser = currentProfileUser; // تحديد الهدف
+        toggleSheet('profileSheet', false);
+        openGiftSheet();
+    };
+
+    // 6. منطق الهدايا
+    async function loadGifts() {
+        // تحميل من فير بيز (محاكاة هنا للكود، لكن استخدمنا الكود الأصلي)
+        try {
+             const gSnap = await getDocs(collection(db, "gifts"));
+             storeGifts = gSnap.docs.map(d => ({id: d.id, ...d.data()}));
+             renderGiftsGrid();
+        } catch(e) { console.log("Gifts load error", e); }
+    }
+
+    function renderGiftsGrid() {
+        const grid = document.getElementById('giftsGrid');
+        grid.innerHTML = '';
+        if(storeGifts.length === 0) {
+            grid.innerHTML = '<div style="color:#888; grid-column:span 4; text-align:center">لا توجد هدايا</div>';
+            return;
         }
 
-        async function loadRoomOwner() {
-            try {
-                let ownerId = roomId;
-                
-                if (roomType === 'private') {
-                    // تحميل بيانات مالك الغرفة الخاصة
-                    const ownerDoc = await getDoc(doc(db, "users", ownerId));
-                    if (ownerDoc.exists()) {
-                        roomOwnerData = { uid: ownerDoc.id, ...ownerDoc.data() };
-                        updateRoomHeader();
-                    }
-                } else {
-                    // للغرف العامة، نستخدم معرف الغرفة
-                    const roomDoc = await getDoc(doc(db, "rooms", ownerId));
-                    if (roomDoc.exists()) {
-                        const room = roomDoc.data();
-                        document.getElementById('roomOwnerName').innerText = room.name;
-                        document.getElementById('roomTypeBadge').innerText = 'عامة';
-                        document.getElementById('roomTypeBadge').className = 'bg-white/20 px-3 py-1 rounded-full text-xs font-bold';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading room owner:', error);
-            }
-        }
-
-        function updateRoomHeader() {
-            if (!roomOwnerData.uid) return;
-            
-            document.getElementById('roomOwnerName').innerText = roomOwnerData.displayName || "مستخدم";
-            document.getElementById('roomOwnerEmail').innerText = roomOwnerData.email || "لا يوجد بريد";
-            document.getElementById('roomOwnerMagicLevel').innerText = roomOwnerData.magicLevel || 1;
-            document.getElementById('roomOwnerWealthLevel').innerText = roomOwnerData.wealthLevel || 1;
-            document.getElementById('roomOwnerAvatar').src = roomOwnerData.photoURL || 'https://via.placeholder.com/150';
-            
-            // تحديث نوع الغرفة
-            document.getElementById('roomTypeBadge').innerText = roomType === 'private' ? 'خاصة' : 'عامة';
-            
-            // تحديث إطار الصورة إذا كان موجوداً
-            const avatarWrapper = document.getElementById('roomOwnerAvatarWrapper');
-            const frameEl = document.getElementById('roomOwnerFrame');
-            const svgaContainer = document.getElementById('roomOwnerSvgaFrame');
-            
-            frameEl.classList.add('hidden');
-            svgaContainer.classList.add('hidden');
-            svgaContainer.innerHTML = '';
-            avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
-            
-            if (roomOwnerData.activeFrame) {
-                const item = storeData.itemsById[roomOwnerData.activeFrame];
-                if (item) {
-                    const sizeClass = getFrameSizeClass(item.frameConfig);
-                    if (sizeClass) avatarWrapper.classList.add(sizeClass);
-                    
-                    if (item.itemType === 'svga') {
-                        svgaContainer.classList.remove('hidden');
-                        playPerfectSvga(item.fileUrl, svgaContainer, { loops: 0, clearsAfterStop: false });
-                    } else {
-                        frameEl.src = item.image;
-                        frameEl.classList.remove('hidden');
-                    }
-                }
-            }
-        }
-
-        function getFrameSizeClass(frameConfig) {
-            if (!frameConfig || !frameConfig.size) return '';
-            const sizeMap = { 'small': 'frame-size-small', 'medium': 'frame-size-medium', 'large': 'frame-size-large', 'xl': 'frame-size-xl' };
-            return sizeMap[frameConfig.size] || '';
-        }
-
-        function playSvga(url, container, options = {}) {
-            try {
-                container.innerHTML = '';
-                const player = new SVGA.Player(container);
-                const parser = new SVGA.Parser();
-                parser.load(url, (videoItem) => {
-                    player.setVideoItem(videoItem);
-                    player.loops = options.loops || 0;
-                    player.clearsAfterStop = options.clearsAfterStop || false;
-                    player.startAnimation();
-                    setTimeout(() => {
-                        const canvas = container.querySelector('canvas');
-                        if (canvas) {
-                            canvas.classList.add('vga-player-canvas');
-                            canvas.style.objectFit = 'contain';
-                            canvas.style.display = 'block';
-                        }
-                    }, 50);
-                    const id = 'player_' + Date.now();
-                    activeSvgaPlayers[id] = { player, container };
-                    container.dataset.playerId = id;
-                }, (error) => {
-                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
-                });
-            } catch (error) {
-                container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
-            }
-        }
-
-        function playPerfectSvga(url, container, options = {}) {
-            try {
-                container.innerHTML = '';
-                const player = new SVGA.Player(container);
-                const parser = new SVGA.Parser();
-                parser.load(url, (videoItem) => {
-                    player.setVideoItem(videoItem);
-                    player.loops = options.loops || 0;
-                    player.clearsAfterStop = options.clearsAfterStop || false;
-                    player.startAnimation();
-                    setTimeout(() => {
-                        const canvas = container.querySelector('canvas');
-                        if (canvas) {
-                            canvas.classList.add('vga-player-canvas');
-                            canvas.style.objectFit = 'contain';
-                            canvas.style.display = 'block';
-                        }
-                    }, 50);
-                    const id = 'player_' + Date.now();
-                    activeSvgaPlayers[id] = { player, container };
-                    container.dataset.playerId = id;
-                }, (error) => {
-                    container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
-                });
-            } catch (error) {
-                container.innerHTML = '<div class="text-center text-xs text-gray-400 p-2">SVGA</div>';
-            }
-        }
-
-        async function loadAllUsers() {
-            try {
-                document.getElementById('usersLoading').classList.remove('hidden');
-                
-                const usersSnap = await getDocs(collection(db, "users"));
-                allUsers = [];
-                
-                usersSnap.forEach(doc => {
-                    const user = { uid: doc.id, ...doc.data() };
-                    if (user.uid !== userData.uid) {
-                        allUsers.push(user);
-                    }
-                });
-                
-                displayUsers(allUsers);
-                document.getElementById('usersLoading').classList.add('hidden');
-                document.getElementById('roomMemberCount').innerText = `${allUsers.length + 1} أعضاء`;
-            } catch (error) {
-                console.error('Error loading users:', error);
-                document.getElementById('usersLoading').innerHTML = `
-                    <div class="text-center py-6">
-                        <i data-lucide="alert-circle" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
-                        <p class="text-gray-400 text-sm">حدث خطأ في تحميل المستخدمين</p>
-                    </div>
-                `;
-                lucide.createIcons();
-            }
-        }
-
-        function displayUsers(users) {
-            const grid = document.getElementById('usersGrid');
-            grid.innerHTML = '';
-            
-            if (users.length === 0) {
-                grid.innerHTML = `
-                    <div class="col-span-2 glass-card p-8 rounded-3xl flex flex-col items-center justify-center text-center">
-                        <i data-lucide="users" class="w-12 h-12 text-gray-300 mb-4"></i>
-                        <p class="text-gray-400 text-sm">لا يوجد مستخدمين</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            users.forEach(user => {
-                const isOnline = user.lastSeen && (Date.now() - user.lastSeen.toDate().getTime()) < 300000;
-                const magicLevel = user.magicLevel || 1;
-                const wealthLevel = user.wealthLevel || 1;
-                const magicLevelImg = storeData.magicLevels[magicLevel]?.image || '';
-                const wealthLevelImg = storeData.wealthLevels[wealthLevel]?.image || '';
-                
-                const isFollowing = userData.friends?.includes(user.uid);
-                const isOwner = roomOwnerData.uid === user.uid;
-                
-                let followButton = '';
-                if (!isFollowing && !isOwner) {
-                    followButton = `<button onclick="sendFriendRequestFromRoom('${user.uid}')" class="mt-2 px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-xs rounded-full font-bold hover:shadow-lg transition">متابعة</button>`;
-                } else if (isFollowing) {
-                    followButton = `<button class="mt-2 px-3 py-1 bg-gray-100 text-gray-600 text-xs rounded-full font-bold">✓ متابع</button>`;
-                }
-                
-                grid.innerHTML += `
-                    <div class="user-card p-4 ${isOwner ? 'user-card-active' : ''}">
-                        <div class="flex items-start justify-between mb-3">
-                            <div class="relative">
-                                <div class="avatar-wrapper" style="width: 60px; height: 60px;">
-                                    <img src="${user.photoURL || 'https://via.placeholder.com/150'}" class="avatar-img">
-                                    ${user.activeFrame ? `<div class="svga-avatar-frame" id="user-frame-${user.uid}"></div>` : ''}
-                                </div>
-                                ${isOnline ? '<div class="online-dot"></div>' : '<div class="offline-dot"></div>'}
-                            </div>
-                            <div class="text-left">
-                                <div class="flex gap-1 mb-1">
-                                    <div class="level-badge">
-                                        <i data-lucide="star" class="w-3 h-3"></i>
-                                        <span>${magicLevel}</span>
-                                    </div>
-                                    <div class="wealth-badge">
-                                        <i data-lucide="gem" class="w-3 h-3"></i>
-                                        <span>${wealthLevel}</span>
-                                    </div>
-                                </div>
-                                ${isOwner ? '<span class="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">صاحب الغرفة</span>' : ''}
-                            </div>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-900 text-sm truncate">${user.displayName}</h4>
-                            <p class="text-xs text-gray-400 truncate mb-2">${user.email}</p>
-                            ${followButton}
-                        </div>
-                    </div>
-                `;
-                
-                // تحميل إطار الصورة إذا كان موجوداً
-                if (user.activeFrame) {
-                    setTimeout(() => {
-                        const item = storeData.itemsById[user.activeFrame];
-                        const frameContainer = document.getElementById(`user-frame-${user.uid}`);
-                        if (frameContainer && item && item.fileUrl && item.itemType === 'svga') {
-                            playPerfectSvga(item.fileUrl, frameContainer, { loops: 0, clearsAfterStop: false });
-                        }
-                    }, 100);
-                }
-            });
-            
-            lucide.createIcons();
-        }
-
-        function updateSidebarUI() {
-            if (!userData.uid) return;
-            
-            document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
-            document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
-            document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
-            document.getElementById('giftWalletBalance').innerText = (userData.balance || 0).toLocaleString();
-            
-            const ml = userData.magicLevel || 1;
-            const wl = userData.wealthLevel || 1;
-            const magicImg = document.getElementById('magicLevelImg');
-            const wealthImg = document.getElementById('wealthLevelImg');
-            
-            if (storeData.magicLevels[ml]) {
-                magicImg.src = storeData.magicLevels[ml].image;
-                document.getElementById('sideMagicLevelText').innerText = ml;
-            }
-            if (storeData.wealthLevels[wl]) {
-                wealthImg.src = storeData.wealthLevels[wl].image;
-                document.getElementById('sideWealthLevelText').innerText = wl;
-            }
-            
-            const avatarWrapper = document.getElementById('sidebarAvatarWrapper');
-            const frameEl = document.getElementById('sideFrame');
-            const svgaContainer = document.getElementById('sideSvgaFrame');
-            
-            frameEl.classList.add('hidden');
-            svgaContainer.classList.add('hidden');
-            svgaContainer.innerHTML = '';
-            avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
-            
-            if (userData.activeFrame) {
-                const item = storeData.itemsById[userData.activeFrame];
-                if (item) {
-                    const sizeClass = getFrameSizeClass(item.frameConfig);
-                    if (sizeClass) avatarWrapper.classList.add(sizeClass);
-                    
-                    if (item.itemType === 'svga') {
-                        svgaContainer.classList.remove('hidden');
-                        playPerfectSvga(item.fileUrl, svgaContainer, { loops: 0, clearsAfterStop: false });
-                    } else {
-                        frameEl.src = item.image;
-                        frameEl.classList.remove('hidden');
-                    }
-                }
-            }
-        }
-
-        function setupPresence() {
-            if (!userData.uid) return;
-            
-            const userStatusRef = ref(rtdb, `status/${userData.uid}`);
-            const userStatusFirestoreRef = doc(db, "users", userData.uid);
-            
-            const isOfflineForDatabase = {
-                state: 'offline',
-                last_changed: new Date().toISOString(),
+        storeGifts.forEach(gift => {
+            const div = document.createElement('div');
+            div.className = 'gift-card';
+            div.onclick = () => {
+                document.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedGiftId = gift.id;
             };
-            
-            const isOnlineForDatabase = {
-                state: 'online',
-                last_changed: new Date().toISOString(),
-            };
-            
-            set(ref(rtdb, '.info/connected'), onDisconnect(userStatusRef).set(isOfflineForDatabase).then(() => {
-                set(userStatusRef, isOnlineForDatabase);
-            }));
-            
-            updateDoc(userStatusFirestoreRef, {
-                lastSeen: new Date()
-            });
-        }
-
-        function loadRoomChat() {
-            if (roomType !== 'public') return;
-            
-            const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
-            
-            if (chatUnsubscribe) chatUnsubscribe();
-            
-            chatUnsubscribe = onValue(chatRef, (snapshot) => {
-                const messages = snapshot.val();
-                const container = document.getElementById('roomChatMessages');
-                container.innerHTML = '';
-                
-                if (messages) {
-                    Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
-                        const isMe = msg.senderId === userData.uid;
-                        const bubbleClass = isMe ? 'chat-bubble-me' : 'chat-bubble-them';
-                        const alignClass = isMe ? 'flex justify-end' : 'flex justify-start';
-                        
-                        container.innerHTML += `
-                            <div class="${alignClass}">
-                                <div class="${bubbleClass} max-w-[80%]">
-                                    <div class="font-bold text-xs mb-1">${msg.senderName}</div>
-                                    <div class="text-sm">${msg.text}</div>
-                                    <div class="absolute bottom-2 left-4 text-xs opacity-70">
-                                        ${new Date(msg.timestamp).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    container.scrollTop = container.scrollHeight;
-                }
-            });
-        }
-
-        async function sendRoomMessage() {
-            const input = document.getElementById('roomChatInput');
-            const text = input.value.trim();
-            
-            if (!text || roomType !== 'public') return;
-            
-            const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
-            await push(chatRef, {
-                senderId: userData.uid,
-                senderName: userData.displayName,
-                text: text,
-                timestamp: Date.now()
-            });
-            
-            input.value = '';
-        }
-
-        window.filterUsers = (filterType) => {
-            currentFilter = filterType;
-            
-            document.getElementById('filterOnline').className = filterType === 'online' 
-                ? 'px-3 py-1 bg-blue-500 text-white rounded-full text-xs font-bold transition' 
-                : 'px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold transition';
-            
-            document.getElementById('filterAll').className = filterType === 'all' 
-                ? 'px-3 py-1 bg-blue-500 text-white rounded-full text-xs font-bold transition' 
-                : 'px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold transition';
-            
-            if (filterType === 'online') {
-                const onlineUsers = allUsers.filter(user => 
-                    user.lastSeen && (Date.now() - user.lastSeen.toDate().getTime()) < 300000
-                );
-                displayUsers(onlineUsers);
-            } else {
-                displayUsers(allUsers);
-            }
-        };
-
-        window.sendFriendRequestFromRoom = async (uid) => {
-            try {
-                if (!userData.uid) {
-                    alert("يرجى الانتظار حتى تحميل بياناتك");
-                    return;
-                }
-                
-                await updateDoc(doc(db, "users", userData.uid), { sentRequests: arrayUnion(uid) });
-                await updateDoc(doc(db, "users", uid), { friendRequests: arrayUnion(userData.uid) });
-                
-                showNotification('تم إرسال طلب المتابعة بنجاح!');
-                loadAllUsers();
-            } catch (error) {
-                alert('فشل إرسال الطلب: ' + error.message);
-            }
-        };
-
-        window.openGiftBox = () => {
-            const giftBox = document.getElementById('giftBox');
-            giftBox.classList.remove('hidden');
-            switchGiftTab('fixed');
-        };
-
-        window.closeGiftBox = () => {
-            document.getElementById('giftBox').classList.add('hidden');
-        };
-
-        window.switchGiftTab = (type) => {
-            const grid = document.getElementById('giftGrid');
-            grid.innerHTML = '';
-            const items = type === 'fixed' ? storeData.gifts : storeData.luckGifts;
-            
-            document.getElementById('tab-fixed').className = type === 'fixed' 
-                ? 'font-bold text-black border-b-2 border-black pb-1' 
-                : 'font-bold text-gray-400 pb-1';
-            
-            document.getElementById('tab-luck').className = type === 'luck' 
-                ? 'font-bold text-black border-b-2 border-black pb-1' 
-                : 'font-bold text-gray-400 pb-1';
-            
-            if (items.length === 0) {
-                grid.innerHTML = '<p class="col-span-4 text-center text-gray-400 text-xs py-10">لا توجد هدايا متاحة</p>';
-                return;
-            }
-            
-            items.forEach(item => {
-                grid.innerHTML += `
-                    <div onclick="sendGift('${item.id}', '${item.type}')" class="flex flex-col items-center gap-1 cursor-pointer active:scale-90 transition">
-                        <div class="w-14 h-14 bg-gray-50 rounded-2xl flex items-center justify-center p-2">
-                            <img src="${item.image}" class="w-full h-full object-contain">
-                        </div>
-                        <span class="text-[10px] font-bold text-gray-800 truncate w-full text-center">${item.name}</span>
-                        <span class="text-[8px] text-yellow-600 font-black">${item.price || 0} 💰</span>
-                    </div>
-                `;
-            });
-        };
-
-        window.sendGift = async (giftId, giftType) => {
-            if (!roomOwnerData.uid) {
-                alert('لا يمكن إرسال هدية في هذا الوقت');
-                return;
-            }
-            
-            const giftList = giftType === 'magic' ? storeData.luckGifts : storeData.gifts;
-            const gift = giftList.find(g => g.id === giftId);
-            
-            if (userData.balance < (gift.price || 0)) {
-                alert('رصيدك غير كافٍ!');
-                return;
-            }
-            
-            await updateDoc(doc(db, "users", userData.uid), { 
-                balance: increment(-(gift.price || 0)) 
-            });
-            
-            const receiverRef = doc(db, "users", roomOwnerData.uid);
-            const receiverSnap = await getDoc(receiverRef);
-            
-            if (receiverSnap.exists()) {
-                const receiverData = receiverSnap.data();
-                
-                if (giftType === 'magic') {
-                    const newJewels = (receiverData.jewels || 0) + 10;
-                    let newCoins = receiverData.balance || 0;
-                    let newMagicLevel = receiverData.magicLevel || 1;
-                    
-                    if (newJewels >= 10) {
-                        const coinsToAdd = Math.floor(newJewels / 10);
-                        newCoins += coinsToAdd;
-                        const magicPoints = newCoins;
-                        if (magicPoints >= 100 * newMagicLevel) newMagicLevel += 1;
-                    }
-                    
-                    await updateDoc(receiverRef, { 
-                        jewels: newJewels % 10, 
-                        balance: newCoins, 
-                        magicLevel: newMagicLevel 
-                    });
-                } else if (giftType === 'wealth') {
-                    const wealthGiftValue = gift.reward || 1;
-                    const currentWealth = receiverData.wealthLevel || 1;
-                    const newWealthLevel = currentWealth + wealthGiftValue;
-                    
-                    await updateDoc(receiverRef, { 
-                        wealthLevel: newWealthLevel, 
-                        balance: increment(gift.reward || 0) 
-                    });
-                }
-            }
-            
-            showGiftAnimation(gift, `تم إرسال هدية ${gift.name} إلى ${roomOwnerData.displayName}`);
-            closeGiftBox();
-        };
-
-        function showGiftAnimation(gift, text) {
-            const anim = document.createElement('div');
-            anim.className = 'gift-animation flex flex-col items-center gap-4';
-            anim.innerHTML = `
-                <img src="${gift.image}" class="w-32 h-32 object-contain drop-shadow-2xl">
-                <div class="glass px-6 py-3 rounded-2xl shadow-xl border-2 border-white">
-                    <p class="font-black text-gray-900 text-center">${text}</p>
-                </div>
+            div.innerHTML = `
+                <img src="${gift.image}" class="gift-img">
+                <span style="font-size:10px; font-weight:bold">${gift.name}</span>
+                <span class="gift-price">${gift.price} 💰</span>
             `;
-            document.body.appendChild(anim);
-            setTimeout(() => anim.remove(), 3000);
+            grid.appendChild(div);
+        });
+    }
+
+    window.openGiftSheet = () => {
+        if(!giftTargetUser) giftTargetUser = { uid: currentRoomOwnerId, name: "المالك" };
+        document.getElementById('giftTargetName').innerText = giftTargetUser.name;
+        toggleSheet('giftSheet', true);
+    };
+
+    window.sendSelectedGift = async () => {
+        if(!selectedGiftId) return alert("اختر هدية أولاً");
+        const gift = storeGifts.find(g => g.id === selectedGiftId);
+        
+        if(currentUser.balance < gift.price) {
+            alert("رصيدك غير كافٍ!");
+            return;
         }
 
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'fixed top-24 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white px-6 py-3 rounded-2xl text-sm font-bold z-50 shadow-xl animate-bounce';
-            notification.innerText = message;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+        toggleSheet('giftSheet', false);
+
+        // 1. خصم الرصيد
+        await updateDoc(doc(db, "users", currentUser.uid), {
+            balance: increment(-gift.price)
+        });
+        currentUser.balance -= gift.price;
+        document.getElementById('myBalance').innerText = currentUser.balance.toLocaleString();
+
+        // 2. تحديث المستلم (إضافة نقاط/ثروة)
+        // (يمكنك إضافة منطق زيادة الثروة هنا كما في الكود الأصلي)
+
+        // 3. إرسال رسالة بالشات
+        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
+        await push(chatRef, {
+            senderId: currentUser.uid,
+            senderName: currentUser.displayName,
+            text: `أرسل ${gift.name} إلى ${giftTargetUser.name}`,
+            giftName: gift.name,
+            timestamp: rtdbTimestamp(),
+            type: 'gift'
+        });
+
+        // 4. تشغيل الأنيميشن
+        showGiftAnimation(gift.image);
+    };
+
+    function showGiftAnimation(imgSrc) {
+        const div = document.createElement('div');
+        div.className = 'gift-fx-container';
+        div.innerHTML = `<img src="${imgSrc}" class="gift-fx-item">`;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 2500);
+    }
+
+    // 7. أدوات الواجهة
+    window.toggleSheet = (id, show) => {
+        const el = document.getElementById(id);
+        if(show) el.classList.add('show');
+        else el.classList.remove('show');
+    };
+
+    window.handleGlobalClick = (e) => {
+        const input = document.getElementById('chatInput');
+        const giftBtn = document.getElementById('giftBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        if (e.target !== input) {
+            // input.blur(); // اختياري
         }
+    };
 
-        window.toggleRoomChat = () => {
-            const inputContainer = document.getElementById('roomChatInputContainer');
-            const chatClosed = document.getElementById('roomChatClosed');
-            
-            if (roomType !== 'public') {
-                alert('الدردشة متاحة فقط للغرف العامة');
-                return;
-            }
-            
-            if (inputContainer.classList.contains('hidden')) {
-                inputContainer.classList.remove('hidden');
-                chatClosed.classList.add('hidden');
-            } else {
-                inputContainer.classList.add('hidden');
-                chatClosed.classList.remove('hidden');
-            }
-        };
+    document.getElementById('chatInput').addEventListener('input', (e) => {
+        const val = e.target.value.trim();
+        if(val.length > 0) {
+            document.getElementById('giftBtn').classList.add('hidden');
+            document.getElementById('sendBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('giftBtn').classList.remove('hidden');
+            document.getElementById('sendBtn').classList.add('hidden');
+        }
+    });
 
-        window.goBack = () => {
+    window.exitRoom = () => {
+        if(confirm("هل تود المغادرة؟")) {
             window.history.back();
-        };
+        }
+    };
+    
+    // جعل الدوال متاحة للـ HTML
+    window.exitRoom = window.exitRoom;
+    window.handleGlobalClick = window.handleGlobalClick;
+    window.sendMessage = window.sendMessage;
+    window.openGiftSheet = window.openGiftSheet;
+    window.sendSelectedGift = window.sendSelectedGift;
+    window.toggleSheet = window.toggleSheet;
+    window.handleProfileMention = window.handleProfileMention;
+    window.handleProfileGift = window.handleProfileGift;
 
-        window.toggleSidebar = (show) => {
-            const s = document.getElementById('sidebar');
-            const o = document.getElementById('sidebarOverlay');
-            s.classList.toggle('open', show);
-            o.classList.toggle('hidden', !show);
-            if (show) setTimeout(() => o.classList.add('visible'), 10);
-            else o.classList.remove('visible');
-        };
+</script>
 
-        window.copyEmail = () => {
-            navigator.clipboard.writeText(userData.email).then(() => {
-                const notification = document.createElement('div');
-                notification.className = 'fixed top-20 right-1/2 transform translate-x-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-bold z-50 animate-bounce';
-                notification.innerText = 'تم النسخ!';
-                document.body.appendChild(notification);
-                setTimeout(() => notification.remove(), 2000);
-            });
-        };
-
-        window.confirmLogout = () => {
-            if (confirm('هل تريد تسجيل الخروج؟')) {
-                Object.keys(activeSvgaPlayers).forEach(id => {
-                    try { activeSvgaPlayers[id].player.clear(); } catch (e) {}
-                });
-                activeSvgaPlayers = {};
-                signOut(auth);
-            }
-        };
-
-        lucide.createIcons();
-        setInterval(() => lucide.createIcons(), 1000);
-    </script>
 </body>
 </html>
+
