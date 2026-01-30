@@ -57,310 +57,241 @@
             text-shadow: 0 0 20px rgba(147, 51, 234, 0.5), 0 0 40px rgba(147, 51, 234, 0.3);
         }
 
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .input-field:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #9333ea;
+            box-shadow: 0 0 15px rgba(147, 51, 234, 0.3);
+            outline: none;
+        }
+
         .btn-glow {
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3), 0 0 20px rgba(255, 255, 255, 0.1);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .btn-glow:hover {
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 30px rgba(255, 255, 255, 0.15);
         }
 
-        .btn-glow:active {
-            transform: scale(0.98);
+        .btn-primary {
+            background: linear-gradient(135deg, #9333ea 0%, #3b82f6 100%);
         }
 
-        .google-btn {
-            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
-            color: #333;
-        }
-
-        .google-btn:hover {
-            background: linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%);
-        }
-
-        .twitter-btn {
-            background: linear-gradient(135deg, #1da1f2 0%, #0d8bd9 100%);
-            color: white;
-        }
-
-        .twitter-btn:hover {
-            background: linear-gradient(135deg, #0d8bd9 0%, #0a7bc2 100%);
-        }
-
-        .github-btn {
-            background: linear-gradient(135deg, #333333 0%, #1a1a1a 100%);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .github-btn:hover {
-            background: linear-gradient(135deg, #444444 0%, #2a2a2a 100%);
-        }
+        .google-btn { background: #ffffff; color: #333; }
+        .twitter-btn { background: #1da1f2; color: white; }
+        .github-btn { background: #333; color: white; }
 
         .fade-in { animation: fadeIn 0.8s ease-out forwards; }
         .slide-up { animation: slideUp 0.6s ease-out forwards; opacity: 0; }
         
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .loader {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-left-color: #9333ea;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-left-color: currentColor;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .logo-ring {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #9333ea, #3b82f6);
-            padding: 3px;
-            animation: pulse 2s infinite;
-        }
-
-        .logo-ring-inner {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: #0a0a0a;
+        .divider-container {
             display: flex;
             align-items: center;
-            justify-content: center;
+            text-align: center;
+            margin: 1.5rem 0;
         }
-
-        @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.4); }
-            50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.7); }
+        .divider-container::before, .divider-container::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        }
+        .divider-container:not(:empty)::before { margin-left: .5em; }
+        .divider-container:not(:empty)::after { margin-right: .5em; }
     </style>
 </head>
 <body class="antialiased">
-    <!-- Stars Background -->
     <div class="stars" id="stars"></div>
 
-    <!-- Main Content -->
-    <div class="relative z-10 min-h-screen flex flex-col items-center justify-center p-6">
+    <div class="relative z-10 min-h-screen flex flex-col items-center justify-center p-4">
         
-        <!-- Logo Section -->
-        <div class="fade-in mb-8">
-            <div class="logo-ring mx-auto">
-                <div class="logo-ring-inner">
-                    <i data-lucide="bot" class="w-12 h-12 text-purple-400"></i>
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <div class="w-20 h-20 mx-auto bg-gradient-to-tr from-purple-600 to-blue-500 rounded-3xl flex items-center justify-center shadow-2xl mb-4 rotate-3">
+                <i data-lucide="bot" class="w-12 h-12 text-white"></i>
+            </div>
+            <h1 class="text-3xl font-black glow-text">Afnan AI</h1>
+            <p class="text-gray-400 text-sm mt-1">مستقبلك يبدأ هنا</p>
+        </div>
+
+        <!-- Auth Card -->
+        <div class="w-full max-w-md glass-panel p-8 rounded-[2.5rem] slide-up shadow-2xl" style="animation-delay: 0.2s;">
+            
+            <!-- Email Form -->
+            <form id="emailLoginForm" class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs text-gray-400 mr-2">البريد الإلكتروني</label>
+                    <div class="relative">
+                        <i data-lucide="mail" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                        <input type="email" id="emailInput" placeholder="name@example.com" class="input-field w-full py-4 pr-12 pl-4 rounded-2xl text-sm" required>
+                    </div>
                 </div>
+
+                <div class="space-y-1">
+                    <label class="text-xs text-gray-400 mr-2">كلمة المرور</label>
+                    <div class="relative">
+                        <i data-lucide="lock" class="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500"></i>
+                        <input type="password" id="passwordInput" placeholder="••••••••" class="input-field w-full py-4 pr-12 pl-4 rounded-2xl text-sm" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="emailSubmitBtn" class="btn-glow btn-primary w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2 mt-2">
+                    <span id="emailBtnText">تسجيل الدخول</span>
+                    <div id="emailLoader" class="loader hidden"></div>
+                </button>
+
+                <div class="flex justify-between items-center text-xs px-2 mt-2">
+                    <button type="button" class="text-purple-400 hover:text-purple-300">نسيت كلمة المرور؟</button>
+                    <button type="button" class="text-gray-400 hover:text-white">إنشاء حساب جديد</button>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider-container text-gray-500 text-[10px] uppercase tracking-widest font-bold">
+                أو عبر وسائل التواصل
+            </div>
+
+            <!-- Social Logins -->
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="loginWithGoogle()" class="btn-glow google-btn h-14 rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                </button>
+                <button onclick="loginWithTwitter()" class="btn-glow twitter-btn h-14 rounded-2xl flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </button>
+                <button onclick="loginWithGitHub()" class="btn-glow github-btn h-14 rounded-2xl flex items-center justify-center">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
-        <!-- Welcome Text -->
-        <div class="text-center mb-12 slide-up" style="animation-delay: 0.2s;">
-            <h1 class="text-4xl md:text-5xl font-black mb-3 glow-text tracking-tight">
-                Welcome to
-            </h1>
-            <h2 class="text-5xl md:text-6xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400">
-                Afnan Chat
-            </h2>
-            <p class="text-gray-400 mt-4 text-lg font-light">
-                تواصل مع العالم بطريقة جديدة وممتعة
-            </p>
-        </div>
-
-        <!-- Login Buttons -->
-        <div class="w-full max-w-sm space-y-4 slide-up" style="animation-delay: 0.4s;">
-            
-            <!-- Google Login -->
-            <button onclick="loginWithGoogle()" id="googleBtn" class="btn-glow w-full py-4 rounded-2xl google-btn font-bold text-base flex items-center justify-center gap-3">
-                <svg class="w-5 h-5" viewBox="0 0 24 24">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                </svg>
-                <span id="googleText">تسجيل الدخول بـ Google</span>
-                <div id="googleLoader" class="loader hidden"></div>
-            </button>
-
-            <!-- Twitter Login -->
-            <button onclick="loginWithTwitter()" id="twitterBtn" class="btn-glow w-full py-4 rounded-2xl twitter-btn font-bold text-base flex items-center justify-center gap-3">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                </svg>
-                <span id="twitterText">تسجيل الدخول بـ X (Twitter)</span>
-                <div id="twitterLoader" class="loader hidden"></div>
-            </button>
-
-            <!-- GitHub Login -->
-            <button onclick="loginWithGitHub()" id="githubBtn" class="btn-glow w-full py-4 rounded-2xl github-btn font-bold text-base flex items-center justify-center gap-3">
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                </svg>
-                <span id="githubText">تسجيل الدخول بـ GitHub</span>
-                <div id="githubLoader" class="loader hidden"></div>
-            </button>
-
-        </div>
-
         <!-- Footer -->
-        <div class="mt-12 text-center slide-up" style="animation-delay: 0.6s;">
-            <div class="divider mb-6 w-48 mx-auto"></div>
-            <p class="text-gray-500 text-sm">
-                بالتسجيل، أنت توافق على 
-                <a href="#" class="text-purple-400 hover:text-purple-300 transition">شروط الاستخدام</a>
-                و
-                <a href="#" class="text-purple-400 hover:text-purple-300 transition">سياسة الخصوصية</a>
-            </p>
-            <p class="text-gray-600 text-xs mt-4">
-                © 2024 Afnan Chat. جميع الحقوق محفوظة.
-            </p>
+        <div class="mt-8 text-center slide-up text-[11px] text-gray-500" style="animation-delay: 0.4s;">
+            © 2024 Afnan AI. جميع الحقوق محفوظة.
+            <div class="mt-2 space-x-4 space-x-reverse">
+                <a href="#" class="hover:underline">الشروط</a>
+                <a href="#" class="hover:underline">الخصوصية</a>
+            </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, TwitterAuthProvider, GithubAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, GoogleAuthProvider, TwitterAuthProvider, GithubAuthProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+        // Your Config
         const firebaseConfig = {
             apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
             authDomain: "rtx3090-28439.firebaseapp.com",
             projectId: "rtx3090-28439",
             storageBucket: "rtx3090-28439.firebasestorage.app",
             messagingSenderId: "178612030690",
-            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
-            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
+            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        const googleProvider = new GoogleAuthProvider();
-        const twitterProvider = new TwitterAuthProvider();
-        const githubProvider = new GithubAuthProvider();
-
-        // Generate stars
+        // UI Helpers
         function createStars() {
-            const starsContainer = document.getElementById('stars');
-            for (let i = 0; i < 100; i++) {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 80; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
                 star.style.top = Math.random() * 100 + '%';
                 star.style.animationDelay = Math.random() * 3 + 's';
-                star.style.opacity = Math.random();
-                starsContainer.appendChild(star);
+                container.appendChild(star);
             }
         }
         createStars();
+        lucide.createIcons();
 
-        function setLoading(provider, loading) {
-            const btn = document.getElementById(provider + 'Btn');
-            const text = document.getElementById(provider + 'Text');
-            const loader = document.getElementById(provider + 'Loader');
-            
-            if (loading) {
-                text.classList.add('hidden');
-                loader.classList.remove('hidden');
-                btn.disabled = true;
-                btn.style.opacity = '0.7';
-            } else {
-                text.classList.remove('hidden');
+        // Email Login Logic
+        const emailForm = document.getElementById('emailLoginForm');
+        emailForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const btnText = document.getElementById('emailBtnText');
+            const loader = document.getElementById('emailLoader');
+
+            btnText.classList.add('hidden');
+            loader.classList.remove('hidden');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                alert("خطأ في تسجيل الدخول: " + error.message);
+                btnText.classList.remove('hidden');
                 loader.classList.add('hidden');
-                btn.disabled = false;
-                btn.style.opacity = '1';
-            }
-        }
-
-        window.loginWithGoogle = async () => {
-            setLoading('google', true);
-            try {
-                await signInWithPopup(auth, googleProvider);
-            } catch (error) {
-                console.error('Google login error:', error);
-                alert('فشل تسجيل الدخول: ' + error.message);
-                setLoading('google', false);
             }
         };
 
-        window.loginWithTwitter = async () => {
-            setLoading('twitter', true);
-            try {
-                await signInWithPopup(auth, twitterProvider);
-            } catch (error) {
-                console.error('Twitter login error:', error);
-                alert('فشل تسجيل الدخول: ' + error.message);
-                setLoading('twitter', false);
-            }
-        };
+        // Social Logins
+        window.loginWithGoogle = () => signInWithPopup(auth, new GoogleAuthProvider());
+        window.loginWithTwitter = () => signInWithPopup(auth, new TwitterAuthProvider());
+        window.loginWithGitHub = () => signInWithPopup(auth, new GithubAuthProvider());
 
-        window.loginWithGitHub = async () => {
-            setLoading('github', true);
-            try {
-                await signInWithPopup(auth, githubProvider);
-            } catch (error) {
-                console.error('GitHub login error:', error);
-                alert('فشل تسجيل الدخول: ' + error.message);
-                setLoading('github', false);
-            }
-        };
-
+        // Auth State
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const userDocRef = doc(db, "users", user.uid);
                 const userSnap = await getDoc(userDocRef);
                 
                 if (!userSnap.exists()) {
-                    // Create new user account
-                    const newUserData = {
+                    await setDoc(userDocRef, {
                         uid: user.uid,
                         email: user.email,
                         displayName: user.displayName || "مستخدم جديد",
                         photoURL: user.photoURL || 'https://via.placeholder.com/150',
                         balance: 1000,
-                        jewels: 0,
-                        magicLevel: 1,
-                        wealthLevel: 1,
-                        customId: Math.floor(100000 + Math.random() * 900000).toString(),
-                        purchasedFrames: [],
-                        purchasedBadges: [],
-                        purchasedSvga: [],
-                        purchasedChatBubbles: [],
-                        activeFrame: null,
-                        activeBadges: [],
-                        activeChatBubble: null,
-                        friends: [],
-                        friendRequests: [],
-                        sentRequests: [],
-                        blockedUsers: [],
                         createdAt: serverTimestamp()
-                    };
-                    await setDoc(userDocRef, newUserData);
+                    });
                 }
-                
-                // Redirect to main app
                 window.location.href = "afnan_ai_white.html";
             }
         });
-
-        lucide.createIcons();
     </script>
 </body>
 </html>
+
