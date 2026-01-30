@@ -3,525 +3,1253 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Premium Live - SVGA Engine</title>
-    
-    <!-- مكتبات خارجية -->
+    <title>Premium Live Experience</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- مكتبة تشغيل ملفات SVGA -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
-
     <style>
         :root {
-            --primary: #7c3aed;
-            --bg-dark: #0f172a;
+            --primary: #8b5cf6;
+            --accent: #f59e0b;
+            --bg-black: #000000;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --wealth: #facc15;
+            --magic: #d946ef;
         }
 
-        body {
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            outline: none; 
+            -webkit-tap-highlight-color: transparent; 
             font-family: 'Cairo', sans-serif;
-            background-color: #000;
-            color: #fff;
+        }
+        body {
+            background-color: var(--bg-black);
+            color: #fff; 
+            height: 100vh; 
             overflow: hidden;
-            height: 100vh;
-            height: 100dvh;
+            display: flex; 
+            justify-content: center;
         }
 
-        /* خلفية التطبيق */
         .app-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at 50% 10%, #1e1b4b 0%, #000000 90%);
+            position: fixed; 
+            inset: 0;
+            background: radial-gradient(circle at 10% 10%, #1e1b4b 0%, #000000 50%);
+            z-index: -1;
         }
 
-        /* --- حاويات الصور والـ SVGA --- */
-        .avatar-wrapper {
-            position: relative;
-            display: flex; justify-content: center; align-items: center;
+        .app-container { 
+            width: 100%; 
+            max-width: 480px; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
         }
-        
-        .user-img {
-            border-radius: 50%;
+
+        /* الهيدر */
+        .header { 
+            padding: 15px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            z-index: 100; 
+        }
+        .room-info {
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            background: var(--glass);
+            padding: 5px 12px; 
+            border-radius: 30px; 
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px); 
+            cursor: pointer;
+        }
+        .owner-img { 
+            width: 38px; 
+            height: 38px; 
+            border-radius: 50%; 
+            border: 2px solid var(--accent); 
+            object-fit: cover;
+        }
+
+        /* عرض المستخدمين في الأعلى */
+        .users-bar {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.3);
+            min-height: 90px;
+        }
+        .users-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .user-avatar {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+            position: relative;
+        }
+        .avatar-ring {
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: var(--glass);
+            border: 1px solid var(--glass-border); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            backdrop-filter: blur(5px); 
+            transition: 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .avatar-img {
+            width: 90%; 
+            height: 90%; 
+            border-radius: 50%; 
             object-fit: cover;
             position: relative;
-            z-index: 1; /* الصورة في الخلف */
+            z-index: 2;
         }
-
-        /* حاوية الإطار المتحرك SVGA */
-        .svga-frame-container {
+        .avatar-frame {
             position: absolute;
-            top: 50%; left: 50%;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
-            width: 150%; /* الإطار أكبر من الصورة */
-            height: 150%;
-            z-index: 2; /* الإطار فوق الصورة */
+            width: 100%;
+            height: 100%;
+            z-index: 3;
             pointer-events: none;
-            display: flex; align-items: center; justify-content: center;
         }
-        
-        /* ضبط الكانفاس داخل الحاوية */
-        .svga-frame-container canvas {
-            width: 100% !important;
-            height: 100% !important;
+        .user-name {
+            font-size: 10px;
+            margin-top: 5px;
+            text-align: center;
+            color: #ccc;
+            max-width: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .online-dot {
+            position: absolute;
+            bottom: 0;
+            right: 5px;
+            width: 10px;
+            height: 10px;
+            background: #10b981;
+            border-radius: 50%;
+            border: 2px solid #000;
+            z-index: 4;
         }
 
-        /* --- تحسينات الشات --- */
-        .chat-area::-webkit-scrollbar { width: 4px; }
-        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        /* الشات */
+        .chat-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+        .chat-area::-webkit-scrollbar {
+            display: none;
+        }
+        .msg-bubble {
+            background: rgba(255,255,255,0.08); 
+            border: 1px solid var(--glass-border);
+            padding: 10px; 
+            border-radius: 18px; 
+            border-bottom-right-radius: 2px;
+            backdrop-filter: blur(10px); 
+            display: flex; 
+            align-items: flex-start; 
+            gap: 10px;
+            max-width: 85%; 
+            animation: slideIn 0.3s ease;
+        }
+        .msg-avatar { 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%; 
+            border: 1px solid var(--accent); 
+            cursor: pointer; 
+            transition: 0.2s; 
+            position: relative;
+            overflow: hidden;
+        }
+        .msg-avatar-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+        .msg-avatar:active { 
+            transform: scale(0.9); 
+        }
+        .msg-user { 
+            font-size: 11px; 
+            font-weight: bold; 
+            color: var(--accent); 
+            display: flex; 
+            align-items: center; 
+            gap: 5px; 
+            margin-bottom: 5px;
+        }
         
-        .chat-bubble {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.08);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        .badge { 
+            font-size: 8px; 
+            padding: 1px 6px; 
+            border-radius: 10px; 
+            font-weight: bold; 
+        }
+        .b-wealth { 
+            background: var(--wealth); 
+            color: #000; 
+        }
+        .b-magic { 
+            background: var(--magic); 
+            color: #fff; 
+        }
+        
+        /* أزرار الشات */
+        .msg-badges {
+            display: flex;
+            gap: 3px;
+            margin-left: 5px;
+        }
+        .msg-badge-icon {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .msg-badge-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
-        /* --- طبقة أنيميشن الدخول والهدايا --- */
-        #fullScreenAnimLayer {
-            position: fixed; inset: 0; 
-            z-index: 9999; 
-            pointer-events: none;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        /* الفوتر */
+        .footer { 
+            padding: 10px 15px 25px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            z-index: 500; 
         }
-        
-        .entry-banner {
-            background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.8), transparent);
-            padding: 10px 40px;
-            margin-bottom: 20px;
-            animation: fadeIn 0.5s;
-            text-shadow: 0 2px 5px black;
-            font-weight: bold;
+        .input-box {
+            flex: 1; 
+            background: var(--glass); 
+            border: 1px solid var(--glass-border);
+            border-radius: 25px; 
+            height: 46px; 
+            padding: 0 15px; 
+            display: flex; 
+            align-items: center;
+        }
+        .main-input { 
+            background: transparent; 
+            border: none; 
+            color: #fff; 
+            width: 100%; 
+            font-size: 14px; 
+        }
+        .btn-action {
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            border: none;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer;
             font-size: 18px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            transition: 0.2s;
+        }
+        .btn-action:active {
+            transform: scale(0.9);
         }
 
-        /* --- القوائم السفلية --- */
-        .bottom-sheet {
-            position: absolute; bottom: 0; left: 0; right: 0;
-            background: #111827;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-radius: 24px 24px 0 0;
-            transform: translateY(110%);
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-            z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .bottom-sheet.active { transform: translateY(0); }
-        
+        /* النوافذ (Sheets) */
         .sheet-overlay {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
-            z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-            backdrop-filter: blur(2px);
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.5); 
+            backdrop-filter: blur(5px);
+            z-index: 2000; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-end;
+            opacity: 0; 
+            pointer-events: none; 
+            transition: 0.3s;
         }
-        .sheet-overlay.active { opacity: 1; pointer-events: auto; }
+        .sheet-overlay.show { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+        .bottom-sheet {
+            background: rgba(20, 20, 25, 0.95); 
+            backdrop-filter: blur(40px);
+            width: 100%; 
+            border-radius: 30px 30px 0 0; 
+            border-top: 1px solid var(--glass-border);
+            transform: translateY(100%); 
+            transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 25px; 
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .sheet-overlay.show .bottom-sheet { 
+            transform: translateY(0); 
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* أزرار البروفايل الجديدة */
+        .profile-tools { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin: 20px 0; 
+        }
+        .tool-btn {
+            width: 45px; 
+            height: 45px; 
+            border-radius: 15px; 
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border); 
+            color: #fff; 
+            display: flex;
+            align-items: center; 
+            justify-content: center; 
+            font-size: 18px; 
+            transition: 0.2s;
+        }
+        .tool-btn:active { 
+            transform: scale(0.9); 
+            background: var(--glass); 
+        }
+        .tool-btn.gift { 
+            color: var(--accent); 
+        }
+        .tool-btn.mention { 
+            color: #3b82f6; 
+        }
+
+        /* الهدايا */
+        .user-selector { 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            padding-bottom: 15px; 
+            margin-bottom: 15px; 
+            border-bottom: 1px solid var(--glass-border); 
+        }
+        .user-option { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            opacity: 0.4; 
+            min-width: 50px; 
+            cursor: pointer;
+        }
+        .user-option.active { 
+            opacity: 1; 
+            font-weight: bold; 
+            color: var(--accent); 
+        }
+        .user-option img { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            margin-bottom: 4px; 
+            border: 2px solid transparent; 
+        }
+        .user-option.active img { 
+            border-color: var(--accent); 
+        }
+
+        .gifts-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            padding-bottom: 10px;
+        }
+        .gift-card {
+            background: rgba(255,255,255,0.05); 
+            border-radius: 12px; 
+            padding: 12px 5px;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .gift-card:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .gift-card.selected { 
+            background: rgba(245, 158, 11, 0.15); 
+            border-color: var(--accent); 
+        }
+        .gift-emoji {
+            font-size: 25px;
+            margin-bottom: 5px;
+        }
+        .gift-price {
+            font-size: 10px; 
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .hidden { 
+            display: none !important; 
+        }
+
+        /* أنيميشن */
+        @keyframes giftPop {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            50% { transform: scale(1.8) rotate(10deg); opacity: 1; }
+            100% { transform: scale(1) translateY(-250px); opacity: 0; }
+        }
+        .gift-fx {
+            position: absolute; 
+            left: 50%; 
+            top: 50%; 
+            font-size: 100px;
+            pointer-events: none; 
+            z-index: 3000; 
+            animation: giftPop 1.5s ease-out forwards;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* تحسينات للهواتف */
+        @media (max-width: 400px) {
+            .users-bar {
+                gap: 10px;
+            }
+            .avatar-ring {
+                width: 45px;
+                height: 45px;
+            }
+            .gifts-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
     </style>
 </head>
-<body>
+<body onclick="handleGlobalClick(event)">
 
-    <div class="app-bg"></div>
+<div class="app-bg"></div>
 
-    <!-- طبقة تأثيرات الدخول والهدايا (سيارات، صواريخ) -->
-    <div id="fullScreenAnimLayer"></div>
+<div class="app-container">
+    <header class="header">
+        <div class="room-info" onclick="openProfileById(userData.uid)">
+            <img id="roomOwnerAvatar" src="https://via.placeholder.com/150" class="owner-img">
+            <div>
+                <span style="font-size:9px; color:var(--accent)" id="roomOwnerId">ID: ...</span>
+                <div style="font-size:12px; font-weight:bold" id="roomOwnerName">جاري التحميل...</div>
+            </div>
+        </div>
+        <div style="display:flex; gap:8px">
+            <button class="btn-action" onclick="window.location.href='index.html'">
+                <i class="fa-solid fa-home"></i>
+            </button>
+            <button class="btn-action" onclick="confirmLogout()">
+                <i class="fa-solid fa-sign-out-alt"></i>
+            </button>
+        </div>
+    </header>
 
-    <div class="flex flex-col h-full w-full relative">
+    <!-- شريط عرض المستخدمين -->
+    <div class="users-bar" id="usersBar"></div>
+
+    <!-- منطقة الشات -->
+    <div class="chat-area" id="chatArea">
+        <div class="msg-bubble" style="background: rgba(59, 130, 246, 0.1); border-color: #3b82f6;">
+            <div class="msg-content">
+                <div class="msg-user" style="color:#3b82f6;">
+                    <i class="fa-solid fa-info-circle"></i> نظام الغرفة
+                </div>
+                <div class="msg-text">مرحباً بك في الغرفة! يمكنك إرسال رسائل وهدايا للمستخدمين.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- الفوتر لإدخال الرسائل -->
+    <footer class="footer">
+        <div class="input-box" onclick="event.stopPropagation()">
+            <input type="text" id="chatInput" class="main-input" placeholder="اكتب رسالة..." autocomplete="off">
+        </div>
+        <button id="giftBtn" class="btn-action" style="background:var(--accent)" onclick="toggleSheet('giftSheet', true)">
+            <i class="fa-solid fa-gift"></i>
+        </button>
+        <button id="sendBtn" class="btn-action hidden" style="background:var(--primary)" onclick="sendMessage()">
+            <i class="fa-solid fa-paper-plane"></i>
+        </button>
+    </footer>
+</div>
+
+<!-- نافذة البروفايل -->
+<div class="sheet-overlay" id="profileSheet">
+    <div style="flex:1" onclick="toggleSheet('profileSheet', false)"></div>
+    <div class="bottom-sheet">
+        <div style="text-align:center; position: relative;">
+            <div style="position: relative; display: inline-block;">
+                <img id="p-img" src="" class="owner-img" style="width: 90px; height: 90px; border: 3px solid var(--accent)">
+                <div id="p-frame" class="avatar-frame"></div>
+                <div id="p-online" class="online-dot" style="bottom: 5px; right: 5px;"></div>
+            </div>
+            <h3 id="p-name" style="margin-top:10px; font-size: 18px;">اسم المستخدم</h3>
+            <p id="p-id" style="color:#888; font-size:12px">ID: ---</p>
+            
+            <div class="profile-tools">
+                <button class="tool-btn gift" onclick="handleProfileGift()"><i class="fa-solid fa-gift"></i></button>
+                <button class="tool-btn mention" onclick="handleProfileMention()"><i class="fa-solid fa-at"></i></button>
+                <button class="tool-btn" style="width: 120px; font-size: 14px; font-weight: bold;" id="followBtn">متابعة</button>
+            </div>
+
+            <div style="display:flex; justify-content:center; gap:20px; font-size:12px; margin-top: 10px;">
+                <span class="badge b-wealth" id="p-wealth">الثروة: --</span>
+                <span class="badge b-magic" id="p-magic">السحر: --</span>
+            </div>
+            
+            <!-- الشارات النشطة -->
+            <div style="margin-top: 15px;">
+                <h4 style="font-size: 14px; margin-bottom: 10px; color: var(--accent)">الشارات النشطة</h4>
+                <div id="p-badges" style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                    <!-- سيتم ملؤها بالشارات -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- نافذة الهدايا -->
+<div class="sheet-overlay" id="giftSheet">
+    <div style="flex:1" onclick="toggleSheet('giftSheet', false)"></div>
+    <div class="bottom-sheet">
+        <h3 style="margin-bottom: 15px; text-align: center; color: var(--accent)">إرسال هدية</h3>
         
-        <!-- الهيدر -->
-        <header class="flex justify-between items-center p-4 pt-6 z-20 bg-gradient-to-b from-black/80 to-transparent">
-            <!-- معلومات الغرفة -->
-            <div class="flex items-center gap-3 bg-white/5 pr-1 pl-4 py-1 rounded-full border border-white/10 backdrop-blur-md cursor-pointer" onclick="showOwnerProfile()">
-                <div class="avatar-wrapper w-10 h-10">
-                    <img id="roomOwnerImg" src="https://via.placeholder.com/100" class="user-img w-full h-full border border-white/20">
-                    <!-- حاوية إطار المالك SVGA -->
-                    <div id="roomOwnerFrame" class="svga-frame-container"></div>
-                </div>
-                <div class="flex flex-col">
-                    <span id="roomName" class="text-sm font-bold text-white">جار التحميل...</span>
-                    <span id="roomIdDisp" class="text-[10px] text-gray-400 font-mono">ID: ...</span>
-                </div>
+        <div class="user-selector" id="giftUserSelector"></div>
+        
+        <div class="gifts-grid" id="giftsGrid"></div>
+        
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:20px">
+            <div style="font-size:12px">الرصيد: <span style="color:var(--accent)" id="walletBalance">0</span> 🪙</div>
+            <div style="display:flex; gap:10px">
+                <input type="number" value="1" min="1" max="99" id="giftQty" style="width:50px; background:var(--glass); border:1px solid var(--glass-border); border-radius:8px; color:var(--accent); text-align:center; font-weight:bold">
+                <button class="btn-send-gift" onclick="sendGift()" style="background:var(--accent); border:none; padding:8px 25px; border-radius:20px; font-weight:bold; color: #000;">إرسال</button>
             </div>
+        </div>
+    </div>
+</div>
 
-            <!-- أزرار التحكم -->
-            <div class="flex gap-3">
-                <button class="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10" onclick="alert('قائمة المتواجدين')">
-                    <i class="fa-solid fa-users text-gray-300 text-sm"></i>
-                </button>
-                <button onclick="exitRoom()" class="w-9 h-9 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-500">
-                    <i class="fa-solid fa-power-off text-sm"></i>
-                </button>
-            </div>
-        </header>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getDatabase, ref, push, onValue, set, onDisconnect } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        <!-- منطقة الشات -->
-        <main id="chatArea" class="chat-area flex-1 overflow-y-auto px-4 pb-4 space-y-4 relative z-10">
-            <div class="text-center py-6 opacity-40 text-xs">بداية المحادثة</div>
-        </main>
+    const firebaseConfig = {
+        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
+        authDomain: "rtx3090-28439.firebaseapp.com",
+        projectId: "rtx3090-28439",
+        storageBucket: "rtx3090-28439.firebasestorage.app",
+        messagingSenderId: "178612030690",
+        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
+        databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
+    };
 
-        <!-- الفوتر -->
-        <footer class="p-4 z-20 bg-gradient-to-t from-black via-black/90 to-transparent">
-            <div class="flex items-center gap-3">
-                <div class="flex-1 bg-gray-800/50 backdrop-blur-md rounded-full h-12 flex items-center px-5 border border-white/10 focus-within:border-purple-500/50 transition-colors">
-                    <input type="text" id="msgInput" placeholder="اكتب رسالة..." class="bg-transparent border-none outline-none text-white text-sm w-full placeholder-gray-500 font-cairo">
-                </div>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
+
+    // بيانات التطبيق
+    let userData = {};
+    let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {} };
+    let allUsers = [];
+    let currentProfileUser = null;
+    let selectedRecipient = null;
+    let selectedGift = null;
+    let roomType = 'private';
+    let roomId = '';
+    let chatUnsubscribe = null;
+    let activeSvgaPlayers = {};
+
+    // الحصول على معاملات URL
+    const urlParams = new URLSearchParams(window.location.search);
+    roomId = urlParams.get('id');
+    roomType = urlParams.get('type') || 'private';
+
+    // عندما يتغير حالة المستخدم (تسجيل الدخول/الخروج)
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            const userDocRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userDocRef);
+            if (userSnap.exists()) {
+                userData = { uid: userSnap.id, ...userSnap.data() };
                 
-                <button onclick="openGiftSheet()" class="w-12 h-12 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-600 flex items-center justify-center shadow-lg shadow-amber-500/20 active:scale-95 transition-transform group">
-                    <i class="fa-solid fa-gift text-white text-xl group-hover:animate-bounce"></i>
-                </button>
-
-                <button id="sendBtn" onclick="sendMessage()" class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center shadow-lg active:scale-95 transition-transform hidden">
-                    <i class="fa-solid fa-paper-plane text-white"></i>
-                </button>
-            </div>
-        </footer>
-    </div>
-
-    <!-- نافذة البروفايل -->
-    <div id="sheetOverlay" class="sheet-overlay" onclick="closeSheets()"></div>
-    <div id="profileSheet" class="bottom-sheet p-6">
-        <div class="flex flex-col items-center -mt-12 mb-4 relative">
-            <div class="avatar-wrapper w-28 h-28">
-                <img id="p-img" src="" class="user-img w-full h-full border-4 border-[#111827]">
-                <!-- إطار البروفايل SVGA -->
-                <div id="p-frame-container" class="svga-frame-container" style="width: 160%; height: 160%;"></div>
-            </div>
-        </div>
-        
-        <div class="text-center mb-6">
-            <h2 id="p-name" class="text-xl font-bold text-white mb-1">...</h2>
-            <div class="flex items-center justify-center gap-2 mb-3">
-                <span id="p-id" class="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded">ID: ...</span>
-                <span class="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded flex items-center gap-1">
-                    <i class="fa-solid fa-gem text-amber-500"></i> <span id="p-wealth">0</span>
-                </span>
-            </div>
-            
-            <!-- الشارات -->
-            <div id="p-badges" class="flex flex-wrap justify-center gap-2 min-h-[30px]"></div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-            <button class="py-3.5 rounded-xl bg-white/5 font-bold hover:bg-white/10 transition">متابعة</button>
-            <button class="py-3.5 rounded-xl bg-purple-600 font-bold hover:bg-purple-700 transition" onclick="alert('إرسال هدية')">إرسال هدية</button>
-        </div>
-    </div>
-
-    <!-- Firebase Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, collection, getDocs, onSnapshot, updateDoc, increment, addDoc, serverTimestamp, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getDatabase, ref, push, onChildAdded, set, onDisconnect, serverTimestamp as rtdbTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY",
-            authDomain: "rtx3090-28439.firebaseapp.com",
-            projectId: "rtx3090-28439",
-            storageBucket: "rtx3090-28439.firebasestorage.app",
-            messagingSenderId: "178612030690",
-            appId: "1:178612030690:web:883189ced2ed3a78e3e2bb",
-            databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const rtdb = getDatabase(app);
-
-        // Variables
-        let currentUser = null;
-        let roomId = new URLSearchParams(window.location.search).get('id') || 'default';
-        let storeData = { frames: {}, cars: {}, badges: {} };
-        let svgaParser = new SVGA.Parser(); // Parser واحد عالمي
-
-        // --- 1. SVGA HELPER FUNCTION (The Core) ---
-        // هذه الدالة هي القلب النابض الذي يشغل أي ملف SVGA في أي مكان
-        async function playSvga(url, targetElementId, options = {}) {
-            const container = document.getElementById(targetElementId);
-            if (!container) return;
-
-            // تنظيف الحاوية السابقة إذا وجدت
-            container.innerHTML = '';
-
-            // إنشاء عنصر DIV جديد للتشغيل
-            const divId = `svga-${Math.random().toString(36).substr(2, 9)}`;
-            const div = document.createElement('div');
-            div.id = divId;
-            div.style.width = '100%';
-            div.style.height = '100%';
-            container.appendChild(div);
-
-            const player = new SVGA.Player(div);
-            
-            // إعدادات التشغيل
-            player.loops = options.loops || 0; // 0 = لانهائي
-            player.clearsAfterStop = options.clearsAfterStop || false;
-
-            svgaParser.load(url, (videoItem) => {
-                player.setVideoItem(videoItem);
-                player.startAnimation();
-                if (options.onFinish) {
-                    player.onFinished(() => options.onFinish(container));
-                }
-            }, (error) => {
-                console.error("SVGA Load Error:", error);
-            });
-        }
-
-        // --- 2. التحميل الأولي (Metadata) ---
-        async function initData() {
-            try {
-                // جلب بيانات المتجر (الإطارات، السيارات)
-                const storeSnap = await getDocs(collection(db, "storeItems"));
-                storeSnap.forEach(doc => {
-                    const item = doc.data();
-                    // تصنيف العناصر بناءً على النوع
-                    // نفترض أن النوع يحدد في قاعدة البيانات، أو نخزن الكل في قاموس واحد
-                    // هنا سنخزن كل العناصر في قاموس واحد للسهولة باستخدام الـ ID
-                    storeData.frames[doc.id] = item; // نفترض أن الكل هنا للتبسيط
-                    storeData.cars[doc.id] = item;
-                });
-
-                // جلب الشارات
-                const badgesSnap = await getDocs(collection(db, "badges"));
-                badgesSnap.forEach(doc => {
-                    storeData.badges[doc.id] = doc.data();
-                });
-
-                console.log("Data loaded", storeData);
-            } catch (e) { console.error(e); }
-        }
-
-        // --- 3. المصادقة والبدء ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                await initData();
-                const userDoc = await getDoc(doc(db, "users", user.uid));
-                if (userDoc.exists()) {
-                    currentUser = { uid: user.uid, ...userDoc.data() };
-                    
-                    setupRoom();
-                    setupPresence();
-                }
-            } else {
-                window.location.href = "login.html";
-            }
-        });
-
-        // --- 4. إعداد الغرفة ---
-        async function setupRoom() {
-            // تحميل بيانات مالك الغرفة في الهيدر
-            const ownerSnap = await getDoc(doc(db, "users", roomId));
-            if (ownerSnap.exists()) {
-                const owner = ownerSnap.data();
-                document.getElementById('roomName').innerText = owner.displayName;
-                document.getElementById('roomIdDisp').innerText = `ID: ${owner.uid.substring(0,6)}`;
-                document.getElementById('roomOwnerImg').src = owner.photoURL;
-
-                // تشغيل إطار المالك (SVGA)
-                if (owner.activeFrame && storeData.frames[owner.activeFrame]) {
-                    playSvga(storeData.frames[owner.activeFrame].fileUrl || storeData.frames[owner.activeFrame].image, 'roomOwnerFrame', { loops: 0 });
-                }
-            }
-
-            // الاستماع للرسائل
-            const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
-            onChildAdded(chatRef, (snapshot) => {
-                renderMessage(snapshot.val());
-            });
-        }
-
-        // --- 5. نظام الحضور ودخول السيارات (SVGA) ---
-        function setupPresence() {
-            // تسجيل وجودي
-            const myRef = ref(rtdb, `roomUsers/${roomId}/${currentUser.uid}`);
-            set(myRef, {
-                uid: currentUser.uid,
-                name: currentUser.displayName,
-                activeEntry: currentUser.activeEntry || null, // معرف السيارة
-                timestamp: rtdbTimestamp()
-            });
-            onDisconnect(myRef).remove();
-
-            // الاستماع للآخرين لتشغيل دخول السيارات
-            const usersRef = ref(rtdb, `roomUsers/${roomId}`);
-            let initialLoad = true;
-
-            onChildAdded(usersRef, (snapshot) => {
-                const user = snapshot.val();
-                if (!initialLoad && user.uid !== currentUser.uid) {
-                    // مستخدم جديد دخل للتو -> تشغيل السيارة
-                    playEntryAnimation(user);
-                }
-            });
-
-            setTimeout(() => initialLoad = false, 2000);
-        }
-
-        function playEntryAnimation(user) {
-            // التحقق مما إذا كان المستخدم يملك سيارة دخول
-            if (!user.activeEntry) return;
-            const carItem = storeData.cars[user.activeEntry];
-            
-            // يجب أن يكون الرابط ملف SVGA
-            if (!carItem || !carItem.fileUrl) return;
-
-            // إنشاء حاوية مؤقتة للأنيميشن
-            const animLayer = document.getElementById('fullScreenAnimLayer');
-            
-            // بانر الاسم
-            const banner = document.createElement('div');
-            banner.className = 'entry-banner text-white rounded-full border border-white/20';
-            banner.innerHTML = `✨ ${user.name} انضم إلينا ✨`;
-            animLayer.appendChild(banner);
-
-            // حاوية SVGA
-            const svgaContainer = document.createElement('div');
-            svgaContainer.id = `entry-${Date.now()}`;
-            svgaContainer.style.width = '100%';
-            svgaContainer.style.maxWidth = '600px';
-            svgaContainer.style.height = '400px'; // ارتفاع مناسب للسيارة
-            animLayer.appendChild(svgaContainer);
-
-            // تشغيل الملف
-            playSvga(carItem.fileUrl, svgaContainer.id, {
-                loops: 1,
-                clearsAfterStop: true,
-                onFinish: (container) => {
-                    container.remove();
-                    banner.remove();
-                }
-            });
-        }
-
-        // --- 6. عرض الرسائل (مع إطارات SVGA) ---
-        async function renderMessage(msg) {
-            // جلب بيانات المرسل (للحصول على الإطار المحدث)
-            let senderData = {};
-            if (msg.senderId === currentUser.uid) {
-                senderData = currentUser;
-            } else {
-                const snap = await getDoc(doc(db, "users", msg.senderId));
-                senderData = snap.exists() ? snap.data() : { displayName: msg.senderName, photoURL: 'https://via.placeholder.com/150' };
-            }
-
-            const chatArea = document.getElementById('chatArea');
-            const isMe = msg.senderId === currentUser.uid;
-            
-            // معرفات فريدة للعناصر
-            const msgId = `msg-${Date.now()}-${Math.random()}`;
-            const frameContainerId = `frame-${msgId}`;
-
-            // HTML الرسالة
-            const msgHTML = `
-                <div class="flex items-start gap-3 ${isMe ? 'flex-row-reverse' : ''} animate-[fadeIn_0.3s_ease-out]">
-                    <!-- الصورة والإطار -->
-                    <div class="avatar-wrapper w-10 h-10 flex-shrink-0 cursor-pointer" onclick="openProfile('${msg.senderId}')">
-                        <img src="${senderData.photoURL}" class="user-img w-full h-full">
-                        <!-- مكان الإطار SVGA -->
-                        <div id="${frameContainerId}" class="svga-frame-container"></div>
-                    </div>
-
-                    <div class="flex flex-col max-w-[75%] ${isMe ? 'items-end' : 'items-start'}">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-[10px] text-gray-400 font-bold">${senderData.displayName}</span>
-                            <!-- مستويات -->
-                            ${senderData.wealthLevel ? `<span class="bg-amber-500/10 text-amber-500 text-[9px] px-1.5 rounded border border-amber-500/20">Lv.${senderData.wealthLevel}</span>` : ''}
-                        </div>
-                        
-                        <div class="chat-bubble px-4 py-2 rounded-2xl text-sm leading-6 ${isMe ? 'rounded-tr-sm bg-purple-900/40 text-white' : 'rounded-tl-sm text-gray-100'}">
-                            ${msg.text}
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            chatArea.insertAdjacentHTML('beforeend', msgHTML);
-            chatArea.scrollTop = chatArea.scrollHeight;
-
-            // تشغيل إطار SVGA إذا وجد
-            if (senderData.activeFrame && storeData.frames[senderData.activeFrame]) {
-                const frameUrl = storeData.frames[senderData.activeFrame].fileUrl || storeData.frames[senderData.activeFrame].image;
-                // تأخير بسيط لضمان وجود العنصر في DOM
-                setTimeout(() => {
-                    playSvga(frameUrl, frameContainerId, { loops: 0 });
-                }, 50);
-            }
-        }
-
-        // --- 7. البروفايل ---
-        window.openProfile = async (uid) => {
-            const docSnap = await getDoc(doc(db, "users", uid));
-            if (!docSnap.exists()) return;
-            const data = docSnap.data();
-
-            document.getElementById('p-name').innerText = data.displayName;
-            document.getElementById('p-id').innerText = `ID: ${data.uid}`;
-            document.getElementById('p-img').src = data.photoURL;
-            document.getElementById('p-wealth').innerText = data.wealthLevel || 0;
-
-            // إظهار الشارات
-            const badgesDiv = document.getElementById('p-badges');
-            badgesDiv.innerHTML = '';
-            if (data.badges) {
-                data.badges.forEach(bid => {
-                    if (storeData.badges[bid]) {
-                        // الشارات غالباً صور ثابتة، لكن لو كانت SVGA يمكن استخدام playSvga
-                        badgesDiv.innerHTML += `<img src="${storeData.badges[bid].image}" class="w-6 h-6 object-contain" title="${storeData.badges[bid].name}">`;
+                // تحديث البيانات في الوقت الحقيقي
+                onSnapshot(userDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        userData = { uid: docSnap.id, ...docSnap.data() };
+                        updateWalletBalance();
                     }
                 });
+                
+                await loadGlobalData();
+                await loadRoomOwner();
+                await loadAllUsers();
+                setupPresence();
+                loadRoomChat();
+                
+                // تحديث واجهة الشات
+                document.getElementById('chatInput').addEventListener('focus', function() {
+                    document.getElementById('giftBtn').classList.add('hidden');
+                    document.getElementById('sendBtn').classList.remove('hidden');
+                });
+                
+            } else {
+                alert('هذا الحساب غير مسجل في النظام. يرجى التواصل مع الإدارة.');
+                await signOut(auth);
+                window.location.href = "login.html";
             }
+        } else {
+            window.location.href = "login.html";
+        }
+    });
 
-            // تشغيل إطار البروفايل الكبير SVGA
-            const pFrameContainer = document.getElementById('p-frame-container');
-            pFrameContainer.innerHTML = ''; // تنظيف القديم
+    // تحميل البيانات العامة
+    async function loadGlobalData() {
+        try {
+            const storeSnap = await getDocs(collection(db, "storeItems"));
+            storeData.items = storeSnap.docs.map(d => ({id: d.id, ...d.data()}));
+            storeData.itemsById = {};
+            storeData.items.forEach(item => { storeData.itemsById[item.id] = item; });
             
-            if (data.activeFrame && storeData.frames[data.activeFrame]) {
-                const frameUrl = storeData.frames[data.activeFrame].fileUrl || storeData.frames[data.activeFrame].image;
-                playSvga(frameUrl, 'p-frame-container', { loops: 0 });
+            const gSnap = await getDocs(collection(db, "gifts"));
+            storeData.gifts = gSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'wealth'}));
+            
+            const lgSnap = await getDocs(collection(db, "luckGifts"));
+            storeData.luckGifts = lgSnap.docs.map(d => ({id: d.id, ...d.data(), type: 'magic'}));
+            
+            const mlSnap = await getDocs(collection(db, "magicLevels"));
+            mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
+            
+            const wlSnap = await getDocs(collection(db, "wealthLevels"));
+            wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+            
+        } catch (error) {
+            console.error('Error loading global data:', error);
+        }
+    }
+
+    // تحميل مالك الغرفة
+    async function loadRoomOwner() {
+        try {
+            let ownerId = roomId;
+            
+            if (roomType === 'private') {
+                const ownerDoc = await getDoc(doc(db, "users", ownerId));
+                if (ownerDoc.exists()) {
+                    const ownerData = ownerDoc.data();
+                    document.getElementById('roomOwnerName').textContent = ownerData.displayName || "مستخدم";
+                    document.getElementById('roomOwnerId').textContent = `ID: ${ownerId.substring(0, 6)}`;
+                    document.getElementById('roomOwnerAvatar').src = ownerData.photoURL || 'https://via.placeholder.com/150';
+                }
+            } else {
+                const roomDoc = await getDoc(doc(db, "rooms", ownerId));
+                if (roomDoc.exists()) {
+                    const room = roomDoc.data();
+                    document.getElementById('roomOwnerName').textContent = room.name;
+                    document.getElementById('roomOwnerId').textContent = `غرفة عامة`;
+                }
             }
+        } catch (error) {
+            console.error('Error loading room owner:', error);
+        }
+    }
 
-            // فتح النافذة
-            document.getElementById('sheetOverlay').classList.add('active');
-            document.getElementById('profileSheet').classList.add('active');
-        };
-
-        // --- دوال مساعدة ---
-        window.sendMessage = async () => {
-            const input = document.getElementById('msgInput');
-            if(!input.value.trim()) return;
+    // تحميل جميع المستخدمين
+    async function loadAllUsers() {
+        try {
+            const usersBar = document.getElementById('usersBar');
+            usersBar.innerHTML = '<div style="padding: 10px; color: #888;">جاري تحميل المستخدمين...</div>';
             
-            await push(ref(rtdb, `roomChats/${roomId}/messages`), {
-                senderId: currentUser.uid,
-                senderName: currentUser.displayName,
-                text: input.value,
-                timestamp: rtdbTimestamp()
+            const usersSnap = await getDocs(collection(db, "users"));
+            allUsers = [];
+            
+            usersSnap.forEach(doc => {
+                const user = { uid: doc.id, ...doc.data() };
+                allUsers.push(user);
             });
-            input.value = '';
-        };
+            
+            displayUsersInBar();
+            
+            // تعيين المستخدم الأول كمستلم افتراضي للهدايا
+            if (allUsers.length > 0) {
+                selectedRecipient = allUsers.find(u => u.uid !== userData.uid) || allUsers[0];
+                renderGiftUsers();
+            }
+        } catch (error) {
+            console.error('Error loading users:', error);
+            usersBar.innerHTML = '<div style="padding: 10px; color: #f00;">حدث خطأ في تحميل المستخدمين</div>';
+        }
+    }
 
-        document.getElementById('msgInput').addEventListener('input', (e) => {
-            document.getElementById('sendBtn').classList.toggle('hidden', e.target.value.trim() === '');
+    // عرض المستخدمين في الشريط العلوي
+    function displayUsersInBar() {
+        const usersBar = document.getElementById('usersBar');
+        usersBar.innerHTML = '';
+        
+        allUsers.forEach(user => {
+            const isOnline = user.lastSeen && (Date.now() - user.lastSeen.toDate().getTime()) < 300000;
+            
+            const userDiv = document.createElement('div');
+            userDiv.className = 'user-avatar';
+            userDiv.onclick = () => openProfile(user);
+            
+            // إطار الصورة إذا كان موجوداً
+            let frameHtml = '';
+            if (user.activeFrame && storeData.itemsById[user.activeFrame]) {
+                const frameItem = storeData.itemsById[user.activeFrame];
+                if (frameItem.itemType === 'svga') {
+                    frameHtml = `<div class="avatar-frame" id="frame-${user.uid}"></div>`;
+                }
+            }
+            
+            userDiv.innerHTML = `
+                <div class="avatar-ring">
+                    <img src="${user.photoURL || 'https://via.placeholder.com/150'}" class="avatar-img" alt="${user.displayName}">
+                    ${frameHtml}
+                    ${isOnline ? '<div class="online-dot"></div>' : ''}
+                </div>
+                <div class="user-name">${user.displayName || "مستخدم"}</div>
+            `;
+            
+            usersBar.appendChild(userDiv);
+            
+            // تحميل إطار SVGA إذا كان موجوداً
+            if (user.activeFrame && storeData.itemsById[user.activeFrame] && storeData.itemsById[user.activeFrame].itemType === 'svga') {
+                setTimeout(() => {
+                    const frameItem = storeData.itemsById[user.activeFrame];
+                    const frameContainer = document.getElementById(`frame-${user.uid}`);
+                    if (frameContainer && frameItem.fileUrl) {
+                        playSvga(frameItem.fileUrl, frameContainer, { loops: 0, clearsAfterStop: false });
+                    }
+                }, 100);
+            }
         });
+    }
 
-        window.closeSheets = () => {
-            document.querySelectorAll('.sheet-overlay, .bottom-sheet').forEach(el => el.classList.remove('active'));
-        };
-
-        window.exitRoom = () => {
-            // إزالة بيانات الحضور
-            set(ref(rtdb, `roomUsers/${roomId}/${currentUser.uid}`), null).then(() => {
-                window.history.back();
+    // تشغيل SVGA
+    function playSvga(url, container, options = {}) {
+        try {
+            container.innerHTML = '';
+            const player = new SVGA.Player(container);
+            const parser = new SVGA.Parser();
+            parser.load(url, (videoItem) => {
+                player.setVideoItem(videoItem);
+                player.loops = options.loops || 0;
+                player.clearsAfterStop = options.clearsAfterStop || false;
+                player.startAnimation();
+                
+                const id = 'player_' + Date.now();
+                activeSvgaPlayers[id] = { player, container };
+                container.dataset.playerId = id;
+            }, (error) => {
+                console.error('SVGA Error:', error);
             });
+        } catch (error) {
+            console.error('SVGA Play Error:', error);
+        }
+    }
+
+    // فتح بروفايل مستخدم
+    function openProfile(user) {
+        currentProfileUser = user;
+        
+        document.getElementById('p-name').textContent = user.displayName || "مستخدم";
+        document.getElementById('p-id').textContent = `ID: ${user.uid.substring(0, 8)}`;
+        document.getElementById('p-img').src = user.photoURL || 'https://via.placeholder.com/150';
+        document.getElementById('p-wealth').textContent = `الثروة: ${user.wealthLevel || 1}`;
+        document.getElementById('p-magic').textContent = `السحر: ${user.magicLevel || 1}`;
+        
+        // حالة الاتصال
+        const isOnline = user.lastSeen && (Date.now() - user.lastSeen.toDate().getTime()) < 300000;
+        document.getElementById('p-online').style.backgroundColor = isOnline ? '#10b981' : '#6b7280';
+        
+        // تحديث زر المتابعة
+        const isFollowing = userData.friends?.includes(user.uid);
+        const followBtn = document.getElementById('followBtn');
+        if (isFollowing) {
+            followBtn.innerHTML = '✓ متابع';
+            followBtn.style.background = 'var(--glass)';
+            followBtn.onclick = () => unfollowUser(user.uid);
+        } else {
+            followBtn.innerHTML = 'متابعة';
+            followBtn.style.background = 'var(--primary)';
+            followBtn.onclick = () => sendFriendRequest(user.uid);
+        }
+        
+        // عرض الإطار إذا كان موجوداً
+        const frameContainer = document.getElementById('p-frame');
+        frameContainer.innerHTML = '';
+        if (user.activeFrame && storeData.itemsById[user.activeFrame]) {
+            const frameItem = storeData.itemsById[user.activeFrame];
+            if (frameItem.itemType === 'svga' && frameItem.fileUrl) {
+                playSvga(frameItem.fileUrl, frameContainer, { loops: 0, clearsAfterStop: false });
+            }
+        }
+        
+        // عرض الشارات النشطة
+        const badgesContainer = document.getElementById('p-badges');
+        badgesContainer.innerHTML = '';
+        
+        if (user.activeBadges && user.activeBadges.length > 0) {
+            user.activeBadges.forEach(badgeId => {
+                const badge = storeData.itemsById[badgeId];
+                if (badge) {
+                    const badgeDiv = document.createElement('div');
+                    badgeDiv.className = 'msg-badge-icon';
+                    badgeDiv.style.width = '30px';
+                    badgeDiv.style.height = '30px';
+                    
+                    if (badge.itemType === 'svga') {
+                        badgeDiv.id = `profile-badge-${badgeId}`;
+                        badgesContainer.appendChild(badgeDiv);
+                        
+                        setTimeout(() => {
+                            if (badge.fileUrl) {
+                                playSvga(badge.fileUrl, badgeDiv, { loops: 0, clearsAfterStop: false });
+                            }
+                        }, 100);
+                    } else {
+                        badgeDiv.innerHTML = `<img src="${badge.image}" alt="${badge.name}" title="${badge.name}">`;
+                        badgesContainer.appendChild(badgeDiv);
+                    }
+                }
+            });
+        } else {
+            badgesContainer.innerHTML = '<p style="color: #888; font-size: 12px;">لا توجد شارات نشطة</p>';
+        }
+        
+        toggleSheet('profileSheet', true);
+    }
+
+    // فتح بروفايل بالمعرف
+    function openProfileById(id) {
+        const user = allUsers.find(u => u.uid === id);
+        if (user) {
+            openProfile(user);
+        }
+    }
+
+    // إرسال طلب متابعة
+    async function sendFriendRequest(uid) {
+        try {
+            await updateDoc(doc(db, "users", userData.uid), { sentRequests: arrayUnion(uid) });
+            await updateDoc(doc(db, "users", uid), { friendRequests: arrayUnion(userData.uid) });
+            alert('تم إرسال طلب المتابعة بنجاح!');
+            toggleSheet('profileSheet', false);
+        } catch (error) {
+            alert('فشل إرسال الطلب: ' + error.message);
+        }
+    }
+
+    // إلغاء المتابعة
+    async function unfollowUser(uid) {
+        try {
+            await updateDoc(doc(db, "users", userData.uid), { friends: arrayRemove(uid) });
+            await updateDoc(doc(db, "users", uid), { friends: arrayRemove(userData.uid) });
+            alert('تم إلغاء المتابعة');
+            toggleSheet('profileSheet', false);
+        } catch (error) {
+            alert('فشل إلغاء المتابعة: ' + error.message);
+        }
+    }
+
+    // إعداد حالة الاتصال
+    function setupPresence() {
+        if (!userData.uid) return;
+        
+        const userStatusRef = ref(rtdb, `status/${userData.uid}`);
+        const userStatusFirestoreRef = doc(db, "users", userData.uid);
+        
+        const isOfflineForDatabase = {
+            state: 'offline',
+            last_changed: new Date().toISOString(),
         };
+        
+        const isOnlineForDatabase = {
+            state: 'online',
+            last_changed: new Date().toISOString(),
+        };
+        
+        // تحديث حالة الاتصال في Realtime Database
+        set(ref(rtdb, '.info/connected'), onDisconnect(userStatusRef).set(isOfflineForDatabase).then(() => {
+            set(userStatusRef, isOnlineForDatabase);
+        }));
+        
+        // تحديث lastSeen في Firestore
+        updateDoc(userStatusFirestoreRef, {
+            lastSeen: new Date()
+        });
+    }
 
-        // تصدير الدوال
-        window.openProfile = window.openProfile;
-        window.closeSheets = window.closeSheets;
-        window.sendMessage = window.sendMessage;
-        window.exitRoom = window.exitRoom;
+    // تحميل دردشة الغرفة
+    function loadRoomChat() {
+        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
+        
+        if (chatUnsubscribe) chatUnsubscribe();
+        
+        chatUnsubscribe = onValue(chatRef, (snapshot) => {
+            const messages = snapshot.val();
+            const container = document.getElementById('chatArea');
+            
+            // احتفظ بالرسالة الترحيبية الأولى فقط
+            const welcomeMsg = container.querySelector('.msg-bubble');
+            container.innerHTML = '';
+            if (welcomeMsg) container.appendChild(welcomeMsg);
+            
+            if (messages) {
+                Object.values(messages).sort((a, b) => a.timestamp - b.timestamp).forEach(msg => {
+                    addMessageToChat(msg);
+                });
+                container.scrollTop = container.scrollHeight;
+            }
+        });
+    }
 
-    </script>
+    // إضافة رسالة إلى الشات
+    function addMessageToChat(msg) {
+        const container = document.getElementById('chatArea');
+        const isMe = msg.senderId === userData.uid;
+        
+        // البحث عن بيانات المرسل
+        const sender = allUsers.find(u => u.uid === msg.senderId) || { 
+            displayName: msg.senderName || 'مستخدم', 
+            photoURL: 'https://via.placeholder.com/150',
+            wealthLevel: 1,
+            magicLevel: 1,
+            activeBadges: []
+        };
+        
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'msg-bubble';
+        msgDiv.style.alignSelf = isMe ? 'flex-end' : 'flex-start';
+        msgDiv.style.backgroundColor = isMe ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255,255,255,0.08)';
+        msgDiv.style.borderColor = isMe ? '#3b82f6' : 'var(--glass-border)';
+        
+        // إنشاء شارات المستخدم
+        let badgesHtml = '';
+        if (sender.activeBadges && sender.activeBadges.length > 0) {
+            badgesHtml = '<div class="msg-badges">';
+            sender.activeBadges.slice(0, 3).forEach(badgeId => {
+                const badge = storeData.itemsById[badgeId];
+                if (badge) {
+                    if (badge.itemType === 'svga') {
+                        badgesHtml += `<div class="msg-badge-icon" id="chat-badge-${badgeId}-${msg.senderId}"></div>`;
+                    } else {
+                        badgesHtml += `<div class="msg-badge-icon"><img src="${badge.image}" alt="${badge.name}" title="${badge.name}"></div>`;
+                    }
+                }
+            });
+            badgesHtml += '</div>';
+        }
+        
+        msgDiv.innerHTML = `
+            <div class="msg-avatar" onclick="openProfileById('${msg.senderId}')">
+                <img src="${sender.photoURL}" class="msg-avatar-img">
+            </div>
+            <div class="msg-content">
+                <div class="msg-user">
+                    ${sender.displayName}
+                    <span class="badge b-wealth">W.${sender.wealthLevel || 1}</span>
+                    <span class="badge b-magic">M.${sender.magicLevel || 1}</span>
+                    ${badgesHtml}
+                </div>
+                <div class="msg-text">${msg.text}</div>
+                <div style="font-size: 9px; color: #888; margin-top: 5px;">
+                    ${new Date(msg.timestamp).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}
+                </div>
+            </div>
+        `;
+        
+        container.appendChild(msgDiv);
+        
+        // تحميل شارات SVGA إذا كانت موجودة
+        if (sender.activeBadges) {
+            setTimeout(() => {
+                sender.activeBadges.slice(0, 3).forEach(badgeId => {
+                    const badge = storeData.itemsById[badgeId];
+                    if (badge && badge.itemType === 'svga' && badge.fileUrl) {
+                        const badgeContainer = document.getElementById(`chat-badge-${badgeId}-${msg.senderId}`);
+                        if (badgeContainer) {
+                            playSvga(badge.fileUrl, badgeContainer, { loops: 0, clearsAfterStop: false });
+                        }
+                    }
+                });
+            }, 100);
+        }
+    }
+
+    // إرسال رسالة
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        
+        if (!text) return;
+        
+        const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
+        await push(chatRef, {
+            senderId: userData.uid,
+            senderName: userData.displayName,
+            text: text,
+            timestamp: Date.now()
+        });
+        
+        input.value = '';
+        
+        // إعادة زر الهدية
+        document.getElementById('giftBtn').classList.remove('hidden');
+        document.getElementById('sendBtn').classList.add('hidden');
+    }
+
+    // تحديث رصيد المحفظة
+    function updateWalletBalance() {
+        document.getElementById('walletBalance').textContent = (userData.balance || 0).toLocaleString();
+    }
+
+    // عرض المستلمين المحتملين للهدايا
+    function renderGiftUsers() {
+        const container = document.getElementById('giftUserSelector');
+        container.innerHTML = '';
+        
+        allUsers.forEach(user => {
+            if (user.uid === userData.uid) return; // تخطي المستخدم الحالي
+            
+            const div = document.createElement('div');
+            div.className = `user-option ${selectedRecipient?.uid === user.uid ? 'active' : ''}`;
+            div.onclick = () => {
+                selectedRecipient = user;
+                renderGiftUsers();
+            };
+            div.innerHTML = `
+                <img src="${user.photoURL || 'https://via.placeholder.com/150'}" alt="${user.displayName}">
+                <span style="font-size:9px">${user.displayName || 'مستخدم'}</span>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // عرض الهدايا
+    function renderGifts() {
+        const grid = document.getElementById('giftsGrid');
+        grid.innerHTML = '';
+        
+        // دمج الهدايا العادية وهدايا الحظ
+        const allGifts = [...storeData.gifts, ...storeData.luckGifts];
+        
+        if (allGifts.length === 0) {
+            grid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #888; padding: 20px;">لا توجد هدايا متاحة</p>';
+            return;
+        }
+        
+        allGifts.forEach(gift => {
+            const div = document.createElement('div');
+            div.className = 'gift-card';
+            div.onclick = () => {
+                document.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
+                div.classList.add('selected');
+                selectedGift = gift;
+            };
+            
+            const giftTypeIcon = gift.type === 'magic' ? '🔮' : '💰';
+            div.innerHTML = `
+                <div class="gift-emoji">${giftTypeIcon}</div>
+                <div style="font-size: 11px; margin-bottom: 5px; text-align: center;">${gift.name}</div>
+                <div class="gift-price">${gift.price || 0} 🪙</div>
+            `;
+            
+            grid.appendChild(div);
+        });
+        
+        // تحديد أول هدية افتراضياً
+        if (allGifts.length > 0 && !selectedGift) {
+            selectedGift = allGifts[0];
+            grid.querySelector('.gift-card').classList.add('selected');
+        }
+    }
+
+    // إرسال هدية
+    async function sendGift() {
+        if (!selectedRecipient || !selectedGift) {
+            alert('يرجى اختيار مستلم وهدية');
+            return;
+        }
+        
+        if (userData.balance < (selectedGift.price || 0)) {
+            alert('رصيدك غير كافٍ!');
+            return;
+        }
+        
+        try {
+            // خصم السعر من رصيد المرسل
+            await updateDoc(doc(db, "users", userData.uid), { 
+                balance: increment(-(selectedGift.price || 0)) 
+            });
+            
+            const qty = parseInt(document.getElementById('giftQty').value) || 1;
+            
+            // إضافة الهدية إلى المستلم
+            const receiverRef = doc(db, "users", selectedRecipient.uid);
+            
+            if (selectedGift.type === 'magic') {
+                const newJewels = (selectedRecipient.jewels || 0) + (10 * qty);
+                let newCoins = selectedRecipient.balance || 0;
+                let newMagicLevel = selectedRecipient.magicLevel || 1;
+                
+                if (newJewels >= 10) {
+                    const coinsToAdd = Math.floor(newJewels / 10);
+                    newCoins += coinsToAdd;
+                    const magicPoints = newCoins;
+                    if (magicPoints >= 100 * newMagicLevel) newMagicLevel += 1;
+                }
+                
+                await updateDoc(receiverRef, { 
+                    jewels: newJewels % 10, 
+                    balance: newCoins, 
+                    magicLevel: newMagicLevel 
+                });
+            } else if (selectedGift.type === 'wealth') {
+                const wealthGiftValue = selectedGift.reward || 1;
+                const currentWealth = selectedRecipient.wealthLevel || 1;
+                const newWealthLevel = currentWealth + (wealthGiftValue * qty);
+                
+                await updateDoc(receiverRef, { 
+                    wealthLevel: newWealthLevel, 
+                    balance: increment((selectedGift.reward || 0) * qty) 
+                });
+            }
+            
+            // إرسال رسالة في الشات عن الهدية
+            const chatRef = ref(rtdb, `roomChats/${roomId}/messages`);
+            await push(chatRef, {
+                senderId: userData.uid,
+                senderName: userData.displayName,
+                text: `🎁 أرسل هدية ${selectedGift.name} إلى ${selectedRecipient.displayName} (${qty}x)`,
+                timestamp: Date.now(),
+                type: 'gift'
+            });
+            
+            // عرض تأثير الهدية
+            showGiftAnimation();
+            
+            toggleSheet('giftSheet', false);
+            
+        } catch (error) {
+            alert('فشل إرسال الهدية: ' + error.message);
+        }
+    }
+
+    // عرض تأثير الهدية
+    function showGiftAnimation() {
+        const fx = document.createElement('div');
+        fx.className = 'gift-fx';
+        fx.innerHTML = '🎁';
+        document.body.appendChild(fx);
+        setTimeout(() => fx.remove(), 1500);
+    }
+
+    // وظائف مساعدة للواجهة
+    window.toggleSheet = (id, show) => {
+        const sheet = document.getElementById(id);
+        if (show) {
+            sheet.classList.add('show');
+            
+            // إذا كانت نافذة الهدايا، قم بتحميل الهدايا
+            if (id === 'giftSheet') {
+                updateWalletBalance();
+                renderGifts();
+                if (allUsers.length > 0 && !selectedRecipient) {
+                    selectedRecipient = allUsers.find(u => u.uid !== userData.uid) || allUsers[0];
+                }
+                renderGiftUsers();
+            }
+        } else {
+            sheet.classList.remove('show');
+        }
+    };
+
+    window.handleGlobalClick = (e) => {
+        const input = document.getElementById('chatInput');
+        if (e.target !== input) {
+            input.blur();
+            document.getElementById('giftBtn').classList.remove('hidden');
+            document.getElementById('sendBtn').classList.add('hidden');
+        }
+    };
+
+    window.handleProfileMention = () => {
+        if (!currentProfileUser) return;
+        
+        toggleSheet('profileSheet', false);
+        const input = document.getElementById('chatInput');
+        input.value = `@${currentProfileUser.displayName} `;
+        input.focus();
+        document.getElementById('giftBtn').classList.add('hidden');
+        document.getElementById('sendBtn').classList.remove('hidden');
+    };
+
+    window.handleProfileGift = () => {
+        if (!currentProfileUser) return;
+        
+        selectedRecipient = currentProfileUser;
+        toggleSheet('profileSheet', false);
+        toggleSheet('giftSheet', true);
+    };
+
+    window.sendMessage = sendMessage;
+    window.sendGift = sendGift;
+    window.openProfileById = openProfileById;
+
+    window.confirmLogout = () => {
+        if (confirm('هل تريد تسجيل الخروج؟')) {
+            Object.keys(activeSvgaPlayers).forEach(id => {
+                try { activeSvgaPlayers[id].player.clear(); } catch (e) {}
+            });
+            activeSvgaPlayers = {};
+            signOut(auth);
+        }
+    };
+</script>
+
 </body>
 </html>
-
