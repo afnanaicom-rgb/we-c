@@ -96,8 +96,8 @@
     });
 
     async function loadStore() {
-        const sSnap = await db.collection('storeItems').where('type', '==', 'frame').get();
-        sSnap.forEach(doc => storeData.frames[doc.id] = doc.data());
+        const sSnap = await db.collection('storeItems').get();
+        sSnap.forEach(doc => { if (doc.data().type === 'frame') storeData.frames[doc.id] = doc.data(); });
     }
 
     async function loadRoom() {
@@ -113,21 +113,9 @@
         const pRef = rtdb.ref(`rooms/${roomId}/users/${user.uid}`);
         pRef.set({ uid: user.uid, name: userData.displayName, photo: userData.photoURL });
         pRef.onDisconnect().remove();
-        
-        rtdb.ref(`rooms/${roomId}/users`).on('value', (s) => {
-            document.getElementById('roomUserCount').textContent = `${s.numChildren()} متصل`;
-        });
-
-        // عرض الرسائل السابقة (آخر 50 رسالة)
-        rtdb.ref(`rooms/${roomId}/messages`).limitToLast(50).once('value', (s) => {
-            s.forEach(m => renderMsg(m.val()));
-        });
-
-        // الاستماع للرسائل الجديدة
-        rtdb.ref(`rooms/${roomId}/messages`).limitToLast(1).on('child_added', (s) => {
-            const msg = s.val();
-            if (msg.time > Date.now() - 5000) renderMsg(msg);
-        });
+        rtdb.ref(`rooms/${roomId}/users`).on('value', (s) => { document.getElementById('roomUserCount').textContent = `${s.numChildren()} متصل`; });
+        rtdb.ref(`rooms/${roomId}/messages`).limitToLast(50).once('value', (s) => { s.forEach(m => renderMsg(m.val())); });
+        rtdb.ref(`rooms/${roomId}/messages`).limitToLast(1).on('child_added', (s) => { const msg = s.val(); if (msg.time > Date.now() - 5000) renderMsg(msg); });
     }
 
     async function renderMsg(msg) {
@@ -135,26 +123,15 @@
         const div = document.createElement('div');
         div.className = 'msg-bubble';
         const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
-        
-        div.innerHTML = `
-            <div class="avatar-wrapper">
-                <img src="${msg.photo}" class="avatar-img">
-                <div id="frame_${msgId}" class="frame-img"></div>
-            </div>
-            <div>
-                <p style="font-size:11px; font-weight:bold; color:var(--accent)">${msg.senderName}</p>
-                <p style="font-size:13px">${msg.text}</p>
-            </div>`;
+        div.innerHTML = `<div class="avatar-wrapper"><img src="${msg.photo}" class="avatar-img"><div id="frame_${msgId}" class="frame-img"></div></div><div><p style="font-size:11px; font-weight:bold; color:var(--accent)">${msg.senderName}</p><p style="font-size:13px">${msg.text}</p></div>`;
         area.appendChild(div);
-        
         const uSnap = await db.collection('users').doc(msg.senderId).get();
         const u = uSnap.data();
         if (u && u.last_active_frame) {
             const f = storeData.frames[u.last_active_frame];
             if (f) {
                 const fCont = document.getElementById(`frame_${msgId}`);
-                if (f.itemType === 'svga') playSvga(f.fileUrl, fCont);
-                else fCont.innerHTML = `<img src="${f.image}" style="width:100%; height:100%">`;
+                if (f.itemType === 'svga') playSvga(f.fileUrl, fCont); else fCont.innerHTML = `<img src="${f.image}" style="width:100%; height:100%">`;
             }
         }
         area.scrollTop = area.scrollHeight;
@@ -173,27 +150,16 @@
         const newName = document.getElementById('setRoomName').value;
         const bgFile = document.getElementById('setRoomBg').files[0];
         let background = room.background;
-        
         if (bgFile && supabase) {
-            const ext = bgFile.name.split('.').pop();
-            const fileName = `${Date.now()}.${ext}`;
-            const { data } = await supabase.storage.from('uploads').upload(`rooms/${fileName}`, bgFile);
-            if (data) {
-                const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(`rooms/${fileName}`);
-                background = urlData.publicUrl;
-            }
+            const fileName = `${Date.now()}-${bgFile.name}`;
+            const { data, error } = await supabase.storage.from('uploads').upload(`rooms/${fileName}`, bgFile);
+            if (data) { const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(`rooms/${fileName}`); background = urlData.publicUrl; }
         }
-        
         await db.collection('rooms').doc(roomId).update({ name: newName, background });
         location.reload();
     }
 
-    function playSvga(url, container) {
-        const player = new SVGA.Player(container);
-        const parser = new SVGA.Parser();
-        parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.startAnimation(); });
-    }
-
+    function playSvga(url, container) { const player = new SVGA.Player(container); const parser = new SVGA.Parser(); parser.load(url, (v) => { player.setVideoItem(v); player.startAnimation(); }); }
     function toggleSheet(id, s) { document.getElementById(id).classList.toggle('show', s); }
     function leaveRoom() { window.location.href = "afnan_ai_white.html"; }
 </script>
