@@ -2,162 +2,390 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-    <title>Afnan AI - الأصدقاء</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>الأصدقاء والمحادثات</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation }
         body { background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%); color: #1f2937; min-height: 100vh }
-        .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.6) }
+        .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s ease }
+        .glass-card:active { transform: scale(0.97) }
+        .chat-container { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s ease }
+        .chat-container.open { transform: translateX(0) }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px }
+        .chat-messages::-webkit-scrollbar { width: 4px }
+        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px }
+        .msg-sent { align-self: flex-end; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; padding: 10px 15px; border-radius: 18px 18px 4px 18px; max-width: 75%; word-break: break-word }
+        .msg-received { align-self: flex-start; background: rgba(255,255,255,0.15); color: white; padding: 10px 15px; border-radius: 18px 18px 18px 4px; max-width: 75%; word-break: break-word }
+        .msg-time { font-size: 10px; opacity: 0.6; margin-top: 4px }
+        .typing-indicator { display: flex; gap: 4px; padding: 10px 15px }
+        .typing-indicator span { width: 8px; height: 8px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: typing 1.4s infinite }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s }
+        @keyframes typing { 0%, 60%, 100% { transform: translateY(0) } 30% { transform: translateY(-10px) } }
+        .friend-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; cursor: pointer; transition: all 0.2s }
+        .friend-item:hover { background: rgba(255,255,255,0.6) }
+        .friend-item.unread { background: rgba(139, 92, 246, 0.1) }
+        .online-dot { width: 10px; height: 10px; border-radius: 50%; background: #22c55e; border: 2px solid white; position: absolute; bottom: 2px; right: 2px }
+        .tab-btn { flex: 1; padding: 12px; text-align: center; font-weight: bold; border-radius: 12px; transition: all 0.2s }
+        .tab-btn.active { background: white; color: #1f2937; box-shadow: 0 2px 8px rgba(0,0,0,0.1) }
+        .request-item { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.6); border-radius: 16px; margin-bottom: 8px }
+        .btn-accept { background: #22c55e; color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: bold }
+        .btn-reject { background: #ef4444; color: white; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: bold }
+        .badge-count { background: #ef4444; color: white; font-size: 10px; padding: 2px 6px; border-radius: 10px; min-width: 18px; text-align: center }
+        .notification { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 25px; backdrop-filter: blur(10px); z-index: 5000; animation: slideUp 0.3s ease }
+        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0 } to { transform: translateX(-50%) translateY(0); opacity: 1 } }
+        .search-input { width: 100%; padding: 12px 16px; border-radius: 16px; background: rgba(255,255,255,0.6); border: 1px solid rgba(255,255,255,0.4); font-size: 14px }
+        .search-input:focus { outline: none; background: white }
     </style>
 </head>
-<body class="antialiased p-5">
-    <header class="flex items-center gap-4 mb-8">
-        <button onclick="window.location.href='afnan_ai_white.html'" class="p-2 rounded-full bg-white shadow-sm"><i data-lucide="chevron-right"></i></button>
-        <h1 class="text-2xl font-black">الأصدقاء</h1>
+<body>
+    <header class="fixed top-0 left-0 right-0 h-16 z-30 px-4 flex items-center justify-between glass">
+        <button onclick="window.location.href='afnan_ai_white.html'" class="w-10 h-10 rounded-full flex items-center justify-center"><i data-lucide="arrow-right" class="w-5 h-5"></i></button>
+        <h2 class="text-lg font-bold">الأصدقاء</h2>
+        <div class="w-10"></div>
     </header>
 
-    <div class="relative mb-6">
-        <input type="text" id="searchInp" placeholder="ابحث عن مستخدم بالبريد..." class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-2 focus:ring-blue-500 outline-none">
-        <button onclick="searchUser()" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i data-lucide="search"></i></button>
-    </div>
+    <main class="pt-20 px-4 pb-24">
+        <div class="flex gap-2 mb-4 p-1 bg-white/60 backdrop-blur-md rounded-2xl">
+            <button id="tab-friends" onclick="switchTab('friends')" class="tab-btn active">الأصدقاء</button>
+            <button id="tab-requests" onclick="switchTab('requests')" class="tab-btn relative">الطلبات <span id="requestsBadge" class="badge-count hidden absolute -top-1 -left-1">0</span></button>
+            <button id="tab-online" onclick="switchTab('online')" class="tab-btn">متصل الآن</button>
+        </div>
 
-    <div id="searchResult" class="mb-8 hidden">
-        <h3 class="font-bold mb-3 text-sm">نتيجة البحث</h3>
-        <div id="userCard" class="glass-card p-4 rounded-3xl flex items-center justify-between"></div>
-    </div>
+        <div id="searchContainer" class="mb-4">
+            <input type="text" id="searchInput" class="search-input" placeholder="البحث عن أصدقاء..." oninput="searchFriends(this.value)">
+        </div>
 
-    <div class="mb-8">
-        <h3 class="font-bold mb-3 text-sm">طلبات المتابعة</h3>
-        <div id="requestsList" class="space-y-3"></div>
-    </div>
+        <div id="view-friends" class="view-section">
+            <div id="friendsList"></div>
+        </div>
 
-    <div>
-        <h3 class="font-bold mb-3 text-sm">قائمة الأصدقاء</h3>
-        <div id="friendsList" class="space-y-3"></div>
+        <div id="view-requests" class="view-section hidden">
+            <div id="requestsList"></div>
+        </div>
+
+        <div id="view-online" class="view-section hidden">
+            <div id="onlineList"></div>
+        </div>
+    </main>
+
+    <!-- Chat Container -->
+    <div id="chatContainer" class="chat-container">
+        <header class="glass px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button onclick="closeChat()" class="w-10 h-10 rounded-full flex items-center justify-center"><i data-lucide="arrow-right" class="w-5 h-5 text-white"></i></button>
+                <div class="relative">
+                    <img id="chatAvatar" src="" class="w-10 h-10 rounded-full object-cover">
+                    <span id="chatOnlineStatus" class="online-dot hidden"></span>
+                </div>
+                <div>
+                    <div id="chatName" class="font-bold text-white text-sm">...</div>
+                    <div id="chatStatus" class="text-xs text-gray-400">...</div>
+                </div>
+            </div>
+        </header>
+        <div id="chatMessages" class="chat-messages"></div>
+        <div id="typingIndicator" class="typing-indicator hidden"><span></span><span></span><span></span></div>
+        <footer class="glass px-4 py-3 flex items-center gap-3">
+            <div class="flex-1 bg-white/10 rounded-full px-4 py-3">
+                <input type="text" id="chatInput" class="w-full bg-transparent text-white text-sm" placeholder="اكتب رسالة..." onkeypress="if(event.key==='Enter')sendMessage()">
+            </div>
+            <button onclick="sendMessage()" class="w-11 h-11 rounded-full bg-violet-600 flex items-center justify-center"><i data-lucide="send" class="w-5 h-5 text-white"></i></button>
+        </footer>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, getDocs, arrayUnion, arrayRemove, setDoc, deleteDoc, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getDatabase, ref, onValue, push, set, onDisconnect, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
 
-        let me = null;
+    let currentUser = null, currentUserData = null, friendsData = {}, activeChatId = null, messagesUnsub = null, typingUnsub = null;
+    const onlineUsers = new Set();
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const snap = await getDoc(doc(db, "users", user.uid));
-                me = { uid: user.uid, ...snap.data() };
+    // تشفير بسيط للرسائل
+    const encrypt = (text) => btoa(unescape(encodeURIComponent(text))).split('').reverse().join('');
+    const decrypt = (text) => decodeURIComponent(escape(atob(text.split('').reverse().join(''))));
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            const snap = await getDoc(doc(db, 'users', user.uid));
+            if (snap.exists()) {
+                currentUserData = { uid: user.uid, ...snap.data() };
+                setupPresence();
                 loadFriends();
-                loadRequests();
-            } else { window.location.href = "login.html"; }
+                listenToRequests();
+            }
+        } else window.location.href = 'login.html';
+    });
+
+    function setupPresence() {
+        const presenceRef = ref(rtdb, `presence/${currentUser.uid}`);
+        set(presenceRef, { online: true, lastSeen: serverTimestamp() });
+        onDisconnect(presenceRef).set({ online: false, lastSeen: serverTimestamp() });
+    }
+
+    async function loadFriends() {
+        const friends = currentUserData.friends || [];
+        const friendsList = document.getElementById('friendsList');
+        friendsList.innerHTML = '';
+        friendsData = {};
+
+        if (friends.length === 0) {
+            friendsList.innerHTML = '<div class="text-center text-gray-400 py-10">لا يوجد أصدقاء بعد</div>';
+            return;
+        }
+
+        for (const friendId of friends) {
+            const snap = await getDoc(doc(db, 'users', friendId));
+            if (snap.exists()) {
+                const friend = { uid: friendId, ...snap.data() };
+                friendsData[friendId] = friend;
+                renderFriendItem(friend);
+            }
+        }
+
+        // Listen to online status
+        friends.forEach(fid => {
+            onValue(ref(rtdb, `presence/${fid}`), (snap) => {
+                const data = snap.val();
+                if (data) {
+                    if (data.online) onlineUsers.add(fid);
+                    else onlineUsers.delete(fid);
+                    updateOnlineStatus(fid, data.online);
+                }
+            });
+        });
+    }
+
+    function renderFriendItem(friend, container = 'friendsList') {
+        const isOnline = onlineUsers.has(friend.uid);
+        const div = document.createElement('div');
+        div.className = 'friend-item glass-card';
+        div.onclick = () => openChat(friend.uid);
+        div.innerHTML = `
+            <div class="relative">
+                <img src="${friend.photoURL || 'https://i.pravatar.cc/100'}" class="w-12 h-12 rounded-full object-cover">
+                <span class="online-dot ${isOnline ? '' : 'hidden'}"></span>
+            </div>
+            <div class="flex-1">
+                <div class="font-bold text-sm">${friend.displayName || 'مستخدم'}</div>
+                <div class="text-xs text-gray-500">${isOnline ? 'متصل الآن' : 'غير متصل'}</div>
+            </div>
+            <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
+        `;
+        document.getElementById(container).appendChild(div);
+    }
+
+    function updateOnlineStatus(uid, isOnline) {
+        const items = document.querySelectorAll('.friend-item');
+        items.forEach(item => {
+            const dot = item.querySelector('.online-dot');
+            if (dot) {
+                const shouldShow = isOnline && friendsData[uid];
+                dot.classList.toggle('hidden', !shouldShow);
+            }
+        });
+    }
+
+    function listenToRequests() {
+        onSnapshot(doc(db, 'users', currentUser.uid), (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                const requests = data.friendRequests || [];
+                const badge = document.getElementById('requestsBadge');
+                badge.textContent = requests.length;
+                badge.classList.toggle('hidden', requests.length === 0);
+                renderRequests(requests);
+            }
+        });
+    }
+
+    async function renderRequests(requests) {
+        const list = document.getElementById('requestsList');
+        list.innerHTML = '';
+        if (requests.length === 0) {
+            list.innerHTML = '<div class="text-center text-gray-400 py-10">لا يوجد طلبات صداقة</div>';
+            return;
+        }
+        for (const reqId of requests) {
+            const snap = await getDoc(doc(db, 'users', reqId));
+            if (snap.exists()) {
+                const user = snap.data();
+                const div = document.createElement('div');
+                div.className = 'request-item';
+                div.innerHTML = `
+                    <img src="${user.photoURL || 'https://i.pravatar.cc/100'}" class="w-10 h-10 rounded-full object-cover">
+                    <div class="flex-1">
+                        <div class="font-bold text-sm">${user.displayName || 'مستخدم'}</div>
+                    </div>
+                    <button onclick="acceptRequest('${reqId}')" class="btn-accept">قبول</button>
+                    <button onclick="rejectRequest('${reqId}')" class="btn-reject">رفض</button>
+                `;
+                list.appendChild(div);
+            }
+        }
+    }
+
+    window.acceptRequest = async (reqId) => {
+        await updateDoc(doc(db, 'users', currentUser.uid), {
+            friends: arrayUnion(reqId),
+            friendRequests: arrayRemove(reqId)
+        });
+        await updateDoc(doc(db, 'users', reqId), {
+            friends: arrayUnion(currentUser.uid),
+            sentRequests: arrayRemove(currentUser.uid)
+        });
+        showNotification('تمت إضافة الصديق');
+        loadFriends();
+    };
+
+    window.rejectRequest = async (reqId) => {
+        await updateDoc(doc(db, 'users', currentUser.uid), { friendRequests: arrayRemove(reqId) });
+        await updateDoc(doc(db, 'users', reqId), { sentRequests: arrayRemove(currentUser.uid) });
+        showNotification('تم رفض الطلب');
+    };
+
+    window.switchTab = (tab) => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+        document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+        document.getElementById(`view-${tab}`).classList.remove('hidden');
+        document.getElementById('searchContainer').classList.toggle('hidden', tab !== 'friends');
+        if (tab === 'online') loadOnlineFriends();
+    };
+
+    async function loadOnlineFriends() {
+        const list = document.getElementById('onlineList');
+        list.innerHTML = '';
+        const online = Object.entries(friendsData).filter(([uid]) => onlineUsers.has(uid));
+        if (online.length === 0) {
+            list.innerHTML = '<div class="text-center text-gray-400 py-10">لا يوجد أصدقاء متصلين</div>';
+            return;
+        }
+        online.forEach(([uid, friend]) => renderFriendItem(friend, 'onlineList'));
+    }
+
+    window.searchFriends = (query) => {
+        const items = document.querySelectorAll('#friendsList .friend-item');
+        items.forEach(item => {
+            const name = item.querySelector('.font-bold').textContent.toLowerCase();
+            item.style.display = name.includes(query.toLowerCase()) ? 'flex' : 'none';
+        });
+    };
+
+    window.openChat = async (friendId) => {
+        activeChatId = friendId;
+        const friend = friendsData[friendId];
+        if (!friend) return;
+
+        document.getElementById('chatAvatar').src = friend.photoURL || 'https://i.pravar.cc/100';
+        document.getElementById('chatName').textContent = friend.displayName || 'مستخدم';
+        document.getElementById('chatOnlineStatus').classList.toggle('hidden', !onlineUsers.has(friendId));
+        document.getElementById('chatStatus').textContent = onlineUsers.has(friendId) ? 'متصل الآن' : 'غير متصل';
+        document.getElementById('chatContainer').classList.add('open');
+
+        // Create chat room ID (sorted UIDs)
+        const chatId = [currentUser.uid, friendId].sort().join('_');
+
+        // Load messages
+        if (messagesUnsub) messagesUnsub();
+        messagesUnsub = onSnapshot(collection(db, 'chats', chatId, 'messages'), orderBy('timestamp', 'asc'), (snap) => {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            snap.forEach(doc => {
+                const msg = doc.data();
+                displayMessage(msg);
+            });
+            container.scrollTop = container.scrollHeight;
         });
 
-        window.searchUser = async () => {
-            const email = document.getElementById('searchInp').value.trim().toLowerCase();
-            const q = query(collection(db, "users"), where("email", "==", email));
-            const snap = await getDocs(q);
-            const res = document.getElementById('searchResult');
-            const card = document.getElementById('userCard');
-            res.classList.remove('hidden');
-            if (snap.empty) { card.innerHTML = "<p class='text-gray-400 text-sm'>لم يتم العثور على المستخدم</p>"; }
-            else {
-                const u = snap.docs[0].data();
-                const uid = snap.docs[0].id;
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="relative w-10 h-10 flex items-center justify-center">
-                            <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover relative z-10">
-                            <div id="frame_search_${uid}" class="absolute inset-0 pointer-events-none z-20"></div>
-                        </div>
-                        <div><h4 class="font-bold text-sm">${u.displayName}</h4></div>
-                    </div>
-                    <button onclick="followUser('${uid}')" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-bold">متابعة</button>
-                `;
-                if(u.activeFrame) {
-                    const fSnap = await getDoc(doc(db, "storeItems", u.activeFrame));
-                    if(fSnap.exists()) {
-                        const fData = fSnap.data();
-                        const fCont = document.getElementById(`frame_search_${uid}`);
-                        if(fData.image) fCont.innerHTML = `<img src="${fData.image}" class="w-full h-full object-contain">`;
-                    }
-                }
-            }
-            lucide.createIcons();
-        };
+        // Listen to typing
+        if (typingUnsub) typingUnsub();
+        typingUnsub = onValue(ref(rtdb, `typing/${chatId}/${friendId}`), (snap) => {
+            document.getElementById('typingIndicator').classList.toggle('hidden', !snap.val());
+        });
 
-        window.followUser = async (uid) => {
-            await updateDoc(doc(db, "users", uid), { friendRequests: arrayUnion(me.uid) });
-            alert("تم إرسال الطلب");
-        };
+        // Mark messages as read
+        await updateDoc(doc(db, 'users', currentUser.uid), { [`unread_${friendId}`]: 0 });
+    };
 
-        async function loadRequests() {
-            const list = document.getElementById('requestsList');
-            list.innerHTML = '';
-            if (!me.friendRequests?.length) { list.innerHTML = "<p class='text-gray-400 text-xs'>لا توجد طلبات</p>"; return; }
-            for (const uid of me.friendRequests) {
-                const snap = await getDoc(doc(db, "users", uid));
-                if (snap.exists()) {
-                    const u = snap.data();
-                    list.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
-                                <h4 class="font-bold text-sm">${u.displayName}</h4>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="accept('${uid}')" class="p-2 bg-green-500 text-white rounded-lg"><i data-lucide="check" class="w-4 h-4"></i></button>
-                            </div>
-                        </div>`;
-                }
-            }
-            lucide.createIcons();
+    function displayMessage(msg) {
+        const container = document.getElementById('chatMessages');
+        const isSent = msg.senderId === currentUser.uid;
+        const div = document.createElement('div');
+        div.className = isSent ? 'msg-sent' : 'msg-received';
+        const decryptedText = decrypt(msg.text);
+        const time = msg.timestamp ? new Date(msg.timestamp.toDate()).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }) : '';
+        div.innerHTML = `<div>${decryptedText}</div><div class="msg-time">${time}</div>`;
+        container.appendChild(div);
+    }
+
+    window.sendMessage = async () => {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text || !activeChatId) return;
+
+        const chatId = [currentUser.uid, activeChatId].sort().join('_');
+        const encryptedText = encrypt(text);
+
+        await setDoc(doc(db, 'chats', chatId), { users: [currentUser.uid, activeChatId], updatedAt: new Date() }, { merge: true });
+        await push(collection(db, 'chats', chatId, 'messages'), {
+            senderId: currentUser.uid,
+            text: encryptedText,
+            timestamp: new Date()
+        });
+
+        // Update unread count
+        const friendRef = doc(db, 'users', activeChatId);
+        const friendSnap = await getDoc(friendRef);
+        if (friendSnap.exists()) {
+            const currentUnread = friendSnap.data()[`unread_${currentUser.uid}`] || 0;
+            await updateDoc(friendRef, { [`unread_${currentUser.uid}`]: currentUnread + 1 });
         }
 
-        window.accept = async (uid) => {
-            await updateDoc(doc(db, "users", me.uid), { friends: arrayUnion(uid), friendRequests: arrayRemove(uid) });
-            await updateDoc(doc(db, "users", uid), { friends: arrayUnion(me.uid) });
-            location.reload();
-        };
+        input.value = '';
+    };
 
-        async function loadFriends() {
-            const list = document.getElementById('friendsList');
-            list.innerHTML = '';
-            if (!me.friends?.length) { list.innerHTML = "<p class='text-gray-400 text-xs'>لا يوجد أصدقاء</p>"; return; }
-            for (const uid of me.friends) {
-                const snap = await getDoc(doc(db, "users", uid));
-                if (snap.exists()) {
-                    const u = snap.data();
-                    const frameId = `frame_friend_${uid}`;
-                    list.innerHTML += `
-                        <div class="glass-card p-4 rounded-3xl flex items-center gap-3">
-                            <div class="relative w-10 h-10 flex items-center justify-center">
-                                <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover relative z-10">
-                                <div id="${frameId}" class="absolute inset-0 pointer-events-none z-20"></div>
-                            </div>
-                            <h4 class="font-bold text-sm flex-1">${u.displayName}</h4>
-                            <i data-lucide="message-circle" class="text-gray-300 w-4 h-4"></i>
-                        </div>`;
-                    if(u.activeFrame) {
-                        const fSnap = await getDoc(doc(db, "storeItems", u.activeFrame));
-                        if(fSnap.exists()) {
-                            const fData = fSnap.data();
-                            const fCont = document.getElementById(frameId);
-                            if(fData.image) fCont.innerHTML = `<img src="${fData.image}" class="w-full h-full object-contain">`;
-                        }
-                    }
-                }
-            }
-            lucide.createIcons();
-        }
-        lucide.createIcons();
+    window.closeChat = () => {
+        document.getElementById('chatContainer').classList.remove('open');
+        if (messagesUnsub) messagesUnsub();
+        if (typingUnsub) typingUnsub();
+        activeChatId = null;
+    };
+
+    // Typing indicator
+    let typingTimeout;
+    document.getElementById('chatInput')?.addEventListener('input', () => {
+        if (!activeChatId) return;
+        const chatId = [currentUser.uid, activeChatId].sort().join('_');
+        set(ref(rtdb, `typing/${chatId}/${currentUser.uid}`), true);
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            set(ref(rtdb, `typing/${chatId}/${currentUser.uid}`), false);
+        }, 2000);
+    });
+
+    function showNotification(msg) {
+        const div = document.createElement('div');
+        div.className = 'notification';
+        div.textContent = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    }
+
+    lucide.createIcons();
     </script>
 </body>
 </html>
