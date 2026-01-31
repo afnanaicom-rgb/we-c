@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <title>Afnan AI - الأصدقاء</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation }
+        body { background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%); color: #1f2937; min-height: 100vh }
+        .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s ease }
+    </style>
+</head>
+<body class="antialiased p-5">
+    <header class="flex items-center gap-4 mb-8">
+        <button onclick="window.location.href='afnan_ai_white.html'" class="p-2 rounded-full bg-white shadow-sm"><i data-lucide="chevron-right"></i></button>
+        <h1 class="text-2xl font-black">الأصدقاء</h1>
+    </header>
+
+    <div class="relative mb-6">
+        <input type="text" id="searchInp" placeholder="ابحث عن مستخدم بالبريد..." class="w-full p-4 pr-12 rounded-2xl glass-card border-0 focus:ring-2 focus:ring-blue-500 outline-none">
+        <button onclick="searchUser()" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"><i data-lucide="search"></i></button>
+    </div>
+
+    <div id="searchResult" class="mb-8 hidden">
+        <h3 class="font-bold mb-3">نتيجة البحث</h3>
+        <div id="userCard" class="glass-card p-4 rounded-3xl flex items-center justify-between"></div>
+    </div>
+
+    <div class="mb-8">
+        <h3 class="font-bold mb-3">طلبات المتابعة</h3>
+        <div id="requestsList" class="space-y-3"></div>
+    </div>
+
+    <div>
+        <h3 class="font-bold mb-3">قائمة الأصدقاء</h3>
+        <div id="friendsList" class="space-y-3"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb" };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let me = null;
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const snap = await getDoc(doc(db, "users", user.uid));
+                me = { uid: user.uid, ...snap.data() };
+                loadFriends();
+                loadRequests();
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        window.searchUser = async () => {
+            const email = document.getElementById('searchInp').value.trim().toLowerCase();
+            const q = query(collection(db, "users"), where("email", "==", email));
+            const snap = await getDocs(q);
+            const res = document.getElementById('searchResult');
+            const card = document.getElementById('userCard');
+            res.classList.remove('hidden');
+            if (snap.empty) {
+                card.innerHTML = "<p class='text-gray-400'>لم يتم العثور على المستخدم</p>";
+            } else {
+                const u = snap.docs[0].data();
+                const uid = snap.docs[0].id;
+                const isFriend = me.friends?.includes(uid);
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <img src="${u.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                        <div><h4 class="font-bold">${u.displayName}</h4><p class="text-xs text-gray-400">${u.email}</p></div>
+                    </div>
+                    <button onclick="followUser('${uid}')" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-bold">${isFriend ? 'متابع' : 'متابعة'}</button>
+                `;
+            }
+            lucide.createIcons();
+        };
+
+        window.followUser = async (uid) => {
+            await updateDoc(doc(db, "users", uid), { friendRequests: arrayUnion(me.uid) });
+            alert("تم إرسال طلب المتابعة");
+        };
+
+        async function loadRequests() {
+            const list = document.getElementById('requestsList');
+            list.innerHTML = '';
+            if (!me.friendRequests?.length) { list.innerHTML = "<p class='text-gray-400 text-sm'>لا توجد طلبات</p>"; return; }
+            for (const uid of me.friendRequests) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const u = snap.data();
+                    list.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                                <h4 class="font-bold text-sm">${u.displayName}</h4>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="accept('${uid}')" class="p-2 bg-green-500 text-white rounded-lg"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                <button onclick="reject('${uid}')" class="p-2 bg-red-500 text-white rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>`;
+                }
+            }
+            lucide.createIcons();
+        }
+
+        window.accept = async (uid) => {
+            await updateDoc(doc(db, "users", me.uid), { friends: arrayUnion(uid), friendRequests: arrayRemove(uid) });
+            await updateDoc(doc(db, "users", uid), { friends: arrayUnion(me.uid) });
+            location.reload();
+        };
+
+        async function loadFriends() {
+            const list = document.getElementById('friendsList');
+            list.innerHTML = '';
+            if (!me.friends?.length) { list.innerHTML = "<p class='text-gray-400 text-sm'>لا يوجد أصدقاء</p>"; return; }
+            for (const uid of me.friends) {
+                const snap = await getDoc(doc(db, "users", uid));
+                if (snap.exists()) {
+                    const u = snap.data();
+                    list.innerHTML += `
+                        <div class="glass-card p-4 rounded-3xl flex items-center gap-3">
+                            <img src="${u.photoURL}" class="w-12 h-12 rounded-full object-cover">
+                            <h4 class="font-bold flex-1">${u.displayName}</h4>
+                            <i data-lucide="message-circle" class="text-gray-300"></i>
+                        </div>`;
+                }
+            }
+            lucide.createIcons();
+        }
+        lucide.createIcons();
+    </script>
+</body>
+</html>
