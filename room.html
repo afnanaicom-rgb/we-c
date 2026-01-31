@@ -78,9 +78,10 @@
     <div class="chat-area" id="chatArea"></div>
     <footer class="footer">
         <div class="input-box">
-            <input type="text" id="chatInput" class="main-input" placeholder="اكتب شيئاً...">
+            <input type="text" id="chatInput" class="main-input" placeholder="اكتب شيئاً..." oninput="toggleSendBtn()">
         </div>
-        <button id="sendBtn" class="btn-action" style="background:var(--accent)" onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button>
+        <button id="giftBtn" class="btn-action" style="background:var(--primary)" onclick="toggleSheet('giftSheet', true)"><i class="fa-solid fa-gift"></i></button>
+        <button id="sendBtn" class="btn-action hidden" style="background:var(--accent)" onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button>
     </footer>
 </div>
 
@@ -127,6 +128,7 @@
     const db = firebase.firestore();
     const rtdb = firebase.database();
     let user, userData, room, selectedUserId, storeData = { frames: {}, badges: {}, gifts: [] };
+    let joinTime = Date.now();
 
     firebase.auth().onAuthStateChanged(async (u) => {
         if (!u) return window.location.href = "login.html";
@@ -166,14 +168,29 @@
     }
 
     function listenChat() {
-        rtdb.ref(`rooms/${roomId}/messages`).limitToLast(20).on('child_added', (snap) => renderMsg(snap.val()));
+        // الاستماع للرسائل الجديدة فقط التي أرسلت بعد وقت الانضمام
+        rtdb.ref(`rooms/${roomId}/messages`).orderByChild('time').startAt(joinTime).on('child_added', (snap) => {
+            renderMsg(snap.val(), snap.key);
+        });
     }
 
-    async function renderMsg(msg) {
+    function toggleSendBtn() {
+        const inp = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const giftBtn = document.getElementById('giftBtn');
+        if(inp.value.trim().length > 0) {
+            sendBtn.classList.remove('hidden');
+            giftBtn.classList.add('hidden');
+        } else {
+            sendBtn.classList.add('hidden');
+            giftBtn.classList.remove('hidden');
+        }
+    }
+
+    async function renderMsg(msg, msgId) {
         const area = document.getElementById('chatArea');
         const div = document.createElement('div');
         div.className = 'msg-bubble';
-        const msgId = 'msg_' + Math.random().toString(36).substr(2, 9);
         div.innerHTML = `
             <div class="msg-avatar-wrapper">
                 <img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')">
@@ -212,8 +229,10 @@
         fCont.innerHTML = '';
         if(p.activeFrame) {
             const f = storeData.frames[p.activeFrame];
-            if(f.itemType === 'svga') playSvga(f.fileUrl, fCont);
-            else fCont.innerHTML = `<img src="${f.image}" style="width:100%; height:100%">`;
+            if(f) {
+                if(f.itemType === 'svga') playSvga(f.fileUrl, fCont);
+                else fCont.innerHTML = `<img src="${f.image}" style="width:100%; height:100%">`;
+            }
         }
 
         const bCont = document.getElementById('p-badges');
@@ -239,6 +258,7 @@
             senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL, text: inp.value, time: Date.now()
         });
         inp.value = '';
+        toggleSendBtn();
     }
 
     function playSvga(url, container) {
@@ -270,8 +290,11 @@
         if(!selectedGiftId) return;
         const gift = storeData.gifts.find(g => g.id === selectedGiftId);
         if(userData.balance < gift.price) return alert("رصيدك غير كافٍ");
+        
+        // تحديث رصيد المرسل ومستوى ثراء المستلم في Firestore
         await db.collection('users').doc(user.uid).update({ balance: firebase.firestore.FieldValue.increment(-gift.price) });
-        await db.collection('users').doc(selectedUserId).update({ wealthLevel: firebase.firestore.FieldValue.increment(1) });
+        await db.collection('users').doc(selectedUserId).update({ wealthLevel: firebase.firestore.FieldValue.increment(gift.price) });
+        
         rtdb.ref(`rooms/${roomId}/messages`).push({ type: 'gift', giftId: gift.id, senderName: userData.displayName, senderId: user.uid, photo: userData.photoURL, text: `أرسل هدية ${gift.name}`, time: Date.now() });
         toggleSheet('giftSheet', false);
     }
@@ -281,6 +304,7 @@
         document.getElementById('chatInput').value = `@${name} `;
         toggleSheet('profileSheet', false);
         document.getElementById('chatInput').focus();
+        toggleSendBtn();
     }
 
     async function addFriend() {
@@ -289,7 +313,6 @@
     }
 
     function openPrivateChat() {
-        // يمكن توجيهه لصفحة المحادثة الخاصة أو فتح نافذة
         window.location.href = `chat.html?target=${selectedUserId}`;
     }
 
