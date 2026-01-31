@@ -88,6 +88,26 @@
             border-radius: 50%;
             border: 2px solid var(--accent);
             object-fit: cover;
+            position: relative;
+        }
+
+        .owner-img-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(100% + 10px);
+            height: calc(100% + 10px);
+            z-index: 2;
+            pointer-events: none;
+            animation: frameFloat 3s ease-in-out infinite;
+        }
+
+        .owner-img-frame canvas, 
+        .owner-img-frame img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
         }
 
         .btn-control {
@@ -120,8 +140,8 @@
             width: 100%;
             margin-bottom: 5px;
         }
-        .msg-row.sent { justify-content: flex-start; } /* RTL: Me is Right */
-        .msg-row.received { justify-content: flex-end; } /* RTL: Others Left */
+        .msg-row.sent { justify-content: flex-start; }
+        .msg-row.received { justify-content: flex-end; }
 
         .msg-bubble {
             background: rgba(30, 30, 40, 0.6);
@@ -159,12 +179,13 @@
         }
 
         .msg-avatar {
-            width: 36px;
-            height: 36px;
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             object-fit: cover;
-            z-index: 1;
             border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            z-index: 1;
         }
 
         .msg-frame {
@@ -172,12 +193,17 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 100%; /* Relative to wrapper (45px) */
-            height: 100%;
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
             z-index: 2;
             pointer-events: none;
+            animation: smallFrameFloat 3s ease-in-out infinite;
         }
-        .msg-frame canvas, .msg-frame img { width: 100%!important; height: 100%!important; object-fit: contain; }
+        .msg-frame canvas, .msg-frame img { 
+            width: 100%!important; 
+            height: 100%!important; 
+            object-fit: contain; 
+        }
 
         .msg-content { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .msg-row.received .msg-content { align-items: flex-end; }
@@ -259,19 +285,17 @@
         }
         .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
 
-        /* --- PROFILE STYLE (COPIED FROM WHITE EDITION) --- */
-        /* This matches the exact CSS logic from the provided code */
-        
+        /* --- PROFILE AVATAR WITH FRAME (WHITE EDITION STYLE) --- */
         .avatar-wrapper {
             position: relative;
-            width: 90px; /* Slight increase from 80px for Modal visibility */
+            width: 90px;
             height: 90px;
             margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            overflow: visible; /* Important for frame to stick out */
+            overflow: visible;
         }
 
         .avatar-img {
@@ -282,28 +306,27 @@
             border: 3px solid rgba(255, 255, 255, 0.8);
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             position: relative;
-            z-index: 1; /* Image at bottom */
+            z-index: 1;
         }
 
         .perfect-frame {
             position: absolute;
             pointer-events: none;
-            z-index: 2; /* Frame on top */
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: center;
             animation: frameFloat 3s ease-in-out infinite;
             overflow: visible;
-            
-            /* The specific calculation from White Edition */
-            width: calc(100% + 20px); 
+            width: calc(100% + 20px);
             height: calc(100% + 20px);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
         }
 
-        .perfect-frame canvas, .perfect-frame img {
+        .perfect-frame canvas, 
+        .perfect-frame img {
             width: 100% !important;
             height: 100% !important;
             object-fit: contain;
@@ -314,34 +337,148 @@
             50% { transform: translate(-50%, -50%) scale(1.05); } 
         }
 
+        @keyframes smallFrameFloat { 
+            0%, 100% { transform: translate(-50%, -50%) scale(1); } 
+            50% { transform: translate(-50%, -50%) scale(1.03); } 
+        }
+
         /* ---------------------------------------------------- */
 
         /* Gifts & Users Grid */
-        .users-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .user-card { flex-shrink: 0; width: 60px; text-align: center; cursor: pointer; opacity: 0.6; transition: 0.2s; }
-        .user-card.selected { opacity: 1; transform: scale(1.05); }
-        .user-card img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid transparent; }
-        .user-card.selected img { border-color: var(--accent); }
-        .user-name { font-size: 10px; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .users-scroll { 
+            display: flex; 
+            gap: 12px; 
+            overflow-x: auto; 
+            padding-bottom: 10px; 
+            scrollbar-width: none; 
+        }
+        
+        .user-card { 
+            flex-shrink: 0; 
+            width: 60px; 
+            text-align: center; 
+            cursor: pointer; 
+            opacity: 0.6; 
+            transition: 0.2s;
+            position: relative;
+        }
+        
+        .user-card.selected { 
+            opacity: 1; 
+            transform: scale(1.05); 
+        }
+        
+        .user-card-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .user-card.selected .user-card-avatar { 
+            border-color: var(--accent); 
+        }
+        
+        .user-card-frame {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(100% + 8px);
+            height: calc(100% + 8px);
+            z-index: 2;
+            pointer-events: none;
+            animation: smallFrameFloat 3s ease-in-out infinite;
+        }
+        
+        .user-card-frame canvas,
+        .user-card-frame img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+        
+        .user-name { 
+            font-size: 10px; 
+            margin-top: 4px; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+        }
 
-        .gifts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .gift-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; text-align: center; border: 1px solid transparent; cursor: pointer; }
-        .gift-item.selected { background: rgba(245, 158, 11, 0.15); border-color: var(--accent); }
-        .gift-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
+        .gifts-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 10px; 
+        }
+        
+        .gift-item { 
+            background: rgba(255,255,255,0.05); 
+            border-radius: 12px; 
+            padding: 10px; 
+            text-align: center; 
+            border: 1px solid transparent; 
+            cursor: pointer; 
+        }
+        
+        .gift-item.selected { 
+            background: rgba(245, 158, 11, 0.15); 
+            border-color: var(--accent); 
+        }
+        
+        .gift-img { 
+            width: 40px; 
+            height: 40px; 
+            object-fit: contain; 
+            margin-bottom: 5px; 
+        }
 
         /* Utilities */
-        #svga-fullscreen { position: fixed; inset: 0; pointer-events: none; z-index: 3000; }
-        .hidden { display: none !important; }
+        #svga-fullscreen { 
+            position: fixed; 
+            inset: 0; 
+            pointer-events: none; 
+            z-index: 3000; 
+        }
+        
+        .hidden { 
+            display: none !important; 
+        }
 
         /* Toast */
         #entry-toast {
             position: absolute;
-            top: 15%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.85); padding: 8px 16px; border-radius: 50px;
-            display: flex; align-items: center; gap: 10px; z-index: 1000;
-            border: 1px solid var(--accent); opacity: 0; transition: 0.3s; pointer-events: none;
+            top: 15%; 
+            left: 50%; 
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85); 
+            padding: 8px 16px; 
+            border-radius: 50px;
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            z-index: 1000;
+            border: 1px solid var(--accent); 
+            opacity: 0; 
+            transition: 0.3s; 
+            pointer-events: none;
         }
-        #entry-toast.show { opacity: 1; transform: translate(-50%, 0); }
+        
+        #entry-toast.show { 
+            opacity: 1; 
+            transform: translate(-50%, 0); 
+        }
+        
+        /* Level Badges */
+        .level-badge {
+            width: 16px;
+            height: 16px;
+            object-fit: contain;
+            border-radius: 3px;
+        }
     </style>
 </head>
 <body>
@@ -351,7 +488,10 @@
 
 <!-- Entry Toast -->
 <div id="entry-toast">
-    <img id="toast-img" src="" style="width:28px; height:28px; border-radius:50%">
+    <div style="position:relative; width:28px; height:28px;">
+        <img id="toast-img" src="" style="width:100%; height:100%; border-radius:50%; object-fit:cover">
+        <div id="toast-frame" class="owner-img-frame"></div>
+    </div>
     <span id="toast-text" style="font-size:12px; font-weight:bold"></span>
 </div>
 
@@ -360,7 +500,10 @@
     <header class="header">
         <div class="header-left">
             <div class="room-info" onclick="openProfile(room.owner)">
-                <img src="" class="owner-img" id="roomOwnerImg">
+                <div style="position:relative; width:34px; height:34px;">
+                    <img src="" class="owner-img" id="roomOwnerImg">
+                    <div id="roomOwnerFrame" class="owner-img-frame"></div>
+                </div>
                 <div>
                     <div style="font-size:9px; color:var(--accent); font-weight:bold" id="roomOwnerId">ID: --</div>
                     <div style="font-size:11px; font-weight:bold" id="roomName">...</div>
@@ -405,14 +548,14 @@
     </div>
 </div>
 
-<!-- Profile Sheet (UPDATED DESIGN) -->
+<!-- Profile Sheet -->
 <div id="profileSheet" class="sheet-overlay" onclick="toggleSheet('profileSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
         
-        <!-- Updated Avatar Wrapper Structure -->
+        <!-- Avatar Wrapper with Frame -->
         <div class="avatar-wrapper">
             <img id="p-img" class="avatar-img" src="">
-            <div id="p-frame" class="perfect-frame"></div> <!-- This will hold SVGA or IMG -->
+            <div id="p-frame" class="perfect-frame"></div>
         </div>
 
         <h2 id="p-name" style="text-align:center; font-size:20px; font-weight:800; margin-bottom:2px">--</h2>
@@ -446,7 +589,15 @@
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get('id');
-    const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
+    const firebaseConfig = { 
+        apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", 
+        authDomain: "rtx3090-28439.firebaseapp.com", 
+        projectId: "rtx3090-28439", 
+        storageBucket: "rtx3090-28439.firebasestorage.app", 
+        messagingSenderId: "178612030690", 
+        appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", 
+        databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" 
+    };
     
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
@@ -459,8 +610,11 @@
     let selectedUserId = null;
     let selectedGiftId = null;
     let joinTime = Date.now();
+    
+    // Player instances for frame animations
+    let framePlayers = {};
 
-    // Helper: Calculate Levels
+    // Helper: Calculate Levels - SAME AS WHITE EDITION
     function getLevelInfo(totalPoints) {
         let level = 1;
         let remaining = totalPoints;
@@ -473,17 +627,26 @@
         };
         while (level < 100) {
             let threshold = getThreshold(level);
-            if (remaining >= threshold) { remaining -= threshold; level++; } else break;
+            if (remaining >= threshold) { 
+                remaining -= threshold; 
+                level++; 
+            } else break;
         }
         return { level };
     }
 
-    // Init
+    // Initialize
     auth.onAuthStateChanged(async (u) => {
         if(!u) return window.location.href = "login.html";
         user = u;
         
-        db.collection('users').doc(u.uid).onSnapshot(s => userData = s.data());
+        db.collection('users').doc(u.uid).onSnapshot(async (s) => {
+            userData = s.data();
+            if(userData && userData.activeFrame) {
+                // Load owner frame for header
+                await loadUserFrame(u.uid, 'roomOwnerFrame');
+            }
+        });
         
         await loadData();
         await loadRoom();
@@ -519,12 +682,46 @@
         document.getElementById('roomName').textContent = room.name;
         document.getElementById('roomOwnerId').textContent = "ID: " + room.owner;
         const oSnap = await db.collection('users').doc(room.owner).get();
-        if(oSnap.exists) document.getElementById('roomOwnerImg').src = oSnap.data().photoURL;
+        if(oSnap.exists) {
+            const ownerData = oSnap.data();
+            document.getElementById('roomOwnerImg').src = ownerData.photoURL;
+            await loadUserFrame(room.owner, 'roomOwnerFrame');
+        }
+    }
+
+    async function loadUserFrame(uid, containerId) {
+        try {
+            const userDoc = await db.collection('users').doc(uid).get();
+            if(!userDoc.exists) return;
+            
+            const userData = userDoc.data();
+            if(userData.activeFrame) {
+                const frame = storeData.frames[userData.activeFrame];
+                if(frame) {
+                    const container = document.getElementById(containerId);
+                    if(container) {
+                        container.innerHTML = '';
+                        if(frame.itemType === 'svga') {
+                            playSvga(frame.fileUrl, container);
+                        } else {
+                            container.innerHTML = `<img src="${frame.image}">`;
+                        }
+                    }
+                }
+            }
+        } catch(e) {
+            console.error("Error loading user frame:", e);
+        }
     }
 
     function initPresence() {
         const ref = rtdb.ref(`rooms/${roomId}/users/${user.uid}`);
-        ref.set({ uid: user.uid, name: userData.displayName, photo: userData.photoURL, joinTime: firebase.database.ServerValue.TIMESTAMP });
+        ref.set({ 
+            uid: user.uid, 
+            name: userData.displayName, 
+            photo: userData.photoURL, 
+            joinTime: firebase.database.ServerValue.TIMESTAMP 
+        });
         ref.onDisconnect().remove();
 
         // Listen for users
@@ -544,19 +741,68 @@
         rtdb.ref(`rooms/${roomId}/messages`).orderByChild('time').startAt(joinTime).on('child_added', s => renderMsg(s.val(), s.key));
     }
 
-    function renderOnlineUsers() {
+    async function renderOnlineUsers() {
         const list = document.getElementById('onlineList');
         const targets = document.getElementById('giftTargets');
-        list.innerHTML = ''; targets.innerHTML = '';
+        list.innerHTML = ''; 
+        targets.innerHTML = '';
         
-        Object.values(onlineUsers).forEach(u => {
+        for (const u of Object.values(onlineUsers)) {
+            // Get user frame data
+            let userFrame = null;
+            try {
+                const userDoc = await db.collection('users').doc(u.uid).get();
+                if(userDoc.exists) {
+                    const userData = userDoc.data();
+                    userFrame = userData.activeFrame;
+                }
+            } catch(e) {}
+            
+            // Frame HTML
+            let frameHtml = '';
+            if(userFrame) {
+                const frame = storeData.frames[userFrame];
+                if(frame) {
+                    if(frame.itemType === 'svga') {
+                        frameHtml = `<div class="user-card-frame" id="frame_online_${u.uid}"></div>`;
+                    } else {
+                        frameHtml = `<img src="${frame.image}" class="user-card-frame">`;
+                    }
+                }
+            }
+            
             // Main List
-            list.innerHTML += `<div class="user-card" onclick="openProfile('${u.uid}')"><img src="${u.photo}"><div class="user-name">${u.name}</div></div>`;
+            list.innerHTML += `
+                <div class="user-card" onclick="openProfile('${u.uid}')" id="user_${u.uid}">
+                    <div style="position:relative; width:45px; height:45px; margin:0 auto">
+                        <img src="${u.photo}" class="user-card-avatar">
+                        ${frameHtml}
+                    </div>
+                    <div class="user-name">${u.name}</div>
+                </div>`;
             
             // Gift Targets
             const sel = selectedUserId === u.uid ? 'selected' : '';
-            targets.innerHTML += `<div class="user-card ${sel}" onclick="selectUser('${u.uid}')" id="tgt_${u.uid}"><img src="${u.photo}"><div class="user-name">${u.name}</div></div>`;
-        });
+            targets.innerHTML += `
+                <div class="user-card ${sel}" onclick="selectUser('${u.uid}')" id="tgt_${u.uid}">
+                    <div style="position:relative; width:45px; height:45px; margin:0 auto">
+                        <img src="${u.photo}" class="user-card-avatar">
+                        ${frameHtml}
+                    </div>
+                    <div class="user-name">${u.name}</div>
+                </div>`;
+            
+            // Load SVGA frame if needed
+            if(userFrame) {
+                const frame = storeData.frames[userFrame];
+                if(frame && frame.itemType === 'svga') {
+                    setTimeout(() => {
+                        const container = document.getElementById(`frame_online_${u.uid}`);
+                        if(container) playSvga(frame.fileUrl, container);
+                    }, 100);
+                }
+            }
+        }
     }
 
     function selectUser(uid) {
@@ -566,6 +812,31 @@
 
     async function showEntryToast(u) {
         const toast = document.getElementById('entry-toast');
+        
+        // Load user frame for toast
+        let userFrame = null;
+        try {
+            const userDoc = await db.collection('users').doc(u.uid).get();
+            if(userDoc.exists) {
+                const userData = userDoc.data();
+                userFrame = userData.activeFrame;
+                
+                // Load frame in toast
+                const toastFrame = document.getElementById('toast-frame');
+                toastFrame.innerHTML = '';
+                if(userFrame) {
+                    const frame = storeData.frames[userFrame];
+                    if(frame) {
+                        if(frame.itemType === 'svga') {
+                            playSvga(frame.fileUrl, toastFrame);
+                        } else {
+                            toastFrame.innerHTML = `<img src="${frame.image}">`;
+                        }
+                    }
+                }
+            }
+        } catch(e) {}
+        
         document.getElementById('toast-img').src = u.photo;
         document.getElementById('toast-text').textContent = u.name + " انضم";
         toast.classList.add('show');
@@ -605,11 +876,24 @@
             }
         }
 
+        // Frame for this user
+        let frameHtml = '';
+        if(sData?.activeFrame) {
+            const frame = storeData.frames[sData.activeFrame];
+            if(frame) {
+                if(frame.itemType === 'svga') {
+                    frameHtml = `<div class="msg-frame" id="msg_frame_${key}"></div>`;
+                } else {
+                    frameHtml = `<img src="${frame.image}" class="msg-frame">`;
+                }
+            }
+        }
+
         // Avatar Construction
         const avatarHtml = `
             <div class="msg-avatar-wrapper" onclick="openProfile('${msg.senderId}')">
                 <img src="${msg.photo}" class="msg-avatar">
-                <div class="msg-frame" id="frame_${key}"></div>
+                ${frameHtml}
             </div>
         `;
 
@@ -635,19 +919,19 @@
             // Frame
             if(sData.activeFrame) {
                 const f = storeData.frames[sData.activeFrame];
-                const fc = document.getElementById(`frame_${key}`);
-                if(f && fc) {
-                    if(f.itemType === 'svga') playSvga(f.fileUrl, fc);
-                    else fc.innerHTML = `<img src="${f.image}">`;
+                if(f && f.itemType === 'svga') {
+                    const fc = document.getElementById(`msg_frame_${key}`);
+                    if(fc) playSvga(f.fileUrl, fc);
                 }
             }
-            // Badges
+            
+            // Badges (SAME AS WHITE EDITION)
             const bc = document.getElementById(`badges_${key}`);
             if(bc) {
                 const m = getLevelInfo(sData.magicPoints||0).level;
                 const w = getLevelInfo(sData.wealthPoints||0).level;
-                if(storeData.magicLevels[m]) bc.innerHTML += `<img src="${storeData.magicLevels[m]}" class="chat-badge">`;
-                if(storeData.wealthLevels[w]) bc.innerHTML += `<img src="${storeData.wealthLevels[w]}" class="chat-badge">`;
+                if(storeData.magicLevels[m]) bc.innerHTML += `<img src="${storeData.magicLevels[m]}" class="level-badge">`;
+                if(storeData.wealthLevels[w]) bc.innerHTML += `<img src="${storeData.wealthLevels[w]}" class="level-badge">`;
                 if(sData.activeBadges) {
                     sData.activeBadges.forEach(b => {
                         if(storeData.badges[b]) bc.innerHTML += `<img src="${storeData.badges[b].image}" class="chat-badge">`;
@@ -655,6 +939,7 @@
                 }
             }
         }
+        
         if(msg.type === 'gift' && msg.svga) playSvgaFull(msg.svga);
     }
 
@@ -669,18 +954,21 @@
         document.getElementById('p-id').textContent = "ID: " + uid;
         document.getElementById('p-img').src = p.photoURL;
 
-        // Frame Logic (The specific structure requested)
+        // Frame Logic (White Edition Style)
         const frameCont = document.getElementById('p-frame');
-        frameCont.innerHTML = ''; // Clear old
+        frameCont.innerHTML = '';
         if(p.activeFrame) {
             const f = storeData.frames[p.activeFrame];
             if(f) {
-                if(f.itemType === 'svga') playSvga(f.fileUrl, frameCont);
-                else frameCont.innerHTML = `<img src="${f.image}">`;
+                if(f.itemType === 'svga') {
+                    playSvga(f.fileUrl, frameCont);
+                } else {
+                    frameCont.innerHTML = `<img src="${f.image}">`;
+                }
             }
         }
 
-        // Levels
+        // Levels (SAME AS WHITE EDITION)
         const m = getLevelInfo(p.magicPoints||0).level;
         const w = getLevelInfo(p.wealthPoints||0).level;
         document.getElementById('p-magic-lvl').textContent = m;
@@ -699,12 +987,13 @@
 
         // Friend Button
         const btn = document.getElementById('friendBtn');
-        if(uid === user.uid) btn.style.display = 'none';
-        else {
+        if(uid === user.uid) {
+            btn.style.display = 'none';
+        } else {
             btn.style.display = 'block';
             btn.innerText = '...';
             btn.onclick = () => handleFriend(uid);
-            // Check
+            // Check friendship status
             try {
                 const f = await db.collection('users').doc(user.uid).collection('friends').doc(uid).get();
                 if(f.exists) {
@@ -712,9 +1001,14 @@
                     btn.onclick = () => alert('قريبا');
                 } else {
                     btn.innerText = '➕ صداقة';
-                    btn.onclick = () => { alert('تم الارسال'); btn.innerText = 'تم'; };
+                    btn.onclick = async () => { 
+                        await db.collection('users').doc(user.uid).collection('friends').doc(uid).set({});
+                        btn.innerText = 'تم الارسال'; 
+                    };
                 }
-            } catch(e) { btn.innerText = 'خطأ'; }
+            } catch(e) { 
+                btn.innerText = 'خطأ'; 
+            }
         }
 
         toggleSheet('profileSheet', true);
@@ -730,6 +1024,11 @@
         const n = document.getElementById('p-name').textContent;
         document.getElementById('chatInput').value = `@${n} `;
         toggleSheet('profileSheet', false);
+    }
+
+    function handleFriend(uid) {
+        // Implementation of friend request logic
+        alert('طلب صداقة تم إرساله');
     }
 
     // --- Gifting ---
@@ -774,8 +1073,11 @@
 
         const tUser = onlineUsers[selectedUserId];
         rtdb.ref(`rooms/${roomId}/messages`).push({
-            type: 'gift', svga: g.svgaUrl || null,
-            senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL,
+            type: 'gift', 
+            svga: g.svgaUrl || null,
+            senderId: user.uid, 
+            senderName: userData.displayName, 
+            photo: userData.photoURL,
             text: `أرسل ${g.name} إلى ${tUser ? tUser.name : 'مستخدم'}`,
             time: firebase.database.ServerValue.TIMESTAMP
         });
@@ -786,36 +1088,52 @@
         const inp = document.getElementById('chatInput');
         if(!inp.value.trim()) return;
         rtdb.ref(`rooms/${roomId}/messages`).push({
-            senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL,
-            text: inp.value, time: firebase.database.ServerValue.TIMESTAMP
+            senderId: user.uid, 
+            senderName: userData.displayName, 
+            photo: userData.photoURL,
+            text: inp.value, 
+            time: firebase.database.ServerValue.TIMESTAMP
         });
-        inp.value = ''; checkInput();
+        inp.value = ''; 
+        checkInput();
     }
+    
     function checkInput() {
         const v = document.getElementById('chatInput').value.trim();
         document.getElementById('sendBtn').classList.toggle('hidden', !v);
         document.getElementById('giftBtn').classList.toggle('hidden', !!v);
     }
+    
     function leaveRoom() {
         rtdb.ref(`rooms/${roomId}/users/${user.uid}`).remove();
         window.history.back();
     }
 
+    // --- SVGA Player Functions ---
     function playSvga(url, el) {
+        if(!el) return;
         el.innerHTML = '';
         const p = new SVGA.Player(el);
         const parser = new SVGA.Parser();
-        parser.load(url, (v) => { p.setVideoItem(v); p.startAnimation(); });
+        parser.load(url, (v) => { 
+            p.setVideoItem(v); 
+            p.loops = 0; // Infinite loop for frames
+            p.startAnimation(); 
+        });
     }
+    
     function playSvgaFull(url) {
         const el = document.getElementById('svga-fullscreen');
         el.innerHTML = '';
         const p = new SVGA.Player(el);
         const parser = new SVGA.Parser();
-        p.loops = 1; p.clearsAfterStop = true;
-        parser.load(url, (v) => { p.setVideoItem(v); p.startAnimation(); });
+        p.loops = 1; 
+        p.clearsAfterStop = true;
+        parser.load(url, (v) => { 
+            p.setVideoItem(v); 
+            p.startAnimation(); 
+        });
     }
 </script>
 </body>
 </html>
-
