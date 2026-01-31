@@ -8,6 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
@@ -16,7 +17,6 @@
         .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04), 0 2px 4px -1px rgba(0,0,0,0.02), inset 0 1px 0 0 rgba(255, 255, 255, 0.4) }
         .glass-deep { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%); border-right: 1px solid rgba(255, 255, 255, 0.8) }
         .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 8px -2px rgba(0,0,0,0.03), inset 0 1px 0 0 rgba(255, 255, 255, 0.5) }
-        .glass-card:active { transform: scale(0.97); box-shadow: 0 1px 3px -1px rgba(0,0,0,0.02), inset 0 2px 0 0 rgba(255, 255, 255, 0.3) }
         .sidebar-container { position: fixed; top: 0; right: 0; width: 85%; max-width: 320px; height: 100%; z-index: 50; transform: translateX(110%); transition: transform 0.4s cubic-bezier(0.33, 1, 0.68, 1) }
         .sidebar-container.open { transform: translateX(0) }
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.15); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 40; opacity: 0; pointer-events: none; transition: opacity 0.3s ease }
@@ -24,29 +24,18 @@
         .avatar-wrapper { position: relative; width: 80px; height: 80px; margin: 0 auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; overflow: visible }
         .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255, 255, 255, 0.8); box-shadow: 0 4px 15px rgba(0,0,0,0.05); position: relative; z-index: 1 }
         .svga-avatar-frame { position: absolute; pointer-events: none; z-index: 2; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: frameFloat 3s ease-in-out infinite; overflow: visible; width: calc(100% + 16px); height: calc(100% + 16px); top: 50%; left: 50%; transform: translate(-50%, -50%) }
-        .svga-avatar-frame canvas { border-radius: 50%; object-fit: contain; width: 100%!important; height: 100%!important; position: absolute!important; top: 50%!important; left: 50%!important; transform: translate(-50%, -50%)!important; max-width: 100%!important; max-height: 100%!important; min-width: 100%!important; min-height: 100%!important; z-index: 2 }
         .perfect-frame { position: absolute; pointer-events: none; z-index: 2; object-fit: contain; border-radius: 50%; animation: frameFloat 3s ease-in-out infinite; width: calc(100% + 16px); height: calc(100% + 16px); top: 50%; left: 50%; transform: translate(-50%, -50%) }
         @keyframes frameFloat { 0%, 100% { transform: translate(-50%, -50%) scale(1) } 50% { transform: translate(-50%, -50%) scale(1.05) } }
         .no-scrollbar::-webkit-scrollbar { display: none }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none }
         .banner-container { height: 120px; margin-top: 20px }
         .header-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.8) }
-        .svga-player-canvas { width: 100%!important; height: 60%!important; transform: translateX(25px)!important; z-index: 2; margin: auto; position: relative!important; top: 0!important; left: 0!important }
         .buy-btn { width: 90%; margin: 0 auto; padding: 8px; border: none; border-radius: 6px; background: #000; color: #fff; font-weight: bold; font-size: 0.75rem; cursor: pointer; transition: all 0.3s ease }
-        .buy-btn:hover { background: #333; transform: translateY(-2px) }
-        .buy-btn:active { transform: scale(0.98) }
-        .buy-btn:disabled { background: #ccc; cursor: not-allowed; transform: none }
-        .frame-size-small .svga-avatar-frame, .frame-size-small .perfect-frame { width: calc(100% + 8px); height: calc(100% + 8px) }
         .frame-size-medium .svga-avatar-frame, .frame-size-medium .perfect-frame { width: calc(100% + 16px); height: calc(100% + 16px) }
-        .frame-size-large .svga-avatar-frame, .frame-size-large .perfect-frame { width: calc(100% + 24px); height: calc(100% + 24px) }
-        .frame-size-xl .svga-avatar-frame, .frame-size-xl .perfect-frame { width: calc(100% + 32px); height: calc(100% + 32px) }
-        .badges-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center }
-        .room-item { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); transition: all 0.3s ease }
-        .room-item:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4) }
-        .room-item-private { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white }
         .swiper { width: 100%; height: 100%; border-radius: 28px }
-        .swiper-slide { display: flex; align-items: center; justify-content: center }
         .swiper-slide img { width: 100%; height: 100%; object-fit: cover }
+        .support-link { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 15px; background: rgba(0,0,0,0.05); color: #333; font-weight: bold; font-size: 13px; transition: 0.3s; }
+        .support-link:hover { background: rgba(0,0,0,0.1); }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-100 selection:text-blue-900">
@@ -61,11 +50,7 @@
         <main class="pt-24 px-5">
             <div id="view-home" class="view-section fade-in">
                 <div id="homeBanner" class="w-full banner-container rounded-[28px] glass-card mb-6 relative overflow-hidden shadow-sm group">
-                    <div class="swiper mySwiper">
-                        <div class="swiper-wrapper" id="bannerWrapper">
-                            <!-- البنرات ستضاف هنا -->
-                        </div>
-                    </div>
+                    <div class="swiper mySwiper"><div class="swiper-wrapper" id="bannerWrapper"></div></div>
                 </div>
                 <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
                     <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
@@ -86,28 +71,20 @@
             </div>
             <div id="view-wallet" class="view-section hidden fade-in">
                 <div class="glass-card rounded-[40px] p-8 text-center mb-8 relative overflow-hidden">
-                    <div class="absolute -top-20 -left-20 w-48 h-48 bg-yellow-200/30 rounded-full blur-3xl"></div>
                     <div class="relative z-10">
                         <p class="text-gray-500 text-sm font-semibold mb-2">الرصيد الكلي</p>
                         <h2 class="text-6xl font-black text-gray-900 tracking-tight mb-2" id="walletAmount">0</h2>
                         <span class="inline-flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold"><i data-lucide="coins" class="w-3 h-3"></i> عملة ذهبية</span>
                     </div>
                 </div>
-                <h3 class="font-bold text-xl mb-4 mr-2">شحن الرصيد</h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <div onclick="recharge(85000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition"><span class="text-2xl font-black text-gray-900">85,000</span><span class="text-gray-400 text-xs">$1</span></div>
-                    <div onclick="recharge(170000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition"><span class="text-2xl font-black text-gray-900">170,000</span><span class="text-gray-400 text-xs">$2</span></div>
-                    <div onclick="recharge(425000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition"><span class="text-2xl font-black text-gray-900">425,000</span><span class="text-gray-400 text-xs">$5</span></div>
-                    <div onclick="recharge(850000)" class="glass-card p-6 rounded-3xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-white transition"><span class="text-2xl font-black text-gray-900">850,000</span><span class="text-gray-400 text-xs">$10</span></div>
+                <h3 class="font-bold text-xl mb-4 mr-2">شحن الرصيد (الدعم)</h3>
+                <div class="space-y-4">
+                    <a href="mailto:afnan@afnanai.com" class="support-link"><i data-lucide="mail"></i> afnan@afnanai.com</a>
+                    <a href="https://wa.me/966576150051" target="_blank" class="support-link"><i data-lucide="phone"></i> +966 57 615 0051 (واتساب)</a>
                 </div>
             </div>
             <div id="view-store" class="view-section hidden fade-in">
-                <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2">
-                    <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
-                    <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
-                    <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
-                    <button onclick="loadStoreItems('chatbubble')" id="store-tab-chatbubble" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">فقاعات</button>
-                </div>
+                <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2" id="storeTabs"></div>
                 <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
             </div>
             <div id="view-bag" class="view-section hidden fade-in">
@@ -115,12 +92,6 @@
                 <div id="bagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي</h3>
                 <div id="badgesBagGrid" class="badges-grid mb-8"></div>
-                <h3 class="font-bold text-lg mb-4 text-gray-800">رسوم متحركة</h3>
-                <div id="svgaBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
-                <h3 class="font-bold text-lg mb-4 text-gray-800">شاراتي النشطة</h3>
-                <div id="activeBadgesGrid" class="badges-grid mb-8"></div>
-                <h3 class="font-bold text-lg mb-4 text-gray-800">فقاعاتي</h3>
-                <div id="chatbubblesBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
             </div>
         </main>
     </div>
@@ -141,31 +112,29 @@
             <div class="text-center mb-6">
                 <h3 id="sideName" class="text-2xl font-black text-gray-900 mb-1">...</h3>
                 <div class="inline-flex items-center gap-2 bg-gray-100/50 px-3 py-1 rounded-lg border border-gray-200/50">
-                    <span class="text-xs font-bold text-gray-400">البريد:</span>
                     <span id="sideEmail" class="text-sm font-medium text-gray-600 truncate max-w-[150px]">...</span>
-                    <button onclick="copyEmail()" class="text-gray-400 hover:text-black"><i data-lucide="copy" class="w-3 h-3"></i></button>
                 </div>
             </div>
             <div class="flex gap-3 mb-8">
                 <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
                     <div class="w-16 h-16 flex items-center justify-center overflow-hidden"><img id="magicLevelImg" src="" class="w-full h-full object-contain"></div>
-                    <span id="sideMagicLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
+                    <span id="sideMagicLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">LVL 1</span>
                 </div>
                 <div class="flex-1 glass-card p-3 rounded-2xl flex flex-col items-center justify-center gap-1">
                     <div class="w-16 h-16 flex items-center justify-center overflow-hidden"><img id="wealthLevelImg" src="" class="w-full h-full object-contain"></div>
-                    <span id="sideWealthLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">1</span>
+                    <span id="sideWealthLevelText" class="text-[10px] text-gray-400 font-bold uppercase mt-2">LVL 1</span>
                 </div>
             </div>
-            <div class="mb-6"><div id="sidebarActiveBadges" class="badges-grid"></div></div>
+            <div id="sidebarActiveBadges" class="badges-grid mb-6"></div>
             <nav class="space-y-3">
-                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5 text-gray-500"></i></div>الرئيسية</button>
-                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="wallet" class="w-5 h-5 text-gray-500"></i></div>المحفظة</button>
-                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="shopping-bag" class="w-5 h-5 text-gray-500"></i></div>المتجر</button>
-                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="backpack" class="w-5 h-5 text-gray-500"></i></div>حقيبتي</button>
-                <button onclick="window.location.href='chat.html'" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><div class="w-10 h-10 rounded-2xl bg-gray-50 flex items-center justify-center"><i data-lucide="users" class="w-5 h-5 text-gray-500"></i></div>أصدقائي</button>
-                <button onclick="openMyRoom()" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-blue-600 font-bold"><div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center"><i data-lucide="door-open" class="w-5 h-5 text-blue-500"></i></div>غرفتي</button>
+                <button onclick="switchView('home')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><i data-lucide="home"></i> الرئيسية</button>
+                <button onclick="switchView('wallet')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><i data-lucide="wallet"></i> المحفظة</button>
+                <button onclick="switchView('store')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><i data-lucide="shopping-bag"></i> المتجر</button>
+                <button onclick="switchView('bag')" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><i data-lucide="backpack"></i> حقيبتي</button>
+                <button onclick="window.location.href='chat.html'" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-gray-700 font-bold"><i data-lucide="users"></i> أصدقائي</button>
+                <button onclick="openMyRoom()" class="w-full flex items-center gap-4 p-4 rounded-3xl glass-card hover:bg-white hover:scale-[1.02] transition-all text-blue-600 font-bold"><i data-lucide="door-open"></i> غرفتي</button>
             </nav>
-            <div class="mt-8"><button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2"><i data-lucide="log-out" class="w-5 h-5"></i>تسجيل خروج</button></div>
+            <div class="mt-8"><button onclick="confirmLogout()" class="w-full p-4 rounded-3xl bg-red-50/50 text-red-500 font-bold hover:bg-red-100 transition flex items-center justify-center gap-2"><i data-lucide="log-out"></i> تسجيل خروج</button></div>
         </div>
     </aside>
 
@@ -175,16 +144,15 @@
             <h3 class="text-center font-bold text-xl mb-6">تعديل الملف</h3>
             <div class="space-y-4">
                 <div><label class="block text-xs font-bold text-gray-400 mb-2 mr-2">الاسم الظاهر</label><input id="editNameInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition font-bold text-center"></div>
-                <div><label class="block text-xs font-bold text-gray-400 mb-2 mr-2">رابط الصورة</label><input id="editPhotoInp" type="text" class="w-full p-4 rounded-2xl bg-gray-50/50 border border-gray-100 focus:bg-white focus:outline-none transition text-xs text-center text-gray-500"></div>
+                <div><label class="block text-xs font-bold text-gray-400 mb-2 mr-2">صورة البروفايل (Supabase)</label><input id="editPhotoFile" type="file" accept="image/*" class="w-full p-2 text-xs"></div>
             </div>
             <div class="flex gap-3 mt-8">
                 <button onclick="closeEditModal()" class="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-500 font-bold hover:bg-gray-200">إلغاء</button>
-                <button onclick="saveProfileChanges()" class="flex-1 py-3 rounded-2xl bg-black text-white font-bold hover:shadow-lg hover:-translate-y-1 transition">حفظ</button>
+                <button id="saveProfileBtn" onclick="saveProfileChanges()" class="flex-1 py-3 rounded-2xl bg-black text-white font-bold hover:shadow-lg transition">حفظ</button>
             </div>
         </div>
     </div>
 
-    <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -198,54 +166,50 @@
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
 
+        // Supabase Setup (User should provide real keys, using placeholders)
+        const supabaseUrl = 'https://your-project.supabase.co';
+        const supabaseKey = 'your-anon-key';
+        const supabase = window.supabase?.createClient(supabaseUrl, supabaseKey);
+
         let userData = {};
-        let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {}, chatBubbles: [] };
-        let activeSvgaPlayers = {};
+        let storeData = { items: [], itemsById: {}, gifts: [], magicLevels: {}, wealthLevels: {} };
+
+        // نظام الليفل الجديد
+        function calculateLevel(totalPoints) {
+            let lvl = 1;
+            let needed = 30000;
+            let tempPoints = totalPoints;
+            while (tempPoints >= needed && lvl < 100) {
+                tempPoints -= needed;
+                lvl++;
+                needed = (lvl === 100) ? needed * 2 : needed * 1.3;
+            }
+            return lvl;
+        }
 
         async function saveActiveState(type, id) {
             if (!userData.uid) return;
-            const now = Date.now();
-            const expiry = now + (24 * 60 * 60 * 1000); // 24 hours
+            const expiry = Date.now() + (24 * 60 * 60 * 1000);
             let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
             if (id === null) delete activeItems[type];
             else activeItems[type] = { id, expiry };
             localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
-            try {
-                await updateDoc(doc(db, 'users', userData.uid), {
-                    ['last_active_' + type]: id,
-                    ['expiry_active_' + type]: id ? expiry : null
-                });
-            } catch (e) { console.error('Firebase sync error:', e); }
+            await updateDoc(doc(db, 'users', userData.uid), { [`last_active_${type}`]: id, [`expiry_active_${type}`]: id ? expiry : null });
         }
 
         async function restoreActiveState() {
             if (!userData.uid) return;
             const now = Date.now();
             let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
-            let updates = {};
-            let changed = false;
             const types = ['frame', 'svga', 'chatbubble'];
             for (const type of types) {
-                const firebaseId = userData['last_active_' + type];
-                const firebaseExpiry = userData['expiry_active_' + type];
-                if (firebaseId && firebaseExpiry && firebaseExpiry > now) {
-                    if (!activeItems[type] || activeItems[type].id !== firebaseId) {
-                        activeItems[type] = { id: firebaseId, expiry: firebaseExpiry };
-                        changed = true;
-                    }
-                } else if (firebaseExpiry && firebaseExpiry <= now) {
-                    if (activeItems[type]) { delete activeItems[type]; changed = true; }
-                    updates['last_active_' + type] = null;
-                    updates['expiry_active_' + type] = null;
+                const fId = userData[`last_active_${type}`];
+                const fExp = userData[`expiry_active_${type}`];
+                if (fId && fExp && fExp > now) {
+                    if (type === 'frame' || type === 'svga') userData.activeFrame = fId;
+                } else if (fExp && fExp <= now) {
+                    await updateDoc(doc(db, 'users', userData.uid), { [`last_active_${type}`]: null, [`expiry_active_${type}`]: null });
                 }
-            }
-            if (changed) localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
-            if (activeItems.frame && activeItems.frame.expiry > now) userData.activeFrame = activeItems.frame.id;
-            if (activeItems.svga && activeItems.svga.expiry > now) userData.activeFrame = activeItems.svga.id;
-            if (activeItems.chatbubble && activeItems.chatbubble.expiry > now) userData.activeChatBubble = activeItems.chatbubble.id;
-            if (Object.keys(updates).length > 0) {
-                try { await updateDoc(doc(db, 'users', userData.uid), updates); }
-                catch (e) { console.error('Firebase update error:', e); }
             }
         }
 
@@ -253,155 +217,108 @@
             if (user) {
                 let userDocRef = doc(db, "users", user.uid);
                 let userSnap = await getDoc(userDocRef);
-                if (!userSnap.exists()) {
-                    const q = query(collection(db, "users"), where("email", "==", user.email));
-                    const qSnap = await getDocs(q);
-                    if (!qSnap.empty) {
-                        userDocRef = doc(db, "users", qSnap.docs[0].id);
-                        userSnap = await getDoc(userDocRef);
-                    }
-                }
                 if (userSnap.exists()) {
                     userData = { uid: userSnap.id, ...userSnap.data() };
                     await restoreActiveState();
-                    onSnapshot(userDocRef, async (docSnap) => {
-                        if (docSnap.exists()) {
-                            userData = { uid: docSnap.id, ...docSnap.data() };
-                            await restoreActiveState();
-                            await updateUI();
-                        }
-                    });
+                    onSnapshot(userDocRef, (docSnap) => { if (docSnap.exists()) { userData = { uid: docSnap.id, ...docSnap.data() }; updateUI(); } });
                     await loadBanner();
                     await loadGlobalData();
                     await loadRooms();
-                    await ensurePrivateRoom();
-                } else {
-                    alert('هذا الحساب غير مسجل في النظام.');
-                    await signOut(auth);
-                    window.location.href = "login.html";
-                }
+                } else { window.location.href = "login.html"; }
             } else { window.location.href = "login.html"; }
         });
 
         async function loadGlobalData() {
-            const storeSnap = await getDocs(collection(db, "storeItems"));
-            storeData.items = storeSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            storeData.itemsById = {};
-            storeData.items.forEach(item => { storeData.itemsById[item.id] = item; });
-            const gSnap = await getDocs(collection(db, "gifts"));
-            storeData.gifts = gSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'wealth' }));
-            const lgSnap = await getDocs(collection(db, "luckGifts"));
-            storeData.luckGifts = lgSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'magic' }));
+            const sSnap = await getDocs(collection(db, "storeItems"));
+            storeData.items = sSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            storeData.items.forEach(i => storeData.itemsById[i.id] = i);
             const mlSnap = await getDocs(collection(db, "magicLevels"));
             mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
             const wlSnap = await getDocs(collection(db, "wealthLevels"));
             wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
-            const cbSnap = await getDocs(collection(db, "chatBubbles"));
-            storeData.chatBubbles = cbSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            await updateUI();
+            updateUI();
         }
 
-        async function updateUI() {
+        function updateUI() {
             if (!userData.uid) return;
-            document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
-            document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
+            document.getElementById('sideName').innerText = userData.displayName;
+            document.getElementById('sideEmail').innerText = userData.email;
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
-            const ml = userData.magicLevel || 1;
-            const wl = userData.wealthLevel || 1;
-            if (storeData.magicLevels[ml]) document.getElementById('magicLevelImg').src = storeData.magicLevels[ml].image;
-            if (storeData.wealthLevels[wl]) document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wl].image;
-            document.getElementById('sideMagicLevelText').innerText = ml;
-            document.getElementById('sideWealthLevelText').innerText = wl;
-            const avatarWrapper = document.getElementById('sidebarAvatarWrapper');
+            
+            const magicLvl = calculateLevel(userData.magicPoints || 0);
+            const wealthLvl = calculateLevel(userData.wealthPoints || 0);
+            document.getElementById('sideMagicLevelText').innerText = `LVL ${magicLvl}`;
+            document.getElementById('sideWealthLevelText').innerText = `LVL ${wealthLvl}`;
+            
+            if (storeData.magicLevels[magicLvl]) document.getElementById('magicLevelImg').src = storeData.magicLevels[magicLvl].image;
+            if (storeData.wealthLevels[wealthLvl]) document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wealthLvl].image;
+
             const frameEl = document.getElementById('sideFrame');
-            const svgaContainer = document.getElementById('sideSvgaFrame');
-            frameEl.classList.add('hidden');
-            svgaContainer.classList.add('hidden');
-            svgaContainer.innerHTML = '';
-            avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
+            const svgaCont = document.getElementById('sideSvgaFrame');
+            frameEl.classList.add('hidden'); svgaCont.classList.add('hidden'); svgaCont.innerHTML = '';
             if (userData.activeFrame) {
                 const item = storeData.itemsById[userData.activeFrame];
                 if (item) {
-                    const sizeClass = getFrameSizeClass(item.frameConfig);
-                    if (sizeClass) avatarWrapper.classList.add(sizeClass);
-                    if (item.itemType === 'svga') {
-                        svgaContainer.classList.remove('hidden');
-                        playPerfectSvga(item.fileUrl, svgaContainer);
-                        applyFrameStyles(avatarWrapper, item.frameConfig);
-                    } else {
-                        frameEl.src = item.image;
-                        frameEl.classList.remove('hidden');
-                        applyFrameStyles(avatarWrapper, item.frameConfig);
-                    }
+                    if (item.itemType === 'svga') { svgaCont.classList.remove('hidden'); playSvga(item.fileUrl, svgaCont); }
+                    else { frameEl.src = item.image; frameEl.classList.remove('hidden'); }
                 }
             }
-            const sidebarBadges = document.getElementById('sidebarActiveBadges');
-            sidebarBadges.innerHTML = '';
-            if (userData.activeBadges) {
-                userData.activeBadges.forEach(badgeId => {
-                    const badge = storeData.itemsById[badgeId];
-                    if (badge) sidebarBadges.innerHTML += `<img src="${badge.image}" class="w-8 h-8 object-contain">`;
-                });
+            lucide.createIcons();
+        }
+
+        async function uploadToSupabase(file, path) {
+            if (!supabase) return null;
+            const ext = file.name.split('.').pop();
+            const fileName = `${Date.now()}.${ext}`;
+            const { data, error } = await supabase.storage.from('uploads').upload(`${path}/${fileName}`, file);
+            if (error) return null;
+            const { data: urlData } = supabase.storage.from('uploads').getPublicUrl(`${path}/${fileName}`);
+            return urlData.publicUrl;
+        }
+
+        window.saveProfileChanges = async () => {
+            const btn = document.getElementById('saveProfileBtn');
+            btn.disabled = true; btn.innerText = "جاري الحفظ...";
+            const name = document.getElementById('editNameInp').value;
+            const file = document.getElementById('editPhotoFile').files[0];
+            let photoURL = userData.photoURL;
+            if (file) {
+                const url = await uploadToSupabase(file, 'profiles');
+                if (url) photoURL = url;
             }
-        }
+            await updateDoc(doc(db, "users", userData.uid), { displayName: name, photoURL });
+            btn.disabled = false; btn.innerText = "حفظ";
+            closeEditModal();
+        };
 
-        function getFrameSizeClass(config) {
-            if (!config || !config.size) return '';
-            const map = { 'small': 'frame-size-small', 'medium': 'frame-size-medium', 'large': 'frame-size-large', 'xl': 'frame-size-xl' };
-            return map[config.size] || '';
-        }
+        window.openMyRoom = async () => {
+            const q = query(collection(db, "rooms"), where("owner", "==", userData.uid));
+            const snap = await getDocs(q);
+            if (snap.empty) {
+                const newRoom = { owner: userData.uid, name: `غرفة ${userData.displayName}`, icon: '🏠', color: 'bg-blue-500', createdAt: new Date() };
+                const docRef = await setDoc(doc(db, "rooms", userData.uid), newRoom);
+                window.location.href = `room.html?id=${userData.uid}`;
+            } else { window.location.href = `room.html?id=${snap.docs[0].id}`; }
+        };
 
-        function applyFrameStyles(element, config) {
-            if (!config) return;
-            const frameEl = element.querySelector('.svga-avatar-frame, .perfect-frame');
-            if (!frameEl) return;
-            if (config.width) frameEl.style.width = config.width;
-            if (config.height) frameEl.style.height = config.height;
-            if (config.top) frameEl.style.top = config.top;
-            if (config.left) frameEl.style.left = config.left;
-            if (config.transform) frameEl.style.transform = config.transform;
-        }
-
-        function playPerfectSvga(url, container) {
-            container.innerHTML = '';
+        window.toggleSidebar = (s) => { document.getElementById('sidebar').classList.toggle('open', s); document.getElementById('sidebarOverlay').classList.toggle('hidden', !s); };
+        window.switchView = (v) => { document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden')); document.getElementById('view-' + v).classList.remove('hidden'); toggleSidebar(false); };
+        window.confirmLogout = () => { if (confirm('خروج؟')) signOut(auth); };
+        window.openEditProfile = () => { document.getElementById('editNameInp').value = userData.displayName; document.getElementById('editModal').classList.remove('hidden'); toggleSidebar(false); };
+        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+        
+        function playSvga(url, container) {
             const player = new SVGA.Player(container);
             const parser = new SVGA.Parser();
-            parser.load(url, (videoItem) => {
-                player.setVideoItem(videoItem);
-                player.startAnimation();
-                const canvas = container.querySelector('canvas');
-                if (canvas) canvas.classList.add('svga-player-canvas');
-            });
-        }
-
-        function playSvga(url, container, options = {}) {
-            container.innerHTML = '';
-            const player = new SVGA.Player(container);
-            const parser = new SVGA.Parser();
-            parser.load(url, (videoItem) => {
-                player.setVideoItem(videoItem);
-                player.loops = options.loops || 0;
-                player.clearsAfterStop = options.clearsAfterStop || false;
-                player.startAnimation();
-                const canvas = container.querySelector('canvas');
-                if (canvas) canvas.classList.add('svga-player-canvas');
-            });
+            parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.startAnimation(); });
         }
 
         async function loadBanner() {
             const bSnap = await getDocs(collection(db, "appData", "banner", "items"));
             const wrapper = document.getElementById('bannerWrapper');
             wrapper.innerHTML = '';
-            if (!bSnap.empty) {
-                bSnap.forEach(doc => {
-                    const data = doc.data();
-                    wrapper.innerHTML += `<div class="swiper-slide"><img src="${data.image}"></div>`;
-                });
-            } else {
-                const oldDoc = await getDoc(doc(db, "appData", "banner"));
-                if (oldDoc.exists()) wrapper.innerHTML = `<div class="swiper-slide"><img src="${oldDoc.data().image}"></div>`;
-            }
+            bSnap.forEach(d => { wrapper.innerHTML += `<div class="swiper-slide"><img src="${d.data().image}"></div>`; });
             new Swiper(".mySwiper", { loop: true, autoplay: { delay: 3000 } });
         }
 
@@ -409,166 +326,16 @@
             const rSnap = await getDocs(collection(db, "rooms"));
             const grid = document.getElementById('roomsGrid');
             const roomsRef = ref(rtdb, 'rooms');
-            onValue(roomsRef, (snapshot) => {
-                const rtdbRooms = snapshot.val() || {};
-                const roomsData = rSnap.docs.map(d => {
-                    const r = d.data();
-                    const activeUsersCount = rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0;
-                    return { id: d.id, ...r, activeUsersCount };
-                });
-                roomsData.sort((a, b) => b.activeUsersCount - a.activeUsersCount);
+            onValue(roomsRef, (snap) => {
+                const rtdbRooms = snap.val() || {};
+                const rooms = rSnap.docs.map(d => ({ id: d.id, ...d.data(), count: rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0 }));
+                rooms.sort((a, b) => b.count - a.count);
                 grid.innerHTML = '';
-                roomsData.forEach(r => {
-                    grid.innerHTML += `
-                        <div onclick="window.location.href='room.html?id=${r.id}'" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition">
-                            <div class="w-12 h-12 rounded-full ${r.color || 'bg-blue-500'} flex items-center justify-center text-xl">${r.icon || '🏠'}</div>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-900">${r.name}</h4>
-                                <p class="text-xs text-gray-500">${r.description || ''}</p>
-                            </div>
-                            <div class="flex items-center gap-1 bg-green-50 px-2 py-1 rounded-lg">
-                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                <span class="text-[10px] font-bold text-green-600">${r.activeUsersCount}</span>
-                            </div>
-                            <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
-                        </div>`;
+                rooms.forEach(r => {
+                    grid.innerHTML += `<div onclick="window.location.href='room.html?id=${r.id}'" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition"><div class="w-12 h-12 rounded-full ${r.color} flex items-center justify-center text-xl">${r.icon}</div><div class="flex-1"><h4 class="font-bold">${r.name}</h4></div><div class="bg-green-50 px-2 py-1 rounded-lg text-[10px] font-bold text-green-600">${r.count}</div></div>`;
                 });
-                lucide.createIcons();
             });
         }
-
-        window.loadStoreItems = (type) => {
-            const grid = document.getElementById('storeGrid');
-            grid.innerHTML = '';
-            let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
-            const tabs = ['frames', 'badges', 'svga', 'chatbubble'];
-            tabs.forEach(t => {
-                const el = document.getElementById('store-tab-' + t);
-                if (el) el.className = (type === (t === 'frames' ? 'frame' : t)) ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
-            });
-            items.forEach(item => {
-                let field = '';
-                if (type === 'frame') field = 'purchasedFrames';
-                else if (type === 'badge') field = 'purchasedBadges';
-                else if (type === 'svga') field = 'purchasedSvga';
-                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
-                const owned = userData[field]?.some(i => i.id === item.id);
-                let previewHTML = '';
-                if (type === 'chatbubble') {
-                    previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
-                    if (item.fileUrl) setTimeout(() => { const c = document.getElementById(`preview-cb-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
-                } else if (item.itemType === 'svga') {
-                    previewHTML = `<div class="w-16 h-16 mb-2 relative" id="preview-${item.id}"></div>`;
-                    setTimeout(() => { const c = document.getElementById(`preview-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
-                } else previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
-                grid.innerHTML += `<div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">${previewHTML}<h4 class="font-bold text-sm text-center mb-2">${item.name}</h4><button onclick="${owned ? '' : `buyItem('${type}','${item.id}',${item.price})`}" class="buy-btn ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'}">${owned ? 'مملوك' : `${item.price} 💰 شراء`}</button></div>`;
-            });
-            lucide.createIcons();
-        };
-
-        window.buyItem = async (type, id, price) => {
-            if ((userData.balance || 0) < price) return alert('رصيدك غير كافٍ!');
-            let field = '';
-            if (type === 'frame') field = 'purchasedFrames';
-            else if (type === 'badge') field = 'purchasedBadges';
-            else if (type === 'svga') field = 'purchasedSvga';
-            else if (type === 'chatbubble') field = 'purchasedChatBubbles';
-            const purchaseItem = { id: id, purchasedAt: new Date() };
-            await updateDoc(doc(db, "users", userData.uid), { balance: increment(-price), [field]: arrayUnion(purchaseItem) });
-            alert('تم الشراء بنجاح!');
-            loadStoreItems(type);
-        };
-
-        window.loadBagItems = async () => {
-            const ids = ['bagGrid', 'badgesBagGrid', 'svgaBagGrid', 'activeBadgesGrid', 'chatbubblesBagGrid'];
-            ids.forEach(id => document.getElementById(id).innerHTML = '');
-            const frames = userData.purchasedFrames || [];
-            frames.forEach(f => {
-                const item = storeData.itemsById[f.id];
-                if (item && item.type === 'frame') {
-                    const isEquipped = userData.activeFrame === f.id;
-                    const grid = document.getElementById('bagGrid');
-                    const div = document.createElement('div');
-                    div.onclick = () => equipFrame(f.id);
-                    div.className = `relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}`;
-                    if (item.itemType === 'svga') {
-                        div.innerHTML = `<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}"></div>`;
-                        setTimeout(() => playSvga(item.fileUrl, document.getElementById(`bag-frame-${f.id}`)), 100);
-                    } else div.innerHTML = `<img src="${item.image}" class="w-12 h-12 object-contain rounded-full">`;
-                    grid.appendChild(div);
-                }
-            });
-            const badges = userData.purchasedBadges || [];
-            badges.forEach(b => {
-                const item = storeData.itemsById[b.id];
-                if (item && item.type === 'badge') {
-                    const isActive = userData.activeBadges?.includes(b.id);
-                    const grid = document.getElementById('badgesBagGrid');
-                    grid.innerHTML += `<div onclick="toggleBadge('${b.id}')" class="relative p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}"><img src="${item.image}" class="w-8 h-8 object-contain"></div>`;
-                }
-            });
-        };
-
-        window.equipFrame = async (id) => {
-            const newFrame = userData.activeFrame === id ? null : id;
-            await saveActiveState("frame", newFrame);
-            await updateDoc(doc(db, "users", userData.uid), { activeFrame: newFrame });
-            loadBagItems();
-        };
-
-        window.toggleBadge = async (id) => {
-            const isActive = userData.activeBadges?.includes(id);
-            await updateDoc(doc(db, "users", userData.uid), { activeBadges: isActive ? arrayRemove(id) : arrayUnion(id) });
-            loadBagItems();
-        };
-
-        window.toggleSidebar = (show) => {
-            const s = document.getElementById('sidebar');
-            const o = document.getElementById('sidebarOverlay');
-            s.classList.toggle('open', show);
-            o.classList.toggle('hidden', !show);
-            if (show) setTimeout(() => o.classList.add('visible'), 10);
-            else o.classList.remove('visible');
-        };
-
-        window.switchView = (v) => {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('view-' + v).classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : 'حقيبتي';
-            if (v === 'bag') loadBagItems();
-            if (v === 'store') loadStoreItems('frame');
-            toggleSidebar(false);
-        };
-
-        window.confirmLogout = () => { if (confirm('هل تريد تسجيل الخروج؟')) signOut(auth); };
-        window.copyEmail = () => { navigator.clipboard.writeText(userData.email); alert('تم النسخ'); };
-        window.recharge = async (a) => { await updateDoc(doc(db, "users", userData.uid), { balance: increment(a) }); };
-        window.openEditProfile = () => { document.getElementById('editNameInp').value = userData.displayName; document.getElementById('editPhotoInp').value = userData.photoURL; document.getElementById('editModal').classList.remove('hidden'); toggleSidebar(false); };
-        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
-        window.saveProfileChanges = async () => { await updateDoc(doc(db, "users", userData.uid), { displayName: document.getElementById('editNameInp').value, photoURL: document.getElementById('editPhotoInp').value }); closeEditModal(); };
-        
-        async function ensurePrivateRoom() {
-            const prRef = doc(db, "privateRooms", userData.uid);
-            const prSnap = await getDoc(prRef);
-            if (!prSnap.exists()) await setDoc(prRef, { owner: userData.uid, name: `غرفة ${userData.displayName}`, icon: '🏠', color: 'bg-purple-500' });
-            document.getElementById('myRoomName').innerText = `غرفة ${userData.displayName}`;
-        }
-
-        window.showPrivateRoom = () => {
-            document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
-            document.getElementById('btn-private').classList.replace('text-gray-500', 'bg-white');
-            document.getElementById('roomsGrid').classList.add('hidden');
-            document.getElementById('privateRoomContainer').classList.remove('hidden');
-        };
-
-        window.filterRooms = (t) => {
-            document.getElementById('btn-public').classList.replace('text-gray-500', 'bg-white');
-            document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
-            document.getElementById('roomsGrid').classList.remove('hidden');
-            document.getElementById('privateRoomContainer').classList.add('hidden');
-        };
-
-        window.openMyRoom = () => { window.location.href = `room.html?id=${userData.uid}&type=private`; };
         lucide.createIcons();
     </script>
 </body>

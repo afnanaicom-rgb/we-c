@@ -10,7 +10,7 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation }
         body { background: radial-gradient(circle at 0% 0%, #eef2ff 0%, #fdf2f8 50%, #f0f9ff 100%); color: #1f2937; min-height: 100vh }
-        .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px) saturate(180%); border: 1px solid rgba(255, 255, 255, 0.4); transition: all 0.3s ease }
+        .glass-card { background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.4); }
     </style>
 </head>
 <body class="antialiased p-5">
@@ -25,17 +25,17 @@
     </div>
 
     <div id="searchResult" class="mb-8 hidden">
-        <h3 class="font-bold mb-3">نتيجة البحث</h3>
+        <h3 class="font-bold mb-3 text-sm">نتيجة البحث</h3>
         <div id="userCard" class="glass-card p-4 rounded-3xl flex items-center justify-between"></div>
     </div>
 
     <div class="mb-8">
-        <h3 class="font-bold mb-3">طلبات المتابعة</h3>
+        <h3 class="font-bold mb-3 text-sm">طلبات المتابعة</h3>
         <div id="requestsList" class="space-y-3"></div>
     </div>
 
     <div>
-        <h3 class="font-bold mb-3">قائمة الأصدقاء</h3>
+        <h3 class="font-bold mb-3 text-sm">قائمة الأصدقاء</h3>
         <div id="friendsList" class="space-y-3"></div>
     </div>
 
@@ -57,9 +57,7 @@
                 me = { uid: user.uid, ...snap.data() };
                 loadFriends();
                 loadRequests();
-            } else {
-                window.location.href = "login.html";
-            }
+            } else { window.location.href = "login.html"; }
         });
 
         window.searchUser = async () => {
@@ -69,18 +67,16 @@
             const res = document.getElementById('searchResult');
             const card = document.getElementById('userCard');
             res.classList.remove('hidden');
-            if (snap.empty) {
-                card.innerHTML = "<p class='text-gray-400'>لم يتم العثور على المستخدم</p>";
-            } else {
+            if (snap.empty) { card.innerHTML = "<p class='text-gray-400 text-sm'>لم يتم العثور على المستخدم</p>"; }
+            else {
                 const u = snap.docs[0].data();
                 const uid = snap.docs[0].id;
-                const isFriend = me.friends?.includes(uid);
                 card.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <img src="${u.photoURL}" class="w-12 h-12 rounded-full object-cover">
-                        <div><h4 class="font-bold">${u.displayName}</h4><p class="text-xs text-gray-400">${u.email}</p></div>
+                        <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                        <div><h4 class="font-bold text-sm">${u.displayName}</h4></div>
                     </div>
-                    <button onclick="followUser('${uid}')" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-bold">${isFriend ? 'متابع' : 'متابعة'}</button>
+                    <button onclick="followUser('${uid}')" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-bold">متابعة</button>
                 `;
             }
             lucide.createIcons();
@@ -88,13 +84,13 @@
 
         window.followUser = async (uid) => {
             await updateDoc(doc(db, "users", uid), { friendRequests: arrayUnion(me.uid) });
-            alert("تم إرسال طلب المتابعة");
+            alert("تم إرسال الطلب");
         };
 
         async function loadRequests() {
             const list = document.getElementById('requestsList');
             list.innerHTML = '';
-            if (!me.friendRequests?.length) { list.innerHTML = "<p class='text-gray-400 text-sm'>لا توجد طلبات</p>"; return; }
+            if (!me.friendRequests?.length) { list.innerHTML = "<p class='text-gray-400 text-xs'>لا توجد طلبات</p>"; return; }
             for (const uid of me.friendRequests) {
                 const snap = await getDoc(doc(db, "users", uid));
                 if (snap.exists()) {
@@ -107,7 +103,6 @@
                             </div>
                             <div class="flex gap-2">
                                 <button onclick="accept('${uid}')" class="p-2 bg-green-500 text-white rounded-lg"><i data-lucide="check" class="w-4 h-4"></i></button>
-                                <button onclick="reject('${uid}')" class="p-2 bg-red-500 text-white rounded-lg"><i data-lucide="x" class="w-4 h-4"></i></button>
                             </div>
                         </div>`;
                 }
@@ -124,16 +119,16 @@
         async function loadFriends() {
             const list = document.getElementById('friendsList');
             list.innerHTML = '';
-            if (!me.friends?.length) { list.innerHTML = "<p class='text-gray-400 text-sm'>لا يوجد أصدقاء</p>"; return; }
+            if (!me.friends?.length) { list.innerHTML = "<p class='text-gray-400 text-xs'>لا يوجد أصدقاء</p>"; return; }
             for (const uid of me.friends) {
                 const snap = await getDoc(doc(db, "users", uid));
                 if (snap.exists()) {
                     const u = snap.data();
                     list.innerHTML += `
                         <div class="glass-card p-4 rounded-3xl flex items-center gap-3">
-                            <img src="${u.photoURL}" class="w-12 h-12 rounded-full object-cover">
-                            <h4 class="font-bold flex-1">${u.displayName}</h4>
-                            <i data-lucide="message-circle" class="text-gray-300"></i>
+                            <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                            <h4 class="font-bold text-sm flex-1">${u.displayName}</h4>
+                            <i data-lucide="message-circle" class="text-gray-300 w-4 h-4"></i>
                         </div>`;
                 }
             }
