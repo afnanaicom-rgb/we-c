@@ -29,26 +29,28 @@
         .msg-row.sent { justify-content: flex-start; }
         .msg-row.received { justify-content: flex-end; }
         
-        .msg-bubble { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 10px; border-radius: 18px; backdrop-filter: blur(10px); display: flex; align-items: flex-start; gap: 10px; max-width: 85%; animation: slideIn 0.3s ease; position: relative; }
+        .msg-bubble { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 12px; border-radius: 20px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 15px; max-width: 85%; animation: slideIn 0.3s ease; position: relative; }
         .msg-row.sent .msg-bubble { border-bottom-left-radius: 2px; flex-direction: row; }
         .msg-row.received .msg-bubble { border-bottom-right-radius: 2px; flex-direction: row-reverse; background: rgba(139, 92, 246, 0.15); }
         
-        /* ضبط الإطار بدقة فوق الصورة */
-        .msg-avatar-wrapper { position: relative; width: 45px; height: 45px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .msg-avatar { width: 80%; height: 80%; border-radius: 50%; cursor: pointer; position: relative; z-index: 1; object-fit: cover; }
+        /* إصلاح الإطار في الدردشة ليكون كبيراً ويغطي الصورة تماماً */
+        .msg-avatar-wrapper { position: relative; width: 65px; height: 65px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .msg-avatar { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; position: relative; z-index: 1; object-fit: cover; }
         .msg-frame-container { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; display: flex; align-items: center; justify-content: center; }
         .msg-frame-container img, .msg-frame-container canvas { width: 100%; height: 100%; object-fit: contain; }
         
-        .msg-content { display: flex; flex-direction: column; gap: 2px; }
+        .msg-content { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .msg-row.received .msg-content { align-items: flex-end; }
-        .msg-user { font-size: 11px; font-weight: bold; color: var(--accent); display: flex; align-items: center; gap: 5px; }
-        .msg-text { font-size: 13px; line-height: 1.5; color: #eee; word-break: break-word; }
-        .badge-container { display: inline-flex; align-items: center; gap: 2px; }
-        .lvl-badge { width: 18px; height: 18px; object-fit: contain; }
+        .msg-user { font-size: 13px; font-weight: bold; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+        .msg-text { font-size: 14px; line-height: 1.5; color: #eee; word-break: break-word; }
+        
+        /* تكبير الشارات */
+        .badge-container { display: inline-flex; align-items: center; gap: 4px; }
+        .lvl-badge { width: 35px; height: 35px; object-fit: contain; }
 
         #entry-toast { position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--accent); display: flex; align-items: center; gap: 10px; z-index: 1000; transition: 0.3s; opacity: 0; pointer-events: none; }
         #entry-toast.show { opacity: 1; }
-        .toast-img { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--accent); }
+        .toast-img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent); }
 
         .footer { padding: 10px 15px 25px; display: flex; align-items: center; gap: 10px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
         .input-box { flex: 1; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 25px; height: 46px; padding: 0 15px; display: flex; align-items: center; }
@@ -57,19 +59,25 @@
 
         .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; }
         .sheet-overlay.show { opacity: 1; pointer-events: auto; }
-        .bottom-sheet { background: rgba(20, 20, 25, 0.98); backdrop-filter: blur(40px); width: 100%; border-radius: 30px 30px 0 0; border-top: 1px solid var(--glass-border); transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); padding: 20px; max-height: 85vh; overflow-y: auto; }
+        .bottom-sheet { background: rgba(20, 20, 25, 0.98); backdrop-filter: blur(40px); width: 100%; border-radius: 30px 30px 0 0; border-top: 1px solid var(--glass-border); transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); padding: 25px; max-height: 85vh; overflow-y: auto; }
         .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
 
+        /* نافذة البروفايل - تكبير الإطار والشارات */
+        .profile-header-wrapper { position: relative; width: 150px; height: 150px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
+        .profile-avatar { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; position: relative; z-index: 1; }
+        .profile-frame-container { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; display: flex; align-items: center; justify-content: center; }
+        .profile-frame-container img, .profile-frame-container canvas { width: 100%; height: 100%; object-fit: contain; }
+
         .users-selection { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 15px; scrollbar-width: none; }
-        .user-select-card { flex-shrink: 0; width: 60px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; position: relative; }
-        .user-select-img { width: 50px; height: 50px; border-radius: 50%; border: 2px solid transparent; object-fit: cover; }
+        .user-select-card { flex-shrink: 0; width: 70px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; position: relative; }
+        .user-select-img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid transparent; object-fit: cover; }
         .user-select-card.selected .user-select-img { border-color: var(--accent); }
-        .user-select-name { font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
+        .user-select-name { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
 
         .gifts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
         .gift-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; border: 1px solid transparent; cursor: pointer; }
         .gift-card.selected { background: rgba(245, 158, 11, 0.15); border-color: var(--accent); }
-        .gift-icon { width: 40px; height: 40px; object-fit: contain; }
+        .gift-icon { width: 45px; height: 45px; object-fit: contain; }
 
         #svga-container { position: fixed; inset: 0; pointer-events: none; z-index: 3000; }
         .hidden { display: none !important; }
@@ -135,21 +143,27 @@
 <!-- Profile Sheet -->
 <div id="profileSheet" class="sheet-overlay" onclick="toggleSheet('profileSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
-        <div style="position:relative; width:100px; height:100px; margin:0 auto 15px; display:flex; align-items:center; justify-content:center">
-            <img src="" class="profile-avatar" id="p-img" style="width:80%; height:80%; border-radius:50%; object-fit:cover;">
-            <div id="p-frame" style="position:absolute; inset:0; pointer-events:none; z-index:2; display:flex; align-items:center; justify-content:center"></div>
+        <div class="profile-header-wrapper">
+            <img src="" class="profile-avatar" id="p-img">
+            <div id="p-frame" class="profile-frame-container"></div>
         </div>
-        <h2 id="p-name" style="text-align:center; font-size:20px">---</h2>
-        <p id="p-id" style="text-align:center; font-size:12px; color:#888; margin-bottom:15px">ID: ---</p>
+        <h2 id="p-name" style="text-align:center; font-size:22px; font-weight:bold">---</h2>
+        <p id="p-id" style="text-align:center; font-size:13px; color:#888; margin-bottom:20px">ID: ---</p>
         
-        <div style="display:flex; justify-content:center; gap:15px; margin-bottom:15px">
-            <div style="text-align:center"><img id="p-magic-img" src="" class="lvl-badge"><p style="font-size:10px">Magic: <span id="p-magic-lvl">1</span></p></div>
-            <div style="text-align:center"><img id="p-wealth-img" src="" class="lvl-badge"><p style="font-size:10px">Wealth: <span id="p-wealth-lvl">1</span></p></div>
+        <div style="display:flex; justify-content:center; gap:25px; margin-bottom:20px">
+            <div style="text-align:center">
+                <img id="p-magic-img" src="" class="lvl-badge" style="width:50px; height:50px">
+                <p style="font-size:12px; font-weight:bold; margin-top:5px">Magic: <span id="p-magic-lvl">1</span></p>
+            </div>
+            <div style="text-align:center">
+                <img id="p-wealth-img" src="" class="lvl-badge" style="width:50px; height:50px">
+                <p style="font-size:12px; font-weight:bold; margin-top:5px">Wealth: <span id="p-wealth-lvl">1</span></p>
+            </div>
         </div>
-        <div id="p-badges" style="display:flex; justify-content:center; gap:5px; flex-wrap:wrap"></div>
-        <div style="display:flex; gap:10px; margin-top:20px">
-            <button class="action-btn" style="flex:1; background:var(--accent); color:black; border:none; padding:10px; border-radius:10px" onclick="mentionUser()">@ إشارة</button>
-            <button class="action-btn" style="flex:1; background:#ef4444; color:white; border:none; padding:10px; border-radius:10px" onclick="toggleSheet('giftSheet', true); toggleSheet('profileSheet', false)">إرسال هدية</button>
+        <div id="p-badges" style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap"></div>
+        <div style="display:flex; gap:15px; margin-top:25px">
+            <button class="action-btn" style="flex:1; background:var(--accent); color:black; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="mentionUser()">@ إشارة</button>
+            <button class="action-btn" style="flex:1; background:#ef4444; color:white; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="toggleSheet('giftSheet', true); toggleSheet('profileSheet', false)">إرسال هدية</button>
         </div>
     </div>
 </div>
@@ -165,29 +179,22 @@
     let joinTime = Date.now();
     let onlineUsers = {};
 
-    // نظام المستويات المطلوب
-    const levelThresholds = [0, 50000, 100000, 150000, 225000]; // مثال لأول 5 ليفلات، يتم حساب الباقي برمجياً
-
     function getLevelInfo(totalPoints) {
         let level = 1;
         let remaining = totalPoints;
-        
         const getThreshold = (lvl) => {
             if (lvl === 1) return 50000;
             if (lvl === 2) return 100000;
             if (lvl === 3) return 150000;
             if (lvl === 4) return 225000;
-            return Math.floor(225000 * Math.pow(1.5, lvl - 4)); // زيادة بنسبة 50% لكل ليفل بعد الرابع
+            return Math.floor(225000 * Math.pow(1.5, lvl - 4));
         };
-
         while (level < 100) {
             let threshold = getThreshold(level);
             if (remaining >= threshold) {
                 remaining -= threshold;
                 level++;
-            } else {
-                break;
-            }
+            } else break;
         }
         return { level, currentPoints: remaining, nextThreshold: getThreshold(level) };
     }
@@ -195,10 +202,7 @@
     firebase.auth().onAuthStateChanged(async (u) => {
         if (!u) return window.location.href = "login.html";
         user = u;
-        db.collection('users').doc(u.uid).onSnapshot(snap => {
-            userData = snap.data();
-            updateMyProfileUI();
-        });
+        db.collection('users').doc(u.uid).onSnapshot(snap => { userData = snap.data(); });
         await loadStore();
         await loadRoom();
         joinRoom();
@@ -213,16 +217,10 @@
         });
         const gSnap = await db.collection('gifts').get();
         gSnap.forEach(doc => storeData.gifts[doc.id] = { id: doc.id, ...doc.data() });
-        
-        // جلب صور المستويات من المجموعات الجديدة
         const wSnap = await db.collection('wealthLevels').get();
         wSnap.forEach(doc => storeData.wealthLevels[doc.id] = doc.data().image);
         const mSnap = await db.collection('magicLevels').get();
         mSnap.forEach(doc => storeData.magicLevels[doc.id] = doc.data().image);
-    }
-
-    function updateMyProfileUI() {
-        // تحديث واجهة المستخدم الخاصة بي إذا لزم الأمر
     }
 
     async function loadRoom() {
@@ -238,17 +236,14 @@
         const pRef = rtdb.ref(`rooms/${roomId}/users/${user.uid}`);
         pRef.set({ uid: user.uid, name: userData.displayName, photo: userData.photoURL, joinTime: Date.now() });
         pRef.onDisconnect().remove();
-        
         rtdb.ref(`rooms/${roomId}/users`).on('value', (snap) => {
             onlineUsers = snap.val() || {};
             updateOnlineUsersUI();
         });
-
         rtdb.ref(`rooms/${roomId}/users`).on('child_added', (snap) => {
             const newUser = snap.val();
             if(newUser.joinTime > joinTime) showEntryToast(newUser);
         });
-
         listenChat();
     }
 
@@ -263,20 +258,11 @@
     function updateOnlineUsersUI() {
         const list = document.getElementById('onlineUsersList');
         const giftTargets = document.getElementById('giftTargetUsers');
-        list.innerHTML = '';
-        giftTargets.innerHTML = '';
-        
+        list.innerHTML = ''; giftTargets.innerHTML = '';
         Object.values(onlineUsers).forEach(u => {
-            const html = `<div class="user-select-card" onclick="openProfile('${u.uid}')">
-                <img src="${u.photo}" class="user-select-img">
-                <div class="user-select-name">${u.name}</div>
-            </div>`;
+            const html = `<div class="user-select-card" onclick="openProfile('${u.uid}')"><img src="${u.photo}" class="user-select-img"><div class="user-select-name">${u.name}</div></div>`;
             list.innerHTML += html;
-
-            const giftHtml = `<div class="user-select-card" id="target_${u.uid}" onclick="selectGiftTarget('${u.uid}')">
-                <img src="${u.photo}" class="user-select-img">
-                <div class="user-select-name">${u.name}</div>
-            </div>`;
+            const giftHtml = `<div class="user-select-card" id="target_${u.uid}" onclick="selectGiftTarget('${u.uid}')"><img src="${u.photo}" class="user-select-img"><div class="user-select-name">${u.name}</div></div>`;
             giftTargets.innerHTML += giftHtml;
         });
     }
@@ -298,23 +284,8 @@
         const isMe = msg.senderId === user.uid;
         const row = document.createElement('div');
         row.className = `msg-row ${isMe ? 'sent' : 'received'}`;
-        
-        row.innerHTML = `
-            <div class="msg-bubble">
-                <div class="msg-avatar-wrapper">
-                    <img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')">
-                    <div id="frame_${msgId}" class="msg-frame-container"></div>
-                </div>
-                <div class="msg-content">
-                    <div class="msg-user">
-                        ${msg.senderName} 
-                        <div id="badges_${msgId}" class="badge-container"></div>
-                    </div>
-                    <div class="msg-text">${msg.text}</div>
-                </div>
-            </div>`;
+        row.innerHTML = `<div class="msg-bubble"><div class="msg-avatar-wrapper"><img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')"><div id="frame_${msgId}" class="msg-frame-container"></div></div><div class="msg-content"><div class="msg-user">${msg.senderName} <div id="badges_${msgId}" class="badge-container"></div></div><div class="msg-text">${msg.text}</div></div></div>`;
         area.appendChild(row);
-        
         const uSnap = await db.collection('users').doc(msg.senderId).get();
         const u = uSnap.data();
         if(u) {
@@ -327,17 +298,12 @@
                 }
             }
             const bCont = document.getElementById(`badges_${msgId}`);
-            
-            // حساب ليفل السحر والثراء
             const magicInfo = getLevelInfo(u.magicPoints || 0);
             const wealthInfo = getLevelInfo(u.wealthPoints || 0);
-            
             const mImg = storeData.magicLevels[magicInfo.level];
             if(mImg) bCont.innerHTML += `<img src="${mImg}" class="lvl-badge">`;
-            
             const wImg = storeData.wealthLevels[wealthInfo.level];
             if(wImg) bCont.innerHTML += `<img src="${wImg}" class="lvl-badge">`;
-
             if(u.activeBadges) {
                 u.activeBadges.forEach(bid => {
                     const b = storeData.badges[bid];
@@ -345,11 +311,7 @@
                 });
             }
         }
-        
-        if(msg.type === 'gift' && msg.giftSvga) {
-            playSvgaOverlay(msg.giftSvga);
-        }
-
+        if(msg.type === 'gift' && msg.giftSvga) playSvgaOverlay(msg.giftSvga);
         area.scrollTop = area.scrollHeight;
     }
 
@@ -357,13 +319,8 @@
         const inp = document.getElementById('chatInput');
         const sendBtn = document.getElementById('sendBtn');
         const giftBtn = document.getElementById('giftBtn');
-        if(inp.value.trim().length > 0) {
-            sendBtn.classList.remove('hidden');
-            giftBtn.classList.add('hidden');
-        } else {
-            sendBtn.classList.add('hidden');
-            giftBtn.classList.remove('hidden');
-        }
+        if(inp.value.trim().length > 0) { sendBtn.classList.remove('hidden'); giftBtn.classList.add('hidden'); }
+        else { sendBtn.classList.add('hidden'); giftBtn.classList.remove('hidden'); }
     }
 
     async function openProfile(uid) {
@@ -373,23 +330,18 @@
         document.getElementById('p-name').textContent = p.displayName;
         document.getElementById('p-id').textContent = `ID: ${uid}`;
         document.getElementById('p-img').src = p.photoURL;
-        
         const magicInfo = getLevelInfo(p.magicPoints || 0);
         const wealthInfo = getLevelInfo(p.wealthPoints || 0);
-        
         document.getElementById('p-magic-lvl').textContent = magicInfo.level;
         document.getElementById('p-wealth-lvl').textContent = wealthInfo.level;
-        
         document.getElementById('p-magic-img').src = storeData.magicLevels[magicInfo.level] || '';
         document.getElementById('p-wealth-img').src = storeData.wealthLevels[wealthInfo.level] || '';
-
-        const fCont = document.getElementById('p-frame');
-        fCont.innerHTML = '';
+        const fCont = document.getElementById('p-frame'); fCont.innerHTML = '';
         if(p.activeFrame) {
             const f = storeData.frames[p.activeFrame];
             if(f) {
                 if(f.itemType === 'svga') playSvga(f.fileUrl, fCont);
-                else fCont.innerHTML = `<img src="${f.image}" style="width:100%; height:100%">`;
+                else fCont.innerHTML = `<img src="${f.image}">`;
             }
         }
         toggleSheet('profileSheet', true);
@@ -398,11 +350,8 @@
     function sendMsg() {
         const inp = document.getElementById('chatInput');
         if(!inp.value.trim()) return;
-        rtdb.ref(`rooms/${roomId}/messages`).push({
-            senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL, text: inp.value, time: Date.now()
-        });
-        inp.value = '';
-        toggleSendBtn();
+        rtdb.ref(`rooms/${roomId}/messages`).push({ senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL, text: inp.value, time: Date.now() });
+        inp.value = ''; toggleSendBtn();
     }
 
     function playSvga(url, container) {
@@ -418,18 +367,13 @@
         const player = new SVGA.Player(container);
         const parser = new SVGA.Parser();
         player.loops = 1;
-        parser.load(url, (videoItem) => {
-            player.setVideoItem(videoItem);
-            player.startAnimation();
-            player.onFinished(() => container.innerHTML = '');
-        });
+        parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.startAnimation(); player.onFinished(() => container.innerHTML = ''); });
     }
 
     function toggleSheet(id, show) {
         document.getElementById(id).classList.toggle('show', show);
         if(id === 'giftSheet' && show) {
-            const grid = document.getElementById('giftsGrid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('giftsGrid'); grid.innerHTML = '';
             Object.values(storeData.gifts).forEach(g => {
                 grid.innerHTML += `<div class="gift-card" onclick="selectGift('${g.id}')" id="g_${g.id}"><img src="${g.image}" class="gift-icon"><p style="font-size:10px">${g.name}</p><p style="font-size:9px;color:var(--accent)">${g.price} 🪙</p></div>`;
             });
@@ -447,46 +391,22 @@
         if(!selectedGiftId || !selectedUserId) return alert("اختر المستلم والهدية");
         const gift = storeData.gifts[selectedGiftId];
         if(userData.balance < gift.price) return alert("رصيدك غير كافٍ");
-        
         const batch = db.batch();
-        // خصم الرصيد وزيادة نقاط الثراء للمرسل
-        batch.update(db.collection('users').doc(user.uid), { 
-            balance: firebase.firestore.FieldValue.increment(-gift.price),
-            wealthPoints: firebase.firestore.FieldValue.increment(gift.price)
-        });
-        // زيادة نقاط السحر للمستلم
-        batch.update(db.collection('users').doc(selectedUserId), { 
-            magicPoints: firebase.firestore.FieldValue.increment(gift.price)
-        });
-        
+        batch.update(db.collection('users').doc(user.uid), { balance: firebase.firestore.FieldValue.increment(-gift.price), wealthPoints: firebase.firestore.FieldValue.increment(gift.price) });
+        batch.update(db.collection('users').doc(selectedUserId), { magicPoints: firebase.firestore.FieldValue.increment(gift.price) });
         await batch.commit();
-        
         const targetUser = onlineUsers[selectedUserId];
-        rtdb.ref(`rooms/${roomId}/messages`).push({
-            type: 'gift',
-            giftId: gift.id,
-            giftSvga: gift.svgaUrl || null,
-            senderName: userData.displayName,
-            senderId: user.uid,
-            photo: userData.photoURL,
-            text: `أرسل هدية ${gift.name} إلى ${targetUser ? targetUser.name : 'مستخدم'}`,
-            time: Date.now()
-        });
+        rtdb.ref(`rooms/${roomId}/messages`).push({ type: 'gift', giftId: gift.id, giftSvga: gift.svgaUrl || null, senderName: userData.displayName, senderId: user.uid, photo: userData.photoURL, text: `أرسل هدية ${gift.name} إلى ${targetUser ? targetUser.name : 'مستخدم'}`, time: Date.now() });
         toggleSheet('giftSheet', false);
     }
 
     function mentionUser() {
         const name = document.getElementById('p-name').textContent;
         document.getElementById('chatInput').value = `@${name} `;
-        toggleSheet('profileSheet', false);
-        document.getElementById('chatInput').focus();
-        toggleSendBtn();
+        toggleSheet('profileSheet', false); document.getElementById('chatInput').focus(); toggleSendBtn();
     }
 
-    function leaveRoom() {
-        rtdb.ref(`rooms/${roomId}/users/${user.uid}`).remove();
-        window.location.href = "afnan_ai_white.html";
-    }
+    function leaveRoom() { rtdb.ref(`rooms/${roomId}/users/${user.uid}`).remove(); window.location.href = "afnan_ai_white.html"; }
 </script>
 </body>
 </html>
