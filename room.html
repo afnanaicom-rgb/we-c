@@ -6,100 +6,436 @@
     <title>Premium Live Experience</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
+    <!-- SVGA Player -->
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+
     <style>
-        :root { --primary: #8b5cf6; --accent: #f59e0b; --bg-black: #000000; --glass: rgba(255, 255, 255, 0.1); --glass-border: rgba(255, 255, 255, 0.15); }
-        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-black); color: #fff; height: 100dvh; overflow: hidden; display: flex; justify-content: center; }
-        .app-bg { position: fixed; inset: 0; background: radial-gradient(circle at 10% 10%, #1e1b4b 0%, #000000 50%); z-index: -1; }
-        .app-container { width: 100%; max-width: 480px; height: 100%; display: flex; flex-direction: column; position: relative; }
-        
-        .header { padding: 15px; display: flex; justify-content: space-between; align-items: center; z-index: 100; border-bottom: 1px solid var(--glass-border); background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
-        .header-left { display: flex; align-items: center; gap: 10px; }
-        .room-info { display: flex; align-items: center; gap: 10px; background: var(--glass); padding: 5px 12px; border-radius: 30px; border: 1px solid var(--glass-border); cursor: pointer; }
-        .owner-img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--accent); object-fit: cover; }
-        .btn-control { background: transparent; border: none; color: #fff; font-size: 18px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0.8; }
+        :root {
+            --primary: #8b5cf6;
+            --accent: #f59e0b;
+            --bg-black: #000000;
+            --glass: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
 
-        .chat-area { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-        .msg-row { display: flex; width: 100%; margin-bottom: 5px; }
-        .msg-row.sent { justify-content: flex-start; }
-        .msg-row.received { justify-content: flex-end; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-black);
+            color: #fff;
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        .app-bg {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 10% 10%, #1e1b4b 0%, #000000 50%);
+            z-index: -1;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
         
-        .msg-bubble { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 12px; border-radius: 20px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 15px; max-width: 85%; animation: slideIn 0.3s ease; position: relative; }
-        .msg-row.sent .msg-bubble { border-bottom-left-radius: 2px; flex-direction: row; }
-        .msg-row.received .msg-bubble { border-bottom-right-radius: 2px; flex-direction: row-reverse; background: rgba(139, 92, 246, 0.15); }
+        /* Header */
+        .header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--glass);
+            padding: 5px 12px;
+            border-radius: 30px;
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+        }
+
+        .owner-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid var(--accent);
+            object-fit: cover;
+        }
+
+        .btn-control {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
+        }
+
+        .msg-row {
+            display: flex;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .msg-row.sent { justify-content: flex-start; } /* My messages left (RTL reversed logic if needed, but standard is sent right/received left usually. Keeping your logic) */
+        /* Assuming RTL: sent (me) starts from right? Standard chat: Sent (right), Received (left). 
+           Since dir="rtl", flex-start is Right. So 'sent' is Right. 'received' is Left. Correct. */
+
+        .msg-row.received { justify-content: flex-end; } 
+
+        .msg-bubble {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border);
+            padding: 8px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: flex-start; /* Align top to handle different heights */
+            gap: 10px;
+            max-width: 85%;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        .msg-row.sent .msg-bubble {
+            border-bottom-left-radius: 2px;
+            flex-direction: row; 
+        }
+
+        .msg-row.received .msg-bubble {
+            border-bottom-right-radius: 2px;
+            flex-direction: row-reverse;
+            background: rgba(139, 92, 246, 0.15);
+        }
+
+        /* --- FIX: Avatar & Frame in Chat --- */
+        .msg-avatar-wrapper {
+            position: relative;
+            width: 55px;  /* Fixed container size */
+            height: 55px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: -5px; /* Slight adjustment to align with text top */
+        }
+
+        .msg-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1; /* Below frame */
+            cursor: pointer;
+        }
+
+        .msg-frame-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 65px; /* Larger than avatar */
+            height: 65px;
+            z-index: 5; /* Above avatar */
+            pointer-events: none; /* Let clicks pass to avatar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         
-        /* إصلاح الإطار في الدردشة ليكون كبيراً ويغطي الصورة تماماً */
-        .msg-avatar-wrapper { position: relative; width: 55px; height: 55px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-left: 10px; }
-        .msg-avatar { width: 42px; height: 42px; border-radius: 50%; cursor: pointer; position: relative; z-index: 1; object-fit: cover; }
-        .msg-frame-container { position: absolute; width: calc(100% + 14px); height: calc(100% + 14px); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 2; display: flex; align-items: center; justify-content: center; }
-        .msg-frame-container img, .msg-frame-container canvas { width: 100%!important; height: 100%!important; object-fit: contain; }
-        
-        .msg-content { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .msg-frame-container img, 
+        .msg-frame-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+        /* ----------------------------------- */
+
+        .msg-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            padding-top: 4px;
+        }
+
         .msg-row.received .msg-content { align-items: flex-end; }
-        .msg-user { font-size: 13px; font-weight: bold; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-        .msg-text { font-size: 14px; line-height: 1.5; color: #eee; word-break: break-word; }
-        
-        /* تكبير الشارات */
-        .badge-container { display: inline-flex; align-items: center; gap: 4px; }
-        .lvl-badge { width: 35px; height: 35px; object-fit: contain; }
 
-        #entry-toast { position: absolute; top: 20%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--accent); display: flex; align-items: center; gap: 10px; z-index: 1000; transition: 0.3s; opacity: 0; pointer-events: none; }
-        #entry-toast.show { opacity: 1; }
-        .toast-img { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--accent); }
+        .msg-user {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
 
-        .footer { padding: 10px 15px 25px; display: flex; align-items: center; gap: 10px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); }
-        .input-box { flex: 1; background: var(--glass); border: 1px solid var(--glass-border); border-radius: 25px; height: 46px; padding: 0 15px; display: flex; align-items: center; }
-        .main-input { background: transparent; border: none; color: #fff; width: 100%; font-size: 14px; font-family: inherit; }
-        .btn-action { width: 44px; height: 44px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; font-size: 18px; }
+        .msg-text {
+            font-size: 14px;
+            line-height: 1.5;
+            color: #eee;
+            word-break: break-word;
+        }
 
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; pointer-events: none; transition: 0.3s; }
+        /* Badges */
+        .badge-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+        .lvl-badge {
+            width: 18px; /* Adjusted for chat */
+            height: 18px;
+            object-fit: contain;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 10px 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+        }
+
+        .input-box {
+            flex: 1;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            height: 46px;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .main-input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            width: 100%;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .btn-action {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+            font-size: 18px;
+        }
+
+        /* Sheets */
+        .sheet-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
         .sheet-overlay.show { opacity: 1; pointer-events: auto; }
-        .bottom-sheet { background: rgba(20, 20, 25, 0.98); backdrop-filter: blur(40px); width: 100%; border-radius: 30px 30px 0 0; border-top: 1px solid var(--glass-border); transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); padding: 25px; max-height: 85vh; overflow-y: auto; }
+
+        .bottom-sheet {
+            background: rgba(20, 20, 25, 0.98);
+            backdrop-filter: blur(40px);
+            width: 100%;
+            border-radius: 30px 30px 0 0;
+            border-top: 1px solid var(--glass-border);
+            transform: translateY(100%);
+            transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 25px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
         .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
 
-        /* نافذة البروفايل - تكبير الإطار والشارات */
-        .profile-header-wrapper { position: relative; width: 130px; height: 130px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
-        .profile-avatar { width: 95px; height: 95px; border-radius: 50%; object-fit: cover; position: relative; z-index: 1; }
-        .profile-frame-container { position: absolute; width: calc(100% + 40px); height: calc(100% + 40px); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 2; display: flex; align-items: center; justify-content: center; }
-        .profile-frame-container img, .profile-frame-container canvas { width: 100%!important; height: 100%!important; object-fit: contain; }
+        /* Profile Sheet Specifics */
+        .profile-header-wrapper {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-avatar {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 1; /* Below Frame */
+        }
+        .profile-frame-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5; /* Above Avatar */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-frame-container img, .profile-frame-container canvas {
+            width: 100%!important; height: 100%!important; object-fit: contain;
+        }
 
-        .users-selection { display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; margin-bottom: 15px; scrollbar-width: none; }
-        .user-select-card { flex-shrink: 0; width: 70px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; position: relative; }
-        .user-select-img { width: 55px; height: 55px; border-radius: 50%; border: 2px solid transparent; object-fit: cover; }
-        .user-select-card.selected .user-select-img { border-color: var(--accent); }
+        /* Horizontal Scroll Users */
+        .users-selection {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            margin-bottom: 15px;
+            scrollbar-width: none;
+        }
+        .user-select-card {
+            flex-shrink: 0;
+            width: 70px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            position: relative;
+        }
+        .user-select-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            object-fit: cover;
+        }
+        .user-select-card.selected .user-select-img { border-color: var(--accent); transform: scale(1.1); transition: 0.2s; }
         .user-select-name { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
 
+        /* Gifts Grid */
         .gifts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .gift-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px 5px; display: flex; flex-direction: column; align-items: center; border: 1px solid transparent; cursor: pointer; }
+        .gift-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: 0.2s;
+        }
         .gift-card.selected { background: rgba(245, 158, 11, 0.15); border-color: var(--accent); }
-        .gift-icon { width: 45px; height: 45px; object-fit: contain; }
+        .gift-icon { width: 45px; height: 45px; object-fit: contain; margin-bottom: 5px; }
 
+        /* Utils */
         #svga-container { position: fixed; inset: 0; pointer-events: none; z-index: 3000; }
         .hidden { display: none !important; }
+        
+        /* Toast */
+        #entry-toast {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transition: 0.3s;
+            opacity: 0;
+            pointer-events: none;
+        }
+        #entry-toast.show { opacity: 1; animation: slideIn 0.3s ease; }
+
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
+
 <div class="app-bg"></div>
 <div id="svga-container"></div>
+
+<!-- Entry Toast -->
 <div id="entry-toast">
-    <img src="" class="toast-img" id="toast-img">
-    <span id="toast-text"></span>
+    <img src="" class="toast-img" id="toast-img" style="width:30px;height:30px;border-radius:50%">
+    <span id="toast-text" style="font-size:12px"></span>
 </div>
 
 <div class="app-container">
+    <!-- Header -->
     <header class="header">
         <div class="header-left">
             <div class="room-info" onclick="openProfile(room.owner)">
                 <img src="" class="owner-img" id="roomOwnerImg">
                 <div>
-                    <span style="font-size:9px; color:var(--accent)" id="roomOwnerId">ID: ---</span>
-                    <div style="font-size:12px; font-weight:bold" id="roomName">تحميل...</div>
+                    <span style="font-size:9px; color:var(--accent)" id="roomOwnerId">ID: ...</span>
+                    <div style="font-size:12px; font-weight:bold" id="roomName">...</div>
                 </div>
             </div>
         </div>
@@ -110,8 +446,10 @@
         </div>
     </header>
 
+    <!-- Chat -->
     <div class="chat-area" id="chatArea"></div>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="input-box">
             <input type="text" id="chatInput" class="main-input" placeholder="اكتب شيئاً..." oninput="toggleSendBtn()">
@@ -124,7 +462,7 @@
 <!-- Online Users Sheet -->
 <div id="onlineUsersSheet" class="sheet-overlay" onclick="toggleSheet('onlineUsersSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
-        <h3 style="margin-bottom:15px">المتواجدون في الغرفة</h3>
+        <h3 style="margin-bottom:15px; text-align:center">المتواجدون (<span id="onlineCount">0</span>)</h3>
         <div id="onlineUsersList" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px;"></div>
     </div>
 </div>
@@ -132,11 +470,16 @@
 <!-- Gift Sheet -->
 <div id="giftSheet" class="sheet-overlay" onclick="toggleSheet('giftSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
-        <h3 style="margin-bottom:10px">إرسال هدية إلى:</h3>
+        <h3 style="margin-bottom:10px; font-size:14px">إرسال هدية إلى:</h3>
+        <!-- Horizontal Scroll for Active Users -->
         <div id="giftTargetUsers" class="users-selection"></div>
-        <h3 style="margin-bottom:10px">اختر الهدية:</h3>
+        
+        <div style="width:100%; height:1px; background:var(--glass-border); margin:10px 0 15px;"></div>
+        
+        <h3 style="margin-bottom:10px; font-size:14px">اختر الهدية:</h3>
         <div id="giftsGrid" class="gifts-grid"></div>
-        <button class="action-btn btn-gift" style="width:100%; margin-top:20px; background:#ef4444; color:white; padding:12px; border-radius:15px; border:none; font-weight:bold" onclick="sendGift()">إرسال</button>
+        
+        <button class="action-btn btn-gift" style="width:100%; margin-top:20px; background:#ef4444; color:white; padding:12px; border-radius:15px; border:none; font-weight:bold; font-size:16px" onclick="sendGift()">إرسال</button>
     </div>
 </div>
 
@@ -144,41 +487,61 @@
 <div id="profileSheet" class="sheet-overlay" onclick="toggleSheet('profileSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
         <div class="profile-header-wrapper">
-            <img src="" class="profile-avatar" id="p-img">
+            <!-- Frame Container (Z-Index 5) -->
             <div id="p-frame" class="profile-frame-container"></div>
+            <!-- Avatar (Z-Index 1) -->
+            <img src="" class="profile-avatar" id="p-img">
         </div>
+        
         <h2 id="p-name" style="text-align:center; font-size:22px; font-weight:bold">---</h2>
         <p id="p-id" style="text-align:center; font-size:13px; color:#888; margin-bottom:20px">ID: ---</p>
         
+        <!-- Stats -->
         <div style="display:flex; justify-content:center; gap:25px; margin-bottom:20px">
             <div style="text-align:center">
-                <img id="p-magic-img" src="" class="lvl-badge" style="width:50px; height:50px">
-                <p style="font-size:12px; font-weight:bold; margin-top:5px">Magic: <span id="p-magic-lvl">1</span></p>
+                <img id="p-magic-img" src="" class="lvl-badge" style="width:40px; height:40px; margin-bottom:5px">
+                <p style="font-size:11px; font-weight:bold; color:#ccc">Magic: <span id="p-magic-lvl">1</span></p>
             </div>
             <div style="text-align:center">
-                <img id="p-wealth-img" src="" class="lvl-badge" style="width:50px; height:50px">
-                <p style="font-size:12px; font-weight:bold; margin-top:5px">Wealth: <span id="p-wealth-lvl">1</span></p>
+                <img id="p-wealth-img" src="" class="lvl-badge" style="width:40px; height:40px; margin-bottom:5px">
+                <p style="font-size:11px; font-weight:bold; color:#ccc">Wealth: <span id="p-wealth-lvl">1</span></p>
             </div>
         </div>
-        <div id="p-badges" style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap"></div>
-        <div style="display:flex; gap:15px; margin-top:25px">
-            <button class="action-btn" style="flex:1; background:var(--accent); color:black; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="mentionUser()">@ إشارة</button>
-            <button class="action-btn" style="flex:1; background:#ef4444; color:white; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="toggleSheet('giftSheet', true); toggleSheet('profileSheet', false)">إرسال هدية</button>
+
+        <!-- Badges Strip -->
+        <div id="p-badges" style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:25px"></div>
+        
+        <!-- Actions -->
+        <div style="display:flex; gap:15px;">
+            <button id="friendBtn" class="action-btn" style="flex:1; background:var(--accent); color:black; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="handleFriendAction()">جاري التحميل...</button>
+            <button class="action-btn" style="flex:1; background:#ef4444; color:white; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="toggleSheet('giftSheet', true); toggleSheet('profileSheet', false)">🎁 هدية</button>
         </div>
+        <button class="action-btn" style="width:100%; background:var(--glass); border:1px solid var(--glass-border); color:white; padding:12px; border-radius:15px; font-weight:bold; margin-top:10px" onclick="mentionUser()">@ إشارة في الشات</button>
     </div>
 </div>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get('id');
+    
+    // Config
     const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
+    
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const rtdb = firebase.database();
-    let user, userData, room, selectedUserId, storeData = { frames: {}, badges: {}, gifts: {}, wealthLevels: {}, magicLevels: {} };
-    let joinTime = Date.now();
+    const auth = firebase.auth();
+
+    let user, userData, room;
+    let selectedUserId = null; 
+    let selectedGiftId = null;
+    let storeData = { frames: {}, badges: {}, gifts: {}, wealthLevels: {}, magicLevels: {}, chatBubbles: {} };
+    
+    // Critical: Join time for chat history filtering
+    let joinTime = Date.now(); 
     let onlineUsers = {};
 
+    // Helper: Level Calculation
     function getLevelInfo(totalPoints) {
         let level = 1;
         let remaining = totalPoints;
@@ -191,178 +554,290 @@
         };
         while (level < 100) {
             let threshold = getThreshold(level);
-            if (remaining >= threshold) {
-                remaining -= threshold;
-                level++;
-            } else break;
+            if (remaining >= threshold) { remaining -= threshold; level++; } else break;
         }
-        return { level, currentPoints: remaining, nextThreshold: getThreshold(level) };
+        return { level };
     }
 
-    firebase.auth().onAuthStateChanged(async (u) => {
+    // --- INIT ---
+    auth.onAuthStateChanged(async (u) => {
         if (!u) return window.location.href = "login.html";
         user = u;
+        
+        // Listen to my data
         db.collection('users').doc(u.uid).onSnapshot(snap => { userData = snap.data(); });
+        
         await loadStore();
         await loadRoom();
-        joinRoom();
+        joinRoomLogic();
     });
 
     async function loadStore() {
-        const sSnap = await db.collection('storeItems').get();
+        // Parallel loading for speed
+        const [sSnap, gSnap, wSnap, mSnap, cbSnap] = await Promise.all([
+            db.collection('storeItems').get(),
+            db.collection('gifts').get(),
+            db.collection('wealthLevels').get(),
+            db.collection('magicLevels').get(),
+            db.collection('chatBubbles').get()
+        ]);
+
         sSnap.forEach(doc => {
             const d = doc.data();
             if(d.type === 'frame') storeData.frames[doc.id] = d;
             if(d.type === 'badge') storeData.badges[doc.id] = d;
         });
-        const gSnap = await db.collection('gifts').get();
         gSnap.forEach(doc => storeData.gifts[doc.id] = { id: doc.id, ...doc.data() });
-        const wSnap = await db.collection('wealthLevels').get();
         wSnap.forEach(doc => storeData.wealthLevels[doc.id] = doc.data().image);
-        const mSnap = await db.collection('magicLevels').get();
         mSnap.forEach(doc => storeData.magicLevels[doc.id] = doc.data().image);
-        const cbSnap = await db.collection('chatBubbles').get();
-        storeData.chatBubbles = {};
         cbSnap.forEach(doc => storeData.chatBubbles[doc.id] = { id: doc.id, ...doc.data() });
     }
 
     async function loadRoom() {
+        if(!roomId) return alert("Room ID missing");
         const rSnap = await db.collection('rooms').doc(roomId).get();
+        if(!rSnap.exists) return alert("Room not found");
         room = rSnap.data();
+        
         document.getElementById('roomName').textContent = room.name;
         document.getElementById('roomOwnerId').textContent = `ID: ${room.owner}`;
         const oSnap = await db.collection('users').doc(room.owner).get();
         if(oSnap.exists) document.getElementById('roomOwnerImg').src = oSnap.data().photoURL;
     }
 
-    function joinRoom() {
-        const pRef = rtdb.ref(`rooms/${roomId}/users/${user.uid}`);
-        pRef.set({ uid: user.uid, name: userData.displayName, photo: userData.photoURL, joinTime: Date.now() });
-        pRef.onDisconnect().remove();
+    function joinRoomLogic() {
+        const presenceRef = rtdb.ref(`rooms/${roomId}/users/${user.uid}`);
+        presenceRef.set({
+            uid: user.uid,
+            name: userData.displayName,
+            photo: userData.photoURL,
+            joinTime: firebase.database.ServerValue.TIMESTAMP
+        });
+        presenceRef.onDisconnect().remove();
+
+        // Listen for online users
         rtdb.ref(`rooms/${roomId}/users`).on('value', (snap) => {
             onlineUsers = snap.val() || {};
+            document.getElementById('onlineCount').textContent = Object.keys(onlineUsers).length;
             updateOnlineUsersUI();
         });
+
+        // Listen for NEW entries (Toast)
         rtdb.ref(`rooms/${roomId}/users`).on('child_added', (snap) => {
             const newUser = snap.val();
-            if(newUser.joinTime > joinTime) showEntryToast(newUser);
+            // Show toast only if they joined AFTER I loaded the page (approx)
+            if(newUser.joinTime > joinTime && newUser.uid !== user.uid) {
+                showEntryToast(newUser);
+            }
         });
+
         listenChat();
     }
 
-    async function showEntryToast(u) {
-        const toast = document.getElementById('entry-toast');
-        document.getElementById('toast-img').src = u.photo;
-        document.getElementById('toast-text').textContent = `${u.name} متواجد الآن بالغرفة`;
-        toast.classList.add('show');
-        
-        // Play entry effect (car) if exists
-        const uSnap = await db.collection('users').doc(u.uid).get();
-        const userData = uSnap.data();
-        if(userData && userData.activeSvga) {
-            const sSnap = await db.collection('storeItems').doc(userData.activeSvga).get();
-            if(sSnap.exists) {
-                const sData = sSnap.data();
-                if(sData.fileUrl) playSvgaOverlay(sData.fileUrl);
-            }
-        }
-
-        setTimeout(() => toast.classList.remove('show'), 3000);
-    }
-
+    // --- UI UPDATES ---
     function updateOnlineUsersUI() {
         const list = document.getElementById('onlineUsersList');
         const giftTargets = document.getElementById('giftTargetUsers');
-        list.innerHTML = ''; giftTargets.innerHTML = '';
+        
+        list.innerHTML = ''; 
+        giftTargets.innerHTML = '';
+
         Object.values(onlineUsers).forEach(u => {
-            const html = `<div class="user-select-card" onclick="openProfile('${u.uid}')"><img src="${u.photo}" class="user-select-img"><div class="user-select-name">${u.name}</div></div>`;
-            list.innerHTML += html;
-            const giftHtml = `<div class="user-select-card" id="target_${u.uid}" onclick="selectGiftTarget('${u.uid}')"><img src="${u.photo}" class="user-select-img"><div class="user-select-name">${u.name}</div></div>`;
-            giftTargets.innerHTML += giftHtml;
+            // Main List
+            list.innerHTML += `
+                <div class="user-select-card" onclick="openProfile('${u.uid}')">
+                    <img src="${u.photo}" class="user-select-img">
+                    <div class="user-select-name">${u.name}</div>
+                </div>`;
+
+            // Gift Target List (Horizontal)
+            // If already selected, keep selected class
+            const isSelected = selectedUserId === u.uid ? 'selected' : '';
+            giftTargets.innerHTML += `
+                <div class="user-select-card ${isSelected}" id="target_${u.uid}" onclick="selectGiftTarget('${u.uid}')">
+                    <img src="${u.photo}" class="user-select-img">
+                    <div class="user-select-name">${u.name}</div>
+                </div>`;
         });
     }
 
     function selectGiftTarget(uid) {
         selectedUserId = uid;
         document.querySelectorAll('#giftTargetUsers .user-select-card').forEach(c => c.classList.remove('selected'));
-        document.getElementById(`target_${uid}`).classList.add('selected');
+        const el = document.getElementById(`target_${uid}`);
+        if(el) el.classList.add('selected');
     }
 
+    async function showEntryToast(u) {
+        const toast = document.getElementById('entry-toast');
+        document.getElementById('toast-img').src = u.photo;
+        document.getElementById('toast-text').textContent = `${u.name} انضم للغرفة`;
+        toast.classList.add('show');
+        
+        // Entry Effect
+        try {
+            const uSnap = await db.collection('users').doc(u.uid).get();
+            const ud = uSnap.data();
+            if(ud && ud.activeSvga) {
+                const sItem = await db.collection('storeItems').doc(ud.activeSvga).get();
+                if(sItem.exists && sItem.data().fileUrl) playSvgaOverlay(sItem.data().fileUrl);
+            }
+        } catch(e) { console.log("Entry effect error", e); }
+
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // --- CHAT LOGIC ---
     function listenChat() {
-        rtdb.ref(`rooms/${roomId}/messages`).orderByChild('time').startAt(joinTime).on('child_added', (snap) => {
-            renderMsg(snap.val(), snap.key);
-        });
+        // Requirement: "Don't see old messages" -> startAt(joinTime)
+        rtdb.ref(`rooms/${roomId}/messages`)
+            .orderByChild('time')
+            .startAt(joinTime)
+            .on('child_added', (snap) => {
+                renderMsg(snap.val(), snap.key);
+            });
     }
 
     async function renderMsg(msg, msgId) {
         const area = document.getElementById('chatArea');
         const isMe = msg.senderId === user.uid;
-        const row = document.createElement('div');
-        row.className = `msg-row ${isMe ? 'sent' : 'received'}`;
         
-        const uSnap = await db.collection('users').doc(msg.senderId).get();
-        const u = uSnap.data();
-        
+        // Get sender details for Frame/Badges
+        let senderData = null;
+        if(isMe) senderData = userData;
+        else {
+            const sSnap = await db.collection('users').doc(msg.senderId).get();
+            senderData = sSnap.data();
+        }
+
+        // Chat Bubble Style
         let bubbleStyle = "";
-        if(u && u.activeChatBubble) {
-            const cb = storeData.chatBubbles[u.activeChatBubble];
+        let bubbleTextCol = "#eee";
+        if(senderData && senderData.activeChatBubble) {
+            const cb = storeData.chatBubbles[senderData.activeChatBubble];
             if(cb) {
-                bubbleStyle = `style="background-image: url('${cb.image}'); background-size: 100% 100%; background-repeat: no-repeat; border: none; padding: 20px; color: ${cb.textColor || '#fff'};"`;
+                bubbleStyle = `background-image: url('${cb.image}'); background-size: 100% 100%; border:none;`;
+                if(cb.textColor) bubbleTextCol = cb.textColor;
             }
         }
 
-        row.innerHTML = `<div class="msg-bubble" id="bubble_${msgId}" ${bubbleStyle}><div class="msg-avatar-wrapper"><img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')"><div id="frame_${msgId}" class="msg-frame-container"></div></div><div class="msg-content"><div class="msg-user">${msg.senderName} <div id="badges_${msgId}" class="badge-container"></div></div><div class="msg-text">${msg.text}</div></div></div>`;
+        const row = document.createElement('div');
+        row.className = `msg-row ${isMe ? 'sent' : 'received'}`;
+        
+        // --- HTML Structure: Avatar Wrapper handles layering ---
+        let avatarHTML = `
+            <div class="msg-avatar-wrapper">
+                <img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')">
+                <div id="frame_${msgId}" class="msg-frame-container"></div>
+            </div>
+        `;
+
+        row.innerHTML = `
+            <div class="msg-bubble" style="${bubbleStyle}">
+                ${isMe ? '' : avatarHTML} <!-- If Received, Avatar First -->
+                
+                <div class="msg-content">
+                    <div class="msg-user">
+                        ${msg.senderName} 
+                        <div id="badges_${msgId}" class="badge-container"></div>
+                    </div>
+                    <div class="msg-text" style="color:${bubbleTextCol}">${msg.text}</div>
+                </div>
+
+                ${isMe ? avatarHTML : ''} <!-- If Sent, Avatar Last -->
+            </div>
+        `;
+        
         area.appendChild(row);
 
-        if(u) {
-            if(u.activeFrame) {
-                const f = storeData.frames[u.activeFrame];
-                if(f) {
-                    const fCont = document.getElementById(`frame_${msgId}`);
+        // --- Async Rendering of Frame/Badges ---
+        if(senderData) {
+            // Frame
+            if(senderData.activeFrame) {
+                const f = storeData.frames[senderData.activeFrame];
+                const fCont = document.getElementById(`frame_${msgId}`);
+                if(f && fCont) {
                     if(f.itemType === 'svga') playSvga(f.fileUrl, fCont);
                     else fCont.innerHTML = `<img src="${f.image}">`;
                 }
             }
+
+            // Badges
             const bCont = document.getElementById(`badges_${msgId}`);
-            const magicInfo = getLevelInfo(u.magicPoints || 0);
-            const wealthInfo = getLevelInfo(u.wealthPoints || 0);
-            const mImg = storeData.magicLevels[magicInfo.level];
-            if(mImg) bCont.innerHTML += `<img src="${mImg}" class="lvl-badge">`;
-            const wImg = storeData.wealthLevels[wealthInfo.level];
-            if(wImg) bCont.innerHTML += `<img src="${wImg}" class="lvl-badge">`;
-            if(u.activeBadges) {
-                u.activeBadges.forEach(bid => {
-                    const b = storeData.badges[bid];
-                    if(b) bCont.innerHTML += `<img src="${b.image}" class="lvl-badge">`;
-                });
+            if(bCont) {
+                // Levels
+                const mInfo = getLevelInfo(senderData.magicPoints || 0);
+                const wInfo = getLevelInfo(senderData.wealthPoints || 0);
+                if(storeData.magicLevels[mInfo.level]) bCont.innerHTML += `<img src="${storeData.magicLevels[mInfo.level]}" class="lvl-badge">`;
+                if(storeData.wealthLevels[wInfo.level]) bCont.innerHTML += `<img src="${storeData.wealthLevels[wInfo.level]}" class="lvl-badge">`;
+                
+                // Store Badges
+                if(senderData.activeBadges) {
+                    senderData.activeBadges.forEach(bid => {
+                        const b = storeData.badges[bid];
+                        if(b) bCont.innerHTML += `<img src="${b.image}" class="lvl-badge">`;
+                    });
+                }
             }
         }
+
         if(msg.type === 'gift' && msg.giftSvga) playSvgaOverlay(msg.giftSvga);
+        
         area.scrollTop = area.scrollHeight;
+    }
+
+    function sendMsg() {
+        const inp = document.getElementById('chatInput');
+        const txt = inp.value.trim();
+        if(!txt) return;
+        
+        rtdb.ref(`rooms/${roomId}/messages`).push({
+            senderId: user.uid,
+            senderName: userData.displayName,
+            photo: userData.photoURL,
+            text: txt,
+            time: firebase.database.ServerValue.TIMESTAMP
+        });
+        inp.value = ''; 
+        toggleSendBtn();
     }
 
     function toggleSendBtn() {
         const inp = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const giftBtn = document.getElementById('giftBtn');
-        if(inp.value.trim().length > 0) { sendBtn.classList.remove('hidden'); giftBtn.classList.add('hidden'); }
-        else { sendBtn.classList.add('hidden'); giftBtn.classList.remove('hidden'); }
+        const hasText = inp.value.trim().length > 0;
+        document.getElementById('sendBtn').classList.toggle('hidden', !hasText);
+        document.getElementById('giftBtn').classList.toggle('hidden', hasText);
     }
 
+    // --- PROFILE & FRIEND LOGIC ---
+    let currentProfileUid = null;
+
     async function openProfile(uid) {
-        selectedUserId = uid;
+        currentProfileUid = uid;
+        selectedUserId = uid; // Auto select for gifting
+        
+        // Select in gift list if visible
+        selectGiftTarget(uid);
+
         const snap = await db.collection('users').doc(uid).get();
+        if(!snap.exists) return;
         const p = snap.data();
+
         document.getElementById('p-name').textContent = p.displayName;
         document.getElementById('p-id').textContent = `ID: ${uid}`;
         document.getElementById('p-img').src = p.photoURL;
-        const magicInfo = getLevelInfo(p.magicPoints || 0);
-        const wealthInfo = getLevelInfo(p.wealthPoints || 0);
-        document.getElementById('p-magic-lvl').textContent = magicInfo.level;
-        document.getElementById('p-wealth-lvl').textContent = wealthInfo.level;
-        document.getElementById('p-magic-img').src = storeData.magicLevels[magicInfo.level] || '';
-        document.getElementById('p-wealth-img').src = storeData.wealthLevels[wealthInfo.level] || '';
-        const fCont = document.getElementById('p-frame'); fCont.innerHTML = '';
+        
+        // Levels
+        const mInfo = getLevelInfo(p.magicPoints || 0);
+        const wInfo = getLevelInfo(p.wealthPoints || 0);
+        document.getElementById('p-magic-lvl').textContent = mInfo.level;
+        document.getElementById('p-wealth-lvl').textContent = wInfo.level;
+        document.getElementById('p-magic-img').src = storeData.magicLevels[mInfo.level] || '';
+        document.getElementById('p-wealth-img').src = storeData.wealthLevels[wInfo.level] || '';
+
+        // Frame in Profile (Overlay logic)
+        const fCont = document.getElementById('p-frame');
+        fCont.innerHTML = '';
         if(p.activeFrame) {
             const f = storeData.frames[p.activeFrame];
             if(f) {
@@ -370,43 +845,85 @@
                 else fCont.innerHTML = `<img src="${f.image}">`;
             }
         }
+
+        // Badges
+        const bDiv = document.getElementById('p-badges');
+        bDiv.innerHTML = '';
+        if(p.activeBadges) {
+            p.activeBadges.forEach(bid => {
+                const b = storeData.badges[bid];
+                if(b) bDiv.innerHTML += `<img src="${b.image}" class="lvl-badge" style="width:30px;height:30px">`;
+            });
+        }
+
+        // Friend Button Logic
+        const btn = document.getElementById('friendBtn');
+        if(uid === user.uid) {
+            btn.style.display = 'none';
+        } else {
+            btn.style.display = 'block';
+            btn.textContent = '...';
+            btn.onclick = null;
+            
+            // Check friendship
+            try {
+                const fCheck = await db.collection('users').doc(user.uid).collection('friends').doc(uid).get();
+                if(fCheck.exists) {
+                    btn.textContent = "💬 إرسال رسالة";
+                    btn.onclick = () => { alert("فتح المحادثة الخاصة (قريباً)"); }; // Placeholder for private chat
+                } else {
+                    btn.textContent = "➕ طلب صداقة";
+                    btn.onclick = () => sendFriendRequest(uid);
+                }
+            } catch(e) {
+                console.error(e);
+                btn.textContent = "خطأ";
+            }
+        }
+
         toggleSheet('profileSheet', true);
     }
 
-    function sendMsg() {
-        const inp = document.getElementById('chatInput');
-        if(!inp.value.trim()) return;
-        rtdb.ref(`rooms/${roomId}/messages`).push({ senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL, text: inp.value, time: Date.now() });
-        inp.value = ''; toggleSendBtn();
-    }
-
-    function playSvga(url, container) {
-        container.innerHTML = '';
-        const player = new SVGA.Player(container);
-        const parser = new SVGA.Parser();
-        parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.startAnimation(); });
-    }
-
-    function playSvgaOverlay(url) {
-        const container = document.getElementById('svga-container');
-        container.innerHTML = '';
-        const player = new SVGA.Player(container);
-        const parser = new SVGA.Parser();
-        player.loops = 1;
-        parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.startAnimation(); player.onFinished(() => container.innerHTML = ''); });
-    }
-
-    function toggleSheet(id, show) {
-        document.getElementById(id).classList.toggle('show', show);
-        if(id === 'giftSheet' && show) {
-            const grid = document.getElementById('giftsGrid'); grid.innerHTML = '';
-            Object.values(storeData.gifts).forEach(g => {
-                grid.innerHTML += `<div class="gift-card" onclick="selectGift('${g.id}')" id="g_${g.id}"><img src="${g.image}" class="gift-icon"><p style="font-size:10px">${g.name}</p><p style="font-size:9px;color:var(--accent)">${g.price} 🪙</p></div>`;
-            });
+    async function sendFriendRequest(targetUid) {
+        // Implement Friend Request Logic here (Firestore)
+        // For now, simpler direct add or toast
+        if(confirm("إرسال طلب صداقة؟")) {
+             alert("تم إرسال الطلب بنجاح");
+             // Add logic: db.collection('friendRequests').add(...)
         }
     }
 
-    let selectedGiftId;
+    function mentionUser() {
+        const name = document.getElementById('p-name').textContent;
+        const inp = document.getElementById('chatInput');
+        inp.value = `@${name} ` + inp.value;
+        toggleSheet('profileSheet', false);
+        inp.focus();
+        toggleSendBtn();
+    }
+
+    // --- GIFTING ---
+    function toggleSheet(id, show) {
+        document.getElementById(id).classList.toggle('show', show);
+        
+        if(id === 'giftSheet' && show) {
+            // Render gifts
+            const grid = document.getElementById('giftsGrid');
+            if(grid.innerHTML === '') { // Only render once
+                Object.values(storeData.gifts).forEach(g => {
+                    grid.innerHTML += `
+                        <div class="gift-card" onclick="selectGift('${g.id}')" id="g_${g.id}">
+                            <img src="${g.image}" class="gift-icon">
+                            <p style="font-size:10px;text-align:center">${g.name}</p>
+                            <p style="font-size:9px;color:var(--accent)">${g.price} 🪙</p>
+                        </div>`;
+                });
+            }
+            // Ensure target list is updated
+            updateOnlineUsersUI();
+        }
+    }
+
     function selectGift(id) {
         selectedGiftId = id;
         document.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
@@ -414,25 +931,78 @@
     }
 
     async function sendGift() {
-        if(!selectedGiftId || !selectedUserId) return alert("اختر المستلم والهدية");
+        if(!selectedGiftId) return alert("اختر هدية");
+        if(!selectedUserId) return alert("اختر مستخدم لاستلام الهدية");
+        
         const gift = storeData.gifts[selectedGiftId];
         if(userData.balance < gift.price) return alert("رصيدك غير كافٍ");
-        const batch = db.batch();
-        batch.update(db.collection('users').doc(user.uid), { balance: firebase.firestore.FieldValue.increment(-gift.price), wealthPoints: firebase.firestore.FieldValue.increment(gift.price) });
-        batch.update(db.collection('users').doc(selectedUserId), { magicPoints: firebase.firestore.FieldValue.increment(gift.price) });
-        await batch.commit();
-        const targetUser = onlineUsers[selectedUserId];
-        rtdb.ref(`rooms/${roomId}/messages`).push({ type: 'gift', giftId: gift.id, giftSvga: gift.svgaUrl || null, senderName: userData.displayName, senderId: user.uid, photo: userData.photoURL, text: `أرسل هدية ${gift.name} إلى ${targetUser ? targetUser.name : 'مستخدم'}`, time: Date.now() });
+
         toggleSheet('giftSheet', false);
+
+        // Transaction
+        const batch = db.batch();
+        batch.update(db.collection('users').doc(user.uid), { 
+            balance: firebase.firestore.FieldValue.increment(-gift.price),
+            wealthPoints: firebase.firestore.FieldValue.increment(gift.price)
+        });
+        batch.update(db.collection('users').doc(selectedUserId), { 
+            magicPoints: firebase.firestore.FieldValue.increment(gift.price) 
+        });
+        await batch.commit();
+
+        const targetUser = onlineUsers[selectedUserId];
+        const targetName = targetUser ? targetUser.name : "مستخدم";
+
+        rtdb.ref(`rooms/${roomId}/messages`).push({
+            type: 'gift',
+            giftId: gift.id,
+            giftSvga: gift.svgaUrl || null,
+            senderName: userData.displayName,
+            senderId: user.uid,
+            photo: userData.photoURL,
+            text: `أرسل ${gift.name} 🎁 إلى ${targetName}`,
+            time: firebase.database.ServerValue.TIMESTAMP
+        });
     }
 
-    function mentionUser() {
-        const name = document.getElementById('p-name').textContent;
-        document.getElementById('chatInput').value = `@${name} `;
-        toggleSheet('profileSheet', false); document.getElementById('chatInput').focus(); toggleSendBtn();
+    // --- UTILS (SVGA) ---
+    function playSvga(url, container) {
+        container.innerHTML = '';
+        const player = new SVGA.Player(container);
+        const parser = new SVGA.Parser();
+        parser.load(url, (videoItem) => {
+            player.setVideoItem(videoItem);
+            player.startAnimation();
+        });
     }
 
-    function leaveRoom() { rtdb.ref(`rooms/${roomId}/users/${user.uid}`).remove(); window.location.href = "afnan_ai_white.html"; }
+    function playSvgaOverlay(url) {
+        const container = document.getElementById('svga-container');
+        container.innerHTML = '';
+        container.style.pointerEvents = 'auto'; // Block clicks while playing? Optional.
+        
+        const player = new SVGA.Player(container);
+        const parser = new SVGA.Parser();
+        player.loops = 1;
+        player.clearsAfterStop = true;
+        
+        parser.load(url, (videoItem) => {
+            player.setVideoItem(videoItem);
+            player.startAnimation();
+            player.onFinished(() => {
+                container.innerHTML = '';
+                container.style.pointerEvents = 'none';
+            });
+        });
+    }
+
+    function leaveRoom() {
+        if(roomId && user) {
+            rtdb.ref(`rooms/${roomId}/users/${user.uid}`).remove();
+        }
+        window.history.back();
+    }
 </script>
 </body>
 </html>
+
