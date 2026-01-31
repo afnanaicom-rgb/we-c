@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
-    <!-- Swiper CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation }
@@ -29,9 +28,7 @@
         @keyframes frameFloat { 0%, 100% { transform: translate(-50%, -50%) scale(1) } 50% { transform: translate(-50%, -50%) scale(1.05) } }
         .no-scrollbar::-webkit-scrollbar { display: none }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none }
-        .banner-container { height: 120px; margin-top: 20px }
         .header-icon { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.8) }
-        .svga-player-canvas { width: 100%!important; height: 60%!important; transform: translateX(25px)!important; z-index: 2; margin: auto; position: relative!important; top: 0!important; left: 0!important }
         .buy-btn { width: 90%; margin: 0 auto; padding: 8px; border: none; border-radius: 6px; background: #000; color: #fff; font-weight: bold; font-size: 0.75rem; cursor: pointer; transition: all 0.3s ease }
         .buy-btn:hover { background: #333; transform: translateY(-2px) }
         .buy-btn:active { transform: scale(0.98) }
@@ -47,6 +44,10 @@
         .swiper { width: 100%; height: 100%; border-radius: 28px }
         .swiper-slide { display: flex; align-items: center; justify-content: center }
         .swiper-slide img { width: 100%; height: 100%; object-fit: cover }
+        .notification { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 25px; backdrop-filter: blur(10px); z-index: 5000; animation: slideUp 0.3s ease }
+        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0 } to { transform: translateX(-50%) translateY(0); opacity: 1 } }
+        .fade-in { animation: fadeIn 0.3s ease }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
     </style>
 </head>
 <body class="antialiased selection:bg-blue-100 selection:text-blue-900">
@@ -60,12 +61,8 @@
         </header>
         <main class="pt-24 px-5">
             <div id="view-home" class="view-section fade-in">
-                <div id="homeBanner" class="w-full banner-container rounded-[28px] glass-card mb-6 relative overflow-hidden shadow-sm group">
-                    <div class="swiper mySwiper">
-                        <div class="swiper-wrapper" id="bannerWrapper">
-                            <!-- البنرات ستضاف هنا -->
-                        </div>
-                    </div>
+                <div id="homeBanner" class="w-full h-[120px] rounded-[28px] glass-card mb-6 relative overflow-hidden shadow-sm">
+                    <div class="swiper mySwiper"><div class="swiper-wrapper" id="bannerWrapper"></div></div>
                 </div>
                 <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
                     <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
@@ -103,7 +100,7 @@
             </div>
             <div id="view-store" class="view-section hidden fade-in">
                 <div class="flex gap-3 mb-6 overflow-x-auto no-scrollbar pb-2">
-                    <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg hover:bg-gray-800 transition">إطارات</button>
+                    <button onclick="loadStoreItems('frame')" id="store-tab-frames" class="flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg">إطارات</button>
                     <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
                     <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
                     <button onclick="loadStoreItems('chatbubble')" id="store-tab-chatbubble" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">فقاعات</button>
@@ -184,416 +181,380 @@
         </div>
     </div>
 
-    <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const rtdb = getDatabase(app);
+    const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const rtdb = getDatabase(app);
 
-        let userData = {};
-        let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {}, chatBubbles: [] };
-        let activeSvgaPlayers = {};
+    let userData = {};
+    let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {}, chatBubbles: [] };
+    const activeSvgaPlayers = {};
 
-        function getLevelInfo(totalPoints) {
-            let level = 1;
-            let remaining = totalPoints;
-            const getThreshold = (lvl) => {
-                if (lvl === 1) return 50000;
-                if (lvl === 2) return 100000;
-                if (lvl === 3) return 150000;
-                if (lvl === 4) return 225000;
-                return Math.floor(225000 * Math.pow(1.5, lvl - 4));
-            };
-            while (level < 100) {
-                let threshold = getThreshold(level);
-                if (remaining >= threshold) {
-                    remaining -= threshold;
-                    level++;
-                } else break;
-            }
-            return { level, currentPoints: remaining, nextThreshold: getThreshold(level) };
+    function getLevelInfo(totalPoints) {
+        let level = 1, remaining = totalPoints;
+        const getThreshold = (lvl) => {
+            if (lvl === 1) return 50000;
+            if (lvl === 2) return 100000;
+            if (lvl === 3) return 150000;
+            if (lvl === 4) return 225000;
+            return Math.floor(225000 * Math.pow(1.5, lvl - 4));
+        };
+        while (level < 100) {
+            const threshold = getThreshold(level);
+            if (remaining >= threshold) { remaining -= threshold; level++; }
+            else break;
         }
+        return { level, currentPoints: remaining, nextThreshold: getThreshold(level) };
+    }
 
-        async function saveActiveState(type, id) {
-            if (!userData.uid) return;
-            const now = Date.now();
-            const expiry = now + (24 * 60 * 60 * 1000); // 24 hours
-            let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
-            if (id === null) delete activeItems[type];
-            else activeItems[type] = { id, expiry };
-            localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
-            try {
-                await updateDoc(doc(db, 'users', userData.uid), {
-                    ['last_active_' + type]: id,
-                    ['expiry_active_' + type]: id ? expiry : null
-                });
-            } catch (e) { console.error('Firebase sync error:', e); }
-        }
+    async function saveActiveState(type, id) {
+        if (!userData.uid) return;
+        const now = Date.now();
+        const expiry = now + (24 * 60 * 60 * 1000);
+        let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
+        if (id === null) delete activeItems[type];
+        else activeItems[type] = { id, expiry };
+        localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
+        try {
+            await updateDoc(doc(db, 'users', userData.uid), { ['last_active_' + type]: id, ['expiry_active_' + type]: id ? expiry : null });
+        } catch (e) { console.error('Firebase sync error:', e); }
+    }
 
-        async function restoreActiveState() {
-            if (!userData.uid) return;
-            const now = Date.now();
-            let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
-            let updates = {};
-            let changed = false;
-            const types = ['frame', 'svga', 'chatbubble'];
-            for (const type of types) {
-                const firebaseId = userData['last_active_' + type];
-                const firebaseExpiry = userData['expiry_active_' + type];
-                if (firebaseId && firebaseExpiry && firebaseExpiry > now) {
-                    if (!activeItems[type] || activeItems[type].id !== firebaseId) {
-                        activeItems[type] = { id: firebaseId, expiry: firebaseExpiry };
-                        changed = true;
-                    }
-                } else if (firebaseExpiry && firebaseExpiry <= now) {
-                    if (activeItems[type]) { delete activeItems[type]; changed = true; }
-                    updates['last_active_' + type] = null;
-                    updates['expiry_active_' + type] = null;
-                }
+    async function restoreActiveState() {
+        if (!userData.uid) return;
+        const now = Date.now();
+        let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
+        let updates = {};
+        ['frame', 'svga', 'chatbubble'].forEach(type => {
+            const firebaseId = userData['last_active_' + type];
+            const firebaseExpiry = userData['expiry_active_' + type];
+            if (firebaseId && firebaseExpiry && firebaseExpiry > now) {
+                if (!activeItems[type] || activeItems[type].id !== firebaseId) activeItems[type] = { id: firebaseId, expiry: firebaseExpiry };
+            } else if (firebaseExpiry && firebaseExpiry <= now) {
+                if (activeItems[type]) delete activeItems[type];
+                updates['last_active_' + type] = null;
+                updates['expiry_active_' + type] = null;
             }
-            if (changed) localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
-            if (activeItems.frame && activeItems.frame.expiry > now) userData.activeFrame = activeItems.frame.id;
-            if (activeItems.svga && activeItems.svga.expiry > now) userData.activeFrame = activeItems.svga.id;
-            if (activeItems.chatbubble && activeItems.chatbubble.expiry > now) userData.activeChatBubble = activeItems.chatbubble.id;
-            if (Object.keys(updates).length > 0) {
-                try { await updateDoc(doc(db, 'users', userData.uid), updates); }
-                catch (e) { console.error('Firebase update error:', e); }
-            }
-        }
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                let userDocRef = doc(db, "users", user.uid);
-                let userSnap = await getDoc(userDocRef);
-                if (!userSnap.exists()) {
-                    const q = query(collection(db, "users"), where("email", "==", user.email));
-                    const qSnap = await getDocs(q);
-                    if (!qSnap.empty) {
-                        userDocRef = doc(db, "users", qSnap.docs[0].id);
-                        userSnap = await getDoc(userDocRef);
-                    }
-                }
-                if (userSnap.exists()) {
-                    userData = { uid: userSnap.id, ...userSnap.data() };
-                    await restoreActiveState();
-                    onSnapshot(userDocRef, async (docSnap) => {
-                        if (docSnap.exists()) {
-                            userData = { uid: docSnap.id, ...docSnap.data() };
-                            await restoreActiveState();
-                            await updateUI();
-                        }
-                    });
-                    await loadBanner();
-                    await loadGlobalData();
-                    await loadRooms();
-                    await ensurePrivateRoom();
-                } else {
-                    alert('هذا الحساب غير مسجل في النظام.');
-                    await signOut(auth);
-                    window.location.href = "login.html";
-                }
-            } else { window.location.href = "login.html"; }
         });
-
-        async function loadGlobalData() {
-            const storeSnap = await getDocs(collection(db, "storeItems"));
-            storeData.items = storeSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            storeData.itemsById = {};
-            storeData.items.forEach(item => { storeData.itemsById[item.id] = item; });
-            const gSnap = await getDocs(collection(db, "gifts"));
-            storeData.gifts = gSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'wealth' }));
-            const lgSnap = await getDocs(collection(db, "luckGifts"));
-            storeData.luckGifts = lgSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'magic' }));
-            const mlSnap = await getDocs(collection(db, "magicLevels"));
-            mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
-            const wlSnap = await getDocs(collection(db, "wealthLevels"));
-            wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
-            const cbSnap = await getDocs(collection(db, "chatBubbles"));
-            storeData.chatBubbles = cbSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-            await updateUI();
+        localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
+        if (activeItems.frame?.expiry > now) userData.activeFrame = activeItems.frame.id;
+        if (activeItems.svga?.expiry > now) userData.activeFrame = activeItems.svga.id;
+        if (activeItems.chatbubble?.expiry > now) userData.activeChatBubble = activeItems.chatbubble.id;
+        if (Object.keys(updates).length > 0) {
+            try { await updateDoc(doc(db, 'users', userData.uid), updates); }
+            catch (e) { console.error('Firebase update error:', e); }
         }
+    }
 
-        async function updateUI() {
-            if (!userData.uid) return;
-            document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
-            document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
-            document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
-            document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
-            
-            const magicInfo = getLevelInfo(userData.magicPoints || 0);
-            const wealthInfo = getLevelInfo(userData.wealthPoints || 0);
-            const ml = magicInfo.level;
-            const wl = wealthInfo.level;
-            
-            if (storeData.magicLevels[ml]) document.getElementById('magicLevelImg').src = storeData.magicLevels[ml].image;
-            if (storeData.wealthLevels[wl]) document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wl].image;
-            document.getElementById('sideMagicLevelText').innerText = ml;
-            document.getElementById('sideWealthLevelText').innerText = wl;
-            const avatarWrapper = document.getElementById('sidebarAvatarWrapper');
-            const frameEl = document.getElementById('sideFrame');
-            const svgaContainer = document.getElementById('sideSvgaFrame');
-            frameEl.classList.add('hidden');
-            svgaContainer.classList.add('hidden');
-            svgaContainer.innerHTML = '';
-            avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
-            if (userData.activeFrame) {
-                const item = storeData.itemsById[userData.activeFrame];
-                if (item) {
-                    const sizeClass = getFrameSizeClass(item.frameConfig);
-                    if (sizeClass) avatarWrapper.classList.add(sizeClass);
-                    if (item.itemType === 'svga') {
-                        svgaContainer.classList.remove('hidden');
-                        playPerfectSvga(item.fileUrl, svgaContainer);
-                        applyFrameStyles(avatarWrapper, item.frameConfig);
-                    } else {
-                        frameEl.src = item.image;
-                        frameEl.classList.remove('hidden');
-                        applyFrameStyles(avatarWrapper, item.frameConfig);
-                    }
-                }
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            let userDocRef = doc(db, "users", user.uid);
+            let userSnap = await getDoc(userDocRef);
+            if (!userSnap.exists()) {
+                const q = query(collection(db, "users"), where("email", "==", user.email));
+                const qSnap = await getDocs(q);
+                if (!qSnap.empty) { userDocRef = doc(db, "users", qSnap.docs[0].id); userSnap = await getDoc(userDocRef); }
             }
-            const sidebarBadges = document.getElementById('sidebarActiveBadges');
-            sidebarBadges.innerHTML = '';
-            if (userData.activeBadges) {
-                userData.activeBadges.forEach(badgeId => {
-                    const badge = storeData.itemsById[badgeId];
-                    if (badge) sidebarBadges.innerHTML += `<img src="${badge.image}" class="w-8 h-8 object-contain">`;
+            if (userSnap.exists()) {
+                userData = { uid: userSnap.id, ...userSnap.data() };
+                await restoreActiveState();
+                onSnapshot(userDocRef, async (docSnap) => {
+                    if (docSnap.exists()) { userData = { uid: docSnap.id, ...docSnap.data() }; await restoreActiveState(); await updateUI(); }
                 });
-            }
-        }
-
-        function getFrameSizeClass(config) {
-            if (!config || !config.size) return '';
-            const map = { 'small': 'frame-size-small', 'medium': 'frame-size-medium', 'large': 'frame-size-large', 'xl': 'frame-size-xl' };
-            return map[config.size] || '';
-        }
-
-        function applyFrameStyles(element, config) {
-            if (!config) return;
-            const frameEl = element.querySelector('.svga-avatar-frame, .perfect-frame');
-            if (!frameEl) return;
-            if (config.width) frameEl.style.width = config.width;
-            if (config.height) frameEl.style.height = config.height;
-            if (config.top) frameEl.style.top = config.top;
-            if (config.left) frameEl.style.left = config.left;
-            if (config.transform) frameEl.style.transform = config.transform;
-        }
-
-        function playPerfectSvga(url, container) {
-            container.innerHTML = '';
-            const player = new SVGA.Player(container);
-            const parser = new SVGA.Parser();
-            parser.load(url, (videoItem) => {
-                player.setVideoItem(videoItem);
-                player.startAnimation();
-                const canvas = container.querySelector('canvas');
-                if (canvas) canvas.classList.add('svga-player-canvas');
-            });
-        }
-
-        function playSvga(url, container, options = {}) {
-            container.innerHTML = '';
-            const player = new SVGA.Player(container);
-            const parser = new SVGA.Parser();
-            parser.load(url, (videoItem) => {
-                player.setVideoItem(videoItem);
-                player.loops = options.loops || 0;
-                player.clearsAfterStop = options.clearsAfterStop || false;
-                player.startAnimation();
-                const canvas = container.querySelector('canvas');
-                if (canvas) canvas.classList.add('svga-player-canvas');
-            });
-        }
-
-        async function loadBanner() {
-            const bSnap = await getDocs(collection(db, "appData", "banner", "items"));
-            const wrapper = document.getElementById('bannerWrapper');
-            wrapper.innerHTML = '';
-            if (!bSnap.empty) {
-                bSnap.forEach(doc => {
-                    const data = doc.data();
-                    wrapper.innerHTML += `<div class="swiper-slide"><img src="${data.image}"></div>`;
-                });
+                await Promise.all([loadBanner(), loadGlobalData(), loadRooms(), ensurePrivateRoom()]);
             } else {
-                const oldDoc = await getDoc(doc(db, "appData", "banner"));
-                if (oldDoc.exists()) wrapper.innerHTML = `<div class="swiper-slide"><img src="${oldDoc.data().image}"></div>`;
+                alert('هذا الحساب غير مسجل في النظام.');
+                await signOut(auth);
+                window.location.href = "login.html";
             }
-            new Swiper(".mySwiper", { loop: true, autoplay: { delay: 3000 } });
-        }
+        } else { window.location.href = "login.html"; }
+    });
 
-        async function loadRooms() {
-            const rSnap = await getDocs(collection(db, "rooms"));
-            const grid = document.getElementById('roomsGrid');
-            const roomsRef = ref(rtdb, 'rooms');
-            onValue(roomsRef, (snapshot) => {
-                const rtdbRooms = snapshot.val() || {};
-                const roomsData = rSnap.docs.map(d => {
-                    const r = d.data();
-                    const activeUsersCount = rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0;
-                    return { id: d.id, ...r, activeUsersCount };
-                });
-                roomsData.sort((a, b) => b.activeUsersCount - a.activeUsersCount);
-                grid.innerHTML = '';
-                roomsData.forEach(r => {
-                    grid.innerHTML += `
-                        <div onclick="window.location.href='room.html?id=${r.id}'" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition">
-                            <div class="w-12 h-12 rounded-full ${r.color || 'bg-blue-500'} flex items-center justify-center text-xl">${r.icon || '🏠'}</div>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-gray-900">${r.name}</h4>
-                                <p class="text-xs text-gray-500">${r.description || ''}</p>
-                            </div>
-                            <div class="flex items-center gap-1 bg-green-50 px-2 py-1 rounded-lg">
-                                <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                <span class="text-[10px] font-bold text-green-600">${r.activeUsersCount}</span>
-                            </div>
-                            <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
-                        </div>`;
-                });
-                lucide.createIcons();
+    async function loadGlobalData() {
+        const [storeSnap, gSnap, lgSnap, mlSnap, wlSnap, cbSnap] = await Promise.all([
+            getDocs(collection(db, "storeItems")),
+            getDocs(collection(db, "gifts")),
+            getDocs(collection(db, "luckGifts")),
+            getDocs(collection(db, "magicLevels")),
+            getDocs(collection(db, "wealthLevels")),
+            getDocs(collection(db, "chatBubbles"))
+        ]);
+        storeData.items = storeSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        storeData.itemsById = {};
+        storeData.items.forEach(item => storeData.itemsById[item.id] = item);
+        storeData.gifts = gSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'wealth' }));
+        storeData.luckGifts = lgSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'magic' }));
+        mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
+        wlSnap.docs.forEach(d => storeData.wealthLevels[d.id] = d.data());
+        storeData.chatBubbles = cbSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+        await updateUI();
+    }
+
+    async function updateUI() {
+        if (!userData.uid) return;
+        document.getElementById('sideName').innerText = userData.displayName || "مستخدم";
+        document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
+        document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
+        document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
+        const magicInfo = getLevelInfo(userData.magicPoints || 0);
+        const wealthInfo = getLevelInfo(userData.wealthPoints || 0);
+        if (storeData.magicLevels[magicInfo.level]) document.getElementById('magicLevelImg').src = storeData.magicLevels[magicInfo.level].image;
+        if (storeData.wealthLevels[wealthInfo.level]) document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wealthInfo.level].image;
+        document.getElementById('sideMagicLevelText').innerText = magicInfo.level;
+        document.getElementById('sideWealthLevelText').innerText = wealthInfo.level;
+        const avatarWrapper = document.getElementById('sidebarAvatarWrapper');
+        const frameEl = document.getElementById('sideFrame');
+        const svgaContainer = document.getElementById('sideSvgaFrame');
+        frameEl.classList.add('hidden');
+        svgaContainer.classList.add('hidden');
+        svgaContainer.innerHTML = '';
+        avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
+        if (userData.activeFrame) {
+            const item = storeData.itemsById[userData.activeFrame];
+            if (item) {
+                const sizeClass = getFrameSizeClass(item.frameConfig);
+                if (sizeClass) avatarWrapper.classList.add(sizeClass);
+                if (item.itemType === 'svga') {
+                    svgaContainer.classList.remove('hidden');
+                    playPerfectSvga(item.fileUrl, svgaContainer);
+                } else {
+                    frameEl.src = item.image;
+                    frameEl.classList.remove('hidden');
+                }
+            }
+        }
+        const sidebarBadges = document.getElementById('sidebarActiveBadges');
+        sidebarBadges.innerHTML = '';
+        if (userData.activeBadges) {
+            userData.activeBadges.forEach(badgeId => {
+                const badge = storeData.itemsById[badgeId];
+                if (badge) sidebarBadges.innerHTML += `<img src="${badge.image}" class="w-8 h-8 object-contain">`;
             });
         }
+    }
 
-        window.loadStoreItems = (type) => {
-            const grid = document.getElementById('storeGrid');
-            grid.innerHTML = '';
-            let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
-            const tabs = ['frames', 'badges', 'svga', 'chatbubble'];
-            tabs.forEach(t => {
-                const el = document.getElementById('store-tab-' + t);
-                if (el) el.className = (type === (t === 'frames' ? 'frame' : t)) ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
-            });
-            items.forEach(item => {
-                let field = '';
-                if (type === 'frame') field = 'purchasedFrames';
-                else if (type === 'badge') field = 'purchasedBadges';
-                else if (type === 'svga') field = 'purchasedSvga';
-                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
-                const owned = userData[field]?.some(i => i.id === item.id);
-                let previewHTML = '';
-                if (type === 'chatbubble') {
-                    previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
-                    if (item.fileUrl) setTimeout(() => { const c = document.getElementById(`preview-cb-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
-                } else if (item.itemType === 'svga') {
-                    previewHTML = `<div class="w-16 h-16 mb-2 relative" id="preview-${item.id}"></div>`;
-                    setTimeout(() => { const c = document.getElementById(`preview-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
-                } else previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
-                grid.innerHTML += `<div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">${previewHTML}<h4 class="font-bold text-sm text-center mb-2">${item.name}</h4><button onclick="${owned ? '' : `buyItem('${type}','${item.id}',${item.price})`}" class="buy-btn ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'}">${owned ? 'مملوك' : `${item.price} 💰 شراء`}</button></div>`;
-            });
+    function getFrameSizeClass(config) {
+        if (!config?.size) return '';
+        const map = { 'small': 'frame-size-small', 'medium': 'frame-size-medium', 'large': 'frame-size-large', 'xl': 'frame-size-xl' };
+        return map[config.size] || '';
+    }
+
+    function playPerfectSvga(url, container) {
+        container.innerHTML = '';
+        const player = new SVGA.Player(container);
+        const parser = new SVGA.Parser();
+        parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.startAnimation(); });
+    }
+
+    function playSvga(url, container, options = {}) {
+        container.innerHTML = '';
+        const player = new SVGA.Player(container);
+        const parser = new SVGA.Parser();
+        parser.load(url, (videoItem) => { player.setVideoItem(videoItem); player.loops = options.loops || 0; player.clearsAfterStop = options.clearsAfterStop || false; player.startAnimation(); });
+    }
+
+    async function loadBanner() {
+        const bSnap = await getDocs(collection(db, "appData", "banner", "items"));
+        const wrapper = document.getElementById('bannerWrapper');
+        wrapper.innerHTML = '';
+        if (!bSnap.empty) bSnap.forEach(doc => wrapper.innerHTML += `<div class="swiper-slide"><img src="${doc.data().image}"></div>`);
+        else {
+            const oldDoc = await getDoc(doc(db, "appData", "banner"));
+            if (oldDoc.exists()) wrapper.innerHTML = `<div class="swiper-slide"><img src="${oldDoc.data().image}"></div>`;
+        }
+        new Swiper(".mySwiper", { loop: true, autoplay: { delay: 3000 } });
+    }
+
+    async function loadRooms() {
+        const rSnap = await getDocs(collection(db, "rooms"));
+        const grid = document.getElementById('roomsGrid');
+        const roomsRef = ref(rtdb, 'rooms');
+        onValue(roomsRef, (snapshot) => {
+            const rtdbRooms = snapshot.val() || {};
+            const roomsData = rSnap.docs.map(d => {
+                const r = d.data();
+                const activeUsersCount = rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0;
+                return { id: d.id, ...r, activeUsersCount };
+            }).sort((a, b) => b.activeUsersCount - a.activeUsersCount);
+            grid.innerHTML = roomsData.map(r => `
+                <div onclick="enterRoom('${r.id}')" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition">
+                    <div class="w-12 h-12 rounded-full ${r.color || 'bg-blue-500'} flex items-center justify-center text-xl">${r.icon || '🏠'}</div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-gray-900">${r.name}</h4>
+                        <p class="text-xs text-gray-500">${r.description || ''}</p>
+                    </div>
+                    <div class="flex items-center gap-1 bg-green-50 px-2 py-1 rounded-lg">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <span class="text-[10px] font-bold text-green-600">${r.activeUsersCount}</span>
+                    </div>
+                    <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
+                </div>
+            `).join('');
             lucide.createIcons();
-        };
+        });
+    }
 
-        window.buyItem = async (type, id, price) => {
-            if ((userData.balance || 0) < price) return alert('رصيدك غير كافٍ!');
-            let field = '';
-            if (type === 'frame') field = 'purchasedFrames';
-            else if (type === 'badge') field = 'purchasedBadges';
-            else if (type === 'svga') field = 'purchasedSvga';
-            else if (type === 'chatbubble') field = 'purchasedChatBubbles';
-            const purchaseItem = { id: id, purchasedAt: new Date() };
-            await updateDoc(doc(db, "users", userData.uid), { balance: increment(-price), [field]: arrayUnion(purchaseItem) });
-            alert('تم الشراء بنجاح!');
-            loadStoreItems(type);
-        };
+    window.enterRoom = (roomId) => {
+        // تمرير بيانات المستخدم للغرفة عبر sessionStorage للسرعة
+        sessionStorage.setItem('room_user_data', JSON.stringify({
+            uid: userData.uid,
+            displayName: userData.displayName,
+            photoURL: userData.photoURL,
+            activeFrame: userData.activeFrame,
+            activeBadges: userData.activeBadges,
+            magicLevel: userData.magicLevel || 1,
+            wealthLevel: userData.wealthLevel || 1,
+            balance: userData.balance
+        }));
+        window.location.href = `room.html?id=${roomId}`;
+    };
 
-        window.loadBagItems = async () => {
-            const ids = ['bagGrid', 'badgesBagGrid', 'svgaBagGrid', 'activeBadgesGrid', 'chatbubblesBagGrid'];
-            ids.forEach(id => document.getElementById(id).innerHTML = '');
-            const frames = userData.purchasedFrames || [];
-            frames.forEach(f => {
-                const item = storeData.itemsById[f.id];
-                if (item && item.type === 'frame') {
-                    const isEquipped = userData.activeFrame === f.id;
-                    const grid = document.getElementById('bagGrid');
-                    const div = document.createElement('div');
-                    div.onclick = () => equipFrame(f.id);
-                    div.className = `relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}`;
-                    if (item.itemType === 'svga') {
-                        div.innerHTML = `<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}"></div>`;
-                        setTimeout(() => playSvga(item.fileUrl, document.getElementById(`bag-frame-${f.id}`)), 100);
-                    } else div.innerHTML = `<img src="${item.image}" class="w-12 h-12 object-contain rounded-full">`;
-                    grid.appendChild(div);
-                }
-            });
-            const badges = userData.purchasedBadges || [];
-            badges.forEach(b => {
-                const item = storeData.itemsById[b.id];
-                if (item && item.type === 'badge') {
-                    const isActive = userData.activeBadges?.includes(b.id);
-                    const grid = document.getElementById('badgesBagGrid');
-                    grid.innerHTML += `<div onclick="toggleBadge('${b.id}')" class="relative p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}"><img src="${item.image}" class="w-8 h-8 object-contain"></div>`;
-                }
-            });
-        };
-
-        window.equipFrame = async (id) => {
-            const newFrame = userData.activeFrame === id ? null : id;
-            await saveActiveState("frame", newFrame);
-            await updateDoc(doc(db, "users", userData.uid), { activeFrame: newFrame });
-            loadBagItems();
-        };
-
-        window.toggleBadge = async (id) => {
-            const isActive = userData.activeBadges?.includes(id);
-            await updateDoc(doc(db, "users", userData.uid), { activeBadges: isActive ? arrayRemove(id) : arrayUnion(id) });
-            loadBagItems();
-        };
-
-        window.toggleSidebar = (show) => {
-            const s = document.getElementById('sidebar');
-            const o = document.getElementById('sidebarOverlay');
-            s.classList.toggle('open', show);
-            o.classList.toggle('hidden', !show);
-            if (show) setTimeout(() => o.classList.add('visible'), 10);
-            else o.classList.remove('visible');
-        };
-
-        window.switchView = (v) => {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById('view-' + v).classList.remove('hidden');
-            document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : 'حقيبتي';
-            if (v === 'bag') loadBagItems();
-            if (v === 'store') loadStoreItems('frame');
-            toggleSidebar(false);
-        };
-
-        window.confirmLogout = () => { if (confirm('هل تريد تسجيل الخروج؟')) signOut(auth); };
-        window.copyEmail = () => { navigator.clipboard.writeText(userData.email); alert('تم النسخ'); };
-        window.recharge = async (a) => { await updateDoc(doc(db, "users", userData.uid), { balance: increment(a) }); };
-        window.openEditProfile = () => { document.getElementById('editNameInp').value = userData.displayName; document.getElementById('editPhotoInp').value = userData.photoURL; document.getElementById('editModal').classList.remove('hidden'); toggleSidebar(false); };
-        window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
-        window.saveProfileChanges = async () => { await updateDoc(doc(db, "users", userData.uid), { displayName: document.getElementById('editNameInp').value, photoURL: document.getElementById('editPhotoInp').value }); closeEditModal(); };
-        
-        async function ensurePrivateRoom() {
-            const prRef = doc(db, "privateRooms", userData.uid);
-            const prSnap = await getDoc(prRef);
-            if (!prSnap.exists()) await setDoc(prRef, { owner: userData.uid, name: `غرفة ${userData.displayName}`, icon: '🏠', color: 'bg-purple-500' });
-            document.getElementById('myRoomName').innerText = `غرفة ${userData.displayName}`;
-        }
-
-        window.showPrivateRoom = () => {
-            document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
-            document.getElementById('btn-private').classList.replace('text-gray-500', 'bg-white');
-            document.getElementById('roomsGrid').classList.add('hidden');
-            document.getElementById('privateRoomContainer').classList.remove('hidden');
-        };
-
-        window.filterRooms = (t) => {
-            document.getElementById('btn-public').classList.replace('text-gray-500', 'bg-white');
-            document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
-            document.getElementById('roomsGrid').classList.remove('hidden');
-            document.getElementById('privateRoomContainer').classList.add('hidden');
-        };
-
-        window.openMyRoom = () => { window.location.href = `room.html?id=${userData.uid}&type=private`; };
+    window.loadStoreItems = (type) => {
+        const grid = document.getElementById('storeGrid');
+        let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
+        ['frames', 'badges', 'svga', 'chatbubble'].forEach(t => {
+            const el = document.getElementById('store-tab-' + t);
+            if (el) el.className = (type === (t === 'frames' ? 'frame' : t)) ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+        });
+        grid.innerHTML = items.map(item => {
+            let field = type === 'frame' ? 'purchasedFrames' : type === 'badge' ? 'purchasedBadges' : type === 'svga' ? 'purchasedSvga' : 'purchasedChatBubbles';
+            const owned = userData[field]?.some(i => i.id === item.id);
+            let previewHTML = '';
+            if (type === 'chatbubble' && item.fileUrl) previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
+            else if (item.itemType === 'svga') previewHTML = `<div class="w-16 h-16 mb-2 relative" id="preview-${item.id}"></div>`;
+            else previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
+            return `<div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">${previewHTML}<h4 class="font-bold text-sm text-center mb-2">${item.name}</h4><button onclick="${owned ? '' : `buyItem('${type}','${item.id}',${item.price})`}" class="buy-btn ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'}">${owned ? 'مملوك' : `${item.price} 💰 شراء`}</button></div>`;
+        }).join('');
+        items.forEach(item => {
+            if (type === 'chatbubble' && item.fileUrl) setTimeout(() => { const c = document.getElementById(`preview-cb-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
+            else if (item.itemType === 'svga') setTimeout(() => { const c = document.getElementById(`preview-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
+        });
         lucide.createIcons();
+    };
+
+    window.buyItem = async (type, id, price) => {
+        if ((userData.balance || 0) < price) return alert('رصيدك غير كافٍ!');
+        let field = type === 'frame' ? 'purchasedFrames' : type === 'badge' ? 'purchasedBadges' : type === 'svga' ? 'purchasedSvga' : 'purchasedChatBubbles';
+        await updateDoc(doc(db, "users", userData.uid), { balance: increment(-price), [field]: arrayUnion({ id: id, purchasedAt: new Date() }) });
+        showNotification('تم الشراء بنجاح!');
+        loadStoreItems(type);
+    };
+
+    window.loadBagItems = async () => {
+        ['bagGrid', 'badgesBagGrid', 'svgaBagGrid', 'activeBadgesGrid', 'chatbubblesBagGrid'].forEach(id => document.getElementById(id).innerHTML = '');
+        (userData.purchasedFrames || []).forEach(f => {
+            const item = storeData.itemsById[f.id];
+            if (item?.type === 'frame') {
+                const isEquipped = userData.activeFrame === f.id;
+                const div = document.createElement('div');
+                div.onclick = () => equipFrame(f.id);
+                div.className = `relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}`;
+                if (item.itemType === 'svga') {
+                    div.innerHTML = `<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}"></div>`;
+                    setTimeout(() => playSvga(item.fileUrl, document.getElementById(`bag-frame-${f.id}`)), 100);
+                } else div.innerHTML = `<img src="${item.image}" class="w-12 h-12 object-contain rounded-full">`;
+                document.getElementById('bagGrid').appendChild(div);
+            }
+        });
+        (userData.purchasedBadges || []).forEach(b => {
+            const item = storeData.itemsById[b.id];
+            if (item?.type === 'badge') {
+                const isActive = userData.activeBadges?.includes(b.id);
+                document.getElementById('badgesBagGrid').innerHTML += `<div onclick="toggleBadge('${b.id}')" class="relative p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}"><img src="${item.image}" class="w-8 h-8 object-contain"></div>`;
+            }
+        });
+    };
+
+    window.equipFrame = async (id) => {
+        const newFrame = userData.activeFrame === id ? null : id;
+        await saveActiveState("frame", newFrame);
+        await updateDoc(doc(db, "users", userData.uid), { activeFrame: newFrame });
+        loadBagItems();
+    };
+
+    window.toggleBadge = async (id) => {
+        const isActive = userData.activeBadges?.includes(id);
+        await updateDoc(doc(db, "users", userData.uid), { activeBadges: isActive ? arrayRemove(id) : arrayUnion(id) });
+        loadBagItems();
+    };
+
+    window.toggleSidebar = (show) => {
+        const s = document.getElementById('sidebar');
+        const o = document.getElementById('sidebarOverlay');
+        s.classList.toggle('open', show);
+        o.classList.toggle('hidden', !show);
+        if (show) setTimeout(() => o.classList.add('visible'), 10);
+        else o.classList.remove('visible');
+    };
+
+    window.switchView = (v) => {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
+        document.getElementById('view-' + v).classList.remove('hidden');
+        document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : 'حقيبتي';
+        if (v === 'bag') loadBagItems();
+        if (v === 'store') loadStoreItems('frame');
+        toggleSidebar(false);
+    };
+
+    window.confirmLogout = () => { if (confirm('هل تريد تسجيل الخروج؟')) signOut(auth); };
+    window.copyEmail = () => { navigator.clipboard.writeText(userData.email); showNotification('تم النسخ'); };
+    window.recharge = async (a) => { await updateDoc(doc(db, "users", userData.uid), { balance: increment(a) }); showNotification('تم الشحن بنجاح!'); };
+    window.openEditProfile = () => { document.getElementById('editNameInp').value = userData.displayName; document.getElementById('editPhotoInp').value = userData.photoURL; document.getElementById('editModal').classList.remove('hidden'); toggleSidebar(false); };
+    window.closeEditModal = () => document.getElementById('editModal').classList.add('hidden');
+    window.saveProfileChanges = async () => { await updateDoc(doc(db, "users", userData.uid), { displayName: document.getElementById('editNameInp').value, photoURL: document.getElementById('editPhotoInp').value }); closeEditModal(); showNotification('تم الحفظ!'); };
+
+    async function ensurePrivateRoom() {
+        const prRef = doc(db, "privateRooms", userData.uid);
+        const prSnap = await getDoc(prRef);
+        if (!prSnap.exists()) await setDoc(prRef, { owner: userData.uid, name: `غرفة ${userData.displayName}`, icon: '🏠', color: 'bg-purple-500', createdAt: new Date() });
+        document.getElementById('myRoomName').innerText = `غرفة ${userData.displayName}`;
+    }
+
+    window.showPrivateRoom = () => {
+        document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('btn-private').classList.replace('text-gray-500', 'bg-white');
+        document.getElementById('roomsGrid').classList.add('hidden');
+        document.getElementById('privateRoomContainer').classList.remove('hidden');
+    };
+
+    window.filterRooms = (t) => {
+        document.getElementById('btn-public').classList.replace('text-gray-500', 'bg-white');
+        document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('roomsGrid').classList.remove('hidden');
+        document.getElementById('privateRoomContainer').classList.add('hidden');
+    };
+
+    window.openMyRoom = () => {
+        sessionStorage.setItem('room_user_data', JSON.stringify({
+            uid: userData.uid,
+            displayName: userData.displayName,
+            photoURL: userData.photoURL,
+            activeFrame: userData.activeFrame,
+            activeBadges: userData.activeBadges,
+            magicLevel: userData.magicLevel || 1,
+            wealthLevel: userData.wealthLevel || 1,
+            balance: userData.balance
+        }));
+        window.location.href = `room.html?id=${userData.uid}&type=private`;
+    };
+
+    function showNotification(msg) {
+        const div = document.createElement('div');
+        div.className = 'notification';
+        div.textContent = msg;
+        document.body.appendChild(div);
+        setTimeout(() => div.remove(), 3000);
+    }
+
+    lucide.createIcons();
     </script>
 </body>
 </html>
