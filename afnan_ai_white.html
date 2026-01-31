@@ -202,14 +202,57 @@
         let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {}, chatBubbles: [] };
         let activeSvgaPlayers = {};
 
+        async function saveActiveState(type, id) {
+            if (!userData.uid) return;
+            const now = Date.now();
+            const expiry = now + (24 * 60 * 60 * 1000); // 24 hours
+            let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
+            if (id === null) delete activeItems[type];
+            else activeItems[type] = { id, expiry };
+            localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
+            try {
+                await updateDoc(doc(db, 'users', userData.uid), {
+                    ['last_active_' + type]: id,
+                    ['expiry_active_' + type]: id ? expiry : null
+                });
+            } catch (e) { console.error('Firebase sync error:', e); }
+        }
+
+        async function restoreActiveState() {
+            if (!userData.uid) return;
+            const now = Date.now();
+            let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
+            let updates = {};
+            let changed = false;
+            const types = ['frame', 'svga', 'chatbubble'];
+            for (const type of types) {
+                const firebaseId = userData['last_active_' + type];
+                const firebaseExpiry = userData['expiry_active_' + type];
+                if (firebaseId && firebaseExpiry && firebaseExpiry > now) {
+                    if (!activeItems[type] || activeItems[type].id !== firebaseId) {
+                        activeItems[type] = { id: firebaseId, expiry: firebaseExpiry };
+                        changed = true;
+                    }
+                } else if (firebaseExpiry && firebaseExpiry <= now) {
+                    if (activeItems[type]) { delete activeItems[type]; changed = true; }
+                    updates['last_active_' + type] = null;
+                    updates['expiry_active_' + type] = null;
+                }
+            }
+            if (changed) localStorage.setItem('active_items_' + userData.uid, JSON.stringify(activeItems));
+            if (activeItems.frame && activeItems.frame.expiry > now) userData.activeFrame = activeItems.frame.id;
+            if (activeItems.svga && activeItems.svga.expiry > now) userData.activeFrame = activeItems.svga.id;
+            if (activeItems.chatbubble && activeItems.chatbubble.expiry > now) userData.activeChatBubble = activeItems.chatbubble.id;
+            if (Object.keys(updates).length > 0) {
+                try { await updateDoc(doc(db, 'users', userData.uid), updates); }
+                catch (e) { console.error('Firebase update error:', e); }
+            }
+        }
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // دعم هيكلة Firestore المرنة (رقم، نص، أو بريد)
-                // نبحث أولاً عن وثيقة تحمل UID الخاص بـ Auth
                 let userDocRef = doc(db, "users", user.uid);
                 let userSnap = await getDoc(userDocRef);
-                
-                // إذا لم توجد، نبحث عن وثيقة يكون فيها حقل email يساوي بريد المستخدم الحالي (للتوافق القديم)
                 if (!userSnap.exists()) {
                     const q = query(collection(db, "users"), where("email", "==", user.email));
                     const qSnap = await getDocs(q);
@@ -218,12 +261,13 @@
                         userSnap = await getDoc(userDocRef);
                     }
                 }
-
                 if (userSnap.exists()) {
                     userData = { uid: userSnap.id, ...userSnap.data() };
+                    await restoreActiveState();
                     onSnapshot(userDocRef, async (docSnap) => {
                         if (docSnap.exists()) {
                             userData = { uid: docSnap.id, ...docSnap.data() };
+                            await restoreActiveState();
                             await updateUI();
                         }
                     });
@@ -236,9 +280,7 @@
                     await signOut(auth);
                     window.location.href = "login.html";
                 }
-            } else {
-                window.location.href = "login.html";
-            }
+            } else { window.location.href = "login.html"; }
         });
 
         async function loadGlobalData() {
@@ -247,7 +289,9 @@
             storeData.itemsById = {};
             storeData.items.forEach(item => { storeData.itemsById[item.id] = item; });
             const gSnap = await getDocs(collection(db, "gifts"));
-            storeData.gifts = gSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+            storeData.gifts = gSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'wealth' }));
+            const lgSnap = await getDocs(collection(db, "luckGifts"));
+            storeData.luckGifts = lgSnap.docs.map(d => ({ id: d.id, ...d.data(), type: 'magic' }));
             const mlSnap = await getDocs(collection(db, "magicLevels"));
             mlSnap.docs.forEach(d => storeData.magicLevels[d.id] = d.data());
             const wlSnap = await getDocs(collection(db, "wealthLevels"));
@@ -263,14 +307,12 @@
             document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
-            
             const ml = userData.magicLevel || 1;
             const wl = userData.wealthLevel || 1;
             if (storeData.magicLevels[ml]) document.getElementById('magicLevelImg').src = storeData.magicLevels[ml].image;
             if (storeData.wealthLevels[wl]) document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wl].image;
             document.getElementById('sideMagicLevelText').innerText = ml;
             document.getElementById('sideWealthLevelText').innerText = wl;
-
             const avatarWrapper = document.getElementById('sidebarAvatarWrapper');
             const frameEl = document.getElementById('sideFrame');
             const svgaContainer = document.getElementById('sideSvgaFrame');
@@ -278,7 +320,6 @@
             svgaContainer.classList.add('hidden');
             svgaContainer.innerHTML = '';
             avatarWrapper.classList.remove('frame-size-small', 'frame-size-medium', 'frame-size-large', 'frame-size-xl');
-
             if (userData.activeFrame) {
                 const item = storeData.itemsById[userData.activeFrame];
                 if (item) {
@@ -295,7 +336,6 @@
                     }
                 }
             }
-            
             const sidebarBadges = document.getElementById('sidebarActiveBadges');
             sidebarBadges.innerHTML = '';
             if (userData.activeBadges) {
@@ -335,6 +375,20 @@
             });
         }
 
+        function playSvga(url, container, options = {}) {
+            container.innerHTML = '';
+            const player = new SVGA.Player(container);
+            const parser = new SVGA.Parser();
+            parser.load(url, (videoItem) => {
+                player.setVideoItem(videoItem);
+                player.loops = options.loops || 0;
+                player.clearsAfterStop = options.clearsAfterStop || false;
+                player.startAnimation();
+                const canvas = container.querySelector('canvas');
+                if (canvas) canvas.classList.add('svga-player-canvas');
+            });
+        }
+
         async function loadBanner() {
             const bSnap = await getDocs(collection(db, "appData", "banner", "items"));
             const wrapper = document.getElementById('bannerWrapper');
@@ -345,11 +399,8 @@
                     wrapper.innerHTML += `<div class="swiper-slide"><img src="${data.image}"></div>`;
                 });
             } else {
-                // التوافق مع الهيكل القديم لوثيقة واحدة
                 const oldDoc = await getDoc(doc(db, "appData", "banner"));
-                if (oldDoc.exists()) {
-                    wrapper.innerHTML = `<div class="swiper-slide"><img src="${oldDoc.data().image}"></div>`;
-                }
+                if (oldDoc.exists()) wrapper.innerHTML = `<div class="swiper-slide"><img src="${oldDoc.data().image}"></div>`;
             }
             new Swiper(".mySwiper", { loop: true, autoplay: { delay: 3000 } });
         }
@@ -357,9 +408,6 @@
         async function loadRooms() {
             const rSnap = await getDocs(collection(db, "rooms"));
             const grid = document.getElementById('roomsGrid');
-            grid.innerHTML = '';
-            
-            // جلب عدد المستخدمين في كل غرفة من Realtime Database للترتيب
             const roomsRef = ref(rtdb, 'rooms');
             onValue(roomsRef, (snapshot) => {
                 const rtdbRooms = snapshot.val() || {};
@@ -368,10 +416,7 @@
                     const activeUsersCount = rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0;
                     return { id: d.id, ...r, activeUsersCount };
                 });
-
-                // ترتيب الغرف: الغرف النشطة أولاً، ثم حسب عدد المستخدمين تنازلياً
                 roomsData.sort((a, b) => b.activeUsersCount - a.activeUsersCount);
-
                 grid.innerHTML = '';
                 roomsData.forEach(r => {
                     grid.innerHTML += `
@@ -392,6 +437,91 @@
             });
         }
 
+        window.loadStoreItems = (type) => {
+            const grid = document.getElementById('storeGrid');
+            grid.innerHTML = '';
+            let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
+            const tabs = ['frames', 'badges', 'svga', 'chatbubble'];
+            tabs.forEach(t => {
+                const el = document.getElementById('store-tab-' + t);
+                if (el) el.className = (type === (t === 'frames' ? 'frame' : t)) ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
+            });
+            items.forEach(item => {
+                let field = '';
+                if (type === 'frame') field = 'purchasedFrames';
+                else if (type === 'badge') field = 'purchasedBadges';
+                else if (type === 'svga') field = 'purchasedSvga';
+                else if (type === 'chatbubble') field = 'purchasedChatBubbles';
+                const owned = userData[field]?.some(i => i.id === item.id);
+                let previewHTML = '';
+                if (type === 'chatbubble') {
+                    previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
+                    if (item.fileUrl) setTimeout(() => { const c = document.getElementById(`preview-cb-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
+                } else if (item.itemType === 'svga') {
+                    previewHTML = `<div class="w-16 h-16 mb-2 relative" id="preview-${item.id}"></div>`;
+                    setTimeout(() => { const c = document.getElementById(`preview-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
+                } else previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
+                grid.innerHTML += `<div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">${previewHTML}<h4 class="font-bold text-sm text-center mb-2">${item.name}</h4><button onclick="${owned ? '' : `buyItem('${type}','${item.id}',${item.price})`}" class="buy-btn ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'}">${owned ? 'مملوك' : `${item.price} 💰 شراء`}</button></div>`;
+            });
+            lucide.createIcons();
+        };
+
+        window.buyItem = async (type, id, price) => {
+            if ((userData.balance || 0) < price) return alert('رصيدك غير كافٍ!');
+            let field = '';
+            if (type === 'frame') field = 'purchasedFrames';
+            else if (type === 'badge') field = 'purchasedBadges';
+            else if (type === 'svga') field = 'purchasedSvga';
+            else if (type === 'chatbubble') field = 'purchasedChatBubbles';
+            const purchaseItem = { id: id, purchasedAt: new Date() };
+            await updateDoc(doc(db, "users", userData.uid), { balance: increment(-price), [field]: arrayUnion(purchaseItem) });
+            alert('تم الشراء بنجاح!');
+            loadStoreItems(type);
+        };
+
+        window.loadBagItems = async () => {
+            const ids = ['bagGrid', 'badgesBagGrid', 'svgaBagGrid', 'activeBadgesGrid', 'chatbubblesBagGrid'];
+            ids.forEach(id => document.getElementById(id).innerHTML = '');
+            const frames = userData.purchasedFrames || [];
+            frames.forEach(f => {
+                const item = storeData.itemsById[f.id];
+                if (item && item.type === 'frame') {
+                    const isEquipped = userData.activeFrame === f.id;
+                    const grid = document.getElementById('bagGrid');
+                    const div = document.createElement('div');
+                    div.onclick = () => equipFrame(f.id);
+                    div.className = `relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}`;
+                    if (item.itemType === 'svga') {
+                        div.innerHTML = `<div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-1" id="bag-frame-${f.id}"></div>`;
+                        setTimeout(() => playSvga(item.fileUrl, document.getElementById(`bag-frame-${f.id}`)), 100);
+                    } else div.innerHTML = `<img src="${item.image}" class="w-12 h-12 object-contain rounded-full">`;
+                    grid.appendChild(div);
+                }
+            });
+            const badges = userData.purchasedBadges || [];
+            badges.forEach(b => {
+                const item = storeData.itemsById[b.id];
+                if (item && item.type === 'badge') {
+                    const isActive = userData.activeBadges?.includes(b.id);
+                    const grid = document.getElementById('badgesBagGrid');
+                    grid.innerHTML += `<div onclick="toggleBadge('${b.id}')" class="relative p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}"><img src="${item.image}" class="w-8 h-8 object-contain"></div>`;
+                }
+            });
+        };
+
+        window.equipFrame = async (id) => {
+            const newFrame = userData.activeFrame === id ? null : id;
+            await saveActiveState("frame", newFrame);
+            await updateDoc(doc(db, "users", userData.uid), { activeFrame: newFrame });
+            loadBagItems();
+        };
+
+        window.toggleBadge = async (id) => {
+            const isActive = userData.activeBadges?.includes(id);
+            await updateDoc(doc(db, "users", userData.uid), { activeBadges: isActive ? arrayRemove(id) : arrayUnion(id) });
+            loadBagItems();
+        };
+
         window.toggleSidebar = (show) => {
             const s = document.getElementById('sidebar');
             const o = document.getElementById('sidebarOverlay');
@@ -405,6 +535,8 @@
             document.querySelectorAll('.view-section').forEach(s => s.classList.add('hidden'));
             document.getElementById('view-' + v).classList.remove('hidden');
             document.getElementById('pageTitle').innerText = v === 'home' ? 'الرئيسية' : v === 'wallet' ? 'المحفظة' : v === 'store' ? 'المتجر' : 'حقيبتي';
+            if (v === 'bag') loadBagItems();
+            if (v === 'store') loadStoreItems('frame');
             toggleSidebar(false);
         };
 
@@ -418,9 +550,7 @@
         async function ensurePrivateRoom() {
             const prRef = doc(db, "privateRooms", userData.uid);
             const prSnap = await getDoc(prRef);
-            if (!prSnap.exists()) {
-                await setDoc(prRef, { owner: userData.uid, name: `غرفة ${userData.displayName}`, icon: '🏠', color: 'bg-purple-500' });
-            }
+            if (!prSnap.exists()) await setDoc(prRef, { owner: userData.uid, name: `غرفة ${userData.displayName}`, icon: '🏠', color: 'bg-purple-500' });
             document.getElementById('myRoomName').innerText = `غرفة ${userData.displayName}`;
         }
 
@@ -439,7 +569,6 @@
         };
 
         window.openMyRoom = () => { window.location.href = `room.html?id=${userData.uid}&type=private`; };
-
         lucide.createIcons();
     </script>
 </body>
