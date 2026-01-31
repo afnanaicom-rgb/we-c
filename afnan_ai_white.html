@@ -202,6 +202,26 @@
         let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {}, chatBubbles: [] };
         let activeSvgaPlayers = {};
 
+        function getLevelInfo(totalPoints) {
+            let level = 1;
+            let remaining = totalPoints;
+            const getThreshold = (lvl) => {
+                if (lvl === 1) return 50000;
+                if (lvl === 2) return 100000;
+                if (lvl === 3) return 150000;
+                if (lvl === 4) return 225000;
+                return Math.floor(225000 * Math.pow(1.5, lvl - 4));
+            };
+            while (level < 100) {
+                let threshold = getThreshold(level);
+                if (remaining >= threshold) {
+                    remaining -= threshold;
+                    level++;
+                } else break;
+            }
+            return { level, currentPoints: remaining, nextThreshold: getThreshold(level) };
+        }
+
         async function saveActiveState(type, id) {
             if (!userData.uid) return;
             const now = Date.now();
@@ -307,8 +327,12 @@
             document.getElementById('sideEmail').innerText = userData.email || "لا يوجد بريد";
             document.getElementById('sideAvatar').src = userData.photoURL || 'https://via.placeholder.com/150';
             document.getElementById('walletAmount').innerText = (userData.balance || 0).toLocaleString();
-            const ml = userData.magicLevel || 1;
-            const wl = userData.wealthLevel || 1;
+            
+            const magicInfo = getLevelInfo(userData.magicPoints || 0);
+            const wealthInfo = getLevelInfo(userData.wealthPoints || 0);
+            const ml = magicInfo.level;
+            const wl = wealthInfo.level;
+            
             if (storeData.magicLevels[ml]) document.getElementById('magicLevelImg').src = storeData.magicLevels[ml].image;
             if (storeData.wealthLevels[wl]) document.getElementById('wealthLevelImg').src = storeData.wealthLevels[wl].image;
             document.getElementById('sideMagicLevelText').innerText = ml;

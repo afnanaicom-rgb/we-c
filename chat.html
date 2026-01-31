@@ -73,11 +73,22 @@
                 const uid = snap.docs[0].id;
                 card.innerHTML = `
                     <div class="flex items-center gap-3">
-                        <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                        <div class="relative w-10 h-10 flex items-center justify-center">
+                            <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover relative z-10">
+                            <div id="frame_search_${uid}" class="absolute inset-0 pointer-events-none z-20"></div>
+                        </div>
                         <div><h4 class="font-bold text-sm">${u.displayName}</h4></div>
                     </div>
                     <button onclick="followUser('${uid}')" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-bold">متابعة</button>
                 `;
+                if(u.activeFrame) {
+                    const fSnap = await getDoc(doc(db, "storeItems", u.activeFrame));
+                    if(fSnap.exists()) {
+                        const fData = fSnap.data();
+                        const fCont = document.getElementById(`frame_search_${uid}`);
+                        if(fData.image) fCont.innerHTML = `<img src="${fData.image}" class="w-full h-full object-contain">`;
+                    }
+                }
             }
             lucide.createIcons();
         };
@@ -124,12 +135,24 @@
                 const snap = await getDoc(doc(db, "users", uid));
                 if (snap.exists()) {
                     const u = snap.data();
+                    const frameId = `frame_friend_${uid}`;
                     list.innerHTML += `
                         <div class="glass-card p-4 rounded-3xl flex items-center gap-3">
-                            <img src="${u.photoURL}" class="w-10 h-10 rounded-full object-cover">
+                            <div class="relative w-10 h-10 flex items-center justify-center">
+                                <img src="${u.photoURL}" class="w-8 h-8 rounded-full object-cover relative z-10">
+                                <div id="${frameId}" class="absolute inset-0 pointer-events-none z-20"></div>
+                            </div>
                             <h4 class="font-bold text-sm flex-1">${u.displayName}</h4>
                             <i data-lucide="message-circle" class="text-gray-300 w-4 h-4"></i>
                         </div>`;
+                    if(u.activeFrame) {
+                        const fSnap = await getDoc(doc(db, "storeItems", u.activeFrame));
+                        if(fSnap.exists()) {
+                            const fData = fSnap.data();
+                            const fCont = document.getElementById(frameId);
+                            if(fData.image) fCont.innerHTML = `<img src="${fData.image}" class="w-full h-full object-contain">`;
+                        }
+                    }
                 }
             }
             lucide.createIcons();

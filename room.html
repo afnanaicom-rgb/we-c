@@ -34,10 +34,10 @@
         .msg-row.received .msg-bubble { border-bottom-right-radius: 2px; flex-direction: row-reverse; background: rgba(139, 92, 246, 0.15); }
         
         /* إصلاح الإطار في الدردشة ليكون كبيراً ويغطي الصورة تماماً */
-        .msg-avatar-wrapper { position: relative; width: 65px; height: 65px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-        .msg-avatar { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; position: relative; z-index: 1; object-fit: cover; }
-        .msg-frame-container { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; display: flex; align-items: center; justify-content: center; }
-        .msg-frame-container img, .msg-frame-container canvas { width: 100%; height: 100%; object-fit: contain; }
+        .msg-avatar-wrapper { position: relative; width: 55px; height: 55px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-left: 10px; }
+        .msg-avatar { width: 42px; height: 42px; border-radius: 50%; cursor: pointer; position: relative; z-index: 1; object-fit: cover; }
+        .msg-frame-container { position: absolute; width: calc(100% + 14px); height: calc(100% + 14px); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 2; display: flex; align-items: center; justify-content: center; }
+        .msg-frame-container img, .msg-frame-container canvas { width: 100%!important; height: 100%!important; object-fit: contain; }
         
         .msg-content { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .msg-row.received .msg-content { align-items: flex-end; }
@@ -221,6 +221,9 @@
         wSnap.forEach(doc => storeData.wealthLevels[doc.id] = doc.data().image);
         const mSnap = await db.collection('magicLevels').get();
         mSnap.forEach(doc => storeData.magicLevels[doc.id] = doc.data().image);
+        const cbSnap = await db.collection('chatBubbles').get();
+        storeData.chatBubbles = {};
+        cbSnap.forEach(doc => storeData.chatBubbles[doc.id] = { id: doc.id, ...doc.data() });
     }
 
     async function loadRoom() {
@@ -247,12 +250,24 @@
         listenChat();
     }
 
-    function showEntryToast(u) {
+    async function showEntryToast(u) {
         const toast = document.getElementById('entry-toast');
         document.getElementById('toast-img').src = u.photo;
         document.getElementById('toast-text').textContent = `${u.name} متواجد الآن بالغرفة`;
         toast.classList.add('show');
-        setTimeout(() => toast.classList.remove('show'), 800);
+        
+        // Play entry effect (car) if exists
+        const uSnap = await db.collection('users').doc(u.uid).get();
+        const userData = uSnap.data();
+        if(userData && userData.activeSvga) {
+            const sSnap = await db.collection('storeItems').doc(userData.activeSvga).get();
+            if(sSnap.exists) {
+                const sData = sSnap.data();
+                if(sData.fileUrl) playSvgaOverlay(sData.fileUrl);
+            }
+        }
+
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
     function updateOnlineUsersUI() {
@@ -284,10 +299,21 @@
         const isMe = msg.senderId === user.uid;
         const row = document.createElement('div');
         row.className = `msg-row ${isMe ? 'sent' : 'received'}`;
-        row.innerHTML = `<div class="msg-bubble"><div class="msg-avatar-wrapper"><img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')"><div id="frame_${msgId}" class="msg-frame-container"></div></div><div class="msg-content"><div class="msg-user">${msg.senderName} <div id="badges_${msgId}" class="badge-container"></div></div><div class="msg-text">${msg.text}</div></div></div>`;
-        area.appendChild(row);
+        
         const uSnap = await db.collection('users').doc(msg.senderId).get();
         const u = uSnap.data();
+        
+        let bubbleStyle = "";
+        if(u && u.activeChatBubble) {
+            const cb = storeData.chatBubbles[u.activeChatBubble];
+            if(cb) {
+                bubbleStyle = `style="background-image: url('${cb.image}'); background-size: 100% 100%; background-repeat: no-repeat; border: none; padding: 20px; color: ${cb.textColor || '#fff'};"`;
+            }
+        }
+
+        row.innerHTML = `<div class="msg-bubble" id="bubble_${msgId}" ${bubbleStyle}><div class="msg-avatar-wrapper"><img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')"><div id="frame_${msgId}" class="msg-frame-container"></div></div><div class="msg-content"><div class="msg-user">${msg.senderName} <div id="badges_${msgId}" class="badge-container"></div></div><div class="msg-text">${msg.text}</div></div></div>`;
+        area.appendChild(row);
+
         if(u) {
             if(u.activeFrame) {
                 const f = storeData.frames[u.activeFrame];
