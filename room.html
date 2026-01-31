@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Premium Live Experience</title>
+    <title>Live Room Experience</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDKs (Compat) -->
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -20,9 +20,9 @@
         :root {
             --primary: #8b5cf6;
             --accent: #f59e0b;
-            --bg-black: #000000;
-            --glass: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.15);
+            --bg-black: #09090b;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -31,10 +31,10 @@
             padding: 0;
             outline: none;
             -webkit-tap-highlight-color: transparent;
+            font-family: 'Noto Sans Arabic', sans-serif;
         }
 
         body {
-            font-family: 'Cairo', sans-serif;
             background-color: var(--bg-black);
             color: #fff;
             height: 100dvh;
@@ -46,7 +46,7 @@
         .app-bg {
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 10% 10%, #1e1b4b 0%, #000000 50%);
+            background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #000000 70%);
             z-index: -1;
         }
 
@@ -58,8 +58,8 @@
             flex-direction: column;
             position: relative;
         }
-        
-        /* Header */
+
+        /* --- Header --- */
         .header {
             padding: 15px;
             display: flex;
@@ -67,7 +67,7 @@
             align-items: center;
             z-index: 100;
             border-bottom: 1px solid var(--glass-border);
-            background: rgba(0,0,0,0.3);
+            background: rgba(0,0,0,0.2);
             backdrop-filter: blur(10px);
         }
 
@@ -75,44 +75,43 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            background: var(--glass);
-            padding: 5px 12px;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 12px 4px 6px;
             border-radius: 30px;
             border: 1px solid var(--glass-border);
             cursor: pointer;
         }
 
         .owner-img {
-            width: 38px;
-            height: 38px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             border: 2px solid var(--accent);
             object-fit: cover;
         }
 
         .btn-control {
-            background: transparent;
-            border: none;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
             color: #fff;
-            font-size: 18px;
-            width: 40px;
-            height: 40px;
+            font-size: 16px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            opacity: 0.8;
         }
 
-        /* Chat Area */
+        /* --- Chat Area --- */
         .chat-area {
             flex: 1;
             overflow-y: auto;
             padding: 15px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             scroll-behavior: smooth;
         }
 
@@ -121,136 +120,89 @@
             width: 100%;
             margin-bottom: 5px;
         }
-
-        .msg-row.sent { justify-content: flex-start; } /* My messages left (RTL reversed logic if needed, but standard is sent right/received left usually. Keeping your logic) */
-        /* Assuming RTL: sent (me) starts from right? Standard chat: Sent (right), Received (left). 
-           Since dir="rtl", flex-start is Right. So 'sent' is Right. 'received' is Left. Correct. */
-
-        .msg-row.received { justify-content: flex-end; } 
+        .msg-row.sent { justify-content: flex-start; } /* RTL: Me is Right */
+        .msg-row.received { justify-content: flex-end; } /* RTL: Others Left */
 
         .msg-bubble {
-            background: rgba(255,255,255,0.08);
+            background: rgba(30, 30, 40, 0.6);
             border: 1px solid var(--glass-border);
             padding: 8px 12px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            backdrop-filter: blur(5px);
             display: flex;
-            align-items: flex-start; /* Align top to handle different heights */
+            align-items: flex-start;
             gap: 10px;
             max-width: 85%;
-            animation: slideIn 0.3s ease;
             position: relative;
         }
 
-        .msg-row.sent .msg-bubble {
-            border-bottom-left-radius: 2px;
-            flex-direction: row; 
-        }
-
-        .msg-row.received .msg-bubble {
-            border-bottom-right-radius: 2px;
-            flex-direction: row-reverse;
+        .msg-row.sent .msg-bubble { 
+            border-bottom-left-radius: 2px; 
+            flex-direction: row;
             background: rgba(139, 92, 246, 0.15);
         }
+        
+        .msg-row.received .msg-bubble { 
+            border-bottom-right-radius: 2px;
+            flex-direction: row-reverse;
+        }
 
-        /* --- FIX: Avatar & Frame in Chat --- */
+        /* Chat Avatar System */
         .msg-avatar-wrapper {
             position: relative;
-            width: 55px;  /* Fixed container size */
-            height: 55px;
+            width: 45px;
+            height: 45px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: -5px; /* Slight adjustment to align with text top */
         }
 
         .msg-avatar {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             object-fit: cover;
-            position: relative;
-            z-index: 1; /* Below frame */
-            cursor: pointer;
+            z-index: 1;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .msg-frame-container {
+        .msg-frame {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 65px; /* Larger than avatar */
-            height: 65px;
-            z-index: 5; /* Above avatar */
-            pointer-events: none; /* Let clicks pass to avatar */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 100%; /* Relative to wrapper (45px) */
+            height: 100%;
+            z-index: 2;
+            pointer-events: none;
         }
-        
-        .msg-frame-container img, 
-        .msg-frame-container canvas {
-            width: 100% !important;
-            height: 50% !important;
-            object-fit: contain;
-        }
-        /* ----------------------------------- */
+        .msg-frame canvas, .msg-frame img { width: 100%!important; height: 100%!important; object-fit: contain; }
 
-        .msg-content {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 1;
-            padding-top: 4px;
-        }
-
+        .msg-content { display: flex; flex-direction: column; gap: 4px; flex: 1; }
         .msg-row.received .msg-content { align-items: flex-end; }
+        .msg-user { font-size: 12px; font-weight: 700; color: #a1a1aa; display: flex; align-items: center; gap: 5px; }
+        .msg-text { font-size: 13px; color: #fff; line-height: 1.5; }
+        
+        /* Badges in Chat */
+        .badge-container { display: inline-flex; align-items: center; gap: 2px; }
+        .chat-badge { width: 16px; height: 16px; object-fit: contain; }
 
-        .msg-user {
-            font-size: 13px;
-            font-weight: bold;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .msg-text {
-            font-size: 14px;
-            line-height: 1.5;
-            color: #eee;
-            word-break: break-word;
-        }
-
-        /* Badges */
-        .badge-container {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-        }
-        .lvl-badge {
-            width: 18px; /* Adjusted for chat */
-            height: 18px;
-            object-fit: contain;
-        }
-
-        /* Footer */
+        /* --- Footer --- */
         .footer {
-            padding: 10px 15px 25px;
+            padding: 10px 15px 20px;
             display: flex;
             align-items: center;
             gap: 10px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
         }
 
         .input-box {
             flex: 1;
-            background: var(--glass);
+            background: rgba(255,255,255,0.08);
             border: 1px solid var(--glass-border);
             border-radius: 25px;
-            height: 46px;
+            height: 44px;
             padding: 0 15px;
             display: flex;
             align-items: center;
@@ -262,7 +214,6 @@
             color: #fff;
             width: 100%;
             font-size: 14px;
-            font-family: inherit;
         }
 
         .btn-action {
@@ -275,15 +226,15 @@
             justify-content: center;
             cursor: pointer;
             color: white;
-            transition: 0.2s;
             font-size: 18px;
+            flex-shrink: 0;
         }
 
-        /* Sheets */
+        /* --- Sheets & Modals --- */
         .sheet-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             backdrop-filter: blur(5px);
             z-index: 2000;
             display: flex;
@@ -296,135 +247,112 @@
         .sheet-overlay.show { opacity: 1; pointer-events: auto; }
 
         .bottom-sheet {
-            background: rgba(20, 20, 25, 0.98);
-            backdrop-filter: blur(40px);
-            width: 100%;
-            border-radius: 30px 30px 0 0;
+            background: #121215;
             border-top: 1px solid var(--glass-border);
+            border-radius: 30px 30px 0 0;
+            padding: 25px 20px;
+            width: 100%;
             transform: translateY(100%);
-            transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
-            padding: 25px;
+            transition: 0.4s cubic-bezier(0.19, 1, 0.22, 1);
             max-height: 85vh;
             overflow-y: auto;
         }
         .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
 
-        /* Profile Sheet Specifics */
-        .profile-header-wrapper {
+        /* --- PROFILE STYLE (COPIED FROM WHITE EDITION) --- */
+        /* This matches the exact CSS logic from the provided code */
+        
+        .avatar-wrapper {
             position: relative;
-            width: 130px;
-            height: 130px;
-            margin: 0 auto 20px;
+            width: 90px; /* Slight increase from 80px for Modal visibility */
+            height: 90px;
+            margin: 0 auto 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .profile-avatar {
-            width: 90px;
-            height: 90px;
             border-radius: 50%;
-            object-fit: cover;
-            position: relative;
-            z-index: 1; /* Below Frame */
+            overflow: visible; /* Important for frame to stick out */
         }
-        .profile-frame-container {
-            position: absolute;
+
+        .avatar-img {
             width: 100%;
             height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1; /* Image at bottom */
+        }
+
+        .perfect-frame {
+            position: absolute;
+            pointer-events: none;
+            z-index: 2; /* Frame on top */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: frameFloat 3s ease-in-out infinite;
+            overflow: visible;
+            
+            /* The specific calculation from White Edition */
+            width: calc(100% + 20px); 
+            height: calc(100% + 20px);
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 5; /* Above Avatar */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .profile-frame-container img, .profile-frame-container canvas {
-            width: 100%!important; height: 100%!important; object-fit: contain;
         }
 
-        /* Horizontal Scroll Users */
-        .users-selection {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding: 10px 5px;
-            margin-bottom: 15px;
-            scrollbar-width: none;
+        .perfect-frame canvas, .perfect-frame img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
         }
-        .user-select-card {
-            flex-shrink: 0;
-            width: 70px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-            position: relative;
-        }
-        .user-select-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            object-fit: cover;
-        }
-        .user-select-card.selected .user-select-img { border-color: var(--accent); transform: scale(1.1); transition: 0.2s; }
-        .user-select-name { font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; text-align: center; }
 
-        /* Gifts Grid */
+        @keyframes frameFloat { 
+            0%, 100% { transform: translate(-50%, -50%) scale(1); } 
+            50% { transform: translate(-50%, -50%) scale(1.05); } 
+        }
+
+        /* ---------------------------------------------------- */
+
+        /* Gifts & Users Grid */
+        .users-scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .user-card { flex-shrink: 0; width: 60px; text-align: center; cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        .user-card.selected { opacity: 1; transform: scale(1.05); }
+        .user-card img { width: 45px; height: 45px; border-radius: 50%; border: 2px solid transparent; }
+        .user-card.selected img { border-color: var(--accent); }
+        .user-name { font-size: 10px; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
         .gifts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-        .gift-card {
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            padding: 10px 5px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .gift-card.selected { background: rgba(245, 158, 11, 0.15); border-color: var(--accent); }
-        .gift-icon { width: 45px; height: 45px; object-fit: contain; margin-bottom: 5px; }
+        .gift-item { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 10px; text-align: center; border: 1px solid transparent; cursor: pointer; }
+        .gift-item.selected { background: rgba(245, 158, 11, 0.15); border-color: var(--accent); }
+        .gift-img { width: 40px; height: 40px; object-fit: contain; margin-bottom: 5px; }
 
-        /* Utils */
-        #svga-container { position: fixed; inset: 0; pointer-events: none; z-index: 3000; }
+        /* Utilities */
+        #svga-fullscreen { position: fixed; inset: 0; pointer-events: none; z-index: 3000; }
         .hidden { display: none !important; }
-        
+
         /* Toast */
         #entry-toast {
             position: absolute;
-            top: 20%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
-            padding: 8px 20px;
-            border-radius: 50px;
-            border: 1px solid var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            transition: 0.3s;
-            opacity: 0;
-            pointer-events: none;
+            top: 15%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.85); padding: 8px 16px; border-radius: 50px;
+            display: flex; align-items: center; gap: 10px; z-index: 1000;
+            border: 1px solid var(--accent); opacity: 0; transition: 0.3s; pointer-events: none;
         }
-        #entry-toast.show { opacity: 1; animation: slideIn 0.3s ease; }
-
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        #entry-toast.show { opacity: 1; transform: translate(-50%, 0); }
     </style>
 </head>
 <body>
 
 <div class="app-bg"></div>
-<div id="svga-container"></div>
+<div id="svga-fullscreen"></div>
 
 <!-- Entry Toast -->
 <div id="entry-toast">
-    <img src="" class="toast-img" id="toast-img" style="width:30px;height:30px;border-radius:50%">
-    <span id="toast-text" style="font-size:12px"></span>
+    <img id="toast-img" src="" style="width:28px; height:28px; border-radius:50%">
+    <span id="toast-text" style="font-size:12px; font-weight:bold"></span>
 </div>
 
 <div class="app-container">
@@ -434,14 +362,13 @@
             <div class="room-info" onclick="openProfile(room.owner)">
                 <img src="" class="owner-img" id="roomOwnerImg">
                 <div>
-                    <span style="font-size:9px; color:var(--accent)" id="roomOwnerId">ID: ...</span>
-                    <div style="font-size:12px; font-weight:bold" id="roomName">...</div>
+                    <div style="font-size:9px; color:var(--accent); font-weight:bold" id="roomOwnerId">ID: --</div>
+                    <div style="font-size:11px; font-weight:bold" id="roomName">...</div>
                 </div>
             </div>
         </div>
         <div style="display:flex; gap:8px">
-            <button class="btn-control" onclick="toggleSheet('onlineUsersSheet', true)"><i class="fa-solid fa-users"></i></button>
-            <button class="btn-control" onclick="window.location.reload()"><i class="fa-solid fa-rotate"></i></button>
+            <button class="btn-control" onclick="toggleSheet('onlineSheet', true)"><i class="fa-solid fa-users"></i></button>
             <button class="btn-control" onclick="leaveRoom()"><i class="fa-solid fa-xmark"></i></button>
         </div>
     </header>
@@ -452,79 +379,73 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="input-box">
-            <input type="text" id="chatInput" class="main-input" placeholder="اكتب شيئاً..." oninput="toggleSendBtn()">
+            <input type="text" id="chatInput" class="main-input" placeholder="اكتب هنا..." oninput="checkInput()">
         </div>
         <button id="giftBtn" class="btn-action" style="background:var(--primary)" onclick="toggleSheet('giftSheet', true)"><i class="fa-solid fa-gift"></i></button>
         <button id="sendBtn" class="btn-action hidden" style="background:var(--accent)" onclick="sendMsg()"><i class="fa-solid fa-paper-plane"></i></button>
     </footer>
 </div>
 
-<!-- Online Users Sheet -->
-<div id="onlineUsersSheet" class="sheet-overlay" onclick="toggleSheet('onlineUsersSheet', false)">
+<!-- Online Sheet -->
+<div id="onlineSheet" class="sheet-overlay" onclick="toggleSheet('onlineSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
-        <h3 style="margin-bottom:15px; text-align:center">المتواجدون (<span id="onlineCount">0</span>)</h3>
-        <div id="onlineUsersList" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px;"></div>
+        <h3 style="text-align:center; font-weight:bold; margin-bottom:15px">المتواجدون (<span id="onlineCount">0</span>)</h3>
+        <div id="onlineList" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px"></div>
     </div>
 </div>
 
 <!-- Gift Sheet -->
 <div id="giftSheet" class="sheet-overlay" onclick="toggleSheet('giftSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
-        <h3 style="margin-bottom:10px; font-size:14px">إرسال هدية إلى:</h3>
-        <!-- Horizontal Scroll for Active Users -->
-        <div id="giftTargetUsers" class="users-selection"></div>
-        
-        <div style="width:100%; height:1px; background:var(--glass-border); margin:10px 0 15px;"></div>
-        
-        <h3 style="margin-bottom:10px; font-size:14px">اختر الهدية:</h3>
-        <div id="giftsGrid" class="gifts-grid"></div>
-        
-        <button class="action-btn btn-gift" style="width:100%; margin-top:20px; background:#ef4444; color:white; padding:12px; border-radius:15px; border:none; font-weight:bold; font-size:16px" onclick="sendGift()">إرسال</button>
+        <h3 style="font-size:13px; font-weight:bold; margin-bottom:10px; color:#aaa">إرسال إلى:</h3>
+        <div id="giftTargets" class="users-scroll"></div>
+        <div style="height:1px; background:var(--glass-border); margin:15px 0"></div>
+        <div id="giftsContainer" class="gifts-grid"></div>
+        <button onclick="sendGift()" style="width:100%; margin-top:15px; background:#ef4444; color:#fff; border:none; padding:12px; border-radius:15px; font-weight:bold; font-size:16px">إرسال</button>
     </div>
 </div>
 
-<!-- Profile Sheet -->
+<!-- Profile Sheet (UPDATED DESIGN) -->
 <div id="profileSheet" class="sheet-overlay" onclick="toggleSheet('profileSheet', false)">
     <div class="bottom-sheet" onclick="event.stopPropagation()">
-        <div class="profile-header-wrapper">
-            <!-- Frame Container (Z-Index 5) -->
-            <div id="p-frame" class="profile-frame-container"></div>
-            <!-- Avatar (Z-Index 1) -->
-            <img src="" class="profile-avatar" id="p-img">
+        
+        <!-- Updated Avatar Wrapper Structure -->
+        <div class="avatar-wrapper">
+            <img id="p-img" class="avatar-img" src="">
+            <div id="p-frame" class="perfect-frame"></div> <!-- This will hold SVGA or IMG -->
         </div>
-        
-        <h2 id="p-name" style="text-align:center; font-size:22px; font-weight:bold">---</h2>
-        <p id="p-id" style="text-align:center; font-size:13px; color:#888; margin-bottom:20px">ID: ---</p>
-        
-        <!-- Stats -->
-        <div style="display:flex; justify-content:center; gap:25px; margin-bottom:20px">
-            <div style="text-align:center">
-                <img id="p-magic-img" src="" class="lvl-badge" style="width:40px; height:40px; margin-bottom:5px">
-                <p style="font-size:11px; font-weight:bold; color:#ccc">Magic: <span id="p-magic-lvl">1</span></p>
+
+        <h2 id="p-name" style="text-align:center; font-size:20px; font-weight:800; margin-bottom:2px">--</h2>
+        <p id="p-id" style="text-align:center; font-size:12px; color:#888; margin-bottom:20px">ID: --</p>
+
+        <!-- Stats / Levels -->
+        <div style="display:flex; gap:10px; justify-content:center; margin-bottom:20px">
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:12px; text-align:center; min-width:80px">
+                <img id="p-magic-img" src="" style="width:40px; height:40px; margin:0 auto">
+                <div style="font-size:10px; margin-top:5px; color:#aaa">Magic: <span id="p-magic-lvl" style="color:#fff; font-weight:bold">0</span></div>
             </div>
-            <div style="text-align:center">
-                <img id="p-wealth-img" src="" class="lvl-badge" style="width:40px; height:40px; margin-bottom:5px">
-                <p style="font-size:11px; font-weight:bold; color:#ccc">Wealth: <span id="p-wealth-lvl">1</span></p>
+            <div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:12px; text-align:center; min-width:80px">
+                <img id="p-wealth-img" src="" style="width:40px; height:40px; margin:0 auto">
+                <div style="font-size:10px; margin-top:5px; color:#aaa">Wealth: <span id="p-wealth-lvl" style="color:#fff; font-weight:bold">0</span></div>
             </div>
         </div>
 
-        <!-- Badges Strip -->
-        <div id="p-badges" style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom:25px"></div>
-        
+        <!-- Badges -->
+        <div id="p-badges" style="display:flex; justify-content:center; flex-wrap:wrap; gap:5px; margin-bottom:25px"></div>
+
         <!-- Actions -->
-        <div style="display:flex; gap:15px;">
-            <button id="friendBtn" class="action-btn" style="flex:1; background:var(--accent); color:black; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="handleFriendAction()">جاري التحميل...</button>
-            <button class="action-btn" style="flex:1; background:#ef4444; color:white; border:none; padding:12px; border-radius:15px; font-weight:bold" onclick="toggleSheet('giftSheet', true); toggleSheet('profileSheet', false)">🎁 هدية</button>
+        <div style="display:flex; gap:10px">
+            <button id="friendBtn" onclick="handleFriend()" style="flex:1; padding:12px; border-radius:12px; border:none; background:var(--glass); color:#fff; font-weight:bold">...</button>
+            <button onclick="openGiftForUser()" style="flex:1; padding:12px; border-radius:12px; border:none; background:var(--accent); color:#000; font-weight:bold">إرسال هدية</button>
         </div>
-        <button class="action-btn" style="width:100%; background:var(--glass); border:1px solid var(--glass-border); color:white; padding:12px; border-radius:15px; font-weight:bold; margin-top:10px" onclick="mentionUser()">@ إشارة في الشات</button>
+        <button onclick="mentionUser()" style="width:100%; margin-top:10px; padding:10px; background:transparent; border:1px solid var(--glass-border); color:#888; border-radius:12px">@ إشارة</button>
+
     </div>
 </div>
 
 <script>
     const urlParams = new URLSearchParams(window.location.search);
     const roomId = urlParams.get('id');
-    
-    // Config
     const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
     
     firebase.initializeApp(firebaseConfig);
@@ -533,15 +454,13 @@
     const auth = firebase.auth();
 
     let user, userData, room;
-    let selectedUserId = null; 
-    let selectedGiftId = null;
-    let storeData = { frames: {}, badges: {}, gifts: {}, wealthLevels: {}, magicLevels: {}, chatBubbles: {} };
-    
-    // Critical: Join time for chat history filtering
-    let joinTime = Date.now(); 
+    let storeData = { frames: {}, badges: {}, gifts: {}, magicLevels: {}, wealthLevels: {}, chatBubbles: {} };
     let onlineUsers = {};
+    let selectedUserId = null;
+    let selectedGiftId = null;
+    let joinTime = Date.now();
 
-    // Helper: Level Calculation
+    // Helper: Calculate Levels
     function getLevelInfo(totalPoints) {
         let level = 1;
         let remaining = totalPoints;
@@ -559,448 +478,342 @@
         return { level };
     }
 
-    // --- INIT ---
+    // Init
     auth.onAuthStateChanged(async (u) => {
-        if (!u) return window.location.href = "login.html";
+        if(!u) return window.location.href = "login.html";
         user = u;
         
-        // Listen to my data
-        db.collection('users').doc(u.uid).onSnapshot(snap => { userData = snap.data(); });
+        db.collection('users').doc(u.uid).onSnapshot(s => userData = s.data());
         
-        await loadStore();
+        await loadData();
         await loadRoom();
-        joinRoomLogic();
+        initPresence();
     });
 
-    async function loadStore() {
-        // Parallel loading for speed
-        const [sSnap, gSnap, wSnap, mSnap, cbSnap] = await Promise.all([
+    async function loadData() {
+        // Load all store assets in parallel
+        const [sSnap, gSnap, mSnap, wSnap, cSnap] = await Promise.all([
             db.collection('storeItems').get(),
             db.collection('gifts').get(),
-            db.collection('wealthLevels').get(),
             db.collection('magicLevels').get(),
+            db.collection('wealthLevels').get(),
             db.collection('chatBubbles').get()
         ]);
 
-        sSnap.forEach(doc => {
-            const d = doc.data();
-            if(d.type === 'frame') storeData.frames[doc.id] = d;
-            if(d.type === 'badge') storeData.badges[doc.id] = d;
+        sSnap.forEach(d => {
+            const val = d.data();
+            if(val.type === 'frame') storeData.frames[d.id] = val;
+            if(val.type === 'badge') storeData.badges[d.id] = val;
         });
-        gSnap.forEach(doc => storeData.gifts[doc.id] = { id: doc.id, ...doc.data() });
-        wSnap.forEach(doc => storeData.wealthLevels[doc.id] = doc.data().image);
-        mSnap.forEach(doc => storeData.magicLevels[doc.id] = doc.data().image);
-        cbSnap.forEach(doc => storeData.chatBubbles[doc.id] = { id: doc.id, ...doc.data() });
+        gSnap.forEach(d => storeData.gifts[d.id] = { id: d.id, ...d.data() });
+        mSnap.forEach(d => storeData.magicLevels[d.id] = d.data().image);
+        wSnap.forEach(d => storeData.wealthLevels[d.id] = d.data().image);
+        cSnap.forEach(d => storeData.chatBubbles[d.id] = { id: d.id, ...d.data() });
     }
 
     async function loadRoom() {
-        if(!roomId) return alert("Room ID missing");
-        const rSnap = await db.collection('rooms').doc(roomId).get();
-        if(!rSnap.exists) return alert("Room not found");
-        room = rSnap.data();
-        
+        if(!roomId) return;
+        const snap = await db.collection('rooms').doc(roomId).get();
+        if(!snap.exists) return alert("الغرفة غير موجودة");
+        room = snap.data();
         document.getElementById('roomName').textContent = room.name;
-        document.getElementById('roomOwnerId').textContent = `ID: ${room.owner}`;
+        document.getElementById('roomOwnerId').textContent = "ID: " + room.owner;
         const oSnap = await db.collection('users').doc(room.owner).get();
         if(oSnap.exists) document.getElementById('roomOwnerImg').src = oSnap.data().photoURL;
     }
 
-    function joinRoomLogic() {
-        const presenceRef = rtdb.ref(`rooms/${roomId}/users/${user.uid}`);
-        presenceRef.set({
-            uid: user.uid,
-            name: userData.displayName,
-            photo: userData.photoURL,
-            joinTime: firebase.database.ServerValue.TIMESTAMP
-        });
-        presenceRef.onDisconnect().remove();
+    function initPresence() {
+        const ref = rtdb.ref(`rooms/${roomId}/users/${user.uid}`);
+        ref.set({ uid: user.uid, name: userData.displayName, photo: userData.photoURL, joinTime: firebase.database.ServerValue.TIMESTAMP });
+        ref.onDisconnect().remove();
 
-        // Listen for online users
-        rtdb.ref(`rooms/${roomId}/users`).on('value', (snap) => {
-            onlineUsers = snap.val() || {};
+        // Listen for users
+        rtdb.ref(`rooms/${roomId}/users`).on('value', s => {
+            onlineUsers = s.val() || {};
             document.getElementById('onlineCount').textContent = Object.keys(onlineUsers).length;
-            updateOnlineUsersUI();
+            renderOnlineUsers();
         });
 
-        // Listen for NEW entries (Toast)
-        rtdb.ref(`rooms/${roomId}/users`).on('child_added', (snap) => {
-            const newUser = snap.val();
-            // Show toast only if they joined AFTER I loaded the page (approx)
-            if(newUser.joinTime > joinTime && newUser.uid !== user.uid) {
-                showEntryToast(newUser);
-            }
+        // Listen for entries (Toast)
+        rtdb.ref(`rooms/${roomId}/users`).on('child_added', s => {
+            const u = s.val();
+            if(u.joinTime > joinTime && u.uid !== user.uid) showEntryToast(u);
         });
 
-        listenChat();
+        // Chat
+        rtdb.ref(`rooms/${roomId}/messages`).orderByChild('time').startAt(joinTime).on('child_added', s => renderMsg(s.val(), s.key));
     }
 
-    // --- UI UPDATES ---
-    function updateOnlineUsersUI() {
-        const list = document.getElementById('onlineUsersList');
-        const giftTargets = document.getElementById('giftTargetUsers');
+    function renderOnlineUsers() {
+        const list = document.getElementById('onlineList');
+        const targets = document.getElementById('giftTargets');
+        list.innerHTML = ''; targets.innerHTML = '';
         
-        list.innerHTML = ''; 
-        giftTargets.innerHTML = '';
-
         Object.values(onlineUsers).forEach(u => {
             // Main List
-            list.innerHTML += `
-                <div class="user-select-card" onclick="openProfile('${u.uid}')">
-                    <img src="${u.photo}" class="user-select-img">
-                    <div class="user-select-name">${u.name}</div>
-                </div>`;
-
-            // Gift Target List (Horizontal)
-            // If already selected, keep selected class
-            const isSelected = selectedUserId === u.uid ? 'selected' : '';
-            giftTargets.innerHTML += `
-                <div class="user-select-card ${isSelected}" id="target_${u.uid}" onclick="selectGiftTarget('${u.uid}')">
-                    <img src="${u.photo}" class="user-select-img">
-                    <div class="user-select-name">${u.name}</div>
-                </div>`;
+            list.innerHTML += `<div class="user-card" onclick="openProfile('${u.uid}')"><img src="${u.photo}"><div class="user-name">${u.name}</div></div>`;
+            
+            // Gift Targets
+            const sel = selectedUserId === u.uid ? 'selected' : '';
+            targets.innerHTML += `<div class="user-card ${sel}" onclick="selectUser('${u.uid}')" id="tgt_${u.uid}"><img src="${u.photo}"><div class="user-name">${u.name}</div></div>`;
         });
     }
 
-    function selectGiftTarget(uid) {
+    function selectUser(uid) {
         selectedUserId = uid;
-        document.querySelectorAll('#giftTargetUsers .user-select-card').forEach(c => c.classList.remove('selected'));
-        const el = document.getElementById(`target_${uid}`);
-        if(el) el.classList.add('selected');
+        renderOnlineUsers(); // Refresh selection UI
     }
 
     async function showEntryToast(u) {
         const toast = document.getElementById('entry-toast');
         document.getElementById('toast-img').src = u.photo;
-        document.getElementById('toast-text').textContent = `${u.name} انضم للغرفة`;
+        document.getElementById('toast-text').textContent = u.name + " انضم";
         toast.classList.add('show');
-        
-        // Entry Effect
+
+        // Check for entry effect
         try {
-            const uSnap = await db.collection('users').doc(u.uid).get();
-            const ud = uSnap.data();
-            if(ud && ud.activeSvga) {
-                const sItem = await db.collection('storeItems').doc(ud.activeSvga).get();
-                if(sItem.exists && sItem.data().fileUrl) playSvgaOverlay(sItem.data().fileUrl);
+            const snap = await db.collection('users').doc(u.uid).get();
+            if(snap.exists && snap.data().activeSvga) {
+                const item = await db.collection('storeItems').doc(snap.data().activeSvga).get();
+                if(item.exists) playSvgaFull(item.data().fileUrl);
             }
-        } catch(e) { console.log("Entry effect error", e); }
-
-        setTimeout(() => toast.classList.remove('show'), 3500);
+        } catch(e){}
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 
-    // --- CHAT LOGIC ---
-    function listenChat() {
-        // Requirement: "Don't see old messages" -> startAt(joinTime)
-        rtdb.ref(`rooms/${roomId}/messages`)
-            .orderByChild('time')
-            .startAt(joinTime)
-            .on('child_added', (snap) => {
-                renderMsg(snap.val(), snap.key);
-            });
-    }
-
-    async function renderMsg(msg, msgId) {
+    // --- Chat System ---
+    async function renderMsg(msg, key) {
         const area = document.getElementById('chatArea');
         const isMe = msg.senderId === user.uid;
-        
-        // Get sender details for Frame/Badges
-        let senderData = null;
-        if(isMe) senderData = userData;
-        else {
-            const sSnap = await db.collection('users').doc(msg.senderId).get();
-            senderData = sSnap.data();
-        }
-
-        // Chat Bubble Style
-        let bubbleStyle = "";
-        let bubbleTextCol = "#eee";
-        if(senderData && senderData.activeChatBubble) {
-            const cb = storeData.chatBubbles[senderData.activeChatBubble];
-            if(cb) {
-                bubbleStyle = `background-image: url('${cb.image}'); background-size: 100% 100%; border:none;`;
-                if(cb.textColor) bubbleTextCol = cb.textColor;
-            }
-        }
-
         const row = document.createElement('div');
         row.className = `msg-row ${isMe ? 'sent' : 'received'}`;
         
-        // --- HTML Structure: Avatar Wrapper handles layering ---
-        let avatarHTML = `
-            <div class="msg-avatar-wrapper">
-                <img src="${msg.photo}" class="msg-avatar" onclick="openProfile('${msg.senderId}')">
-                <div id="frame_${msgId}" class="msg-frame-container"></div>
+        let sData = isMe ? userData : null;
+        if(!sData) {
+            const snap = await db.collection('users').doc(msg.senderId).get();
+            sData = snap.data();
+        }
+
+        // Bubbles
+        let bubbleCss = "";
+        let txtCol = "#fff";
+        if(sData?.activeChatBubble) {
+            const cb = storeData.chatBubbles[sData.activeChatBubble];
+            if(cb) {
+                bubbleCss = `background-image:url('${cb.image}'); background-size:100% 100%; border:none; padding:12px 16px;`;
+                if(cb.textColor) txtCol = cb.textColor;
+            }
+        }
+
+        // Avatar Construction
+        const avatarHtml = `
+            <div class="msg-avatar-wrapper" onclick="openProfile('${msg.senderId}')">
+                <img src="${msg.photo}" class="msg-avatar">
+                <div class="msg-frame" id="frame_${key}"></div>
             </div>
         `;
 
         row.innerHTML = `
-            <div class="msg-bubble" style="${bubbleStyle}">
-                ${isMe ? '' : avatarHTML} <!-- If Received, Avatar First -->
-                
+            <div class="msg-bubble" style="${bubbleCss}">
+                ${!isMe ? avatarHtml : ''}
                 <div class="msg-content">
                     <div class="msg-user">
-                        ${msg.senderName} 
-                        <div id="badges_${msgId}" class="badge-container"></div>
+                        ${msg.senderName}
+                        <div class="badge-container" id="badges_${key}"></div>
                     </div>
-                    <div class="msg-text" style="color:${bubbleTextCol}">${msg.text}</div>
+                    <div class="msg-text" style="color:${txtCol}">${msg.text}</div>
                 </div>
-
-                ${isMe ? avatarHTML : ''} <!-- If Sent, Avatar Last -->
+                ${isMe ? avatarHtml : ''}
             </div>
         `;
-        
-        area.appendChild(row);
 
-        // --- Async Rendering of Frame/Badges ---
-        if(senderData) {
+        area.appendChild(row);
+        area.scrollTop = area.scrollHeight;
+
+        // Async Load Assets
+        if(sData) {
             // Frame
-            if(senderData.activeFrame) {
-                const f = storeData.frames[senderData.activeFrame];
-                const fCont = document.getElementById(`frame_${msgId}`);
-                if(f && fCont) {
-                    if(f.itemType === 'svga') playSvga(f.fileUrl, fCont);
-                    else fCont.innerHTML = `<img src="${f.image}">`;
+            if(sData.activeFrame) {
+                const f = storeData.frames[sData.activeFrame];
+                const fc = document.getElementById(`frame_${key}`);
+                if(f && fc) {
+                    if(f.itemType === 'svga') playSvga(f.fileUrl, fc);
+                    else fc.innerHTML = `<img src="${f.image}">`;
                 }
             }
-
             // Badges
-            const bCont = document.getElementById(`badges_${msgId}`);
-            if(bCont) {
-                // Levels
-                const mInfo = getLevelInfo(senderData.magicPoints || 0);
-                const wInfo = getLevelInfo(senderData.wealthPoints || 0);
-                if(storeData.magicLevels[mInfo.level]) bCont.innerHTML += `<img src="${storeData.magicLevels[mInfo.level]}" class="lvl-badge">`;
-                if(storeData.wealthLevels[wInfo.level]) bCont.innerHTML += `<img src="${storeData.wealthLevels[wInfo.level]}" class="lvl-badge">`;
-                
-                // Store Badges
-                if(senderData.activeBadges) {
-                    senderData.activeBadges.forEach(bid => {
-                        const b = storeData.badges[bid];
-                        if(b) bCont.innerHTML += `<img src="${b.image}" class="lvl-badge">`;
+            const bc = document.getElementById(`badges_${key}`);
+            if(bc) {
+                const m = getLevelInfo(sData.magicPoints||0).level;
+                const w = getLevelInfo(sData.wealthPoints||0).level;
+                if(storeData.magicLevels[m]) bc.innerHTML += `<img src="${storeData.magicLevels[m]}" class="chat-badge">`;
+                if(storeData.wealthLevels[w]) bc.innerHTML += `<img src="${storeData.wealthLevels[w]}" class="chat-badge">`;
+                if(sData.activeBadges) {
+                    sData.activeBadges.forEach(b => {
+                        if(storeData.badges[b]) bc.innerHTML += `<img src="${storeData.badges[b].image}" class="chat-badge">`;
                     });
                 }
             }
         }
-
-        if(msg.type === 'gift' && msg.giftSvga) playSvgaOverlay(msg.giftSvga);
-        
-        area.scrollTop = area.scrollHeight;
+        if(msg.type === 'gift' && msg.svga) playSvgaFull(msg.svga);
     }
 
-    function sendMsg() {
-        const inp = document.getElementById('chatInput');
-        const txt = inp.value.trim();
-        if(!txt) return;
-        
-        rtdb.ref(`rooms/${roomId}/messages`).push({
-            senderId: user.uid,
-            senderName: userData.displayName,
-            photo: userData.photoURL,
-            text: txt,
-            time: firebase.database.ServerValue.TIMESTAMP
-        });
-        inp.value = ''; 
-        toggleSendBtn();
-    }
-
-    function toggleSendBtn() {
-        const inp = document.getElementById('chatInput');
-        const hasText = inp.value.trim().length > 0;
-        document.getElementById('sendBtn').classList.toggle('hidden', !hasText);
-        document.getElementById('giftBtn').classList.toggle('hidden', hasText);
-    }
-
-    // --- PROFILE & FRIEND LOGIC ---
-    let currentProfileUid = null;
-
+    // --- Profile & Friend System ---
     async function openProfile(uid) {
-        currentProfileUid = uid;
-        selectedUserId = uid; // Auto select for gifting
-        
-        // Select in gift list if visible
-        selectGiftTarget(uid);
-
+        selectedUserId = uid;
         const snap = await db.collection('users').doc(uid).get();
         if(!snap.exists) return;
         const p = snap.data();
 
         document.getElementById('p-name').textContent = p.displayName;
-        document.getElementById('p-id').textContent = `ID: ${uid}`;
+        document.getElementById('p-id').textContent = "ID: " + uid;
         document.getElementById('p-img').src = p.photoURL;
-        
-        // Levels
-        const mInfo = getLevelInfo(p.magicPoints || 0);
-        const wInfo = getLevelInfo(p.wealthPoints || 0);
-        document.getElementById('p-magic-lvl').textContent = mInfo.level;
-        document.getElementById('p-wealth-lvl').textContent = wInfo.level;
-        document.getElementById('p-magic-img').src = storeData.magicLevels[mInfo.level] || '';
-        document.getElementById('p-wealth-img').src = storeData.wealthLevels[wInfo.level] || '';
 
-        // Frame in Profile (Overlay logic)
-        const fCont = document.getElementById('p-frame');
-        fCont.innerHTML = '';
+        // Frame Logic (The specific structure requested)
+        const frameCont = document.getElementById('p-frame');
+        frameCont.innerHTML = ''; // Clear old
         if(p.activeFrame) {
             const f = storeData.frames[p.activeFrame];
             if(f) {
-                if(f.itemType === 'svga') playSvga(f.fileUrl, fCont);
-                else fCont.innerHTML = `<img src="${f.image}">`;
+                if(f.itemType === 'svga') playSvga(f.fileUrl, frameCont);
+                else frameCont.innerHTML = `<img src="${f.image}">`;
             }
         }
 
+        // Levels
+        const m = getLevelInfo(p.magicPoints||0).level;
+        const w = getLevelInfo(p.wealthPoints||0).level;
+        document.getElementById('p-magic-lvl').textContent = m;
+        document.getElementById('p-wealth-lvl').textContent = w;
+        document.getElementById('p-magic-img').src = storeData.magicLevels[m] || '';
+        document.getElementById('p-wealth-img').src = storeData.wealthLevels[w] || '';
+
         // Badges
-        const bDiv = document.getElementById('p-badges');
-        bDiv.innerHTML = '';
+        const bgDiv = document.getElementById('p-badges');
+        bgDiv.innerHTML = '';
         if(p.activeBadges) {
-            p.activeBadges.forEach(bid => {
-                const b = storeData.badges[bid];
-                if(b) bDiv.innerHTML += `<img src="${b.image}" class="lvl-badge" style="width:30px;height:30px">`;
+            p.activeBadges.forEach(b => {
+                if(storeData.badges[b]) bgDiv.innerHTML += `<img src="${storeData.badges[b].image}" style="width:30px;height:30px">`;
             });
         }
 
-        // Friend Button Logic
+        // Friend Button
         const btn = document.getElementById('friendBtn');
-        if(uid === user.uid) {
-            btn.style.display = 'none';
-        } else {
+        if(uid === user.uid) btn.style.display = 'none';
+        else {
             btn.style.display = 'block';
-            btn.textContent = '...';
-            btn.onclick = null;
-            
-            // Check friendship
+            btn.innerText = '...';
+            btn.onclick = () => handleFriend(uid);
+            // Check
             try {
-                const fCheck = await db.collection('users').doc(user.uid).collection('friends').doc(uid).get();
-                if(fCheck.exists) {
-                    btn.textContent = "💬 إرسال رسالة";
-                    btn.onclick = () => { alert("فتح المحادثة الخاصة (قريباً)"); }; // Placeholder for private chat
+                const f = await db.collection('users').doc(user.uid).collection('friends').doc(uid).get();
+                if(f.exists) {
+                    btn.innerText = '💬 رسالة';
+                    btn.onclick = () => alert('قريبا');
                 } else {
-                    btn.textContent = "➕ طلب صداقة";
-                    btn.onclick = () => sendFriendRequest(uid);
+                    btn.innerText = '➕ صداقة';
+                    btn.onclick = () => { alert('تم الارسال'); btn.innerText = 'تم'; };
                 }
-            } catch(e) {
-                console.error(e);
-                btn.textContent = "خطأ";
-            }
+            } catch(e) { btn.innerText = 'خطأ'; }
         }
 
         toggleSheet('profileSheet', true);
     }
 
-    async function sendFriendRequest(targetUid) {
-        // Implement Friend Request Logic here (Firestore)
-        // For now, simpler direct add or toast
-        if(confirm("إرسال طلب صداقة؟")) {
-             alert("تم إرسال الطلب بنجاح");
-             // Add logic: db.collection('friendRequests').add(...)
-        }
+    function openGiftForUser() {
+        toggleSheet('profileSheet', false);
+        toggleSheet('giftSheet', true);
+        selectUser(selectedUserId);
     }
 
     function mentionUser() {
-        const name = document.getElementById('p-name').textContent;
-        const inp = document.getElementById('chatInput');
-        inp.value = `@${name} ` + inp.value;
+        const n = document.getElementById('p-name').textContent;
+        document.getElementById('chatInput').value = `@${n} `;
         toggleSheet('profileSheet', false);
-        inp.focus();
-        toggleSendBtn();
     }
 
-    // --- GIFTING ---
+    // --- Gifting ---
     function toggleSheet(id, show) {
         document.getElementById(id).classList.toggle('show', show);
-        
-        if(id === 'giftSheet' && show) {
-            // Render gifts
-            const grid = document.getElementById('giftsGrid');
-            if(grid.innerHTML === '') { // Only render once
-                Object.values(storeData.gifts).forEach(g => {
-                    grid.innerHTML += `
-                        <div class="gift-card" onclick="selectGift('${g.id}')" id="g_${g.id}">
-                            <img src="${g.image}" class="gift-icon">
-                            <p style="font-size:10px;text-align:center">${g.name}</p>
-                            <p style="font-size:9px;color:var(--accent)">${g.price} 🪙</p>
-                        </div>`;
-                });
-            }
-            // Ensure target list is updated
-            updateOnlineUsersUI();
+        if(id === 'giftSheet' && show && document.getElementById('giftsContainer').innerHTML === '') {
+            const c = document.getElementById('giftsContainer');
+            Object.values(storeData.gifts).forEach(g => {
+                c.innerHTML += `
+                    <div class="gift-item" onclick="pickGift('${g.id}', this)">
+                        <img src="${g.image}" class="gift-img">
+                        <div style="font-size:10px">${g.name}</div>
+                        <div style="font-size:9px;color:var(--accent)">${g.price}</div>
+                    </div>`;
+            });
         }
     }
 
-    function selectGift(id) {
-        selectedGiftId = id;
-        document.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
-        document.getElementById(`g_${id}`).classList.add('selected');
+    function pickGift(gid, el) {
+        selectedGiftId = gid;
+        document.querySelectorAll('.gift-item').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
     }
 
     async function sendGift() {
-        if(!selectedGiftId) return alert("اختر هدية");
-        if(!selectedUserId) return alert("اختر مستخدم لاستلام الهدية");
-        
-        const gift = storeData.gifts[selectedGiftId];
-        if(userData.balance < gift.price) return alert("رصيدك غير كافٍ");
+        if(!selectedGiftId || !selectedUserId) return alert("اختر هدية ومستخدم");
+        const g = storeData.gifts[selectedGiftId];
+        if(userData.balance < g.price) return alert("الرصيد لا يكفي");
 
         toggleSheet('giftSheet', false);
-
-        // Transaction
-        const batch = db.batch();
-        batch.update(db.collection('users').doc(user.uid), { 
-            balance: firebase.firestore.FieldValue.increment(-gift.price),
-            wealthPoints: firebase.firestore.FieldValue.increment(gift.price)
+        
+        // Update DB
+        const b = db.batch();
+        b.update(db.collection('users').doc(user.uid), { 
+            balance: firebase.firestore.FieldValue.increment(-g.price),
+            wealthPoints: firebase.firestore.FieldValue.increment(g.price)
         });
-        batch.update(db.collection('users').doc(selectedUserId), { 
-            magicPoints: firebase.firestore.FieldValue.increment(gift.price) 
+        b.update(db.collection('users').doc(selectedUserId), { 
+            magicPoints: firebase.firestore.FieldValue.increment(g.price) 
         });
-        await batch.commit();
+        await b.commit();
 
-        const targetUser = onlineUsers[selectedUserId];
-        const targetName = targetUser ? targetUser.name : "مستخدم";
-
+        const tUser = onlineUsers[selectedUserId];
         rtdb.ref(`rooms/${roomId}/messages`).push({
-            type: 'gift',
-            giftId: gift.id,
-            giftSvga: gift.svgaUrl || null,
-            senderName: userData.displayName,
-            senderId: user.uid,
-            photo: userData.photoURL,
-            text: `أرسل ${gift.name} 🎁 إلى ${targetName}`,
+            type: 'gift', svga: g.svgaUrl || null,
+            senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL,
+            text: `أرسل ${g.name} إلى ${tUser ? tUser.name : 'مستخدم'}`,
             time: firebase.database.ServerValue.TIMESTAMP
         });
     }
 
-    // --- UTILS (SVGA) ---
-    function playSvga(url, container) {
-        container.innerHTML = '';
-        const player = new SVGA.Player(container);
-        const parser = new SVGA.Parser();
-        parser.load(url, (videoItem) => {
-            player.setVideoItem(videoItem);
-            player.startAnimation();
+    // --- Utils ---
+    function sendMsg() {
+        const inp = document.getElementById('chatInput');
+        if(!inp.value.trim()) return;
+        rtdb.ref(`rooms/${roomId}/messages`).push({
+            senderId: user.uid, senderName: userData.displayName, photo: userData.photoURL,
+            text: inp.value, time: firebase.database.ServerValue.TIMESTAMP
         });
+        inp.value = ''; checkInput();
     }
-
-    function playSvgaOverlay(url) {
-        const container = document.getElementById('svga-container');
-        container.innerHTML = '';
-        container.style.pointerEvents = 'auto'; // Block clicks while playing? Optional.
-        
-        const player = new SVGA.Player(container);
-        const parser = new SVGA.Parser();
-        player.loops = 1;
-        player.clearsAfterStop = true;
-        
-        parser.load(url, (videoItem) => {
-            player.setVideoItem(videoItem);
-            player.startAnimation();
-            player.onFinished(() => {
-                container.innerHTML = '';
-                container.style.pointerEvents = 'none';
-            });
-        });
+    function checkInput() {
+        const v = document.getElementById('chatInput').value.trim();
+        document.getElementById('sendBtn').classList.toggle('hidden', !v);
+        document.getElementById('giftBtn').classList.toggle('hidden', !!v);
     }
-
     function leaveRoom() {
-        if(roomId && user) {
-            rtdb.ref(`rooms/${roomId}/users/${user.uid}`).remove();
-        }
+        rtdb.ref(`rooms/${roomId}/users/${user.uid}`).remove();
         window.history.back();
+    }
+
+    function playSvga(url, el) {
+        el.innerHTML = '';
+        const p = new SVGA.Player(el);
+        const parser = new SVGA.Parser();
+        parser.load(url, (v) => { p.setVideoItem(v); p.startAnimation(); });
+    }
+    function playSvgaFull(url) {
+        const el = document.getElementById('svga-fullscreen');
+        el.innerHTML = '';
+        const p = new SVGA.Player(el);
+        const parser = new SVGA.Parser();
+        p.loops = 1; p.clearsAfterStop = true;
+        parser.load(url, (v) => { p.setVideoItem(v); p.startAnimation(); });
     }
 </script>
 </body>
