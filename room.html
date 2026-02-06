@@ -4,201 +4,357 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>الغرفة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation }
-        body { background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #000000 50%, #1e1b4b 100%); color: #fff; overflow: hidden; height: 100vh }
-        .glass { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.15) }
-        .chat-area { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth }
-        .chat-area::-webkit-scrollbar { width: 4px }
-        .chat-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px }
-        .msg-bubble { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); padding: 10px 14px; border-radius: 18px; border-bottom-right-radius: 4px; backdrop-filter: blur(10px); display: flex; align-items: flex-start; gap: 10px; max-width: 85%; animation: slideIn 0.3s ease }
-        .msg-avatar-wrapper { position: relative; width: 45px; height: 45px; flex-shrink: 0 }
-        .msg-avatar { width: 38px; height: 38px; border-radius: 50%; cursor: pointer; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; object-fit: cover }
-        .msg-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 52px; height: 52px; z-index: 2; pointer-events: none; object-fit: contain }
-        .msg-user { font-size: 11px; font-weight: bold; color: #f59e0b; display: flex; align-items: center; gap: 5px; margin-bottom: 3px; flex-wrap: wrap }
-        .msg-text { font-size: 13px; line-height: 1.5; color: #eee; word-break: break-word }
-        .badge { font-size: 8px; padding: 2px 6px; border-radius: 10px; font-weight: bold }
-        .b-wealth { background: #facc15; color: #000 }
-        .b-magic { background: #d946ef; color: #fff }
-        .owner-icon { color: #22c55e; font-size: 12px }
-        .admin-icon { color: #fbbf24; font-size: 12px }
-        .active-badges { display: flex; gap: 2px; margin-right: 5px }
-        .active-badge { width: 16px; height: 16px; border-radius: 4px; overflow: hidden }
-        .active-badge img { width: 100%; height: 100%; object-fit: cover }
-        .system-msg { background: rgba(245, 158, 11, 0.15); color: #f59e0b; font-weight: bold; text-align: center; padding: 8px 16px; border-radius: 20px }
-        .gift-msg { background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.3) }
-        .input-box { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 25px; height: 46px; padding: 0 15px; display: flex; align-items: center }
-        .main-input { background: transparent; border: none; color: #fff; width: 100%; font-size: 14px; font-family: 'Noto Sans Arabic', sans-serif }
-        .main-input::placeholder { color: rgba(255,255,255,0.4) }
-        .btn-action { width: 44px; height: 44px; border-radius: 50%; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: white; transition: 0.2s; font-size: 18px }
-        .btn-action:active { transform: scale(0.9) }
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000; display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; pointer-events: none; transition: 0.3s }
-        .sheet-overlay.show { opacity: 1; pointer-events: auto }
-        .bottom-sheet { background: rgba(20, 20, 25, 0.95); backdrop-filter: blur(40px); width: 100%; border-radius: 30px 30px 0 0; border-top: 1px solid rgba(255,255,255,0.15); transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1); padding: 25px; max-height: 80vh; overflow-y: auto }
-        .sheet-overlay.show .bottom-sheet { transform: translateY(0) }
-        .tool-btn { width: 45px; height: 45px; border-radius: 15px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; cursor: pointer }
-        .tool-btn:active { transform: scale(0.9) }
-        .tool-btn.gift { color: #f59e0b }
-        .tool-btn.mention { color: #3b82f6 }
-        .tool-btn.ban { color: #ef4444 }
-        .tool-btn.mute { color: #f59e0b }
-        .tool-btn.kick { color: #f97316 }
-        .tool-btn.admin { color: #fbbf24 }
-        .join-notification { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(217, 70, 239, 0.9)); padding: 10px 25px; border-radius: 25px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); z-index: 1500; display: flex; align-items: center; gap: 10px; animation: slideDown 0.5s ease, fadeOut 0.5s ease 2.5s forwards; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4) }
-        @keyframes slideDown { from { transform: translateX(-50%) translateY(-20px); opacity: 0 } to { transform: translateX(-50%) translateY(0); opacity: 1 } }
-        @keyframes fadeOut { from { opacity: 1 } to { opacity: 0; pointer-events: none } }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
-        .user-option { display: flex; flex-direction: column; align-items: center; opacity: 0.4; min-width: 55px; cursor: pointer }
-        .user-option.active { opacity: 1; font-weight: bold; color: #f59e0b }
-        .user-option-avatar-wrapper { position: relative; width: 45px; height: 45px }
-        .user-option img { width: 38px; height: 38px; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1 }
-        .user-option-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 52px; height: 52px; z-index: 2; pointer-events: none }
-        .gifts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 250px; overflow-y: auto; padding: 10px 0 }
-        .gift-card { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 5px; display: flex; flex-direction: column; align-items: center; border: 1px solid transparent; cursor: pointer; transition: 0.2s }
-        .gift-card.selected { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b }
-        .gift-icon { font-size: 25px; margin-bottom: 5px }
-        .gift-price { font-size: 10px; color: #f59e0b }
-        .active-users-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 10px 0; max-height: 400px; overflow-y: auto }
-        .active-user-card { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 10px; border-radius: 15px; background: rgba(255,255,255,0.05); border: 1px solid transparent; transition: 0.2s; cursor: pointer }
-        .active-user-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15) }
-        .active-user-avatar-wrapper { position: relative; width: 65px; height: 65px; margin-bottom: 5px }
-        .active-user-avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1 }
-        .active-user-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 72px; height: 72px; z-index: 2; pointer-events: none }
-        .active-user-name { font-size: 11px; font-weight: bold; text-align: center; margin-top: 5px; color: #fff }
-        .owner-badge, .admin-badge { font-size: 10px; padding: 2px 6px; border-radius: 8px; margin-top: 3px }
-        .owner-badge { background: rgba(34, 197, 94, 0.2); color: #22c55e }
-        .admin-badge { background: rgba(251, 191, 36, 0.2); color: #fbbf24 }
-        .list-section { margin: 20px 0; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px }
-        .list-section-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px }
-        .list-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 8px }
-        .list-item img { width: 40px; height: 40px; border-radius: 50% }
-        .list-item-info { flex: 1 }
-        .list-item-name { font-size: 13px; font-weight: bold }
-        .list-item-action { background: rgba(239, 68, 68, 0.2); border: none; color: #ef4444; padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer }
-        .notification { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: white; padding: 12px 24px; border-radius: 25px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15); z-index: 3000; animation: slideUp 0.3s ease; display: flex; align-items: center; gap: 10px; max-width: 90% }
-        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0 } to { transform: translateX(-50%) translateY(0); opacity: 1 } }
-        .hidden { display: none !important }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Cairo', sans-serif; touch-action: manipulation; user-select: none; }
+        
+        body { 
+            background: radial-gradient(circle at 50% 30%, #2d4f38 0%, #102918 60%, #05140a 100%);
+            color: #fff; 
+            overflow: hidden; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* تأثير الزجاج */
+        .glass { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass-panel { background: rgba(20, 30, 25, 0.95); backdrop-filter: blur(20px); border-radius: 20px 20px 0 0; border-top: 1px solid rgba(255,255,255,0.1); }
+
+        /* الهيدر الثابت */
+        header { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            padding: 10px 15px; 
+            z-index: 100; /* أعلى طبقة */
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); 
+            pointer-events: none; /* يسمح بالضغط من خلال المناطق الفارغة */
+        }
+        header > * { pointer-events: auto; }
+
+        /* منطقة الشات */
+        .chat-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding-top: 70px; /* مساحة للهيدر */
+            padding-bottom: 90px; /* مساحة للفوتر */
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 15px;
+            /* Scroll styling */
+            scrollbar-width: none;
+        }
+        .chat-messages::-webkit-scrollbar { display: none; }
+        
+        /* تصميم الرسائل مع استعادة الإطارات والمستويات */
+        .msg-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; animation: fadeIn 0.3s ease; }
+        
+        .msg-avatar-wrapper { position: relative; width: 45px; height: 45px; flex-shrink: 0; }
+        .msg-avatar { width: 38px; height: 38px; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1; border: 1px solid rgba(255,255,255,0.2); }
+        .msg-frame { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 55px; height: 55px; z-index: 2; pointer-events: none; }
+        
+        .msg-body { max-width: 80%; }
+        .msg-info { display: flex; align-items: center; gap: 5px; margin-bottom: 2px; flex-wrap: wrap; }
+        .msg-name { color: #fbbf24; font-weight: bold; font-size: 11px; }
+        
+        .badge { font-size: 8px; padding: 1px 5px; border-radius: 8px; font-weight: bold; display: inline-block; }
+        .b-wealth { background: linear-gradient(45deg, #facc15, #ca8a04); color: #000; }
+        .b-magic { background: linear-gradient(45deg, #d946ef, #a21caf); color: #fff; }
+        
+        .active-badges { display: flex; gap: 2px; }
+        .active-badge-img { width: 14px; height: 14px; }
+
+        .msg-content { background: rgba(0,0,0,0.5); padding: 6px 12px; border-radius: 12px; border-top-right-radius: 2px; font-size: 13px; color: #fff; word-break: break-word; line-height: 1.5; border: 1px solid rgba(255,255,255,0.05); }
+        
+        .system-msg { text-align: center; font-size: 11px; background: rgba(251, 191, 36, 0.2); color: #fbbf24; padding: 4px 12px; border-radius: 20px; width: fit-content; margin: 8px auto; border: 1px solid rgba(251, 191, 36, 0.3); }
+        .gift-msg-box { background: linear-gradient(90deg, rgba(139, 92, 246, 0.2), rgba(217, 70, 239, 0.2)); border: 1px solid rgba(139, 92, 246, 0.4); padding: 5px 15px; border-radius: 15px; text-align: center; width: fit-content; margin: 5px auto; display: flex; align-items: center; gap: 10px; }
+
+        /* الفوتر (الشريط السفلي) */
+        .footer-dock {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 20%, transparent);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .footer-dock.hidden-dock { transform: translateY(150%); }
+
+        .dock-group { display: flex; align-items: center; gap: 15px; }
+        .dock-icon { width: 45px; height: 45px; cursor: pointer; transition: transform 0.2s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+        .dock-icon:active { transform: scale(0.9); }
+        
+        /* مستطيل الدردشة */
+        .chat-input-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: rgba(10, 15, 12, 0.95);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 60;
+        }
+        .chat-input-area.active { transform: translateY(0); }
+        
+        .chat-input {
+            flex: 1;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 25px;
+            padding: 10px 15px;
+            color: white;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        /* طبقة شفافة لإغلاق الشات عند الضغط خارجاً */
+        .chat-overlay-bg {
+            position: fixed; inset: 0; z-index: 55; display: none;
+        }
+        .chat-overlay-bg.active { display: block; }
+
+        /* النوافذ المنبثقة */
+        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; flex-direction: column; justify-content: flex-end; }
+        .sheet-overlay.show { opacity: 1; pointer-events: auto; }
+        .bottom-sheet { width: 100%; max-height: 85vh; overflow-y: auto; padding: 20px; transform: translateY(100%); transition: 0.4s; }
+        .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
+
+        /* الترتيب */
+        .ranking-sheet { background: linear-gradient(180deg, #2b1d0e 0%, #000 100%); border-top: 2px solid #fbbf24; }
+        .rank-item { display: flex; align-items: center; gap: 10px; padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+
+        /* العناصر العامة */
+        .profile-pill { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); border-radius: 30px; padding: 4px 12px 4px 4px; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(10px); cursor: pointer; }
+        .trophy-btn { width: 45px; height: 45px; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.4)); }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* الشبكات */
+        .gifts-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .gift-card { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 12px; text-align: center; border: 1px solid transparent; transition: 0.2s; }
+        .gift-card.selected { border-color: #fbbf24; background: rgba(251, 191, 36, 0.15); transform: scale(1.05); }
+
+        /* إيموشنات */
+        .emoji-popup {
+            position: absolute; bottom: 80px; right: 20px;
+            background: rgba(20, 20, 25, 0.95); border-radius: 20px; padding: 15px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+            z-index: 60; border: 1px solid rgba(255,255,255,0.1);
+            transform: scale(0); transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); transform-origin: bottom right;
+        }
+        .emoji-popup.show { transform: scale(1); }
+        .anim-emoji { width: 45px; height: 45px; cursor: pointer; transition: 0.2s; }
+        .anim-emoji:active { transform: scale(0.9); }
     </style>
 </head>
 <body>
-<div id="joinNotifications"></div>
-<div class="h-screen flex flex-col max-w-lg mx-auto">
-    <header class="glass px-4 py-3 flex items-center justify-between z-10">
-        <div class="flex items-center gap-3">
-            <div class="relative w-10 h-10 cursor-pointer" onclick="openRoomOwnerProfile()">
-                <img id="roomOwnerImg" src="" class="w-9 h-9 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] object-cover">
-                <img id="roomOwnerFrame" src="" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[46px] h-[46px] z-[2] hidden">
-            </div>
-            <div>
-                <span id="roomOwnerId" class="text-[10px] text-amber-400">ID: ---</span>
-                <div id="roomName" class="text-sm font-bold">جاري التحميل...</div>
-            </div>
-        </div>
-        <div class="flex gap-2">
-            <button class="w-9 h-9 rounded-full glass flex items-center justify-center" onclick="toggleSheet('activeUsersSheet', true)"><i data-lucide="users" class="w-4 h-4"></i></button>
-            <button id="roomSettingsBtn" class="w-9 h-9 rounded-full glass flex items-center justify-center hidden" onclick="toggleSheet('roomSettingsSheet', true)"><i data-lucide="settings" class="w-4 h-4 text-amber-400"></i></button>
-            <button class="w-9 h-9 rounded-full glass flex items-center justify-center" onclick="leaveRoom()"><i data-lucide="x" class="w-4 h-4"></i></button>
-        </div>
-    </header>
-    <button id="deleteChatBtn" class="absolute top-16 left-4 bg-red-500/20 text-red-400 px-3 py-1.5 rounded-full text-xs hidden z-20" onclick="confirmDeleteChat()"><i data-lucide="trash-2" class="w-3 h-3 inline mr-1"></i>حذف الشات</button>
-    <div id="chatArea" class="chat-area"></div>
-    <footer class="glass px-4 py-3 flex items-center gap-3">
-        <div class="input-box">
-            <input type="text" id="chatInput" class="main-input" placeholder="اكتب شيئاً..." autocomplete="off" disabled>
-        </div>
-        <button id="giftBtn" class="btn-action bg-amber-500" onclick="toggleSheet('giftSheet', true)"><i data-lucide="gift" class="w-5 h-5"></i></button>
-        <button id="sendBtn" class="btn-action bg-violet-600 hidden" onclick="sendMsg()"><i data-lucide="send" class="w-5 h-5"></i></button>
-    </footer>
-</div>
 
-<!-- Profile Sheet -->
-<div class="sheet-overlay" id="profileSheet">
-    <div class="flex-1" onclick="toggleSheet('profileSheet', false)"></div>
-    <div class="bottom-sheet">
-        <div class="text-center">
+    <!-- الهيدر الثابت -->
+    <header>
+        <div class="profile-pill" onclick="openRoomInfo()">
+            <!-- صورة الغرفة -->
+            <img id="roomOwnerImg" src="" class="w-9 h-9 rounded-full border border-amber-400 object-cover">
+            <div>
+                <!-- اسم الغرفة فقط (تم إخفاء ID) -->
+                <div id="roomName" class="text-xs font-bold text-white leading-tight pl-2">...</div>
+            </div>
+        </div>
+        
+        <!-- أيقونة الكأس -->
+        <img src="https://i.postimg.cc/nLZZRtK7/8c8ed370_0355_11f1_bf87_6b98a6c1e485.png" class="trophy-btn cursor-pointer" onclick="openRanking()" alt="Ranking">
+    </header>
+
+    <!-- طبقة شفافة لإغلاق الشات -->
+    <div id="chatOverlayBg" class="chat-overlay-bg" onclick="closeChatInput()"></div>
+
+    <!-- منطقة الشات -->
+    <div class="chat-container">
+        <div id="joinNotifications" class="fixed top-24 left-1/2 -translate-x-1/2 z-30 pointer-events-none w-full flex flex-col items-center gap-2"></div>
+        <div id="chatArea" class="chat-messages">
+            <!-- الرسائل -->
+        </div>
+    </div>
+
+    <!-- نافذة الإيموشنات -->
+    <div id="emojiPopup" class="emoji-popup">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0yZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/l4FGpP4wFB6d2Wv3W/giphy.gif" class="anim-emoji" onclick="sendEmoji('👋')">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0yZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3o7TKr3nzbh5WgCFxe/giphy.gif" class="anim-emoji" onclick="sendEmoji('❤️')">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0yZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/l0HlHFRbmaZtBRhXG/giphy.gif" class="anim-emoji" onclick="sendEmoji('😂')">
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0xbDN4eW0yZSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/26AHONQ79FdWZhAI0/giphy.gif" class="anim-emoji" onclick="sendEmoji('🎉')">
+    </div>
+
+    <!-- مستطيل الكتابة (يظهر من الأسفل) -->
+    <div id="chatInputBar" class="chat-input-area">
+        <input type="text" id="chatInput" class="chat-input" placeholder="اكتب رسالة..." autocomplete="off">
+        <button onclick="sendMsg()" class="bg-violet-600 w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg flex-shrink-0"><i data-lucide="send" class="w-4 h-4"></i></button>
+    </div>
+
+    <!-- الفوتر (يختفي عند فتح الشات) -->
+    <footer id="footerDock" class="footer-dock">
+        <!-- اليسار -->
+        <div class="dock-group">
+            <img src="https://i.postimg.cc/mrw4K6Vc/aa1d2a10_0349_11f1_b570_e3a84fc27636.png" class="dock-icon" onclick="toggleSheet('giftSheet', true)" alt="Gift">
+            <img src="https://i.postimg.cc/N0YYJw86/b117a9d0_0349_11f1_b570_e3a84fc27636.png" class="dock-icon" onclick="toggleSheet('gamesSheet', true)" alt="Games">
+            <img src="https://i.postimg.cc/SKqqTpLj/9316e250_0355_11f1_bf87_6b98a6c1e485.png" class="dock-icon" onclick="openManagement()" alt="Menu">
+        </div>
+
+        <!-- اليمين -->
+        <div class="dock-group">
+            <div class="relative">
+                <img src="https://cdn-icons-png.flaticon.com/512/1665/1665909.png" class="dock-icon w-9 h-9 opacity-90" onclick="toggleEmojiPopup()" alt="Emoji">
+            </div>
+            <img src="https://i.postimg.cc/0y7P0NSs/9c5cb1a0_0355_11f1_bf87_6b98a6c1e485.png" class="dock-icon" onclick="openChatInput()" alt="Chat">
+        </div>
+    </footer>
+
+    <!-- ================== النوافذ ================== -->
+
+    <!-- نافذة الترتيب -->
+    <div class="sheet-overlay" id="rankingSheet">
+        <div class="flex-1" onclick="toggleSheet('rankingSheet', false)"></div>
+        <div class="bottom-sheet glass-panel ranking-sheet">
+            <div class="text-center mb-6">
+                <img src="https://i.postimg.cc/nLZZRtK7/8c8ed370_0355_11f1_bf87_6b98a6c1e485.png" class="w-20 h-20 mx-auto mb-2 drop-shadow-lg">
+                <h3 class="text-amber-400 font-bold text-xl">كبار الداعمين</h3>
+                <p class="text-gray-400 text-xs">أعلى 20 داعم في الغرفة</p>
+            </div>
+            <div id="rankingList" class="flex flex-col gap-2"></div>
+        </div>
+    </div>
+
+    <!-- نافذة الإدارة -->
+    <div class="sheet-overlay" id="managementSheet">
+        <div class="flex-1" onclick="toggleSheet('managementSheet', false)"></div>
+        <div class="bottom-sheet glass-panel">
+            <h3 class="text-center font-bold mb-5">إدارة الغرفة</h3>
+            
+            <div id="adminControls" class="space-y-4 mb-6 hidden">
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">اسم الغرفة</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="roomSettingsName" class="flex-1 bg-white/10 border border-white/15 rounded-xl p-3 text-sm text-white">
+                        <button onclick="saveRoomSettings('name')" class="bg-violet-600 px-4 rounded-xl text-xs font-bold">حفظ</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 block mb-1">صورة الغرفة</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="roomSettingsImage" class="flex-1 bg-white/10 border border-white/15 rounded-xl p-3 text-xs text-white">
+                        <button onclick="saveRoomSettings('image')" class="bg-violet-600 px-4 rounded-xl text-xs font-bold">حفظ</button>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-white/10">
+                    <button onclick="confirmDeleteChat()" class="w-full bg-red-500/20 text-red-400 py-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i> مسح الشات
+                    </button>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <h4 class="text-xs font-bold mb-3 text-gray-400">المستخدمون المتواجدون</h4>
+                <div id="activeUsersListSimple" class="flex gap-3 overflow-x-auto pb-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الهدايا -->
+    <div class="sheet-overlay" id="giftSheet">
+        <div class="flex-1" onclick="toggleSheet('giftSheet', false)"></div>
+        <div class="bottom-sheet glass-panel">
+            <h3 class="text-center font-bold mb-4">إرسال هدية</h3>
+            <div class="flex gap-3 overflow-x-auto pb-4 mb-4 border-b border-white/10" id="giftUserSelector"></div>
+            <div class="gifts-grid" id="giftsGrid"></div>
+            <div class="flex items-center justify-between mt-5 pt-3 border-t border-white/10">
+                <div class="text-xs">رصيدك: <span id="giftBalance" class="text-amber-400 font-bold text-lg">0</span> 🪙</div>
+                <button onclick="executeGift()" class="bg-gradient-to-r from-amber-500 to-orange-600 px-8 py-2 rounded-full font-bold shadow-lg transform active:scale-95 transition">إرسال</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الألعاب -->
+    <div class="sheet-overlay" id="gamesSheet">
+        <div class="flex-1" onclick="toggleSheet('gamesSheet', false)"></div>
+        <div class="bottom-sheet glass-panel">
+            <h3 class="text-center font-bold mb-5">مركز الألعاب</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white/5 rounded-xl p-4 text-center border border-white/10" onclick="sendSystemMessage('🎲 رمى النرد: ' + Math.floor(Math.random() * 6 + 1)); toggleSheet('gamesSheet', false)">
+                    <div class="text-4xl mb-2">🎲</div>
+                    <div class="font-bold">نرد الحظ</div>
+                </div>
+                <div class="bg-white/5 rounded-xl p-4 text-center border border-white/10">
+                    <div class="text-4xl mb-2">✂️</div>
+                    <div class="font-bold">حجرة ورقة مقص</div>
+                    <div class="flex justify-center gap-2 mt-2">
+                        <button class="text-xl" onclick="playRPS('🪨')">🪨</button>
+                        <button class="text-xl" onclick="playRPS('📄')">📄</button>
+                        <button class="text-xl" onclick="playRPS('✂️')">✂️</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- بروفايل المستخدم -->
+    <div class="sheet-overlay" id="profileSheet">
+        <div class="flex-1" onclick="toggleSheet('profileSheet', false)"></div>
+        <div class="bottom-sheet glass-panel text-center">
             <div class="relative w-[110px] h-[110px] mx-auto mb-4">
                 <img id="p-img" src="" class="w-[95px] h-[95px] rounded-full object-cover absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1]">
-                <img id="p-frame" src="" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115px] h-[115px] hidden">
+                <!-- إطار البروفايل -->
+                <img id="p-frame" src="" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[115px] h-[115px] z-[2] hidden">
             </div>
-            <h3 id="p-name" class="font-bold text-lg">...</h3>
-            <p id="p-id" class="text-gray-400 text-xs">ID: ---</p>
-            <div class="flex justify-center gap-5 my-4">
+            
+            <h3 id="p-name" class="font-bold text-xl mb-1">...</h3>
+            <p id="p-id" class="text-gray-400 text-xs mb-4">ID: ---</p>
+            
+            <div class="flex justify-center gap-6 my-4">
                 <div class="text-center">
-                    <img id="p-magic-level-img" src="" class="w-12 h-12 object-contain">
-                    <div id="p-magic-level" class="text-xs text-gray-400 mt-1">السحر Lv.1</div>
+                    <div class="text-lg font-bold text-fuchsia-400" id="p-magic">1</div>
+                    <div class="text-[10px] text-gray-400">سحر</div>
                 </div>
                 <div class="text-center">
-                    <img id="p-wealth-level-img" src="" class="w-12 h-12 object-contain">
-                    <div id="p-wealth-level" class="text-xs text-gray-400 mt-1">الثروة Lv.1</div>
+                    <div class="text-lg font-bold text-amber-400" id="p-wealth">1</div>
+                    <div class="text-[10px] text-gray-400">ثروة</div>
                 </div>
             </div>
-            <div id="p-badges" class="flex justify-center gap-1 mb-4"></div>
-            <div class="flex flex-wrap justify-center gap-3">
-                <button class="tool-btn gift" onclick="handleProfileGift()" title="إرسال هدية"><i data-lucide="gift" class="w-5 h-5"></i></button>
-                <button class="tool-btn mention" onclick="handleProfileMention()" title="ذكر"><i data-lucide="at-sign" class="w-5 h-5"></i></button>
-                <button id="followBtn" class="tool-btn w-[120px] text-sm font-bold" onclick="handleFollow()">متابعة</button>
-                <button id="kickBtn" class="tool-btn kick hidden" onclick="handleKickUser()" title="طرد"><i data-lucide="user-x" class="w-5 h-5"></i></button>
-                <button id="banBtn" class="tool-btn ban hidden" onclick="handleBanUser()" title="حظر نهائي"><i data-lucide="ban" class="w-5 h-5"></i></button>
-                <button id="muteBtn" class="tool-btn mute hidden" onclick="handleMuteUser()" title="تقييد"><i data-lucide="volume-x" class="w-5 h-5"></i></button>
-                <button id="makeAdminBtn" class="tool-btn admin hidden" onclick="handleMakeAdmin()" title="تعيين أدمن"><i data-lucide="crown" class="w-5 h-5"></i></button>
+
+            <div id="p-badges" class="flex justify-center gap-2 mb-6 min-h-[20px]"></div>
+
+            <div class="flex justify-center gap-4">
+                 <button class="bg-amber-500/20 text-amber-400 px-6 py-2 rounded-full text-sm font-bold border border-amber-500/30" onclick="handleProfileGift()">إهداء 🎁</button>
+                 <button class="bg-blue-500/20 text-blue-400 px-6 py-2 rounded-full text-sm font-bold border border-blue-500/30" onclick="handleFollow()">متابعة +</button>
             </div>
         </div>
     </div>
-</div>
-
-<!-- Gift Sheet -->
-<div class="sheet-overlay" id="giftSheet">
-    <div class="flex-1" onclick="toggleSheet('giftSheet', false)"></div>
-    <div class="bottom-sheet">
-        <div class="flex gap-3 overflow-x-auto pb-4 mb-4 border-b border-white/15" id="giftUserSelector"></div>
-        <div class="gifts-grid" id="giftsGrid"></div>
-        <div class="flex items-center justify-between mt-5">
-            <div class="text-xs">الرصيد: <span id="giftBalance" class="text-amber-400 font-bold">0</span> 🪙</div>
-            <div class="flex gap-2">
-                <input type="number" value="1" min="1" max="99" id="giftQty" class="w-10 bg-white/10 border border-white/15 rounded-lg text-amber-400 text-center font-bold text-sm">
-                <button onclick="executeGift()" class="bg-amber-500 px-6 py-2 rounded-full font-bold text-sm">إرسال</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Active Users Sheet -->
-<div class="sheet-overlay" id="activeUsersSheet">
-    <div class="flex-1" onclick="toggleSheet('activeUsersSheet', false)"></div>
-    <div class="bottom-sheet">
-        <h3 class="text-center font-bold mb-5">المستخدمون النشطون (<span id="activeUsersCount">0</span>)</h3>
-        <div class="active-users-grid" id="activeUsersGrid"></div>
-    </div>
-</div>
-
-<!-- Room Settings Sheet -->
-<div class="sheet-overlay" id="roomSettingsSheet">
-    <div class="flex-1" onclick="toggleSheet('roomSettingsSheet', false)"></div>
-    <div class="bottom-sheet">
-        <h3 class="text-center font-bold mb-5">إعدادات الغرفة</h3>
-        <div class="space-y-4 mb-6">
-            <div><label class="text-xs text-gray-400 block mb-1">اسم الغرفة</label><input type="text" id="roomSettingsName" class="w-full bg-white/10 border border-white/15 rounded-xl p-3 text-sm"></div>
-            <div><label class="text-xs text-gray-400 block mb-1">صورة الغرفة</label><input type="text" id="roomSettingsImage" class="w-full bg-white/10 border border-white/15 rounded-xl p-3 text-sm text-xs"></div>
-        </div>
-        <button onclick="saveRoomSettings()" class="w-full bg-violet-600 py-3 rounded-xl font-bold mb-6">حفظ التغييرات</button>
-        <div class="list-section">
-            <div class="list-section-title"><i data-lucide="crown" class="w-4 h-4 text-amber-400"></i>الأدمن (<span id="adminsCount">0</span>)</div>
-            <div id="adminsList"></div>
-        </div>
-        <div class="list-section">
-            <div class="list-section-title"><i data-lucide="ban" class="w-4 h-4 text-red-400"></i>المحظورين (<span id="bannedCount">0</span>)</div>
-            <div id="bannedList"></div>
-        </div>
-    </div>
-</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, orderBy, limit, arrayUnion, arrayRemove, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getDatabase, ref, onValue, push, set, remove, onDisconnect, off } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
@@ -207,22 +363,22 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const rtdb = getDatabase(app);
 
-let currentUser = null, currentUserData = null, roomData = null, roomId = null, roomType = null;
-let isRoomOwner = false, isRoomAdmin = false, bannedUsers = [], mutedUsers = [], roomAdmins = [];
-let storeData = { itemsById: {}, magicLevels: {}, wealthLevels: {}, gifts: [] };
-let selectedRecipient = null, selectedGift = null, activeUsers = {}, joinedUsers = new Set();
-let messagesUnsub = null, activeUsersUnsub = null, roomUnsub = null;
+let currentUser = null, currentUserData = null, roomData = null, roomId = null;
+let isRoomOwner = false, isRoomAdmin = false;
+let activeUsers = {}, joinedUsers = new Set();
+// استعادة بيانات المتجر كاملة (للفريمات والليفلات)
+let storeData = { gifts: [], itemsById: {}, magicLevels: {}, wealthLevels: {} };
+let selectedGift = null, selectedRecipient = null;
+let roomMessages = [];
 
 const urlParams = new URLSearchParams(window.location.search);
 roomId = urlParams.get('id');
-roomType = urlParams.get('type') || 'public';
 
+// --- التهيئة ---
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
-        await loadUserData(user.uid);
-        await loadStoreData();
-        await loadRoomData();
+        await Promise.all([loadUserData(user.uid), loadStoreData(), loadRoomData()]);
         setupListeners();
     } else window.location.href = 'login.html';
 });
@@ -232,415 +388,334 @@ async function loadUserData(uid) {
     if (snap.exists()) currentUserData = { uid, ...snap.data() };
 }
 
+// استعادة دالة تحميل البيانات الكاملة
 async function loadStoreData() {
-    const [mlSnap, wlSnap, giftsSnap, itemsSnap] = await Promise.all([
-        getDocs(collection(db, 'magicLevels')),
-        getDocs(collection(db, 'wealthLevels')),
+    const [giftsSnap, itemsSnap, mlSnap, wlSnap] = await Promise.all([
         getDocs(collection(db, 'gifts')),
-        getDocs(collection(db, 'storeItems'))
+        getDocs(collection(db, 'storeItems')),
+        getDocs(collection(db, 'magicLevels')),
+        getDocs(collection(db, 'wealthLevels'))
     ]);
-    mlSnap.forEach(d => storeData.magicLevels[d.id] = d.data());
-    wlSnap.forEach(d => storeData.wealthLevels[d.id] = d.data());
+    
     storeData.gifts = giftsSnap.docs.map(d => ({ id: d.id, ...d.data() }));
     itemsSnap.forEach(d => storeData.itemsById[d.id] = { id: d.id, ...d.data() });
+    mlSnap.forEach(d => storeData.magicLevels[d.id] = d.data());
+    wlSnap.forEach(d => storeData.wealthLevels[d.id] = d.data());
 }
 
 async function loadRoomData() {
-    const roomRef = doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId);
-    const snap = await getDoc(roomRef);
-    if (!snap.exists()) { showNotification('الغرفة غير موجودة'); return window.location.href = 'afnan_ai_white.html'; }
+    if (!roomId) return;
+    const snap = await getDoc(doc(db, 'rooms', roomId));
+    if (!snap.exists()) { alert('غرفة غير موجودة'); return; }
     roomData = { id: snap.id, ...snap.data() };
+    
     document.getElementById('roomName').textContent = roomData.name || 'غرفة';
-    if (roomData.owner) await loadRoomOwnerData(roomData.owner);
+    if(roomData.owner) {
+        const oSnap = await getDoc(doc(db, 'users', roomData.owner));
+        if(oSnap.exists()) {
+            document.getElementById('roomOwnerImg').src = oSnap.data().photoURL || 'https://i.pravatar.cc/150';
+        }
+    }
+    
     isRoomOwner = currentUser.uid === roomData.owner;
-    roomAdmins = roomData.admins || [];
-    isRoomAdmin = roomAdmins.includes(currentUser.uid);
-    if (isRoomOwner) document.getElementById('deleteChatBtn').classList.remove('hidden');
-    if (isRoomOwner) document.getElementById('roomSettingsBtn').classList.remove('hidden');
-    bannedUsers = roomData.bannedUsers || [];
-    mutedUsers = roomData.mutedUsers || [];
-    if (bannedUsers.includes(currentUser.uid)) { showNotification('تم حظرك من هذه الغرفة'); return window.location.href = 'afnan_ai_white.html'; }
-    checkIfMuted();
-    await joinRoom();
+    isRoomAdmin = (roomData.admins || []).includes(currentUser.uid);
+    if (isRoomOwner || isRoomAdmin) document.getElementById('adminControls').classList.remove('hidden');
 }
 
-async function loadRoomOwnerData(ownerId) {
-    const snap = await getDoc(doc(db, 'users', ownerId));
-    if (snap.exists()) {
-        const d = snap.data();
-        document.getElementById('roomOwnerImg').src = d.photoURL || 'https://i.pravatar.cc/100';
-        document.getElementById('roomOwnerId').textContent = `ID: ${ownerId}`;
-        if (d.activeFrame && storeData.itemsById[d.activeFrame]) {
-            const frame = document.getElementById('roomOwnerFrame');
-            frame.src = storeData.itemsById[d.activeFrame].image;
-            frame.classList.remove('hidden');
-        }
-    }
-}
-
+// --- المستمعات ---
 function setupListeners() {
-    const msgsRef = ref(rtdb, `roomMessages/${roomId}`);
-    set(msgsRef, null);
-    messagesUnsub = onValue(msgsRef, (snap) => {
+    const activeRef = ref(rtdb, `activeUsers/${roomId}/${currentUser.uid}`);
+    set(activeRef, {
+        uid: currentUser.uid,
+        displayName: currentUserData.displayName,
+        photoURL: currentUserData.photoURL,
+        // إرسال البيانات الكاملة للفريمات والليفلات
+        activeFrame: currentUserData.activeFrame || null,
+        activeBadges: currentUserData.activeBadges || [],
+        magicLevel: currentUserData.magicLevel || 1,
+        wealthLevel: currentUserData.wealthLevel || 1,
+        joinedAt: Date.now()
+    });
+    onDisconnect(activeRef).remove();
+
+    onValue(ref(rtdb, `activeUsers/${roomId}`), (snap) => {
+        activeUsers = snap.val() || {};
+        updateActiveUsersUI();
+    });
+
+    onValue(ref(rtdb, `roomMessages/${roomId}`), (snap) => {
         const msgs = snap.val() || {};
-        Object.entries(msgs).forEach(([k, m]) => displayMessage(m));
-    }, { onlyOnce: false });
-
-    const activeRef = ref(rtdb, `activeUsers/${roomId}`);
-    set(activeRef.child(currentUser.uid), {
-        uid: currentUser.uid, displayName: currentUserData.displayName, photoURL: currentUserData.photoURL,
-        activeFrame: currentUserData.activeFrame, activeBadges: currentUserData.activeBadges || [],
-        magicLevel: currentUserData.magicLevel || 1, wealthLevel: currentUserData.wealthLevel || 1, joinedAt: Date.now()
-    });
-    onDisconnect(activeRef.child(currentUser.uid)).remove();
-
-    activeUsersUnsub = onValue(activeRef, (snap) => {
-        const newUsers = snap.val() || {};
-        Object.entries(newUsers).forEach(([uid, u]) => {
-            if (!activeUsers[uid] && uid !== currentUser.uid && !joinedUsers.has(uid)) {
-                joinedUsers.add(uid);
-                showJoinNotification(u);
-            }
-        });
-        activeUsers = newUsers;
-        updateActiveUsersDisplay();
-    });
-
-    const roomDocRef = doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId);
-    roomUnsub = onSnapshot(roomDocRef, (snap) => {
-        if (snap.exists()) {
-            const d = snap.data();
-            bannedUsers = d.bannedUsers || [];
-            mutedUsers = d.mutedUsers || [];
-            roomAdmins = d.admins || [];
-            isRoomAdmin = roomAdmins.includes(currentUser.uid);
-            if (bannedUsers.includes(currentUser.uid)) { showNotification('تم حظرك'); leaveRoom(); }
-            checkIfMuted();
-        }
+        const msgList = Object.values(msgs).sort((a,b) => a.timestamp - b.timestamp);
+        roomMessages = msgList;
+        renderMessages(msgList);
     });
 }
 
-function showJoinNotification(user) {
-    const div = document.createElement('div');
-    div.className = 'join-notification';
-    div.innerHTML = `<img src="${user.photoURL || 'https://i.pravar.cc/100'}" class="w-7 h-7 rounded-full border-2 border-white"><span>دخل ${user.displayName || 'مستخدم'} الغرفة</span>`;
-    document.getElementById('joinNotifications').appendChild(div);
-    setTimeout(() => div.remove(), 3000);
-}
-
-function updateActiveUsersDisplay() {
-    const grid = document.getElementById('activeUsersGrid');
-    const users = Object.values(activeUsers);
-    document.getElementById('activeUsersCount').textContent = users.length;
-    grid.innerHTML = users.map(u => {
-        const frameHtml = u.activeFrame && storeData.itemsById[u.activeFrame] ? `<img src="${storeData.itemsById[u.activeFrame].image}" class="active-user-frame">` : '';
-        const badgesHtml = (u.activeBadges || []).slice(0, 3).map(b => {
-            const badge = storeData.itemsById[b];
-            return badge ? `<div class="w-4 h-4 rounded overflow-hidden"><img src="${badge.image}" class="w-full h-full object-cover"></div>` : '';
-        }).join('');
-        const roleBadge = u.uid === roomData.owner ? '<div class="owner-badge"><i data-lucide="home" class="w-3 h-3 inline"></i> مالك</div>' : roomAdmins.includes(u.uid) ? '<div class="admin-badge"><i data-lucide="crown" class="w-3 h-3 inline"></i> أدمن</div>' : '';
-        return `<div onclick="openProfileById('${u.uid}')" class="active-user-card">
-            <div class="active-user-avatar-wrapper"><img src="${u.photoURL || 'https://i.pravatar.cc/100'}" class="active-user-avatar">${frameHtml}</div>
-            <div class="flex gap-0.5">${badgesHtml}</div>
-            <div class="active-user-name">${u.displayName || 'مستخدم'}</div>${roleBadge}
-        </div>`;
-    }).join('');
-    lucide.createIcons();
-}
-
-async function displayMessage(message) {
+// --- واجهة المستخدم والرسائل ---
+function renderMessages(msgs) {
     const area = document.getElementById('chatArea');
-    const existing = Array.from(area.children).find(el => el.dataset.msgId === message.timestamp);
-    if (existing) return;
+    area.innerHTML = '';
+    msgs.slice(-50).forEach(msg => {
+        const div = document.createElement('div');
+        
+        // جلب بيانات المرسل (سواء كانت مخزنة في الرسالة أو من المتواجدين)
+        const sender = activeUsers[msg.senderId] || {
+            displayName: msg.senderName,
+            photoURL: msg.photoURL,
+            activeFrame: msg.activeFrame, // يجب أن تكون مخزنة في الرسالة إذا خرج المستخدم
+            magicLevel: msg.magicLevel || 1,
+            wealthLevel: msg.wealthLevel || 1,
+            activeBadges: msg.activeBadges || []
+        };
 
-    let sender = activeUsers[message.senderId];
-    if (!sender && message.senderId !== 'system') {
-        const snap = await getDoc(doc(db, 'users', message.senderId));
-        if (snap.exists()) sender = snap.data();
-    }
+        if (msg.type === 'system') {
+            div.className = 'system-msg';
+            div.textContent = msg.text;
+        } else if (msg.type === 'gift') {
+            const gift = storeData.gifts.find(g => g.id === msg.giftId);
+            div.className = 'w-full flex justify-center mb-2';
+            div.innerHTML = `
+                <div class="gift-msg-box">
+                    <img src="${sender.photoURL}" class="w-6 h-6 rounded-full border border-white">
+                    <div class="text-[10px] text-white">
+                        <span class="text-amber-300 font-bold">${sender.displayName}</span> 
+                        أرسل 
+                        <span class="text-fuchsia-300 font-bold">${gift ? gift.name : 'هدية'}</span>
+                        لـ 
+                        <span class="text-amber-300 font-bold">${msg.recipientName}</span>
+                    </div>
+                    <div class="text-xl">${gift ? gift.icon : '🎁'}</div>
+                </div>
+            `;
+        } else {
+            // رسالة عادية
+            div.className = 'msg-row';
+            
+            // تحضير الإطار (Frame)
+            let frameHtml = '';
+            // نحاول استخدام activeFrame من الرسالة (لتثبيت الشكل القديم) أو من الحالة الحالية
+            const frameId = msg.activeFrame || sender.activeFrame;
+            if (frameId && storeData.itemsById[frameId]) {
+                frameHtml = `<img src="${storeData.itemsById[frameId].image}" class="msg-frame">`;
+            }
 
-    const div = document.createElement('div');
-    div.dataset.msgId = message.timestamp;
-    div.className = 'msg-bubble';
+            // تحضير الشارات (Badges)
+            const badgesHtml = (msg.activeBadges || sender.activeBadges || []).map(bid => {
+                const b = storeData.itemsById[bid];
+                return b ? `<img src="${b.image}" class="active-badge-img">` : '';
+            }).join('');
 
-    if (message.type === 'system') {
-        div.className = 'system-msg';
-        div.textContent = message.text;
-    } else if (message.type === 'gift') {
-        const gift = storeData.gifts.find(g => g.id === message.giftId) || {};
-        div.className = 'msg-bubble gift-msg';
-        div.innerHTML = `<div class="text-2xl">${gift.icon || '🎁'}</div><div><div class="text-violet-400 font-bold text-sm">${sender?.displayName || 'مستخدم'} أرسل ${gift.name || ''} لـ ${message.recipientName}</div><div class="text-xs text-gray-400">x${message.quantity}</div></div>`;
-    } else {
-        const frameHtml = sender?.activeFrame && storeData.itemsById[sender.activeFrame] ? `<img src="${storeData.itemsById[sender.activeFrame].image}" class="msg-frame">` : '';
-        const badgesHtml = (sender?.activeBadges || []).slice(0, 3).map(b => {
-            const badge = storeData.itemsById[b];
-            return badge ? `<div class="active-badge"><img src="${badge.image}"></div>` : '';
-        }).join('');
-        const roleIcon = message.senderId === roomData.owner ? '<i data-lucide="home" class="owner-icon"></i>' : roomAdmins.includes(message.senderId) ? '<i data-lucide="crown" class="admin-icon"></i>' : '';
-        div.innerHTML = `<div class="msg-avatar-wrapper"><img src="${sender?.photoURL || 'https://i.pravatar.cc/100'}" class="msg-avatar" onclick="openProfileById('${message.senderId}')">${frameHtml}</div>
-            <div><div class="msg-user">${roleIcon}${sender?.displayName || 'مستخدم'}<div class="active-badges">${badgesHtml}</div><span class="badge b-wealth">W.${sender?.wealthLevel || 1}</span><span class="badge b-magic">M.${sender?.magicLevel || 1}</span></div><div class="msg-text">${message.text}</div></div>`;
-    }
-    area.appendChild(div);
+            const content = msg.type === 'emoji' 
+                ? `<div class="text-4xl leading-relaxed">${msg.text}</div>` 
+                : `<div class="msg-content">${msg.text}</div>`;
+
+            div.innerHTML = `
+                <div class="msg-avatar-wrapper" onclick="openProfileById('${msg.senderId}')">
+                    <img src="${msg.photoURL || 'https://i.pravatar.cc/100'}" class="msg-avatar">
+                    ${frameHtml}
+                </div>
+                <div class="msg-body">
+                    <div class="msg-info">
+                        <span class="msg-name">${msg.senderName}</span>
+                        <div class="active-badges">${badgesHtml}</div>
+                        <span class="badge b-wealth">Lv.${msg.wealthLevel || 1}</span>
+                        <span class="badge b-magic">Lv.${msg.magicLevel || 1}</span>
+                    </div>
+                    ${content}
+                </div>
+            `;
+        }
+        area.appendChild(div);
+    });
     area.scrollTop = area.scrollHeight;
-    lucide.createIcons();
 }
 
-window.openProfileById = async (uid) => {
-    const snap = await getDoc(doc(db, 'users', uid));
-    if (!snap.exists()) return;
-    window.currentProfileUser = { uid, ...snap.data() };
-    updateProfileSheet();
-    toggleSheet('profileSheet', true);
-};
-
-function updateProfileSheet() {
-    const u = window.currentProfileUser;
-    document.getElementById('p-name').textContent = u.displayName || 'مستخدم';
-    document.getElementById('p-id').textContent = `ID: ${u.uid}`;
-    document.getElementById('p-img').src = u.photoURL || 'https://i.pravatar.cc/100';
-    const frame = document.getElementById('p-frame');
-    if (u.activeFrame && storeData.itemsById[u.activeFrame]) { frame.src = storeData.itemsById[u.activeFrame].image; frame.classList.remove('hidden'); }
-    else frame.classList.add('hidden');
-    document.getElementById('p-magic-level').textContent = `السحر Lv.${u.magicLevel || 1}`;
-    document.getElementById('p-wealth-level').textContent = `الثروة Lv.${u.wealthLevel || 1}`;
-    if (storeData.magicLevels[u.magicLevel || 1]) document.getElementById('p-magic-level-img').src = storeData.magicLevels[u.magicLevel || 1].image;
-    if (storeData.wealthLevels[u.wealthLevel || 1]) document.getElementById('p-wealth-level-img').src = storeData.wealthLevels[u.wealthLevel || 1].image;
-    document.getElementById('p-badges').innerHTML = (u.activeBadges || []).map(b => {
-        const badge = storeData.itemsById[b];
-        return badge ? `<div class="w-6 h-6 rounded overflow-hidden"><img src="${badge.image}" class="w-full h-full object-cover" title="${badge.name}"></div>` : '';
+function updateActiveUsersUI() {
+    const list = document.getElementById('activeUsersListSimple');
+    const giftList = document.getElementById('giftUserSelector');
+    
+    // قائمة المتواجدين (مع الفريمات)
+    list.innerHTML = Object.values(activeUsers).map(u => {
+        const frame = u.activeFrame && storeData.itemsById[u.activeFrame] 
+            ? `<img src="${storeData.itemsById[u.activeFrame].image}" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[55px] h-[55px] pointer-events-none z-10">` 
+            : '';
+        return `
+            <div class="relative w-[45px] h-[45px] flex-shrink-0 cursor-pointer" onclick="openProfileById('${u.uid}')">
+                <img src="${u.photoURL}" class="w-[38px] h-[38px] rounded-full border border-white/20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 object-cover">
+                ${frame}
+            </div>
+        `;
     }).join('');
 
-    const canManage = (isRoomOwner || isRoomAdmin) && u.uid !== currentUser.uid && u.uid !== roomData.owner;
-    ['kickBtn', 'banBtn', 'muteBtn'].forEach(id => document.getElementById(id).classList.toggle('hidden', !canManage));
-    document.getElementById('makeAdminBtn').classList.toggle('hidden', !isRoomOwner || u.uid === currentUser.uid);
-
-    const banBtn = document.getElementById('banBtn');
-    banBtn.innerHTML = bannedUsers.includes(u.uid) ? '<i data-lucide="unlock" class="w-5 h-5"></i>' : '<i data-lucide="ban" class="w-5 h-5"></i>';
-    banBtn.title = bannedUsers.includes(u.uid) ? 'إلغاء الحظر' : 'حظر نهائي';
-    const muteBtn = document.getElementById('muteBtn');
-    muteBtn.innerHTML = mutedUsers.includes(u.uid) ? '<i data-lucide="volume-2" class="w-5 h-5"></i>' : '<i data-lucide="volume-x" class="w-5 h-5"></i>';
-    muteBtn.title = mutedUsers.includes(u.uid) ? 'إلغاء التقييد' : 'تقييد الكتابة';
-    const adminBtn = document.getElementById('makeAdminBtn');
-    adminBtn.innerHTML = roomAdmins.includes(u.uid) ? '<i data-lucide="user-minus" class="w-5 h-5"></i>' : '<i data-lucide="crown" class="w-5 h-5"></i>';
-    adminBtn.title = roomAdmins.includes(u.uid) ? 'إلغاء الأدمن' : 'تعيين أدمن';
-    lucide.createIcons();
+    // قائمة الهدايا
+    giftList.innerHTML = Object.values(activeUsers).map(u => {
+        const isSelected = selectedRecipient?.uid === u.uid;
+        return `
+            <div class="flex flex-col items-center gap-1 min-w-[50px] cursor-pointer ${isSelected ? 'opacity-100 scale-110' : 'opacity-50'}" onclick="selectRecipient('${u.uid}')">
+                <img src="${u.photoURL}" class="w-10 h-10 rounded-full border-2 ${isSelected ? 'border-amber-400' : 'border-transparent'}">
+                <span class="text-[9px] truncate max-w-[50px]">${u.displayName}</span>
+            </div>
+        `;
+    }).join('');
 }
 
-window.handleFollow = async () => {
-    const u = window.currentProfileUser;
-    await updateDoc(doc(db, 'users', currentUser.uid), { sentRequests: arrayUnion(u.uid) });
-    await updateDoc(doc(db, 'users', u.uid), { friendRequests: arrayUnion(currentUser.uid) });
-    showNotification('تم إرسال طلب المتابعة');
+// --- منطق الشات والفوتر ---
+window.openChatInput = () => {
+    document.getElementById('chatInputBar').classList.add('active');
+    document.getElementById('footerDock').classList.add('hidden-dock'); // إخفاء الفوتر
+    document.getElementById('chatOverlayBg').classList.add('active'); // تفعيل طبقة الإغلاق
+    document.getElementById('chatInput').focus();
 };
 
-window.handleKickUser = async () => {
-    const u = window.currentProfileUser;
-    if (!confirm(`طرد ${u.displayName} من الغرفة؟`)) return;
-    await remove(ref(rtdb, `activeUsers/${roomId}/${u.uid}`));
-    await sendSystemMessage(`${u.displayName} تم طرده من الغرفة`);
-    showNotification(`تم طرد ${u.displayName}`);
-    toggleSheet('profileSheet', false);
+window.closeChatInput = () => {
+    document.getElementById('chatInputBar').classList.remove('active');
+    document.getElementById('footerDock').classList.remove('hidden-dock'); // إظهار الفوتر
+    document.getElementById('chatOverlayBg').classList.remove('active');
+    document.getElementById('chatInput').blur();
 };
-
-window.handleBanUser = async () => {
-    const u = window.currentProfileUser;
-    const isBanned = bannedUsers.includes(u.uid);
-    const roomRef = doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId);
-    if (isBanned) {
-        await updateDoc(roomRef, { bannedUsers: arrayRemove(u.uid) });
-        showNotification(`تم إلغاء حظر ${u.displayName}`);
-    } else {
-        await updateDoc(roomRef, { bannedUsers: arrayUnion(u.uid) });
-        await remove(ref(rtdb, `activeUsers/${roomId}/${u.uid}`));
-        await sendSystemMessage(`${u.displayName} تم حظره نهائياً`);
-        showNotification(`تم حظر ${u.displayName} نهائياً`);
-    }
-    toggleSheet('profileSheet', false);
-};
-
-window.handleMuteUser = async () => {
-    const u = window.currentProfileUser;
-    const isMuted = mutedUsers.includes(u.uid);
-    const roomRef = doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId);
-    await updateDoc(roomRef, { mutedUsers: isMuted ? arrayRemove(u.uid) : arrayUnion(u.uid) });
-    showNotification(isMuted ? 'تم إلغاء التقييد' : 'تم تقييد الكتابة');
-    toggleSheet('profileSheet', false);
-};
-
-window.handleMakeAdmin = async () => {
-    const u = window.currentProfileUser;
-    const isAdmin = roomAdmins.includes(u.uid);
-    const roomRef = doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId);
-    await updateDoc(roomRef, { admins: isAdmin ? arrayRemove(u.uid) : arrayUnion(u.uid) });
-    await sendSystemMessage(isAdmin ? `${u.displayName} لم يعد أدمناً` : `${u.displayName} أصبح أدمناً`);
-    showNotification(isAdmin ? 'تم إلغاء الأدمنية' : 'تم تعيين أدمن');
-    toggleSheet('profileSheet', false);
-};
-
-function checkIfMuted() {
-    const input = document.getElementById('chatInput');
-    if (mutedUsers.includes(currentUser.uid)) { input.disabled = true; input.placeholder = '❌ تم تقييدك من الكتابة'; }
-    else { input.disabled = false; input.placeholder = 'اكتب شيئاً...'; }
-}
 
 window.sendMsg = async () => {
     const input = document.getElementById('chatInput');
     const text = input.value.trim();
     if (!text) return;
-    if (mutedUsers.includes(currentUser.uid)) return showNotification('لا يمكنك الكتابة');
-    await push(ref(rtdb, `roomMessages/${roomId}`), { senderId: currentUser.uid, text, timestamp: Date.now(), type: 'message' });
+    
+    // إرفاق بيانات البروفايل الحالية مع الرسالة (لتظهر بشكل صحيح حتى لو تغيرت لاحقاً)
+    await push(ref(rtdb, `roomMessages/${roomId}`), {
+        senderId: currentUser.uid,
+        senderName: currentUserData.displayName,
+        photoURL: currentUserData.photoURL,
+        activeFrame: currentUserData.activeFrame || null,
+        activeBadges: currentUserData.activeBadges || [],
+        magicLevel: currentUserData.magicLevel || 1,
+        wealthLevel: currentUserData.wealthLevel || 1,
+        text: text,
+        type: 'text',
+        timestamp: Date.now()
+    });
     input.value = '';
+    closeChatInput(); // إغلاق الشات وإظهار الفوتر بعد الإرسال
 };
 
-async function sendSystemMessage(text) {
-    await push(ref(rtdb, `roomMessages/${roomId}`), { senderId: 'system', text, timestamp: Date.now(), type: 'system' });
-}
-
-window.handleProfileGift = () => { selectedRecipient = window.currentProfileUser; toggleSheet('profileSheet', false); renderGiftUsers(); toggleSheet('giftSheet', true); };
-window.handleProfileMention = () => { toggleSheet('profileSheet', false); const inp = document.getElementById('chatInput'); inp.value = `@${window.currentProfileUser.displayName} `; inp.focus(); };
-
-function renderGiftUsers() {
-    const container = document.getElementById('giftUserSelector');
-    container.innerHTML = Object.values(activeUsers).map(u => {
-        const frame = u.activeFrame && storeData.itemsById[u.activeFrame] ? `<img src="${storeData.itemsById[u.activeFrame].image}" class="user-option-frame">` : '';
-        return `<div class="user-option ${selectedRecipient?.uid === u.uid ? 'active' : ''}" onclick="selectRecipient('${u.uid}')">
-            <div class="user-option-avatar-wrapper"><img src="${u.photoURL || 'https://i.pravatar.cc/100'}">${frame}</div>
-            <span class="text-[9px]">${u.displayName}</span>
-        </div>`;
-    }).join('');
-}
-
-window.selectRecipient = (uid) => { selectedRecipient = Object.values(activeUsers).find(u => u.uid === uid); renderGiftUsers(); };
-
-window.renderGifts = () => {
-    document.getElementById('giftsGrid').innerHTML = storeData.gifts.map(g => `
-        <div class="gift-card ${selectedGift?.id === g.id ? 'selected' : ''}" onclick="selectGift('${g.id}')">
-            <div class="gift-icon">${g.icon || '🎁'}</div>
-            <span class="text-[10px] text-center">${g.name}</span>
-            <span class="gift-price">${g.price || 0} 🪙</span>
-        </div>
-    `).join('');
-    document.getElementById('giftBalance').textContent = currentUserData.balance || 0;
+window.sendEmoji = async (emoji) => {
+    await push(ref(rtdb, `roomMessages/${roomId}`), {
+        senderId: currentUser.uid,
+        senderName: currentUserData.displayName,
+        photoURL: currentUserData.photoURL,
+        activeFrame: currentUserData.activeFrame || null,
+        text: emoji,
+        type: 'emoji',
+        timestamp: Date.now()
+    });
+    document.getElementById('emojiPopup').classList.remove('show');
 };
 
-window.selectGift = (id) => { selectedGift = storeData.gifts.find(g => g.id === id); renderGifts(); };
+// --- البروفايل ---
+window.openProfileById = async (uid) => {
+    const snap = await getDoc(doc(db, 'users', uid));
+    if(snap.exists()) {
+        const u = snap.data();
+        window.currentProfileUser = {uid, ...u};
+        
+        document.getElementById('p-img').src = u.photoURL;
+        document.getElementById('p-name').textContent = u.displayName;
+        document.getElementById('p-id').textContent = 'ID: ' + uid;
+        document.getElementById('p-magic').textContent = 'Lv.' + (u.magicLevel || 1);
+        document.getElementById('p-wealth').textContent = 'Lv.' + (u.wealthLevel || 1);
+        
+        // عرض الفريم
+        const frameEl = document.getElementById('p-frame');
+        if (u.activeFrame && storeData.itemsById[u.activeFrame]) {
+            frameEl.src = storeData.itemsById[u.activeFrame].image;
+            frameEl.classList.remove('hidden');
+        } else {
+            frameEl.classList.add('hidden');
+        }
 
-window.executeGift = async () => {
-    if (!selectedGift || !selectedRecipient) return showNotification('اختر هدية ومستقبلاً');
-    const qty = parseInt(document.getElementById('giftQty').value) || 1;
-    const cost = selectedGift.price * qty;
-    if ((currentUserData.balance || 0) < cost) return showNotification('رصيدك غير كافٍ');
-    await updateDoc(doc(db, 'users', currentUser.uid), { balance: increment(-cost) });
-    const updates = {};
-    if (selectedGift.type === 'magic') { updates.magicLevel = increment(1); updates.balance = increment(selectedGift.reward || 0); }
-    else if (selectedGift.type === 'wealth') { updates.wealthLevel = increment(1); updates.balance = increment(selectedGift.reward || 0); }
-    if (Object.keys(updates).length) await updateDoc(doc(db, 'users', selectedRecipient.uid), updates);
-    await push(ref(rtdb, `roomMessages/${roomId}`), { senderId: currentUser.uid, recipientId: selectedRecipient.uid, recipientName: selectedRecipient.displayName, giftId: selectedGift.id, quantity: qty, timestamp: Date.now(), type: 'gift' });
-    currentUserData.balance = (currentUserData.balance || 0) - cost;
-    toggleSheet('giftSheet', false);
-    showNotification(`تم إرسال ${selectedGift.name} إلى ${selectedRecipient.displayName}`);
+        // عرض الشارات
+        const badgesContainer = document.getElementById('p-badges');
+        badgesContainer.innerHTML = (u.activeBadges || []).map(bid => {
+             const item = storeData.itemsById[bid];
+             return item ? `<img src="${item.image}" class="w-6 h-6 rounded">` : '';
+        }).join('');
+
+        toggleSheet('profileSheet', true);
+    }
 };
 
-window.confirmDeleteChat = async () => {
-    if (!confirm('حذف جميع الرسائل؟')) return;
-    await set(ref(rtdb, `roomMessages/${roomId}`), null);
-    showNotification('تم حذف الرسائل');
-};
-
-window.saveRoomSettings = async () => {
-    const name = document.getElementById('roomSettingsName').value.trim();
-    const image = document.getElementById('roomSettingsImage').value.trim();
-    if (!name) return showNotification('أدخل اسم الغرفة');
-    const roomRef = doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId);
-    await updateDoc(roomRef, { name, ...(image && { image }) });
-    document.getElementById('roomName').textContent = name;
-    showNotification('تم الحفظ');
-    toggleSheet('roomSettingsSheet', false);
-};
-
-async function joinRoom() {
-    await sendSystemMessage(`${currentUserData.displayName} انضم للغرفة`);
-}
-
-window.leaveRoom = async () => {
-    await remove(ref(rtdb, `activeUsers/${roomId}/${currentUser.uid}`));
-    await sendSystemMessage(`${currentUserData.displayName} غادر الغرفة`);
-    if (messagesUnsub) off(ref(rtdb, `roomMessages/${roomId}`), 'value', messagesUnsub);
-    if (activeUsersUnsub) off(ref(rtdb, `activeUsers/${roomId}`), 'value', activeUsersUnsub);
-    window.location.href = 'afnan_ai_white.html';
-};
-
+// --- دوال مساعدة ---
 window.toggleSheet = (id, show) => {
     const sheet = document.getElementById(id);
-    if (show) {
+    if(show) {
         sheet.classList.add('show');
-        if (id === 'giftSheet') { renderGiftUsers(); renderGifts(); selectedGift = storeData.gifts[0]; }
-        if (id === 'roomSettingsSheet' && isRoomOwner) { document.getElementById('roomSettingsName').value = roomData.name || ''; document.getElementById('roomSettingsImage').value = roomData.image || ''; updateSettingsLists(); }
-    } else sheet.classList.remove('show');
+        if(id === 'giftSheet') renderGifts();
+    } else {
+        sheet.classList.remove('show');
+    }
 };
 
-async function updateSettingsLists() {
-    const adminsList = document.getElementById('adminsList');
-    const bannedList = document.getElementById('bannedList');
-    document.getElementById('adminsCount').textContent = roomAdmins.length;
-    document.getElementById('bannedCount').textContent = bannedUsers.length;
-    adminsList.innerHTML = '';
-    bannedList.innerHTML = '';
-    for (const adminId of roomAdmins) {
-        const snap = await getDoc(doc(db, 'users', adminId));
-        if (snap.exists()) {
-            const d = snap.data();
-            adminsList.innerHTML += `<div class="list-item"><img src="${d.photoURL || 'https://i.pravatar.cc/100'}"><div class="list-item-info"><div class="list-item-name">${d.displayName}</div></div><button class="list-item-action" onclick="removeAdmin('${adminId}')">إلغاء</button></div>`;
-        }
+window.toggleEmojiPopup = () => document.getElementById('emojiPopup').classList.toggle('show');
+
+function renderGifts() {
+    const grid = document.getElementById('giftsGrid');
+    document.getElementById('giftBalance').textContent = currentUserData.balance || 0;
+    
+    if(!selectedRecipient && Object.values(activeUsers).length > 0) {
+        selectRecipient(Object.values(activeUsers)[0].uid);
     }
-    for (const bannedId of bannedUsers) {
-        const snap = await getDoc(doc(db, 'users', bannedId));
-        if (snap.exists()) {
-            const d = snap.data();
-            bannedList.innerHTML += `<div class="list-item"><img src="${d.photoURL || 'https://i.pravar.cc/100'}"><div class="list-item-info"><div class="list-item-name">${d.displayName}</div></div><button class="list-item-action" onclick="unbanUser('${bannedId}')">إلغاء الحظر</button></div>`;
-        }
-    }
+
+    grid.innerHTML = storeData.gifts.map(g => `
+        <div class="gift-card ${selectedGift?.id === g.id ? 'selected' : ''}" onclick="selectGift('${g.id}')">
+            <div class="text-3xl mb-1">${g.icon}</div>
+            <div class="text-[10px] font-bold">${g.name}</div>
+            <div class="text-[9px] text-amber-400">${g.price} 🪙</div>
+        </div>
+    `).join('');
 }
 
-window.removeAdmin = async (id) => {
-    await updateDoc(doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId), { admins: arrayRemove(id) });
-    showNotification('تم إلغاء الأدمنية');
+window.selectGift = (id) => { selectedGift = storeData.gifts.find(g => g.id === id); renderGifts(); };
+window.selectRecipient = (uid) => { selectedRecipient = activeUsers[uid]; updateActiveUsersUI(); };
+
+window.executeGift = async () => {
+    if(!selectedGift || !selectedRecipient) return alert('اختر هدية ومستلم');
+    const cost = selectedGift.price;
+    if((currentUserData.balance || 0) < cost) return alert('رصيدك غير كاف');
+
+    await updateDoc(doc(db, 'users', currentUser.uid), { balance: increment(-cost) });
+    currentUserData.balance -= cost;
+
+    await push(ref(rtdb, `roomMessages/${roomId}`), {
+        type: 'gift',
+        senderId: currentUser.uid,
+        senderName: currentUserData.displayName,
+        photoURL: currentUserData.photoURL,
+        recipientId: selectedRecipient.uid,
+        recipientName: selectedRecipient.displayName,
+        giftId: selectedGift.id,
+        quantity: 1,
+        timestamp: Date.now()
+    });
+    toggleSheet('giftSheet', false);
 };
 
-window.unbanUser = async (id) => {
-    await updateDoc(doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId), { bannedUsers: arrayRemove(id) });
-    showNotification('تم إلغاء الحظر');
+window.openManagement = () => toggleSheet('managementSheet', true);
+window.saveRoomSettings = async (field) => {
+    const val = document.getElementById(field === 'name' ? 'roomSettingsName' : 'roomSettingsImage').value;
+    await updateDoc(doc(db, 'rooms', roomId), { [field]: val });
+    alert('تم الحفظ');
 };
-
-window.openRoomOwnerProfile = () => { if (roomData?.owner) openProfileById(roomData.owner); };
-
-function showNotification(msg) {
-    const div = document.createElement('div');
-    div.className = 'notification';
-    div.innerHTML = `<span>${msg.includes('✓') || msg.includes('تم') ? '✓' : '💬'}</span><span>${msg}</span>`;
-    document.body.appendChild(div);
-    setTimeout(() => div.remove(), 3000);
-}
-
-document.getElementById('chatInput').addEventListener('focus', () => {
-    document.getElementById('giftBtn').classList.add('hidden');
-    document.getElementById('sendBtn').classList.remove('hidden');
-});
-
-document.getElementById('chatInput').addEventListener('blur', () => {
-    setTimeout(() => {
-        document.getElementById('giftBtn').classList.remove('hidden');
-        document.getElementById('sendBtn').classList.add('hidden');
-    }, 200);
-});
-
-document.getElementById('chatInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMsg(); });
-
-window.addEventListener('beforeunload', () => {
-    if (currentUser && roomId) remove(ref(rtdb, `activeUsers/${roomId}/${currentUser.uid}`));
-});
+window.confirmDeleteChat = async () => { if(confirm('حذف؟')) await set(ref(rtdb, `roomMessages/${roomId}`), null); };
+window.openRanking = () => toggleSheet('rankingSheet', true); // (يمكن إضافة منطق الترتيب هنا لاحقاً)
+window.playRPS = (c) => { 
+    const ai = ['🪨','📄','✂️'][Math.floor(Math.random()*3)]; 
+    push(ref(rtdb, `roomMessages/${roomId}`), { type: 'system', text: `${currentUserData.displayName} لعب ${c} ضد ${ai}`, timestamp: Date.now() });
+    toggleSheet('gamesSheet', false);
+};
+window.handleFollow = () => { alert('تم الإرسال'); toggleSheet('profileSheet', false); };
+window.handleProfileGift = () => { selectedRecipient = activeUsers[window.currentProfileUser.uid]; toggleSheet('profileSheet', false); toggleSheet('giftSheet', true); };
 
 lucide.createIcons();
 </script>
 </body>
 </html>
+
+
