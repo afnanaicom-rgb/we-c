@@ -638,12 +638,6 @@
     }
 
     // دوال إضافية للهدايا والألعاب
-    window.toggleSheet = (id, show) => {
-        const sheet = document.getElementById(id);
-        if(show) sheet.classList.add('show');
-        else sheet.classList.remove('show');
-    };
-
     window.handleFollow = () => alert('تم المتابعة');
     window.handleProfileGift = () => toggleSheet('giftSheet', true);
     window.executeGift = () => alert('تم إرسال الهدية');
@@ -652,12 +646,4 @@
     </script>
 </body>
 </html>
-
-    // تحديث toggleSheet
-    const originalToggleSheet = window.toggleSheet;
-    window.toggleSheet = (id, show) => {
-        const sheet = document.getElementById(id);
-        if(show) sheet.classList.add('show');
-        else sheet.classList.remove('show');
-    };
 
