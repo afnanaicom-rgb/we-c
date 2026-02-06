@@ -285,6 +285,9 @@
                         displayName: user.displayName || "مستخدم جديد",
                         photoURL: user.photoURL || 'https://via.placeholder.com/150',
                         balance: 1000,
+                        customId: user.uid.substring(0, 6),
+                        magicLevel: 1,
+                        wealthLevel: 1,
                         createdAt: serverTimestamp()
                     });
                 }
