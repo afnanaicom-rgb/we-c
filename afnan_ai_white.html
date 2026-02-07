@@ -38,9 +38,46 @@
         .frame-size-large .svga-avatar-frame, .frame-size-large .perfect-frame { width: calc(100% + 24px); height: calc(100% + 24px) }
         .frame-size-xl .svga-avatar-frame, .frame-size-xl .perfect-frame { width: calc(100% + 32px); height: calc(100% + 32px) }
         .badges-grid { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center }
-        .room-item { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); transition: all 0.3s ease }
+        .room-item { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 20px; padding: 20px; margin-bottom: 15px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3); transition: all 0.3s ease; position: relative; overflow: hidden }
         .room-item:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(37, 99, 235, 0.4) }
         .room-item-private { background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white }
+        .room-top-1 { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .room-top-2 { background: linear-gradient(135deg, #C0C0C0, #808080); }
+        .room-top-3 { background: linear-gradient(135deg, #CD7F32, #8B4513); }
+        .room-rank-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .room-follow-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .room-follow-btn:hover { transform: scale(1.1); }
+        .room-follow-btn.following { background: #22c55e; color: white; }
         .swiper { width: 100%; height: 100%; border-radius: 28px }
         .swiper-slide { display: flex; align-items: center; justify-content: center }
         .swiper-slide img { width: 100%; height: 100%; object-fit: cover }
@@ -48,7 +85,90 @@
         @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0 } to { transform: translateX(-50%) translateY(0); opacity: 1 } }
         .fade-in { animation: fadeIn 0.3s ease }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px) } to { opacity: 1; transform: translateY(0) } }
+        
+        /* Room Popup */
+        .room-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .room-popup-overlay.show { display: flex; }
+        .room-popup {
+            width: 90%;
+            max-width: 400px;
+            height: 70vh;
+            background: #1a1a2e;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .room-popup iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .room-popup-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 10;
+        }
+        .room-popup-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 60px 0 15px;
+        }
+        .room-popup-title {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        /* Minimized Room Indicator */
+        .minimized-room {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+            z-index: 100;
+            animation: slideUp 0.3s ease;
+        }
+        .minimized-room.show { display: flex; }
     </style>
+<base target="_blank">
 </head>
 <body class="antialiased selection:bg-blue-100 selection:text-blue-900">
     <div id="main-app" class="min-h-screen pb-24">
@@ -67,6 +187,7 @@
                 <div class="flex p-1 bg-white/60 backdrop-blur-md rounded-2xl mb-6 shadow-sm border border-white/40">
                     <button id="btn-public" onclick="filterRooms('public')" class="flex-1 py-3 rounded-xl bg-white text-black font-bold shadow-sm text-sm transition-all">عامة</button>
                     <button id="btn-private" onclick="showPrivateRoom()" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">خاصة</button>
+                    <button id="btn-following" onclick="showFollowingRooms()" class="flex-1 py-3 rounded-xl text-gray-500 font-bold text-sm hover:text-black transition-all">متابعة</button>
                 </div>
                 <div id="roomsGrid" class="space-y-3"></div>
                 <div id="privateRoomContainer" class="hidden">
@@ -78,6 +199,14 @@
                                 <p class="text-sm opacity-90" id="myRoomDesc">الغرفة الخاصة بك - اضغط للدخول</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div id="followingRoomsContainer" class="hidden">
+                    <div id="followingRoomsGrid" class="space-y-3"></div>
+                    <div id="noFollowingMsg" class="hidden text-center py-10">
+                        <div class="text-6xl mb-4">🔔</div>
+                        <p class="text-gray-500">لا توجد غرف متابعة</p>
+                        <p class="text-gray-400 text-sm mt-2">اضغط على ⭐ في أي غرفة لمتابعتها</p>
                     </div>
                 </div>
             </div>
@@ -104,6 +233,7 @@
                     <button onclick="loadStoreItems('badge')" id="store-tab-badges" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">شارات</button>
                     <button onclick="loadStoreItems('svga')" id="store-tab-svga" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">رسوم متحركة</button>
                     <button onclick="loadStoreItems('chatbubble')" id="store-tab-chatbubble" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">فقاعات</button>
+                    <button onclick="loadStoreItems('entrance')" id="store-tab-entrance" class="flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition">دخوليات</button>
                 </div>
                 <div id="storeGrid" class="grid grid-cols-2 gap-4 pb-20"></div>
             </div>
@@ -118,9 +248,30 @@
                 <div id="activeBadgesGrid" class="badges-grid mb-8"></div>
                 <h3 class="font-bold text-lg mb-4 text-gray-800">فقاعاتي</h3>
                 <div id="chatbubblesBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
+                <h3 class="font-bold text-lg mb-4 text-gray-800">دخولياتي</h3>
+                <div id="entranceBagGrid" class="grid grid-cols-3 gap-3 mb-8"></div>
             </div>
         </main>
     </div>
+    
+    <!-- Room Popup -->
+    <div id="roomPopupOverlay" class="room-popup-overlay">
+        <div class="room-popup">
+            <button class="room-popup-close" onclick="closeRoomPopup()">✕</button>
+            <div class="room-popup-header">
+                <span class="room-popup-title" id="roomPopupTitle">الغرفة</span>
+            </div>
+            <iframe id="roomPopupFrame" src=""></iframe>
+        </div>
+    </div>
+    
+    <!-- Minimized Room Indicator -->
+    <div id="minimizedRoom" class="minimized-room" onclick="restoreRoom()">
+        <span>🎮</span>
+        <span id="minimizedRoomName">غرفة</span>
+        <span>▶</span>
+    </div>
+    
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar(false)"></div>
     <aside id="sidebar" class="sidebar-container glass-deep flex flex-col overflow-hidden">
         <div class="pt-12 px-6 flex justify-between items-start">
@@ -186,7 +337,7 @@
     <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, getDocs, increment, query, where, arrayUnion, arrayRemove, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
     import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
@@ -197,6 +348,10 @@
 
     let userData = {};
     let storeData = { items: [], itemsById: {}, gifts: [], luckGifts: [], magicLevels: {}, wealthLevels: {}, chatBubbles: [] };
+    let roomsData = [];
+    let followingRooms = JSON.parse(localStorage.getItem('following_rooms') || '[]');
+    let currentRoomWindow = null;
+    let minimizedRoomId = null;
     const activeSvgaPlayers = {};
 
     function getLevelInfo(totalPoints) {
@@ -234,7 +389,7 @@
         const now = Date.now();
         let activeItems = JSON.parse(localStorage.getItem('active_items_' + userData.uid) || '{}');
         let updates = {};
-        ['frame', 'svga', 'chatbubble'].forEach(type => {
+        ['frame', 'svga', 'chatbubble', 'entrance'].forEach(type => {
             const firebaseId = userData['last_active_' + type];
             const firebaseExpiry = userData['expiry_active_' + type];
             if (firebaseId && firebaseExpiry && firebaseExpiry > now) {
@@ -249,6 +404,7 @@
         if (activeItems.frame?.expiry > now) userData.activeFrame = activeItems.frame.id;
         if (activeItems.svga?.expiry > now) userData.activeFrame = activeItems.svga.id;
         if (activeItems.chatbubble?.expiry > now) userData.activeChatBubble = activeItems.chatbubble.id;
+        if (activeItems.entrance?.expiry > now) userData.entranceAnimation = activeItems.entrance.id;
         if (Object.keys(updates).length > 0) {
             try { await updateDoc(doc(db, 'users', userData.uid), updates); }
             catch (e) { console.error('Firebase update error:', e); }
@@ -376,66 +532,187 @@
 
     async function loadRooms() {
         const rSnap = await getDocs(collection(db, "rooms"));
-        const grid = document.getElementById('roomsGrid');
         const roomsRef = ref(rtdb, 'rooms');
         onValue(roomsRef, (snapshot) => {
             const rtdbRooms = snapshot.val() || {};
-            const roomsData = rSnap.docs.map(d => {
+            roomsData = rSnap.docs.map(d => {
                 const r = d.data();
                 const activeUsersCount = rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0;
                 return { id: d.id, ...r, activeUsersCount };
             }).sort((a, b) => b.activeUsersCount - a.activeUsersCount);
-            grid.innerHTML = roomsData.map(r => `
-                <div onclick="enterRoom('${r.id}')" class="glass-card p-4 rounded-3xl flex items-center gap-4 cursor-pointer hover:bg-white transition">
-                    <div class="w-12 h-12 rounded-full ${r.color || 'bg-blue-500'} flex items-center justify-center text-xl">${r.icon || '🏠'}</div>
-                    <div class="flex-1">
-                        <h4 class="font-bold text-gray-900">${r.name}</h4>
-                        <p class="text-xs text-gray-500">${r.description || ''}</p>
-                    </div>
-                    <div class="flex items-center gap-1 bg-green-50 px-2 py-1 rounded-lg">
-                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span class="text-[10px] font-bold text-green-600">${r.activeUsersCount}</span>
-                    </div>
-                    <i data-lucide="chevron-left" class="w-4 h-4 text-gray-400"></i>
-                </div>
-            `).join('');
-            lucide.createIcons();
+            renderRooms();
         });
     }
 
+    function renderRooms() {
+        const grid = document.getElementById('roomsGrid');
+        grid.innerHTML = roomsData.map((r, index) => {
+            let rankClass = '';
+            let rankBadge = '';
+            if (index === 0) { rankClass = 'room-top-1'; rankBadge = '<div class="room-rank-badge">1</div>'; }
+            else if (index === 1) { rankClass = 'room-top-2'; rankBadge = '<div class="room-rank-badge">2</div>'; }
+            else if (index === 2) { rankClass = 'room-top-3'; rankBadge = '<div class="room-rank-badge">3</div>'; }
+            
+            const isFollowing = followingRooms.includes(r.id);
+            
+            return `
+                <div class="room-item ${rankClass} cursor-pointer" onclick="enterRoom('${r.id}')">
+                    ${rankBadge}
+                    <button class="room-follow-btn ${isFollowing ? 'following' : ''}" onclick="event.stopPropagation(); toggleFollowRoom('${r.id}')">
+                        ${isFollowing ? '✓' : '⭐'}
+                    </button>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full ${r.color || 'bg-blue-500'} flex items-center justify-center text-xl">${r.icon || '🏠'}</div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-lg">${r.name}</h4>
+                            <p class="text-sm opacity-90">${r.description || ''}</p>
+                        </div>
+                        <div class="flex items-center gap-1 bg-white/20 px-3 py-1.5 rounded-lg">
+                            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                            <span class="text-sm font-bold">${r.activeUsersCount}</span>
+                        </div>
+                        <i data-lucide="chevron-left" class="w-5 h-5 opacity-70"></i>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        lucide.createIcons();
+    }
+
+    window.toggleFollowRoom = (roomId) => {
+        const index = followingRooms.indexOf(roomId);
+        if (index > -1) {
+            followingRooms.splice(index, 1);
+            showNotification('تم إلغاء متابعة الغرفة');
+        } else {
+            followingRooms.push(roomId);
+            showNotification('تم متابعة الغرفة');
+        }
+        localStorage.setItem('following_rooms', JSON.stringify(followingRooms));
+        renderRooms();
+    };
+
     window.enterRoom = (roomId) => {
-        // تمرير بيانات المستخدم للغرفة عبر sessionStorage للسرعة
+        const room = roomsData.find(r => r.id === roomId);
+        const roomName = room ? room.name : 'الغرفة';
+        
+        // Store user data for room
         sessionStorage.setItem('room_user_data', JSON.stringify({
             uid: userData.uid,
             displayName: userData.displayName,
             photoURL: userData.photoURL,
             activeFrame: userData.activeFrame,
             activeBadges: userData.activeBadges,
-            magicLevel: userData.magicLevel || 1,
-            wealthLevel: userData.wealthLevel || 1,
-            balance: userData.balance
+            magicPoints: userData.magicPoints || 0,
+            wealthPoints: userData.wealthPoints || 0,
+            balance: userData.balance,
+            entranceAnimation: userData.entranceAnimation
         }));
-        window.location.href = `room.html?id=${roomId}`;
+        
+        // Open in popup
+        document.getElementById('roomPopupTitle').textContent = roomName;
+        document.getElementById('roomPopupFrame').src = `room.html?id=${roomId}`;
+        document.getElementById('roomPopupOverlay').classList.add('show');
+        minimizedRoomId = roomId;
+        document.getElementById('minimizedRoomName').textContent = roomName;
+    };
+
+    window.closeRoomPopup = () => {
+        document.getElementById('roomPopupOverlay').classList.remove('show');
+        document.getElementById('roomPopupFrame').src = '';
+        minimizedRoomId = null;
+        document.getElementById('minimizedRoom').classList.remove('show');
+    };
+
+    window.restoreRoom = () => {
+        if (minimizedRoomId) {
+            document.getElementById('roomPopupOverlay').classList.add('show');
+            document.getElementById('minimizedRoom').classList.remove('show');
+        }
+    };
+
+    // Listen for minimize message from room
+    window.addEventListener('message', (e) => {
+        if (e.data.action === 'minimizeRoom') {
+            document.getElementById('roomPopupOverlay').classList.remove('show');
+            document.getElementById('minimizedRoom').classList.add('show');
+        }
+    });
+
+    window.showFollowingRooms = () => {
+        document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('btn-following').classList.replace('text-gray-500', 'bg-white');
+        document.getElementById('roomsGrid').classList.add('hidden');
+        document.getElementById('privateRoomContainer').classList.add('hidden');
+        document.getElementById('followingRoomsContainer').classList.remove('hidden');
+        
+        const followingGrid = document.getElementById('followingRoomsGrid');
+        const noFollowingMsg = document.getElementById('noFollowingMsg');
+        const followingRoomsList = roomsData.filter(r => followingRooms.includes(r.id));
+        
+        if (followingRoomsList.length === 0) {
+            followingGrid.innerHTML = '';
+            noFollowingMsg.classList.remove('hidden');
+        } else {
+            noFollowingMsg.classList.add('hidden');
+            followingGrid.innerHTML = followingRoomsList.map(r => `
+                <div class="room-item cursor-pointer" onclick="enterRoom('${r.id}')">
+                    <button class="room-follow-btn following" onclick="event.stopPropagation(); toggleFollowRoom('${r.id}')">✓</button>
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full ${r.color || 'bg-blue-500'} flex items-center justify-center text-xl">${r.icon || '🏠'}</div>
+                        <div class="flex-1">
+                            <h4 class="font-bold text-lg">${r.name}</h4>
+                            <p class="text-sm opacity-90">${r.description || ''}</p>
+                        </div>
+                        <div class="flex items-center gap-1 bg-white/20 px-3 py-1.5 rounded-lg">
+                            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                            <span class="text-sm font-bold">${r.activeUsersCount}</span>
+                        </div>
+                        <i data-lucide="chevron-left" class="w-5 h-5 opacity-70"></i>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+    };
+
+    window.filterRooms = (t) => {
+        document.getElementById('btn-public').classList.replace('text-gray-500', 'bg-white');
+        document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('btn-following').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('roomsGrid').classList.remove('hidden');
+        document.getElementById('privateRoomContainer').classList.add('hidden');
+        document.getElementById('followingRoomsContainer').classList.add('hidden');
+    };
+
+    window.showPrivateRoom = () => {
+        document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('btn-private').classList.replace('text-gray-500', 'bg-white');
+        document.getElementById('btn-following').classList.replace('bg-white', 'text-gray-500');
+        document.getElementById('roomsGrid').classList.add('hidden');
+        document.getElementById('privateRoomContainer').classList.remove('hidden');
+        document.getElementById('followingRoomsContainer').classList.add('hidden');
     };
 
     window.loadStoreItems = (type) => {
         const grid = document.getElementById('storeGrid');
-        let items = type === 'chatbubble' ? storeData.chatBubbles : storeData.items.filter(item => item.type === type);
-        ['frames', 'badges', 'svga', 'chatbubble'].forEach(t => {
+        let items = type === 'chatbubble' ? storeData.chatBubbles : type === 'entrance' ? storeData.items.filter(item => item.type === 'entrance') : storeData.items.filter(item => item.type === type);
+        ['frames', 'badges', 'svga', 'chatbubble', 'entrance'].forEach(t => {
             const el = document.getElementById('store-tab-' + t);
             if (el) el.className = (type === (t === 'frames' ? 'frame' : t)) ? 'flex-none px-6 py-2.5 bg-gray-900 text-white rounded-full font-bold text-sm shadow-lg transition' : 'flex-none px-6 py-2.5 glass-card text-gray-600 rounded-full font-bold text-sm hover:bg-white transition';
         });
         grid.innerHTML = items.map(item => {
-            let field = type === 'frame' ? 'purchasedFrames' : type === 'badge' ? 'purchasedBadges' : type === 'svga' ? 'purchasedSvga' : 'purchasedChatBubbles';
+            let field = type === 'frame' ? 'purchasedFrames' : type === 'badge' ? 'purchasedBadges' : type === 'svga' ? 'purchasedSvga' : type === 'entrance' ? 'purchasedEntrance' : 'purchasedChatBubbles';
             const owned = userData[field]?.some(i => i.id === item.id);
             let previewHTML = '';
-            if (type === 'chatbubble' && item.fileUrl) previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
+            if ((type === 'chatbubble' || type === 'entrance') && item.fileUrl) previewHTML = `<div class="w-full h-16 flex items-center justify-center mb-2" id="preview-cb-${item.id}"></div>`;
             else if (item.itemType === 'svga') previewHTML = `<div class="w-16 h-16 mb-2 relative" id="preview-${item.id}"></div>`;
             else previewHTML = `<img src="${item.image}" class="w-16 h-16 object-contain mb-2">`;
             return `<div class="glass-card p-4 rounded-3xl flex flex-col items-center justify-between min-h-[180px] relative">${previewHTML}<h4 class="font-bold text-sm text-center mb-2">${item.name}</h4><button onclick="${owned ? '' : `buyItem('${type}','${item.id}',${item.price})`}" class="buy-btn ${owned ? 'bg-gray-100 text-gray-400' : 'bg-black text-white'}">${owned ? 'مملوك' : `${item.price} 💰 شراء`}</button></div>`;
         }).join('');
         items.forEach(item => {
-            if (type === 'chatbubble' && item.fileUrl) setTimeout(() => { const c = document.getElementById(`preview-cb-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
+            if ((type === 'chatbubble' || type === 'entrance') && item.fileUrl) setTimeout(() => { const c = document.getElementById(`preview-cb-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
             else if (item.itemType === 'svga') setTimeout(() => { const c = document.getElementById(`preview-${item.id}`); if (c) playSvga(item.fileUrl, c, { loops: 1, clearsAfterStop: true }); }, 100);
         });
         lucide.createIcons();
@@ -443,14 +720,14 @@
 
     window.buyItem = async (type, id, price) => {
         if ((userData.balance || 0) < price) return alert('رصيدك غير كافٍ!');
-        let field = type === 'frame' ? 'purchasedFrames' : type === 'badge' ? 'purchasedBadges' : type === 'svga' ? 'purchasedSvga' : 'purchasedChatBubbles';
+        let field = type === 'frame' ? 'purchasedFrames' : type === 'badge' ? 'purchasedBadges' : type === 'svga' ? 'purchasedSvga' : type === 'entrance' ? 'purchasedEntrance' : 'purchasedChatBubbles';
         await updateDoc(doc(db, "users", userData.uid), { balance: increment(-price), [field]: arrayUnion({ id: id, purchasedAt: new Date() }) });
         showNotification('تم الشراء بنجاح!');
         loadStoreItems(type);
     };
 
     window.loadBagItems = async () => {
-        ['bagGrid', 'badgesBagGrid', 'svgaBagGrid', 'activeBadgesGrid', 'chatbubblesBagGrid'].forEach(id => document.getElementById(id).innerHTML = '');
+        ['bagGrid', 'badgesBagGrid', 'svgaBagGrid', 'activeBadgesGrid', 'chatbubblesBagGrid', 'entranceBagGrid'].forEach(id => document.getElementById(id).innerHTML = '');
         (userData.purchasedFrames || []).forEach(f => {
             const item = storeData.itemsById[f.id];
             if (item?.type === 'frame') {
@@ -472,12 +749,31 @@
                 document.getElementById('badgesBagGrid').innerHTML += `<div onclick="toggleBadge('${b.id}')" class="relative p-2 rounded-xl glass-card flex items-center justify-center cursor-pointer ${isActive ? 'border-2 border-black bg-white' : ''}"><img src="${item.image}" class="w-8 h-8 object-contain"></div>`;
             }
         });
+        (userData.purchasedEntrance || []).forEach(e => {
+            const item = storeData.itemsById[e.id];
+            if (item?.type === 'entrance') {
+                const isEquipped = userData.entranceAnimation === e.id;
+                const div = document.createElement('div');
+                div.onclick = () => equipEntrance(e.id);
+                div.className = `relative p-3 rounded-2xl glass-card flex flex-col items-center justify-center cursor-pointer ${isEquipped ? 'border-2 border-black bg-white' : ''}`;
+                div.innerHTML = `<div class="w-12 h-12 flex items-center justify-center mb-1" id="bag-entrance-${e.id}"></div><span class="text-xs font-bold">${item.name}</span>`;
+                document.getElementById('entranceBagGrid').appendChild(div);
+                setTimeout(() => playSvga(item.fileUrl, document.getElementById(`bag-entrance-${e.id}`), { loops: 1, clearsAfterStop: true }), 100);
+            }
+        });
     };
 
     window.equipFrame = async (id) => {
         const newFrame = userData.activeFrame === id ? null : id;
         await saveActiveState("frame", newFrame);
         await updateDoc(doc(db, "users", userData.uid), { activeFrame: newFrame });
+        loadBagItems();
+    };
+
+    window.equipEntrance = async (id) => {
+        const newEntrance = userData.entranceAnimation === id ? null : id;
+        await saveActiveState("entrance", newEntrance);
+        await updateDoc(doc(db, "users", userData.uid), { entranceAnimation: newEntrance });
         loadBagItems();
     };
 
@@ -519,20 +815,6 @@
         document.getElementById('myRoomName').innerText = `غرفة ${userData.displayName}`;
     }
 
-    window.showPrivateRoom = () => {
-        document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
-        document.getElementById('btn-private').classList.replace('text-gray-500', 'bg-white');
-        document.getElementById('roomsGrid').classList.add('hidden');
-        document.getElementById('privateRoomContainer').classList.remove('hidden');
-    };
-
-    window.filterRooms = (t) => {
-        document.getElementById('btn-public').classList.replace('text-gray-500', 'bg-white');
-        document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
-        document.getElementById('roomsGrid').classList.remove('hidden');
-        document.getElementById('privateRoomContainer').classList.add('hidden');
-    };
-
     window.openMyRoom = () => {
         sessionStorage.setItem('room_user_data', JSON.stringify({
             uid: userData.uid,
@@ -540,9 +822,10 @@
             photoURL: userData.photoURL,
             activeFrame: userData.activeFrame,
             activeBadges: userData.activeBadges,
-            magicLevel: userData.magicLevel || 1,
-            wealthLevel: userData.wealthLevel || 1,
-            balance: userData.balance
+            magicPoints: userData.magicPoints || 0,
+            wealthPoints: userData.wealthPoints || 0,
+            balance: userData.balance,
+            entranceAnimation: userData.entranceAnimation
         }));
         window.location.href = `room.html?id=${userData.uid}&type=private`;
     };
