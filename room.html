@@ -9,6 +9,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
 
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation; user-select: none; }
@@ -98,552 +101,499 @@
             transform: scale(1.1) translateY(-5px);
             filter: drop-shadow(0 8px 12px rgba(0,0,0,0.7));
         }
-        .dock-icon:active { transform: scale(0.95); }
-        
-        .chat-input-area {
-            position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px;
-            background: rgba(10, 15, 12, 0.95); border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; gap: 10px;
-            transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 60;
-        }
-        .chat-input-area.active { transform: translateY(0); }
-        
-        .chat-input {
-            flex: 1; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 25px; padding: 10px 15px; color: white; outline: none; font-size: 14px;
-        }
-        
-        .chat-overlay-bg { position: fixed; inset: 0; z-index: 55; display: none; }
-        .chat-overlay-bg.active { display: block; }
 
-        .sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; opacity: 0; pointer-events: none; transition: 0.3s; display: flex; flex-direction: column; justify-content: flex-end; }
+        .sheet-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000;
+            display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; pointer-events: none; transition: 0.3s;
+        }
         .sheet-overlay.show { opacity: 1; pointer-events: auto; }
-        .bottom-sheet { width: 100%; max-height: 85vh; overflow-y: auto; padding: 20px; transform: translateY(100%); transition: 0.4s; }
+
+        .bottom-sheet {
+            background: rgba(20, 30, 25, 0.95); backdrop-filter: blur(40px); width: 100%;
+            border-radius: 30px 30px 0 0; border-top: 1px solid rgba(255,255,255,0.15);
+            transform: translateY(100%); transition: 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 25px; max-height: 80vh; overflow-y: auto;
+        }
         .sheet-overlay.show .bottom-sheet { transform: translateY(0); }
 
-        .profile-pill { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); border-radius: 30px; padding: 4px 12px 4px 4px; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(10px); cursor: pointer; }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none }
+        .tool-btn {
+            width: 45px; height: 45px; border-radius: 15px; background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15); color: #fff; display: flex;
+            align-items: center; justify-content: center; font-size: 18px; transition: 0.2s; cursor: pointer;
+        }
+        .tool-btn:active { transform: scale(0.9); }
+        .tool-btn.gift { color: #f59e0b; }
+        .tool-btn.admin { color: #fbbf24; }
+        .tool-btn.ban { color: #ef4444; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .gifts-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+            max-height: 250px; overflow-y: auto; padding: 10px 0;
+        }
+        .gift-card {
+            background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 5px;
+            display: flex; flex-direction: column; align-items: center; border: 1px solid transparent;
+            cursor: pointer; transition: 0.2s;
+        }
+        .gift-card.selected { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; }
+        .gift-icon { font-size: 25px; margin-bottom: 5px; }
+        .gift-price { font-size: 10px; color: #f59e0b; }
 
-        /* تأثيرات 3D متقدمة */
-        @keyframes float3D {
-            0%, 100% { transform: translate(-50%, -50%) translateZ(0) rotateX(0deg) rotateY(0deg); }
-            25% { transform: translate(-50%, -50%) translateZ(10px) rotateX(5deg) rotateY(5deg); }
-            50% { transform: translate(-50%, -50%) translateZ(20px) rotateX(0deg) rotateY(10deg); }
-            75% { transform: translate(-50%, -50%) translateZ(10px) rotateX(-5deg) rotateY(5deg); }
+        .user-option {
+            display: flex; flex-direction: column; align-items: center; opacity: 0.4;
+            min-width: 55px; cursor: pointer;
+        }
+        .user-option.active { opacity: 1; font-weight: bold; color: #f59e0b; }
+
+        .list-section { margin: 20px 0; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 15px; }
+        .list-section-title { font-size: 14px; font-weight: bold; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .list-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 8px;
+        }
+        .list-item img { width: 40px; height: 40px; border-radius: 50%; }
+        .list-item-info { flex: 1; }
+        .list-item-name { font-size: 13px; font-weight: bold; }
+        .list-item-action {
+            background: rgba(239, 68, 68, 0.2); border: none; color: #ef4444;
+            padding: 6px 12px; border-radius: 8px; font-size: 11px; cursor: pointer;
         }
 
-        @keyframes shimmer {
-            0% { background-position: -1000px 0; }
-            100% { background-position: 1000px 0; }
+        .notification {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 12px 24px;
+            border-radius: 25px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.15);
+            z-index: 3000; animation: slideUp 0.3s ease; display: flex; align-items: center;
+            gap: 10px; max-width: 90%;
         }
+        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
 
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3), 0 0 20px rgba(59, 130, 246, 0.1); }
-            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.3); }
+        .input-box {
+            flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 25px; height: 46px; padding: 0 15px; display: flex; align-items: center;
         }
+        .main-input {
+            background: transparent; border: none; color: #fff; width: 100%;
+            font-size: 14px; font-family: 'Noto Sans Arabic', sans-serif;
+        }
+        .main-input::placeholder { color: rgba(255,255,255,0.4); }
 
-        @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .btn-action {
+            width: 44px; height: 44px; border-radius: 50%; border: none;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            color: white; transition: 0.2s; font-size: 18px;
         }
+        .btn-action:active { transform: scale(0.9); }
 
-        .msg-row { animation: slideInUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); transition: all 0.3s ease; }
-        .msg-row:hover { transform: translateX(-5px); }
-
-        .avatar-wrapper:hover .svga-avatar-frame,
-        .avatar-wrapper:hover .perfect-frame {
-            animation: float3D 4s ease-in-out infinite;
-        }
-
-        .level-badge {
-            animation: glow 2s ease-in-out infinite;
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
-            transition: all 0.3s ease;
-        }
-        .level-badge:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-
-    <header>
+    <header class="glass px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <div class="profile-pill" onclick="openRoomInfo()">
-                <img id="roomOwnerImg" src="" class="w-9 h-9 rounded-full border border-amber-400 object-cover">
-                <div>
-                    <div id="roomName" class="text-xs font-bold text-white leading-tight pl-2">...</div>
-                </div>
+            <div class="relative w-10 h-10 cursor-pointer" onclick="openRoomOwnerProfile()">
+                <img id="roomOwnerImg" src="" class="w-9 h-9 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] object-cover">
+                <img id="roomOwnerFrame" src="" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[46px] h-[46px] z-[2] hidden">
             </div>
-            <!-- أيقونة الإعدادات لمالك الغرفة -->
-            <button id="roomSettingsBtn" class="hidden w-9 h-9 rounded-full glass flex items-center justify-center" onclick="openManagement()">
-                <i data-lucide="settings" class="w-5 h-5 text-white"></i>
-            </button>
+            <div>
+                <span id="roomOwnerId" class="text-[10px] text-amber-400">ID: ---</span>
+                <div id="roomName" class="text-sm font-bold">جاري التحميل...</div>
+            </div>
         </div>
-        <img src="https://i.postimg.cc/nLZZRtK7/8c8ed370_0355_11f1_bf87_6b98a6c1e485.png" class="w-11 h-11 cursor-pointer drop-shadow-lg" onclick="openRanking()" alt="Ranking">
+        <div class="flex gap-2">
+            <button class="w-9 h-9 rounded-full glass flex items-center justify-center" onclick="toggleSheet('activeUsersSheet', true)"><i data-lucide="users" class="w-4 h-4"></i></button>
+            <button id="roomSettingsBtn" class="w-9 h-9 rounded-full glass flex items-center justify-center hidden" onclick="toggleSheet('roomSettingsSheet', true)"><i data-lucide="settings" class="w-4 h-4 text-amber-400"></i></button>
+            <button class="w-9 h-9 rounded-full glass flex items-center justify-center" onclick="leaveRoom()"><i data-lucide="x" class="w-4 h-4"></i></button>
+        </div>
     </header>
 
-    <div id="chatOverlayBg" class="chat-overlay-bg" onclick="closeChatInput()"></div>
-
     <div class="chat-container">
-        <div id="chatArea" class="chat-messages"></div>
+        <div id="chatMessages" class="chat-messages"></div>
     </div>
 
-    <div id="chatInputBar" class="chat-input-area">
-        <input type="text" id="chatInput" class="chat-input" placeholder="اكتب رسالة..." autocomplete="off">
-        <button onclick="sendMsg()" class="bg-violet-600 w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg flex-shrink-0"><i data-lucide="send" class="w-4 h-4"></i></button>
-    </div>
-
-    <footer id="footerDock" class="footer-dock">
-        <div class="dock-group">
-            <img src="https://i.postimg.cc/mrw4K6Vc/aa1d2a10_0349_11f1_b570_e3a84fc27636.png" class="dock-icon" onclick="toggleSheet('giftSheet', true)" alt="Gift">
-            <img src="https://i.postimg.cc/N0YYJw86/b117a9d0_0349_11f1_b570_e3a84fc27636.png" class="dock-icon" onclick="toggleSheet('gamesSheet', true)" alt="Games">
+    <!-- Footer with input -->
+    <footer class="glass px-4 py-3 flex items-center gap-3">
+        <div class="input-box">
+            <input id="chatInput" type="text" class="main-input" placeholder="اكتب رسالة...">
         </div>
-        <div class="dock-group">
-            <img src="https://i.postimg.cc/0y7P0NSs/9c5cb1a0_0355_11f1_bf87_6b98a6c1e485.png" class="dock-icon" onclick="openChatInput()" alt="Chat">
-        </div>
+        <button id="giftBtn" class="btn-action" onclick="toggleSheet('giftSheet', true)">🎁</button>
+        <button id="sendBtn" class="btn-action hidden" onclick="sendMsg()">➤</button>
     </footer>
 
-    <!-- شيت الإدارة -->
-    <div id="managementSheet" class="sheet-overlay" onclick="if(event.target===this)toggleSheet('managementSheet',false)">
-        <div class="bottom-sheet glass-panel p-6">
-            <h3 class="text-xl font-bold mb-6 text-center">إعدادات الغرفة</h3>
-            <div class="space-y-4">
-                <!-- تغيير اسم الغرفة -->
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <label class="text-xs text-gray-400 block mb-2 font-bold">📝 اسم الغرفة</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="roomSettingsName" class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500">
-                        <button onclick="saveRoomSettings('name')" class="bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 rounded-xl text-sm font-bold hover:shadow-lg transition">حفظ</button>
-                    </div>
-                </div>
-
-                <!-- تغيير الخلفية -->
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <label class="text-xs text-gray-400 block mb-2 font-bold">🎨 رابط الخلفية</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="roomSettingsBg" class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-green-500">
-                        <button onclick="saveRoomSettings('background')" class="bg-gradient-to-r from-green-600 to-green-700 px-4 py-2 rounded-xl text-sm font-bold hover:shadow-lg transition">تطبيق</button>
-                    </div>
-                </div>
-
-                <!-- إضافة مشرف -->
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <label class="text-xs text-gray-400 block mb-2 font-bold">👮 إضافة مشرف</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="adminIdInput" class="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-2 text-sm outline-none focus:border-purple-500" placeholder="أدخل ID المستخدم">
-                        <button onclick="addRoomAdmin()" class="bg-gradient-to-r from-purple-600 to-purple-700 px-4 py-2 rounded-xl text-sm font-bold hover:shadow-lg transition">إضافة</button>
-                    </div>
-                </div>
-
-                <!-- قائمة المشرفين -->
-                <div class="bg-white/5 p-4 rounded-2xl border border-white/10">
-                    <label class="text-xs text-gray-400 block mb-2 font-bold">👥 المشرفون</label>
-                    <div id="roomAdminsList" class="space-y-2 max-h-40 overflow-y-auto no-scrollbar">
-                        <!-- قائمة المشرفين -->
-                    </div>
-                </div>
+    <!-- Gift Sheet -->
+    <div id="giftSheet" class="sheet-overlay">
+        <div class="bottom-sheet">
+            <h3 class="text-lg font-bold mb-4">إرسال هدية</h3>
+            <div class="mb-4">
+                <p class="text-sm mb-2">اختر المستقبل:</p>
+                <div id="giftUserSelector" class="flex gap-2 overflow-x-auto pb-2"></div>
             </div>
+            <div class="mb-4">
+                <p class="text-sm mb-2">اختر الهدية:</p>
+                <div id="giftsGrid" class="gifts-grid"></div>
+            </div>
+            <div class="mb-4">
+                <p class="text-sm mb-2">الكمية:</p>
+                <input type="number" id="giftQty" class="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white" value="1" min="1">
+            </div>
+            <div class="text-sm mb-4">رصيدك: <span id="giftBalance">0</span> 🪙</div>
+            <button class="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-2 rounded-lg" onclick="executeGift()">إرسال الهدية</button>
         </div>
     </div>
 
-    <!-- شيت الملف الشخصي -->
-    <div id="profileSheet" class="sheet-overlay" onclick="if(event.target===this)toggleSheet('profileSheet',false)">
-        <div class="bottom-sheet glass-panel p-8 text-center">
-            <div class="avatar-wrapper w-24 h-24 mx-auto mb-4">
-                <img id="p-avatar" src="" class="avatar-img w-20 h-20">
-                <div id="p-frame" class="svga-avatar-frame"></div>
-            </div>
-            <h3 id="p-name" class="text-2xl font-bold mb-1">...</h3>
-            <p id="p-id" class="text-xs text-gray-400 mb-4">ID: ...</p>
+    <!-- Room Settings Sheet -->
+    <div id="roomSettingsSheet" class="sheet-overlay">
+        <div class="bottom-sheet">
+            <h3 class="text-lg font-bold mb-4">إعدادات الغرفة</h3>
             
-            <!-- ميزات الأدمن -->
-            <div id="adminActionsArea" class="hidden mb-4 space-y-2">
-                <!-- تغيير ID -->
-                <div id="adminIdChangeArea" class="hidden p-3 bg-white/5 rounded-2xl border border-white/10">
-                    <p class="text-[10px] text-amber-400 mb-2">تغيير ID المستخدم</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="newUserIdInput" class="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-1 text-xs outline-none">
-                        <button onclick="changeUserCustomId()" class="bg-amber-600 px-3 py-1 rounded-lg text-[10px] font-bold">تغيير</button>
-                    </div>
-                </div>
+            <div class="mb-4">
+                <label class="text-sm mb-2 block">اسم الغرفة</label>
+                <input type="text" id="roomSettingsName" class="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white" placeholder="اسم الغرفة">
+            </div>
 
-                <!-- شحن الرصيد -->
-                <div id="chargeBalanceArea" class="hidden p-3 bg-white/5 rounded-2xl border border-white/10">
-                    <p class="text-[10px] text-green-400 mb-2">شحن الرصيد</p>
-                    <div class="flex gap-2">
-                        <input type="number" id="chargeAmountInput" class="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-1 text-xs outline-none" placeholder="المبلغ">
-                        <button onclick="chargeUserBalance()" class="bg-green-600 px-3 py-1 rounded-lg text-[10px] font-bold">شحن</button>
-                    </div>
-                </div>
+            <div class="mb-4">
+                <label class="text-sm mb-2 block">صورة الغرفة</label>
+                <input type="text" id="roomSettingsImage" class="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white" placeholder="رابط الصورة">
+            </div>
 
-                <!-- حظر المستخدم -->
-                <div id="banUserArea" class="hidden p-3 bg-white/5 rounded-2xl border border-white/10">
-                    <p class="text-[10px] text-red-400 mb-2">حظر المستخدم</p>
-                    <div class="flex gap-2">
-                        <input type="text" id="banReasonInput" class="flex-1 bg-black/20 border border-white/10 rounded-lg px-3 py-1 text-xs outline-none" placeholder="u0633بب الحظر">
-                        <button onclick="banUser()" class="bg-red-600 px-3 py-1 rounded-lg text-[10px] font-bold">حظر</button>
-                    </div>
+            <div class="list-section">
+                <div class="list-section-title">
+                    <i data-lucide="shield" class="w-4 h-4"></i>
+                    <span>المشرفون (<span id="adminsCount">0</span>)</span>
+                </div>
+                <div id="adminsList"></div>
+                <div class="mt-3">
+                    <input type="text" id="newAdminId" class="w-full bg-white/10 border border-white/15 rounded-lg px-3 py-2 text-white mb-2" placeholder="أدخل ID المستخدم">
+                    <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 rounded-lg text-sm" onclick="addAdmin()">إضافة مشرف</button>
                 </div>
             </div>
 
-            <div class="flex justify-center gap-4 mb-6">
-                <div class="text-center">
-                    <div id="p-magic" class="level-badge magic-level px-3 py-1 text-xs mb-1">Lv. 1</div>
-                    <div class="text-[10px] text-gray-400">السحر</div>
+            <div class="list-section">
+                <div class="list-section-title">
+                    <i data-lucide="ban" class="w-4 h-4 text-red-500"></i>
+                    <span>المحظورون (<span id="bannedCount">0</span>)</span>
                 </div>
-                <div class="text-center">
-                    <div id="p-wealth" class="level-badge wealth-level px-3 py-1 text-xs mb-1">Lv. 1</div>
-                    <div class="text-[10px] text-gray-400">الثراء</div>
-                </div>
+                <div id="bannedList"></div>
             </div>
-            <div id="p-badges" class="flex justify-center gap-2 mb-8"></div>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="handleFollow()" class="bg-blue-600 py-3 rounded-2xl font-bold">متابعة</button>
-                <button onclick="handleProfileGift()" class="bg-violet-600 py-3 rounded-2xl font-bold">إرسال هدية</button>
-            </div>
+
+            <button class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 rounded-lg mt-4" onclick="saveRoomSettings()">حفظ الإعدادات</button>
         </div>
     </div>
 
-    <!-- شيت الهدايا -->
-    <div id="giftSheet" class="sheet-overlay" onclick="if(event.target===this)toggleSheet('giftSheet',false)">
-        <div class="bottom-sheet glass-panel p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-bold">إرسال هدايا</h3>
-                <div class="flex items-center gap-1 bg-amber-400/20 px-3 py-1 rounded-full border border-amber-400/30">
-                    <span id="giftBalance" class="text-amber-400 font-bold text-sm">0</span>
-                    <i data-lucide="coins" class="w-3 h-3 text-amber-400"></i>
-                </div>
-            </div>
-            <div id="giftsGrid" class="grid grid-cols-4 gap-3 mb-6 max-h-60 overflow-y-auto no-scrollbar"></div>
-            <button onclick="executeGift()" class="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 py-4 rounded-2xl font-bold shadow-lg">إرسال</button>
+    <!-- Active Users Sheet -->
+    <div id="activeUsersSheet" class="sheet-overlay">
+        <div class="bottom-sheet">
+            <h3 class="text-lg font-bold mb-4">المستخدمون النشطون</h3>
+            <div id="activeUsersList" class="space-y-2"></div>
         </div>
     </div>
 
-    <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc, onSnapshot, collection, query, where, getDocs, setDoc, increment, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getDatabase, ref, onValue, push, set, serverTimestamp, onChildAdded } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    <script>
+        // متغيرات عامة
+        let currentUser = null;
+        let currentUserData = {};
+        let roomId = null;
+        let roomType = 'public';
+        let roomData = {};
+        let roomAdmins = [];
+        let bannedUsers = [];
+        let isRoomOwner = false;
+        let activeUsers = {};
+        let selectedGift = null;
+        let selectedRecipient = null;
+        let messagesUnsub = null;
+        let activeUsersUnsub = null;
 
-    const firebaseConfig = { apiKey: "AIzaSyBnmqWRY6lV54meFvO89QeXwtd28w81FcY", authDomain: "rtx3090-28439.firebaseapp.com", projectId: "rtx3090-28439", storageBucket: "rtx3090-28439.firebasestorage.app", messagingSenderId: "178612030690", appId: "1:178612030690:web:883189ced2ed3a78e3e2bb", databaseURL: "https://rtx3090-28439-default-rtdb.firebaseio.com/" };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const rtdb = getDatabase(app);
+        // بيانات المتجر
+        const storeData = {
+            gifts: [
+                { id: 'rose', name: 'وردة', icon: '🌹', price: 100, type: 'gift', reward: 50 },
+                { id: 'heart', name: 'قلب', icon: '❤️', price: 150, type: 'gift', reward: 75 },
+                { id: 'diamond', name: 'ماس', icon: '💎', price: 500, type: 'gift', reward: 250 },
+                { id: 'crown', name: 'تاج', icon: '👑', price: 1000, type: 'gift', reward: 500 }
+            ],
+            itemsById: {}
+        };
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomId = urlParams.get('id');
-    const roomType = urlParams.get('type') || 'public';
-    const ADMIN_UID = "rtx3090_owner_id"; // معرف مالك التطبيق
+        // تهيئة البيانات
+        storeData.gifts.forEach(g => storeData.itemsById[g.id] = g);
 
-    let currentUser = null, currentUserData = null, roomData = null;
-    let activeUsers = {}, storeData = { itemsById: {}, gifts: [] };
-    const svgaParser = new SVGAParser(), activeSvgaPlayers = {};
+        // تحميل الغرفة
+        async function loadRoom() {
+            const params = new URLSearchParams(window.location.search);
+            roomId = params.get('roomId');
+            roomType = params.get('type') || 'public';
 
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            const snap = await getDoc(doc(db, 'users', user.uid));
-            if (snap.exists()) {
-                currentUserData = { uid: user.uid, ...snap.data() };
-                initRoom();
-                loadStoreData();
+            if (!roomId) {
+                alert('معرف الغرفة غير صحيح');
+                window.location.href = 'afnan_ai_white.html';
+                return;
             }
-        } else window.location.href = 'login.html';
-    });
 
-    async function loadStoreData() {
-        const snap = await getDocs(collection(db, 'store'));
-        snap.forEach(d => {
-            const item = { id: d.id, ...d.data() };
-            storeData.itemsById[d.id] = item;
-            if(item.type === 'gift') storeData.gifts.push(item);
-        });
-    }
+            // تحميل بيانات وهمية للاختبار
+            roomData = {
+                id: roomId,
+                name: 'غرفة الدردشة',
+                owner: 'owner123',
+                image: 'https://via.placeholder.com/50'
+            };
 
-    async function initRoom() {
-        const roomRef = doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId);
-        onSnapshot(roomRef, (snap) => {
-            if(snap.exists()) {
-                roomData = { id: snap.id, ...snap.data() };
-                document.getElementById('roomName').innerText = roomData.name;
-                document.getElementById('roomOwnerImg').src = roomData.ownerPhoto || 'https://via.placeholder.com/100';
-                if(roomData.background) document.body.style.background = `url(${roomData.background}) center/cover no-repeat fixed`;
-                
-                // إظهار زر الإعدادات للمالك أو المشرفين
-                if(currentUser.uid === roomData.owner || (roomData.admins || []).includes(currentUser.uid)) {
-                    document.getElementById('roomSettingsBtn').classList.remove('hidden');
-                    renderAdminsList();
-                }
-            }
-        });
+            currentUser = { uid: 'user123' };
+            currentUserData = {
+                displayName: 'المستخدم',
+                photoURL: 'https://i.pravatar.cc/100',
+                balance: 5000,
+                magicLevel: 5,
+                wealthLevel: 3
+            };
 
-        // الاستماع للرسائل
-        const messagesRef = ref(rtdb, `roomMessages/${roomId}`);
-        onChildAdded(messagesRef, (snap) => {
-            renderMessage(snap.val());
-            scrollToBottom();
-        });
-    }
+            isRoomOwner = true;
+            roomAdmins = [];
+            bannedUsers = [];
 
-    function renderMessage(msg) {
-        const area = document.getElementById('chatArea');
-        const row = document.createElement('div');
-        row.className = 'msg-row slide-in-right';
-        
-        if(msg.type === 'chat') {
-            const frameHtml = msg.activeFrame ? `<div class="svga-avatar-frame" id="frame-${msg.id}"></div>` : '';
-            row.innerHTML = `
-                <div class="avatar-wrapper" onclick="openUserProfile('${msg.senderId}')">
-                    <img src="${msg.photoURL || 'https://via.placeholder.com/100'}" class="avatar-img">
-                    ${frameHtml}
+            document.getElementById('roomName').textContent = roomData.name;
+            document.getElementById('roomOwnerId').textContent = 'ID: owner123';
+            document.getElementById('roomSettingsBtn').classList.toggle('hidden', !isRoomOwner);
+
+            renderActiveUsers();
+            loadMessages();
+        }
+
+        // تحميل الرسائل
+        function loadMessages() {
+            const chatArea = document.getElementById('chatMessages');
+            chatArea.innerHTML = `
+                <div class="msg-row">
+                    <div class="avatar-wrapper">
+                        <img class="avatar-img" src="https://i.pravatar.cc/100">
+                    </div>
+                    <div class="msg-body">
+                        <div class="msg-info">
+                            <span class="msg-name">المستخدم</span>
+                            <span class="level-badge magic-level">سحر: 5</span>
+                            <span class="level-badge wealth-level">ثراء: 3</span>
+                        </div>
+                        <div class="msg-content">مرحباً بك في الغرفة!</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // إرسال رسالة
+        window.sendMsg = () => {
+            const input = document.getElementById('chatInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            const chatArea = document.getElementById('chatMessages');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'msg-row';
+            msgDiv.innerHTML = `
+                <div class="avatar-wrapper">
+                    <img class="avatar-img" src="${currentUserData.photoURL}">
                 </div>
                 <div class="msg-body">
                     <div class="msg-info">
-                        <span class="msg-name">${msg.senderName}</span>
-                        <span class="level-badge magic-level">Lv. ${msg.magicLevel || 1}</span>
-                        <span class="text-[9px] text-gray-500">ID: ${msg.customId || msg.senderId.substring(0,6)}</span>
+                        <span class="msg-name">${currentUserData.displayName}</span>
+                        <span class="level-badge magic-level">سحر: ${currentUserData.magicLevel}</span>
+                        <span class="level-badge wealth-level">ثراء: ${currentUserData.wealthLevel}</span>
                     </div>
-                    <div class="msg-content">${msg.text}</div>
+                    <div class="msg-content">${msg}</div>
                 </div>
             `;
-            if(msg.activeFrame) {
-                const item = storeData.itemsById[msg.activeFrame];
-                if(item?.itemType === 'svga') {
-                    setTimeout(() => playSvga(item.fileUrl, row.querySelector(`#frame-${msg.id}`)), 100);
-                } else if(item?.image) {
-                    row.querySelector('.avatar-wrapper').innerHTML += `<img src="${item.image}" class="perfect-frame">`;
-                }
-            }
+            chatArea.appendChild(msgDiv);
+            input.value = '';
+            chatArea.scrollTop = chatArea.scrollHeight;
+        };
+
+        // عرض المستخدمين النشطين
+        function renderActiveUsers() {
+            const container = document.getElementById('activeUsersList');
+            container.innerHTML = `
+                <div class="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
+                    <img src="https://i.pravatar.cc/100" class="w-10 h-10 rounded-full">
+                    <div class="flex-1">
+                        <div class="font-bold text-sm">المستخدم</div>
+                        <div class="text-xs text-gray-400">نشط الآن</div>
+                    </div>
+                </div>
+            `;
         }
-        area.appendChild(row);
-    }
 
-    window.openChatInput = () => {
-        document.getElementById('chatInputBar').classList.add('active');
-        document.getElementById('chatOverlayBg').classList.add('active');
-        document.getElementById('footerDock').classList.add('hidden-dock');
-        document.getElementById('chatInput').focus();
-    };
+        // إرسال الهدية
+        window.executeGift = () => {
+            if (!selectedGift || !selectedRecipient) {
+                showNotification('اختر هدية ومستقبلاً');
+                return;
+            }
+            const qty = parseInt(document.getElementById('giftQty').value) || 1;
+            const cost = selectedGift.price * qty;
+            if ((currentUserData.balance || 0) < cost) {
+                showNotification('رصيدك غير كافٍ');
+                return;
+            }
+            currentUserData.balance -= cost;
+            toggleSheet('giftSheet', false);
+            showNotification(`تم إرسال ${selectedGift.name} إلى المستقبل`);
+        };
 
-    window.closeChatInput = () => {
-        document.getElementById('chatInputBar').classList.remove('active');
-        document.getElementById('chatOverlayBg').classList.remove('active');
-        document.getElementById('footerDock').classList.remove('hidden-dock');
-    };
+        // اختيار الهدية
+        window.selectGift = (id) => {
+            selectedGift = storeData.gifts.find(g => g.id === id);
+            renderGifts();
+        };
 
-    window.sendMsg = async () => {
-        const input = document.getElementById('chatInput');
-        const text = input.value.trim();
-        if(!text) return;
-        
-        const msgId = Date.now();
-        await push(ref(rtdb, `roomMessages/${roomId}`), {
-            id: msgId,
-            type: 'chat',
-            senderId: currentUser.uid,
-            senderName: currentUserData.displayName,
-            photoURL: currentUserData.photoURL,
-            customId: currentUserData.customId || currentUser.uid.substring(0,6),
-            activeFrame: currentUserData.activeFrame,
-            magicLevel: currentUserData.magicLevel || 1,
-            text: text,
-            timestamp: serverTimestamp()
-        });
-        
-        input.value = '';
-        closeChatInput(); // يختفي تماماً بعد الإرسال
-    };
+        // عرض الهدايا
+        window.renderGifts = () => {
+            document.getElementById('giftsGrid').innerHTML = storeData.gifts.map(g => `
+                <div class="gift-card ${selectedGift?.id === g.id ? 'selected' : ''}" onclick="selectGift('${g.id}')">
+                    <div class="gift-icon">${g.icon}</div>
+                    <span class="text-[10px] text-center">${g.name}</span>
+                    <span class="gift-price">${g.price} 🪙</span>
+                </div>
+            `).join('');
+            document.getElementById('giftBalance').textContent = currentUserData.balance || 0;
+        };
 
-    window.openUserProfile = async (uid) => {
-        const snap = await getDoc(doc(db, 'users', uid));
-        if(snap.exists()) {
-            const u = snap.data();
-            window.currentProfileUser = { uid, ...u };
-            document.getElementById('p-avatar').src = u.photoURL || 'https://via.placeholder.com/150';
-            document.getElementById('p-name').innerText = u.displayName;
-            document.getElementById('p-id').innerText = `ID: ${u.customId || uid.substring(0,6)}`;
-            document.getElementById('p-magic').innerText = `Lv. ${u.magicLevel || 1}`;
-            document.getElementById('p-wealth').innerText = `Lv. ${u.wealthLevel || 1}`;
+        // إضافة مشرف
+        window.addAdmin = () => {
+            const id = document.getElementById('newAdminId').value.trim();
+            if (!id) {
+                showNotification('أدخل ID المستخدم');
+                return;
+            }
+            roomAdmins.push(id);
+            document.getElementById('newAdminId').value = '';
+            updateSettingsLists();
+            showNotification('تم إضافة المشرف');
+        };
+
+        // حذف مشرف
+        window.removeAdmin = (id) => {
+            roomAdmins = roomAdmins.filter(a => a !== id);
+            updateSettingsLists();
+            showNotification('تم إلغاء الأدمنية');
+        };
+
+        // حظر مستخدم
+        window.banUser = (id) => {
+            if (!bannedUsers.includes(id)) {
+                bannedUsers.push(id);
+                updateSettingsLists();
+                showNotification('تم حظر المستخدم');
+            }
+        };
+
+        // إلغاء الحظر
+        window.unbanUser = (id) => {
+            bannedUsers = bannedUsers.filter(b => b !== id);
+            updateSettingsLists();
+            showNotification('تم إلغاء الحظر');
+        };
+
+        // تحديث قوائم الإعدادات
+        async function updateSettingsLists() {
+            const adminsList = document.getElementById('adminsList');
+            const bannedList = document.getElementById('bannedList');
             
-            // إظهار منطقة أدوات الأدمن فقط
-            const adminArea = document.getElementById('adminActionsArea');
-            if(currentUser.uid === ADMIN_UID) {
-                adminArea.classList.remove('hidden');
-                document.getElementById('adminIdChangeArea').classList.remove('hidden');
-                document.getElementById('chargeBalanceArea').classList.remove('hidden');
-                document.getElementById('banUserArea').classList.remove('hidden');
-                document.getElementById('newUserIdInput').value = u.customId || "";
-            } else {
-                adminArea.classList.add('hidden');
-            }
-
-            // تحميل الإطار
-            const frameContainer = document.getElementById('p-frame');
-            frameContainer.innerHTML = '';
-            if(u.activeFrame) {
-                const item = storeData.itemsById[u.activeFrame];
-                if(item?.itemType === 'svga') playSvga(item.fileUrl, frameContainer);
-                else if(item?.image) frameContainer.innerHTML = `<img src="${item.image}" class="perfect-frame">`;
-            }
-
-            toggleSheet('profileSheet', true);
-        }
-    };
-
-    window.openManagement = () => {
-        if(currentUser.uid === roomData.owner || (roomData.admins || []).includes(currentUser.uid)) {
-            document.getElementById('roomSettingsName').value = roomData.name || '';
-            document.getElementById('roomSettingsBg').value = roomData.background || '';
-            toggleSheet('managementSheet', true);
-        } else {
-            alert('فقط مالك الغرفة أو المشرفون يمكنهم الوصول للإعدادات');
-        }
-    };
-
-    window.openRoomInfo = () => {
-        alert(`الغرفة: ${roomData.name}\nالمالك: ${roomData.ownerName || 'مستخدم'}`);
-    };
-
-    window.openRanking = () => {
-        alert('ترتيب الغرفة قريباً');
-    };
-
-    window.changeUserCustomId = async () => {
-        const newId = document.getElementById('newUserIdInput').value.trim();
-        if(!newId) return alert('أدخل ID صالح');
-        try {
-            await updateDoc(doc(db, 'users', window.currentProfileUser.uid), { customId: newId });
-            alert('تم تغيير الـ ID بنجاح');
-            document.getElementById('p-id').innerText = `ID: ${newId}`;
-        } catch (e) { alert('خطأ في التغيير'); }
-    };
-
-    window.chargeUserBalance = async () => {
-        const amount = parseInt(document.getElementById('chargeAmountInput').value);
-        if(!amount || amount <= 0) return alert('أدخل مبلغ صالح');
-        try {
-            await updateDoc(doc(db, 'users', window.currentProfileUser.uid), {
-                balance: increment(amount)
-            });
-            alert(`تم شحن ${amount} عملة`);
-            document.getElementById('chargeAmountInput').value = '';
-        } catch (e) { alert('خطأ في الشحن'); }
-    };
-
-    window.banUser = async () => {
-        const reason = document.getElementById('banReasonInput').value.trim();
-        if(!reason) return alert('أدخل سبب الحظر');
-        try {
-            await updateDoc(doc(db, 'users', window.currentProfileUser.uid), {
-                isBanned: true,
-                banReason: reason,
-                bannedAt: new Date()
-            });
-            alert('تم حظر المستخدم');
-            document.getElementById('banReasonInput').value = '';
-        } catch (e) { alert('خطأ في الحظر'); }
-    };
-
-    window.saveRoomSettings = async (field) => {
-        const inputId = field === 'name' ? 'roomSettingsName' : 'roomSettingsBg';
-        const val = document.getElementById(inputId).value.trim();
-        if(!val) return;
-        await updateDoc(doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId), { [field]: val });
-        alert('تم الحفظ');
-    };
-
-    window.addRoomAdmin = async () => {
-        const adminId = document.getElementById('adminIdInput').value.trim();
-        if(!adminId) return alert('أدخل ID صالح');
-        
-        // البحث عن المستخدم عبر الـ customId أو الـ uid
-        const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('customId', '==', adminId));
-        const snap = await getDocs(q);
-        
-        let targetUid = null;
-        if(!snap.empty) targetUid = snap.docs[0].id;
-        else targetUid = adminId; // نفترض أنه UID إذا لم نجد customId
-
-        await updateDoc(doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId), {
-            admins: arrayUnion(targetUid)
-        });
-        alert('تمت إضافة المشرف');
-        document.getElementById('adminIdInput').value = '';
-        renderAdminsList();
-    };
-
-    async function renderAdminsList() {
-        const list = document.getElementById('roomAdminsList');
-        list.innerHTML = '';
-        const admins = roomData.admins || [];
-        for(const uid of admins) {
-            const snap = await getDoc(doc(db, 'users', uid));
-            const name = snap.exists() ? snap.data().displayName : uid;
-            list.innerHTML += `
-                <div class="flex justify-between items-center bg-white/5 p-2 rounded-lg">
-                    <span class="text-xs">${name}</span>
-                    <button onclick="removeRoomAdmin('${uid}')" class="text-red-500 text-[10px]">حذف</button>
+            document.getElementById('adminsCount').textContent = roomAdmins.length;
+            document.getElementById('bannedCount').textContent = bannedUsers.length;
+            
+            adminsList.innerHTML = roomAdmins.map(id => `
+                <div class="list-item">
+                    <img src="https://i.pravatar.cc/100">
+                    <div class="list-item-info">
+                        <div class="list-item-name">${id}</div>
+                    </div>
+                    <button class="list-item-action" onclick="removeAdmin('${id}')">إلغاء</button>
                 </div>
-            `;
-        }
-    }
+            `).join('');
 
-    window.removeRoomAdmin = async (uid) => {
-        if(!confirm('حذف المشرف؟')) return;
-        await updateDoc(doc(db, roomType === 'private' ? 'privateRooms' : 'rooms', roomId), {
-            admins: arrayRemove(uid)
+            bannedList.innerHTML = bannedUsers.map(id => `
+                <div class="list-item">
+                    <img src="https://i.pravatar.cc/100">
+                    <div class="list-item-info">
+                        <div class="list-item-name">${id}</div>
+                    </div>
+                    <button class="list-item-action" onclick="unbanUser('${id}')">إلغاء الحظر</button>
+                </div>
+            `).join('');
+        }
+
+        // حفظ إعدادات الغرفة
+        window.saveRoomSettings = () => {
+            const name = document.getElementById('roomSettingsName').value.trim();
+            if (!name) {
+                showNotification('أدخل اسم الغرفة');
+                return;
+            }
+            roomData.name = name;
+            document.getElementById('roomName').textContent = name;
+            showNotification('تم حفظ الإعدادات');
+            toggleSheet('roomSettingsSheet', false);
+        };
+
+        // تبديل الـ Sheet
+        window.toggleSheet = (id, show) => {
+            const sheet = document.getElementById(id);
+            if (show) {
+                sheet.classList.add('show');
+                if (id === 'giftSheet') {
+                    renderGifts();
+                    selectedGift = storeData.gifts[0];
+                }
+                if (id === 'roomSettingsSheet' && isRoomOwner) {
+                    document.getElementById('roomSettingsName').value = roomData.name || '';
+                    updateSettingsLists();
+                }
+            } else {
+                sheet.classList.remove('show');
+            }
+        };
+
+        // مغادرة الغرفة
+        window.leaveRoom = () => {
+            if (confirm('هل تريد مغادرة الغرفة؟')) {
+                window.location.href = 'afnan_ai_white.html';
+            }
+        };
+
+        // فتح ملف المستخدم
+        window.openRoomOwnerProfile = () => {
+            showNotification('ملف صاحب الغرفة');
+        };
+
+        // عرض الإشعار
+        function showNotification(msg) {
+            const div = document.createElement('div');
+            div.className = 'notification';
+            div.innerHTML = `<span>${msg.includes('✓') || msg.includes('تم') ? '✓' : '💬'}</span><span>${msg}</span>`;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // معالجات الإدخال
+        document.getElementById('chatInput').addEventListener('focus', () => {
+            document.getElementById('giftBtn').classList.add('hidden');
+            document.getElementById('sendBtn').classList.remove('hidden');
         });
-        renderAdminsList();
-    };
 
-    function playSvga(url, container) {
-        if(!container) return;
-        const canvas = document.createElement('canvas');
-        container.appendChild(canvas);
-        const player = new SVGA.Player(canvas);
-        const parser = new SVGA.Parser();
-        parser.load(url, (videoItem) => {
-            player.setVideoItem(videoItem);
-            player.startAnimation();
+        document.getElementById('chatInput').addEventListener('blur', () => {
+            setTimeout(() => {
+                document.getElementById('giftBtn').classList.remove('hidden');
+                document.getElementById('sendBtn').classList.add('hidden');
+            }, 200);
         });
-    }
 
-    window.toggleSheet = (id, show) => {
-        const sheet = document.getElementById(id);
-        if(show) {
-            sheet.classList.add('show');
-        } else {
-            sheet.classList.remove('show');
-        }
-    };
+        document.getElementById('chatInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMsg();
+        });
 
-    // إضافة دعم الإغلاق بالضغط على Escape
-    document.addEventListener('keydown', (e) => {
-        if(e.key === 'Escape') {
-            document.querySelectorAll('.sheet-overlay.show').forEach(s => s.classList.remove('show'));
-        }
-    });
-
-    function scrollToBottom() {
-        const area = document.getElementById('chatArea');
-        area.scrollTop = area.scrollHeight;
-    }
-
-    // دوال إضافية للهدايا والألعاب
-    window.handleFollow = () => alert('تم المتابعة');
-    window.handleProfileGift = () => toggleSheet('giftSheet', true);
-    window.executeGift = () => alert('تم إرسال الهدية');
-
-    lucide.createIcons();
+        // تهيئة التطبيق
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRoom();
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>
-
