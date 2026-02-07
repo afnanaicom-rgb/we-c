@@ -6,6 +6,7 @@
     <title>الغرفة</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svgaplayerweb@2.3.1/build/svga.min.js"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Noto Sans Arabic', sans-serif; touch-action: manipulation }
         body { 
@@ -52,10 +53,15 @@
             max-width: 85%; 
             animation: slideIn 0.3s ease 
         }
-        .msg-avatar-wrapper { position: relative; width: 45px; height: 45px; flex-shrink: 0 }
+        .msg-avatar-wrapper { 
+            position: relative; 
+            width: 50px; 
+            height: 50px; 
+            flex-shrink: 0;
+        }
         .msg-avatar { 
-            width: 38px; 
-            height: 38px; 
+            width: 42px; 
+            height: 42px; 
             border-radius: 50%; 
             cursor: pointer; 
             position: absolute; 
@@ -66,16 +72,20 @@
             object-fit: cover;
             border: 2px solid rgba(255,255,255,0.3);
         }
-        .msg-frame { 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            transform: translate(-50%, -50%); 
-            width: 52px; 
-            height: 52px; 
-            z-index: 2; 
-            pointer-events: none; 
-            object-fit: contain 
+        .msg-frame-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .msg-frame-container img, .msg-frame-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
         }
         .msg-user { 
             font-size: 11px; 
@@ -88,14 +98,18 @@
             flex-wrap: wrap 
         }
         .msg-text { font-size: 13px; line-height: 1.5; color: #eee; word-break: break-word }
-        .badge { font-size: 8px; padding: 2px 6px; border-radius: 10px; font-weight: bold }
-        .b-wealth { background: #facc15; color: #000 }
-        .b-magic { background: #d946ef; color: #fff }
         .owner-icon { color: #22c55e; font-size: 12px }
         .admin-icon { color: #fbbf24; font-size: 12px }
-        .active-badges { display: flex; gap: 2px; margin-right: 5px }
-        .active-badge { width: 16px; height: 16px; border-radius: 4px; overflow: hidden }
-        .active-badge img { width: 100%; height: 100%; object-fit: cover }
+        .badges-row {
+            display: flex;
+            gap: 3px;
+            margin-right: 5px;
+        }
+        .badge-img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
         .system-msg { 
             background: rgba(245, 158, 11, 0.2); 
             color: #f59e0b; 
@@ -193,17 +207,31 @@
             font-weight: bold;
         }
         
-        /* Trophy Button */
-        .trophy-btn {
+        /* Control Buttons */
+        .control-btns {
             position: fixed;
             top: 80px;
             left: 15px;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             z-index: 100;
-            object-fit: contain;
         }
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #fff;
+            font-size: 18px;
+        }
+        .control-btn:hover { background: rgba(255,255,255,0.1); }
         
         /* Sheet Overlay */
         .sheet-overlay { 
@@ -310,7 +338,7 @@
             background: rgba(255,255,255,0.1);
             border-color: rgba(255,255,255,0.2);
         }
-        .game-card i {
+        .game-card span:first-child {
             font-size: 40px;
             margin-bottom: 10px;
             display: block;
@@ -337,10 +365,10 @@
         .admin-btn:hover {
             background: rgba(255,255,255,0.1);
         }
-        .admin-btn i {
-            font-size: 24px;
+        .admin-btn span:first-child {
+            font-size: 28px;
         }
-        .admin-btn span {
+        .admin-btn span:last-child {
             font-size: 11px;
             color: #ccc;
         }
@@ -523,15 +551,20 @@
             z-index: 1;
             border: 3px solid rgba(255,255,255,0.3);
         }
-        .profile-frame {
+        .profile-frame-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 115px;
-            height: 115px;
+            width: 120px;
+            height: 120px;
             z-index: 2;
             pointer-events: none;
+        }
+        .profile-frame-container img, .profile-frame-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
         }
         .tool-btn { 
             width: 50px; 
@@ -555,6 +588,65 @@
         .tool-btn.kick { color: #f97316 }
         .tool-btn.admin { color: #fbbf24 }
         
+        /* Entrance Animation */
+        .entrance-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        .entrance-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .entrance-container {
+            width: 300px;
+            height: 300px;
+            position: relative;
+        }
+        .entrance-container canvas, .entrance-container img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
+        }
+        .entrance-text {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            white-space: nowrap;
+        }
+        .entrance-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f59e0b;
+            text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        }
+        .entrance-level {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+        
+        /* Level Display */
+        .level-display {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .level-img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+        
         .hidden { display: none !important }
     </style>
 <base target="_blank">
@@ -563,9 +655,23 @@
     <div class="room-bg"></div>
     <div id="joinNotifications"></div>
     
+    <!-- Entrance Animation -->
+    <div id="entranceOverlay" class="entrance-overlay">
+        <div class="entrance-container">
+            <div id="entranceAnimation"></div>
+            <div class="entrance-text">
+                <div class="entrance-name" id="entranceName"></div>
+                <div class="entrance-level" id="entranceLevel"></div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Top Bar -->
     <div class="top-bar">
-        <img src="https://i.postimg.cc/nLZZRtK7/8c8ed370_0355_11f1_bf87_6b98a6c1e485.png" class="trophy-btn" onclick="toggleSheet('trophySheet', true)" alt="Trophy">
+        <div class="control-btns">
+            <button class="control-btn" onclick="minimizeRoom()" title="تصغير">➖</button>
+            <button class="control-btn" onclick="leaveRoom()" title="خروج">✕</button>
+        </div>
         <div class="room-info" onclick="openRoomOwnerProfile()">
             <img id="roomOwnerImg" src="" alt="Owner">
             <div>
@@ -573,7 +679,7 @@
                 <div style="font-size: 10px; color: #aaa;" id="roomOwnerId">ID: ---</div>
             </div>
         </div>
-        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828778.png" class="top-icon" onclick="leaveRoom()" alt="Exit" style="filter: invert(1);">
+        <img src="https://i.postimg.cc/nLZZRtK7/8c8ed370_0355_11f1_bf87_6b98a6c1e485.png" class="top-icon" onclick="toggleSheet('trophySheet', true)" alt="Trophy">
     </div>
     
     <!-- Main Content - Chat Only -->
@@ -586,8 +692,6 @@
         <img src="https://i.postimg.cc/mrw4K6Vc/aa1d2a10_0349_11f1_b570_e3a84fc27636.png" class="bottom-icon" onclick="toggleSheet('giftSheet', true)" alt="Gift Box">
         <img src="https://i.postimg.cc/N0YYJw86/b117a9d0_0349_11f1_b570_e3a84fc27636.png" class="bottom-icon small" onclick="toggleSheet('gamesSheet', true)" alt="Games">
         <img src="https://cdn-icons-png.flaticon.com/512/742/742751.png" class="bottom-icon small" onclick="toggleSheet('emojiSheet', true)" alt="Emoji" style="filter: invert(1);">
-        <img src="https://cdn-icons-png.flaticon.com/512/709/709682.png" class="bottom-icon small" onclick="toggleMic()" alt="Mic" id="micIcon" style="filter: invert(1);">
-        <img src="https://cdn-icons-png.flaticon.com/512/727/727269.png" class="bottom-icon small" onclick="toggleSound()" alt="Sound" id="soundIcon" style="filter: invert(1);">
         <img src="https://i.postimg.cc/SKqqTpLj/9316e250_0355_11f1_bf87_6b98a6c1e485.png" class="bottom-icon small" onclick="toggleSheet('adminSheet', true)" alt="Admin" id="adminBtn" style="display: none;">
         <img src="https://i.postimg.cc/0y7P0NSs/9c5cb1a0_0355_11f1_bf87_6b98a6c1e485.png" class="bottom-icon" onclick="toggleSheet('chatSheet', true)" alt="Chat">
     </div>
@@ -646,19 +750,19 @@
             <h3 style="text-align: center; margin-bottom: 15px;">الألعاب</h3>
             <div class="games-grid">
                 <div class="game-card" onclick="showNotification('قريباً')">
-                    <span style="font-size: 40px;">🎲</span>
+                    <span>🎲</span>
                     <span style="font-size: 14px; font-weight: bold;">النرد</span>
                 </div>
                 <div class="game-card" onclick="showNotification('قريباً')">
-                    <span style="font-size: 40px;">🎯</span>
+                    <span>🎯</span>
                     <span style="font-size: 14px; font-weight: bold;">السهم</span>
                 </div>
                 <div class="game-card" onclick="showNotification('قريباً')">
-                    <span style="font-size: 40px;">🎰</span>
+                    <span>🎰</span>
                     <span style="font-size: 14px; font-weight: bold;">الحظ</span>
                 </div>
                 <div class="game-card" onclick="showNotification('قريباً')">
-                    <span style="font-size: 40px;">⚽</span>
+                    <span>⚽</span>
                     <span style="font-size: 14px; font-weight: bold;">كرة القدم</span>
                 </div>
             </div>
@@ -672,19 +776,19 @@
             <h3 style="text-align: center; margin-bottom: 15px;">لوحة الإدارة</h3>
             <div class="admin-grid">
                 <div class="admin-btn" onclick="toggleSheet('roomSettingsSheet', true); toggleSheet('adminSheet', false);">
-                    <span style="font-size: 28px;">⚙️</span>
+                    <span>⚙️</span>
                     <span>الإعدادات</span>
                 </div>
                 <div class="admin-btn" onclick="toggleSheet('activeUsersSheet', true); toggleSheet('adminSheet', false);">
-                    <span style="font-size: 28px;">👥</span>
+                    <span>👥</span>
                     <span>المستخدمون</span>
                 </div>
                 <div class="admin-btn" onclick="confirmDeleteChat()">
-                    <span style="font-size: 28px;">🗑️</span>
+                    <span>🗑️</span>
                     <span>حذف الشات</span>
                 </div>
                 <div class="admin-btn" onclick="showNotification('قريباً')">
-                    <span style="font-size: 28px;">📊</span>
+                    <span>📊</span>
                     <span>الإحصائيات</span>
                 </div>
             </div>
@@ -745,7 +849,7 @@
             <div class="text-center">
                 <div class="profile-avatar-wrapper">
                     <img id="p-img" src="" class="profile-avatar">
-                    <img id="p-frame" src="" class="profile-frame hidden">
+                    <div id="p-frame-container" class="profile-frame-container"></div>
                 </div>
                 <h3 id="p-name" style="font-size: 18px; font-weight: bold; margin-bottom: 5px;">...</h3>
                 <p id="p-id" style="color: #888; font-size: 12px;">ID: ---</p>
@@ -763,7 +867,7 @@
                 
                 <div id="p-badges" style="display: flex; justify-content: center; gap: 5px; margin-bottom: 20px;"></div>
                 
-                <div style="display: flex; flex-wrap: justify-content: center; gap: 10px; justify-content: center;">
+                <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;">
                     <button class="tool-btn gift" onclick="handleProfileGift()" title="إرسال هدية">🎁</button>
                     <button class="tool-btn mention" onclick="handleProfileMention()" title="ذكر">@</button>
                     <button id="followBtn" class="tool-btn" style="width: 100px; font-size: 12px; font-weight: bold;" onclick="handleFollow()">متابعة</button>
@@ -803,10 +907,30 @@
         let selectedRecipient = null, selectedGift = null, activeUsers = {}, joinedUsers = new Set();
         let messagesUnsub = null, activeUsersUnsub = null, roomUnsub = null;
         let giftLeaders = [];
+        let entranceShown = false;
+        const activeSvgaPlayers = {};
 
         const urlParams = new URLSearchParams(window.location.search);
         roomId = urlParams.get('id');
         roomType = urlParams.get('type') || 'public';
+
+        // Get Level Info (same as main page)
+        function getLevelInfo(totalPoints) {
+            let level = 1, remaining = totalPoints;
+            const getThreshold = (lvl) => {
+                if (lvl === 1) return 50000;
+                if (lvl === 2) return 100000;
+                if (lvl === 3) return 150000;
+                if (lvl === 4) return 225000;
+                return Math.floor(225000 * Math.pow(1.5, lvl - 4));
+            };
+            while (level < 100) {
+                const threshold = getThreshold(level);
+                if (remaining >= threshold) { remaining -= threshold; level++; }
+                else break;
+            }
+            return { level, currentPoints: remaining, nextThreshold: getThreshold(level) };
+        }
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -821,7 +945,14 @@
 
         async function loadUserData(uid) {
             const snap = await getDoc(doc(db, 'users', uid));
-            if (snap.exists()) currentUserData = { uid, ...snap.data() };
+            if (snap.exists()) {
+                currentUserData = { uid, ...snap.data() };
+                // Calculate levels
+                const magicInfo = getLevelInfo(currentUserData.magicPoints || 0);
+                const wealthInfo = getLevelInfo(currentUserData.wealthPoints || 0);
+                currentUserData.magicLevel = magicInfo.level;
+                currentUserData.wealthLevel = wealthInfo.level;
+            }
         }
 
         async function loadStoreData() {
@@ -872,6 +1003,50 @@
             }
         }
 
+        function playSvga(url, container, options = {}) {
+            container.innerHTML = '';
+            const player = new SVGA.Player(container);
+            const parser = new SVGA.Parser();
+            parser.load(url, (videoItem) => { 
+                player.setVideoItem(videoItem); 
+                player.loops = options.loops || 0; 
+                player.clearsAfterStop = options.clearsAfterStop || false; 
+                player.startAnimation();
+            });
+            return player;
+        }
+
+        function showEntranceAnimation(user) {
+            if (entranceShown) return;
+            entranceShown = true;
+            
+            const overlay = document.getElementById('entranceOverlay');
+            const container = document.getElementById('entranceAnimation');
+            const nameEl = document.getElementById('entranceName');
+            const levelEl = document.getElementById('entranceLevel');
+            
+            nameEl.textContent = user.displayName || 'مستخدم';
+            
+            const magicInfo = getLevelInfo(user.magicPoints || 0);
+            const wealthInfo = getLevelInfo(user.wealthPoints || 0);
+            levelEl.textContent = `السحر Lv.${magicInfo.level} | الثروة Lv.${wealthInfo.level}`;
+            
+            // Check if user has entrance animation
+            if (user.entranceAnimation && storeData.itemsById[user.entranceAnimation]) {
+                const entranceItem = storeData.itemsById[user.entranceAnimation];
+                playSvga(entranceItem.fileUrl, container, { loops: 1, clearsAfterStop: true });
+            } else {
+                // Default entrance
+                container.innerHTML = '<div style="font-size: 100px; text-align: center;">✨</div>';
+            }
+            
+            overlay.classList.add('show');
+            
+            setTimeout(() => {
+                overlay.classList.remove('show');
+            }, 4000);
+        }
+
         function setupListeners() {
             const msgsRef = ref(rtdb, `roomMessages/${roomId}`);
             messagesUnsub = onValue(msgsRef, (snap) => {
@@ -888,9 +1063,12 @@
                 photoURL: currentUserData.photoURL,
                 activeFrame: currentUserData.activeFrame, 
                 activeBadges: currentUserData.activeBadges || [],
+                magicPoints: currentUserData.magicPoints || 0,
+                wealthPoints: currentUserData.wealthPoints || 0,
                 magicLevel: currentUserData.magicLevel || 1, 
                 wealthLevel: currentUserData.wealthLevel || 1, 
-                joinedAt: Date.now()
+                joinedAt: Date.now(),
+                entranceAnimation: currentUserData.entranceAnimation || null
             });
             onDisconnect(activeRef.child(currentUser.uid)).remove();
 
@@ -900,6 +1078,10 @@
                     if (!activeUsers[uid] && uid !== currentUser.uid && !joinedUsers.has(uid)) {
                         joinedUsers.add(uid);
                         showJoinNotification(u);
+                        // Show entrance animation for new users
+                        if (u.entranceAnimation) {
+                            showEntranceAnimation(u);
+                        }
                     }
                 });
                 activeUsers = newUsers;
@@ -941,7 +1123,7 @@
             const grid = document.getElementById('activeUsersGrid');
             grid.innerHTML = users.map(u => {
                 const frameHtml = u.activeFrame && storeData.itemsById[u.activeFrame] ? 
-                    `<img src="${storeData.itemsById[u.activeFrame].image}" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 55px; height: 55px; z-index: 2; pointer-events: none;">` : '';
+                    renderFrame(u.activeFrame, '55px') : '';
                 const roleBadge = u.uid === roomData.owner ? 
                     '<span style="font-size: 10px; background: rgba(34,197,94,0.3); color: #22c55e; padding: 2px 8px; border-radius: 8px;">👑 مالك</span>' : 
                     roomAdmins.includes(u.uid) ? 
@@ -960,6 +1142,47 @@
             }).join('');
         }
 
+        function renderFrame(frameId, size = '60px') {
+            const item = storeData.itemsById[frameId];
+            if (!item) return '';
+            
+            const containerId = 'frame-' + Math.random().toString(36).substr(2, 9);
+            
+            if (item.itemType === 'svga') {
+                setTimeout(() => {
+                    const container = document.getElementById(containerId);
+                    if (container) {
+                        playSvga(item.fileUrl, container, { loops: 0, clearsAfterStop: false });
+                    }
+                }, 100);
+                return `<div id="${containerId}" class="msg-frame-container" style="width: ${size}; height: ${size};"></div>`;
+            } else {
+                return `<img src="${item.image}" class="msg-frame-container" style="width: ${size}; height: ${size};" />`;
+            }
+        }
+
+        function renderBadges(badges) {
+            if (!badges || badges.length === 0) return '';
+            return badges.slice(0, 3).map(badgeId => {
+                const badge = storeData.itemsById[badgeId];
+                return badge ? `<img src="${badge.image}" class="badge-img" title="${badge.name}">` : '';
+            }).join('');
+        }
+
+        function renderLevelImages(magicPoints, wealthPoints) {
+            const magicInfo = getLevelInfo(magicPoints || 0);
+            const wealthInfo = getLevelInfo(wealthPoints || 0);
+            
+            let html = '';
+            if (storeData.magicLevels[magicInfo.level]) {
+                html += `<img src="${storeData.magicLevels[magicInfo.level].image}" class="level-img" title="السحر Lv.${magicInfo.level}">`;
+            }
+            if (storeData.wealthLevels[wealthInfo.level]) {
+                html += `<img src="${storeData.wealthLevels[wealthInfo.level].image}" class="level-img" title="الثروة Lv.${wealthInfo.level}">`;
+            }
+            return html;
+        }
+
         async function displayMessage(message) {
             const area = document.getElementById('chatArea');
             const miniArea = document.getElementById('miniChatArea');
@@ -967,7 +1190,13 @@
             let sender = activeUsers[message.senderId];
             if (!sender && message.senderId !== 'system') {
                 const snap = await getDoc(doc(db, 'users', message.senderId));
-                if (snap.exists()) sender = snap.data();
+                if (snap.exists()) {
+                    sender = snap.data();
+                    const magicInfo = getLevelInfo(sender.magicPoints || 0);
+                    const wealthInfo = getLevelInfo(sender.wealthPoints || 0);
+                    sender.magicLevel = magicInfo.level;
+                    sender.wealthLevel = wealthInfo.level;
+                }
             }
 
             const div = document.createElement('div');
@@ -993,12 +1222,9 @@
                 div.style.background = 'rgba(0,0,0,0.4)';
                 div.innerHTML = `<div style="font-size: 40px; animation: bounce 0.5s;">${message.text}</div>`;
             } else {
-                const frameHtml = sender?.activeFrame && storeData.itemsById[sender.activeFrame] ? 
-                    `<img src="${storeData.itemsById[sender.activeFrame].image}" class="msg-frame">` : '';
-                const badgesHtml = (sender?.activeBadges || []).slice(0, 3).map(b => {
-                    const badge = storeData.itemsById[b];
-                    return badge ? `<div class="active-badge"><img src="${badge.image}"></div>` : '';
-                }).join('');
+                const frameHtml = sender?.activeFrame ? renderFrame(sender.activeFrame) : '';
+                const badgesHtml = renderBadges(sender?.activeBadges);
+                const levelHtml = renderLevelImages(sender?.magicPoints, sender?.wealthPoints);
                 const roleIcon = message.senderId === roomData.owner ? '👑' : roomAdmins.includes(message.senderId) ? '⭐' : '';
                 
                 div.className = 'msg-bubble';
@@ -1007,12 +1233,11 @@
                         <img src="${sender?.photoURL || 'https://i.pravatar.cc/100'}" class="msg-avatar" onclick="openProfileById('${message.senderId}')">
                         ${frameHtml}
                     </div>
-                    <div>
+                    <div style="flex: 1;">
                         <div class="msg-user">
                             ${roleIcon} ${sender?.displayName || 'مستخدم'}
-                            <div class="active-badges">${badgesHtml}</div>
-                            <span class="badge b-wealth">W.${sender?.wealthLevel || 1}</span>
-                            <span class="badge b-magic">M.${sender?.magicLevel || 1}</span>
+                            <div class="level-display">${levelHtml}</div>
+                            <div class="badges-row">${badgesHtml}</div>
                         </div>
                         <div class="msg-text">${message.text}</div>
                     </div>
@@ -1026,7 +1251,6 @@
         }
 
         async function loadGiftLeaders() {
-            // Get gift messages from last 24 hours
             const msgsRef = ref(rtdb, `roomMessages/${roomId}`);
             onValue(msgsRef, (snap) => {
                 const msgs = snap.val() || {};
@@ -1075,6 +1299,11 @@
             const snap = await getDoc(doc(db, 'users', uid));
             if (!snap.exists()) return;
             window.currentProfileUser = { uid, ...snap.data() };
+            // Calculate levels
+            const magicInfo = getLevelInfo(window.currentProfileUser.magicPoints || 0);
+            const wealthInfo = getLevelInfo(window.currentProfileUser.wealthPoints || 0);
+            window.currentProfileUser.magicLevel = magicInfo.level;
+            window.currentProfileUser.wealthLevel = wealthInfo.level;
             updateProfileSheet();
             toggleSheet('profileSheet', true);
         };
@@ -1085,11 +1314,17 @@
             document.getElementById('p-id').textContent = `ID: ${u.uid}`;
             document.getElementById('p-img').src = u.photoURL || 'https://i.pravatar.cc/100';
             
-            const frame = document.getElementById('p-frame');
-            if (u.activeFrame && storeData.itemsById[u.activeFrame]) { 
-                frame.src = storeData.itemsById[u.activeFrame].image; 
-                frame.classList.remove('hidden'); 
-            } else frame.classList.add('hidden');
+            // Render frame
+            const frameContainer = document.getElementById('p-frame-container');
+            frameContainer.innerHTML = '';
+            if (u.activeFrame && storeData.itemsById[u.activeFrame]) {
+                const item = storeData.itemsById[u.activeFrame];
+                if (item.itemType === 'svga') {
+                    playSvga(item.fileUrl, frameContainer, { loops: 0, clearsAfterStop: false });
+                } else {
+                    frameContainer.innerHTML = `<img src="${item.image}" style="width: 100%; height: 100%; object-fit: contain;">`;
+                }
+            }
             
             document.getElementById('p-magic-level').textContent = `السحر Lv.${u.magicLevel || 1}`;
             document.getElementById('p-wealth-level').textContent = `الثروة Lv.${u.wealthLevel || 1}`;
@@ -1101,7 +1336,7 @@
             
             document.getElementById('p-badges').innerHTML = (u.activeBadges || []).map(b => {
                 const badge = storeData.itemsById[b];
-                return badge ? `<div style="width: 28px; height: 28px; border-radius: 6px; overflow: hidden;"><img src="${badge.image}" style="width: 100%; height: 100%; object-fit: cover;" title="${badge.name}"></div>` : '';
+                return badge ? `<img src="${badge.image}" style="width: 28px; height: 28px; object-fit: contain;" title="${badge.name}">` : '';
             }).join('');
 
             const canManage = (isRoomOwner || isRoomAdmin) && u.uid !== currentUser.uid && u.uid !== roomData.owner;
@@ -1277,11 +1512,9 @@
             
             const updates = {};
             if (selectedGift.type === 'magic') { 
-                updates.magicLevel = increment(1); 
-                updates.balance = increment(selectedGift.reward || 0); 
+                updates.magicPoints = increment(selectedGift.reward || 1000);
             } else if (selectedGift.type === 'wealth') { 
-                updates.wealthLevel = increment(1); 
-                updates.balance = increment(selectedGift.reward || 0); 
+                updates.wealthPoints = increment(selectedGift.reward || 1000);
             }
             if (Object.keys(updates).length) 
                 await updateDoc(doc(db, 'users', selectedRecipient.uid), updates);
@@ -1322,6 +1555,10 @@
 
         async function joinRoom() {
             await sendSystemMessage(`${currentUserData.displayName} انضم للغرفة`);
+            // Show own entrance animation
+            if (!entranceShown && currentUserData.entranceAnimation) {
+                showEntranceAnimation(currentUserData);
+            }
         }
 
         window.leaveRoom = async () => {
@@ -1330,6 +1567,16 @@
             if (messagesUnsub) off(ref(rtdb, `roomMessages/${roomId}`), 'value', messagesUnsub);
             if (activeUsersUnsub) off(ref(rtdb, `activeUsers/${roomId}`), 'value', activeUsersUnsub);
             window.location.href = 'afnan_ai_white.html';
+        };
+
+        window.minimizeRoom = () => {
+            // Send message to parent window to minimize
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage({ action: 'minimizeRoom', roomId }, '*');
+            }
+            // Or use session storage to track minimized state
+            sessionStorage.setItem('room_minimized', JSON.stringify({ roomId, timestamp: Date.now() }));
+            window.blur();
         };
 
         window.toggleSheet = (id, show) => {
@@ -1407,27 +1654,6 @@
             if (roomData?.owner) openProfileById(roomData.owner); 
         };
 
-        let micEnabled = false;
-        let soundEnabled = true;
-        
-        window.toggleMic = () => {
-            micEnabled = !micEnabled;
-            document.getElementById('micIcon').style.filter = micEnabled ? 'none' : 'invert(1)';
-            document.getElementById('micIcon').src = micEnabled ? 
-                'https://cdn-icons-png.flaticon.com/512/709/709681.png' : 
-                'https://cdn-icons-png.flaticon.com/512/709/709682.png';
-            showNotification(micEnabled ? 'الميكروفون مفعل' : 'الميكروفون mute');
-        };
-        
-        window.toggleSound = () => {
-            soundEnabled = !soundEnabled;
-            document.getElementById('soundIcon').style.filter = soundEnabled ? 'invert(1)' : 'none';
-            document.getElementById('soundIcon').src = soundEnabled ? 
-                'https://cdn-icons-png.flaticon.com/512/727/727269.png' : 
-                'https://cdn-icons-png.flaticon.com/512/727/727240.png';
-            showNotification(soundEnabled ? 'الصوت مفعل' : 'الصوت mute');
-        };
-
         function showNotification(msg) {
             const existing = document.querySelector('.notification');
             if (existing) existing.remove();
@@ -1445,6 +1671,13 @@
 
         window.addEventListener('beforeunload', () => {
             if (currentUser && roomId) remove(ref(rtdb, `activeUsers/${roomId}/${currentUser.uid}`));
+        });
+
+        // Listen for messages from parent window
+        window.addEventListener('message', (e) => {
+            if (e.data.action === 'closeRoom') {
+                leaveRoom();
+            }
         });
     </script>
 </body>
