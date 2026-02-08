@@ -65,8 +65,8 @@
             justify-content: center;
         }
         .avatar-frame-container .avatar-img {
-            width: 50px;
-            height: 50px;
+            width: 75%;
+            height: 75%;
             border-radius: 50%;
             object-fit: cover;
             position: absolute;
@@ -571,8 +571,8 @@
             margin: 0 auto 25px;
         }
         .profile-avatar {
-            width: 90px;
-            height: 90px;
+            width: 70%;
+            height: 70%;
             border-radius: 50%;
             object-fit: cover;
             position: absolute;
@@ -1434,17 +1434,32 @@
         }
 
         async function displayMessage(message) {
+            if (message.deleted) return;
             const area = document.getElementById('chatArea');
             const miniArea = document.getElementById('miniChatArea');
             
             let sender = activeUsers[message.senderId];
             if (!sender && message.senderId !== 'system') {
-                const snap = await getDoc(doc(db, 'users', message.senderId));
-                if (snap.exists()) {
-                    sender = snap.data();
-                    sender.magicLevel = getLevelInfo(sender.magicPoints || 0).level;
-                    sender.wealthLevel = getLevelInfo(sender.wealthPoints || 0).level;
+                // Try to use cached sender data from message first for old messages
+                if (message.senderName && message.senderPhoto) {
+                    sender = {
+                        displayName: message.senderName,
+                        photoURL: message.senderPhoto,
+                        activeFrame: message.senderFrame,
+                        activeBadges: message.senderBadges || [],
+                        magicPoints: message.senderMagicPoints || 0,
+                        wealthPoints: message.senderWealthPoints || 0
+                    };
+                } else {
+                    const snap = await getDoc(doc(db, 'users', message.senderId));
+                    if (snap.exists()) {
+                        sender = snap.data();
+                    }
                 }
+            }
+            if (sender) {
+                sender.magicLevel = getLevelInfo(sender.magicPoints || 0).level;
+                sender.wealthLevel = getLevelInfo(sender.wealthPoints || 0).level;
             }
 
             const div = document.createElement('div');
@@ -1515,21 +1530,44 @@
             const msgsRef = collection(db, 'roomMessages', roomId, 'messages');
             const q = query(msgsRef, where('type', '==', 'gift'));
             
-            onSnapshot(q, (snapshot) => {
+            onSnapshot(q, async (snapshot) => {
                 const giftStats = {};
-                snapshot.forEach(doc => {
-                    const m = doc.data();
+                for (const docSnap of snapshot.docs) {
+                    const m = docSnap.data();
                     if (!giftStats[m.senderId]) {
+                        let photo = m.senderPhoto || 'https://i.pravatar.cc/100';
+                        let name = m.senderName || 'مستخدم';
+                        let frame = m.senderFrame || null;
+                        
+                        // If no data in message, try to get from active users or firestore
+                        if (!m.senderPhoto) {
+                            const u = activeUsers[m.senderId];
+                            if (u) {
+                                photo = u.photoURL;
+                                name = u.displayName;
+                                frame = u.activeFrame;
+                            } else {
+                                const uSnap = await getDoc(doc(db, 'users', m.senderId));
+                                if (uSnap.exists()) {
+                                    const ud = uSnap.data();
+                                    photo = ud.photoURL;
+                                    name = ud.displayName;
+                                    frame = ud.activeFrame;
+                                }
+                            }
+                        }
+
                         giftStats[m.senderId] = { 
                             uid: m.senderId, 
                             total: 0,
-                            displayName: m.senderName || activeUsers[m.senderId]?.displayName || 'مستخدم',
-                            photoURL: activeUsers[m.senderId]?.photoURL || 'https://i.pravatar.cc/100'
+                            displayName: name,
+                            photoURL: photo,
+                            activeFrame: frame
                         };
                     }
                     const gift = storeData.gifts.find(g => g.id === m.giftId);
                     giftStats[m.senderId].total += (m.quantity || 1) * (gift?.price || 0);
-                });
+                }
                 
                 giftLeaders = Object.values(giftStats)
                     .sort((a, b) => b.total - a.total)
@@ -1543,7 +1581,7 @@
             const container = document.getElementById('leaderboardList');
             container.innerHTML = giftLeaders.map((user, index) => {
                 const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
-                const frameHtml = renderFrameHTML(activeUsers[user.uid]?.activeFrame, '55px');
+                const frameHtml = renderFrameHTML(user.activeFrame, '55px');
                 return `
                     <div class="leaderboard-item">
                         <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
@@ -1690,7 +1728,13 @@
             if (mutedUsers.includes(currentUser.uid)) return showNotification('لا يمكنك الكتابة');
             
             const msgData = {
-                senderId: currentUser.uid, 
+                senderId: currentUser.uid,
+                senderName: currentUserData.displayName,
+                senderPhoto: currentUserData.photoURL,
+                senderFrame: currentUserData.activeFrame,
+                senderBadges: currentUserData.activeBadges || [],
+                senderMagicPoints: currentUserData.magicPoints || 0,
+                senderWealthPoints: currentUserData.wealthPoints || 0,
                 text, 
                 timestamp: Date.now(), 
                 type: 'message'
@@ -1707,7 +1751,13 @@
 
         window.sendEmoji = async (emoji) => {
             const msgData = {
-                senderId: currentUser.uid, 
+                senderId: currentUser.uid,
+                senderName: currentUserData.displayName,
+                senderPhoto: currentUserData.photoURL,
+                senderFrame: currentUserData.activeFrame,
+                senderBadges: currentUserData.activeBadges || [],
+                senderMagicPoints: currentUserData.magicPoints || 0,
+                senderWealthPoints: currentUserData.wealthPoints || 0,
                 text: emoji, 
                 timestamp: Date.now(), 
                 type: 'emoji'
@@ -1823,6 +1873,11 @@
             const msgData = {
                 senderId: currentUser.uid,
                 senderName: currentUserData.displayName,
+                senderPhoto: currentUserData.photoURL,
+                senderFrame: currentUserData.activeFrame,
+                senderBadges: currentUserData.activeBadges || [],
+                senderMagicPoints: currentUserData.magicPoints || 0,
+                senderWealthPoints: currentUserData.wealthPoints || 0,
                 recipientId: selectedRecipient.uid, 
                 recipientName: selectedRecipient.displayName, 
                 giftId: selectedGift.id, 

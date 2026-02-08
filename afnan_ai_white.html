@@ -512,36 +512,48 @@
 
     async function loadRooms() {
         const rSnap = await getDocs(collection(db, "rooms"));
-        const roomsRef = ref(rtdb, 'rooms');
+        const prSnap = await getDocs(collection(db, "privateRooms"));
+        const roomsRef = ref(rtdb, 'activeUsers'); // Changed to activeUsers as per RTDB structure in room.html
+        
         onValue(roomsRef, (snapshot) => {
-            const rtdbRooms = snapshot.val() || {};
+            const activeUsersData = snapshot.val() || {};
+            
+            // Map public rooms
             roomsData = rSnap.docs.map(d => {
                 const r = d.data();
-                const activeUsersCount = rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0;
+                const activeUsersCount = activeUsersData[d.id] ? Object.keys(activeUsersData[d.id]).length : 0;
                 return { id: d.id, ...r, activeUsersCount, isPublic: true };
-            }).sort((a, b) => b.activeUsersCount - a.activeUsersCount);
+            });
+
+            // Map private rooms
+            privateRoomsData = prSnap.docs.map(d => {
+                const r = d.data();
+                const activeUsersCount = activeUsersData[d.id] ? Object.keys(activeUsersData[d.id]).length : 0;
+                return { id: d.id, ...r, activeUsersCount, isPublic: false };
+            });
+
             renderRooms();
         });
     }
 
     async function loadPrivateRooms() {
-        const prSnap = await getDocs(collection(db, "privateRooms"));
-        const roomsRef = ref(rtdb, 'rooms');
-        onValue(roomsRef, (snapshot) => {
-            const rtdbRooms = snapshot.val() || {};
-            privateRoomsData = prSnap.docs.map(d => {
-                const r = d.data();
-                const activeUsersCount = rtdbRooms[d.id]?.users ? Object.keys(rtdbRooms[d.id].users).length : 0;
-                return { id: d.id, ...r, activeUsersCount, isPublic: false };
-            }).filter(r => r.activeUsersCount > 0); // Only show private rooms with users
-        });
+        // This is now handled within loadRooms for better synchronization
     }
 
     function renderRooms() {
         const grid = document.getElementById('roomsGrid');
         // Combine public and active private rooms
-        const allRooms = [...roomsData, ...privateRoomsData];
-        allRooms.sort((a, b) => b.activeUsersCount - a.activeUsersCount);
+        // We show all public rooms + private rooms that have active users
+        const activePrivateRooms = privateRoomsData.filter(r => r.activeUsersCount > 0);
+        const allRooms = [...roomsData, ...activePrivateRooms];
+        
+        // Sort: Active rooms first, then by user count
+        allRooms.sort((a, b) => {
+            if (b.activeUsersCount !== a.activeUsersCount) {
+                return b.activeUsersCount - a.activeUsersCount;
+            }
+            return b.isPublic - a.isPublic; // Public rooms first if counts are equal
+        });
         
         grid.innerHTML = allRooms.map((r, index) => {
             let rankClass = '';
@@ -614,11 +626,8 @@
     };
 
     window.showFollowingRooms = () => {
-        document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
-        document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
-        document.getElementById('btn-following').classList.replace('text-gray-500', 'bg-white');
+        filterRooms('following');
         document.getElementById('roomsGrid').classList.add('hidden');
-        document.getElementById('privateRoomContainer').classList.add('hidden');
         document.getElementById('followingRoomsContainer').classList.remove('hidden');
         
         const followingGrid = document.getElementById('followingRoomsGrid');
@@ -658,18 +667,28 @@
     };
 
     window.filterRooms = (t) => {
-        document.getElementById('btn-public').classList.replace('text-gray-500', 'bg-white');
-        document.getElementById('btn-private').classList.replace('bg-white', 'text-gray-500');
-        document.getElementById('btn-following').classList.replace('bg-white', 'text-gray-500');
+        const btnPublic = document.getElementById('btn-public');
+        const btnPrivate = document.getElementById('btn-private');
+        const btnFollowing = document.getElementById('btn-following');
+        
+        // Reset classes
+        [btnPublic, btnPrivate, btnFollowing].forEach(btn => {
+            btn.classList.remove('bg-white', 'shadow-sm', 'text-black');
+            btn.classList.add('text-gray-500');
+        });
+
+        // Set active class
+        const activeBtn = t === 'public' ? btnPublic : t === 'private' ? btnPrivate : btnFollowing;
+        activeBtn.classList.add('bg-white', 'shadow-sm', 'text-black');
+        activeBtn.classList.remove('text-gray-500');
+
         document.getElementById('roomsGrid').classList.remove('hidden');
         document.getElementById('privateRoomContainer').classList.add('hidden');
         document.getElementById('followingRoomsContainer').classList.add('hidden');
     };
 
     window.showPrivateRoom = () => {
-        document.getElementById('btn-public').classList.replace('bg-white', 'text-gray-500');
-        document.getElementById('btn-private').classList.replace('text-gray-500', 'bg-white');
-        document.getElementById('btn-following').classList.replace('bg-white', 'text-gray-500');
+        filterRooms('private');
         document.getElementById('roomsGrid').classList.add('hidden');
         document.getElementById('privateRoomContainer').classList.remove('hidden');
         document.getElementById('followingRoomsContainer').classList.add('hidden');
