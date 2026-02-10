@@ -57,16 +57,16 @@
         /* Frame Container - Frame covers the entire avatar */
         .avatar-frame-container {
             position: relative;
-            width: 70px;
-            height: 70px;
+            width: 65px; /* حاوية مشدودة على حجم الإطار */
+            height: 65px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .avatar-frame-container .avatar-img {
-            width: 45px; /* تصغير الصورة قليلاً لتناسب داخل الإطار */
-            height: 45px;
+            width: 70%; /* الصورة تأخذ مساحة داخلية نسبية من الإطار */
+            height: 70%;
             border-radius: 50%;
             object-fit: cover;
             position: relative;
@@ -76,11 +76,10 @@
         /* General Frame Overlay Style */
         .frame-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 70px; /* الإطار يغطي الحاوية بالكامل */
-            height: 70px;
+            top: 0;
+            left: 0;
+            width: 100%; /* الإطار يملأ الحاوية المشدودة بالكامل */
+            height: 100%;
             z-index: 10;
             pointer-events: none;
             display: flex;
@@ -564,16 +563,16 @@
         /* Profile Sheet */
         .profile-avatar-wrapper {
             position: relative;
-            width: 130px;
-            height: 130px;
+            width: 120px; /* حاوية مشدودة للبروفايل */
+            height: 120px;
             margin: 0 auto 25px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         .profile-avatar {
-            width: 85px; /* تصغير الصورة قليلاً لتناسب داخل الإطار */
-            height: 85px;
+            width: 70%; /* الصورة تأخذ مساحة داخلية من الإطار */
+            height: 70%;
             border-radius: 50%;
             object-fit: cover;
             z-index: 1;
@@ -581,11 +580,10 @@
         }
         .profile-frame-container {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 130px; /* الإطار يغطي الحاوية بالكامل */
-            height: 130px;
+            top: 0;
+            left: 0;
+            width: 100%; /* الإطار يملأ الحاوية بالكامل */
+            height: 100%;
             z-index: 2;
             pointer-events: none;
             display: flex;
