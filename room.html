@@ -60,38 +60,33 @@
             width: 70px;
             height: 70px;
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .avatar-frame-container .avatar-img {
-            width: 75%;
-            height: 75%;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             object-fit: cover;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
             z-index: 1;
         }
         /* General Frame Overlay Style */
         .frame-overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10; /* Ensure it's always on top */
+            top: 0;
+            left: 0;
+            width: 70px;
+            height: 70px;
+            z-index: 10;
             pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         .frame-overlay img,
         .frame-overlay canvas {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain;
+            width: 70px !important;
+            height: 70px !important;
+            object-fit: cover;
+            display: block;
         }
         
         .msg-user { 
@@ -563,41 +558,38 @@
             to { opacity: 1; transform: translateY(0) } 
         }
         
-        /* Profile Sheet */
-        .profile-avatar-wrapper {
+        /* Profile Sheet */        .profile-avatar-container {
             position: relative;
             width: 130px;
             height: 130px;
             margin: 0 auto 25px;
         }
         .profile-avatar {
-            width: 70%;
-            height: 70%;
+            width: 130px;
+            height: 130px;
             border-radius: 50%;
             object-fit: cover;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
             z-index: 1;
             border: 3px solid rgba(255,255,255,0.3);
         }
         .profile-frame-container {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
             width: 130px;
             height: 130px;
             z-index: 2;
             pointer-events: none;
         }
         .profile-frame-container img, .profile-frame-container canvas {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain;
-        }
-        .tool-btn { 
+            width: 130px !important;
+            height: 130px !important;
+            object-fit: cover;
+            display: block;
+        }        .tool-btn { 
             width: 55px; 
             height: 55px; 
             border-radius: 15px; 
@@ -1281,14 +1273,15 @@
         }
 
         function setupListeners() {
-            // Load messages from Firestore (persistent)
+            // Load only recent messages (last 5 minutes) from Firestore
             const messagesRef = collection(db, 'roomMessages', roomId, 'messages');
-            const q = query(messagesRef, orderBy('timestamp', 'desc'), limit(100));
+            const fiveMinutesAgo = Date.now() - (5 * 60 * 1000);
+            const q = query(messagesRef, where('timestamp', '>=', fiveMinutesAgo), orderBy('timestamp', 'asc'));
             
             onSnapshot(q, (snapshot) => {
                 const msgs = [];
                 snapshot.forEach(doc => {
-                    msgs.unshift({ id: doc.id, ...doc.data() });
+                    msgs.push({ id: doc.id, ...doc.data() });
                 });
                 
                 document.getElementById('chatArea').innerHTML = '';
@@ -1528,9 +1521,13 @@
 
         async function loadGiftLeaders() {
             const msgsRef = collection(db, 'roomMessages', roomId, 'messages');
-            const q = query(msgsRef, where('type', '==', 'gift'));
+            const q = query(msgsRef, where('type', '==', 'gift'), orderBy('timestamp', 'desc'));
             
             onSnapshot(q, async (snapshot) => {
+                if (snapshot.empty) {
+                    document.getElementById('leaderboardList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">لا يوجد داعمين حتى الآن</div>';
+                    return;
+                }
                 const giftStats = {};
                 for (const docSnap of snapshot.docs) {
                     const m = docSnap.data();

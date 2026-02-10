@@ -542,10 +542,17 @@
 
     function renderRooms() {
         const grid = document.getElementById('roomsGrid');
+        if (!grid) return;
+        
         // Combine public and active private rooms
         // We show all public rooms + private rooms that have active users
         const activePrivateRooms = privateRoomsData.filter(r => r.activeUsersCount > 0);
         const allRooms = [...roomsData, ...activePrivateRooms];
+        
+        if (allRooms.length === 0) {
+            grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">لا توجد غرف متاحة</div>';
+            return;
+        }
         
         // Sort: Active rooms first, then by user count
         allRooms.sort((a, b) => {
