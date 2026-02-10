@@ -60,32 +60,38 @@
             width: 70px;
             height: 70px;
             flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .avatar-frame-container .avatar-img {
-            width: 70px;
-            height: 70px;
+            width: 50px; /* تصغير الصورة لتناسب الإطار */
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             z-index: 1;
+            border: 2px solid rgba(255,255,255,0.2);
         }
         /* General Frame Overlay Style */
         .frame-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 70px;
-            height: 70px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 75px; /* الإطار أكبر قليلاً من الصورة */
+            height: 75px;
             z-index: 10;
             pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .frame-overlay img,
         .frame-overlay canvas {
-            width: 70px !important;
-            height: 70px !important;
-            object-fit: cover;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
             display: block;
         }
         
@@ -411,7 +417,7 @@
         .rank-other { background: rgba(255,255,255,0.1); color: #fff; }
         .leaderboard-avatar-wrapper {
             position: relative;
-            width: 60px; /* Increased to accommodate larger frame */
+            width: 60px;
             height: 60px;
             display: flex;
             align-items: center;
@@ -422,10 +428,7 @@
             height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            position: relative;
             z-index: 1;
             border: 2px solid rgba(255,255,255,0.2);
         }
@@ -565,29 +568,34 @@
             margin: 0 auto 25px;
         }
         .profile-avatar {
-            width: 130px;
-            height: 130px;
+            width: 90px; /* تصغير صورة البروفايل في النافذة */
+            height: 90px;
             border-radius: 50%;
             object-fit: cover;
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             z-index: 1;
             border: 3px solid rgba(255,255,255,0.3);
         }
         .profile-frame-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 130px;
-            height: 130px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px; /* الإطار أكبر من الصورة */
+            height: 140px;
             z-index: 2;
             pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .profile-frame-container img, .profile-frame-container canvas {
-            width: 130px !important;
-            height: 130px !important;
-            object-fit: cover;
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: contain;
             display: block;
         }        .tool-btn { 
             width: 55px; 
@@ -1383,7 +1391,7 @@
             }).join('');
         }
 
-        function renderFrameHTML(frameId, size = '70px') {
+        function renderFrameHTML(frameId, size = '75px') {
             if (!frameId) return '';
             const item = storeData.itemsById[frameId];
             if (!item) return '';
@@ -1578,7 +1586,7 @@
             const container = document.getElementById('leaderboardList');
             container.innerHTML = giftLeaders.map((user, index) => {
                 const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
-                const frameHtml = renderFrameHTML(user.activeFrame, '55px');
+                const frameHtml = renderFrameHTML(user.activeFrame, '60px');
                 return `
                     <div class="leaderboard-item">
                         <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
